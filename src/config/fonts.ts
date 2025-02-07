@@ -1,0 +1,17 @@
+export enum Fonts {
+  Inter = 'Inter',
+  MORANGA_LIGHT = 'Moranga',
+  GILROY_REGULAR = 'Gilroy-Regular',
+  GILROY_MEDIUM = 'Gilroy-Medium',
+  GILROY_SEMIBOLD = 'Gilroy-SemiBold',
+  GILROY_BOLD = 'Gilroy-Bold',
+  GILROY_EXTRABOLD = 'Gilroy-ExtraBold',
+  CAIRO_REGULAR = 'Cairo-Regular',
+  CAIRO_MEDIUM = 'Cairo-Medium',
+  CAIRO_SEMIBOLD = 'Cairo-SemiBold',
+  CAIRO_BOLD = 'Cairo-Bold',
+  POPPINS_REGULAR = 'Poppins-Regular',
+  POPPINS_MEDIUM = 'Poppins-Medium',
+  POPPINS_BOLD = 'Poppins-Bold',
+  POPPINS_SEMIBOLD = 'Poppins-SemiBold',
+}
