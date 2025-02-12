@@ -27,6 +27,7 @@ export enum TypographyVariant {
   BODY_SMALL_BOLD = 'body-small-bold',
   BODY_SMALL_CAPTION = 'body-small-caption',
   BODY_XSMALL_PRICE = 'body-xsmal_price',
+  BODY_LARGE_PAGE = 'body-large-page',
 
   // Label
   LABEL_LARGE = 'label-large',

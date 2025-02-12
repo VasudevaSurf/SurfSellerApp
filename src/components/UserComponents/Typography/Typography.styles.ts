@@ -55,6 +55,12 @@ export const textBaseStyles = StyleSheet.create({
     fontWeight: 'normal',
     fontFamily: Fonts.Inter,
   },
+  [TypographyVariant.BODY_LARGE_PAGE]: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: 'normal',
+    fontFamily: Fonts.POPPINS_BOLD,
+  },
   [TypographyVariant.BODY_MEDIUM]: {
     fontSize: 16,
     lineHeight: 24,

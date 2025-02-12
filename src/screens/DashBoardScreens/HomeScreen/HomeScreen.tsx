@@ -26,6 +26,9 @@ const HomeScreen = () => {
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
         name="WOW Shop"
+        image={{
+          source: require('../../../assets/images/placeholder-profile.png'),
+        }}
         rightIcons={[
           {
             icon: SearchIcon,

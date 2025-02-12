@@ -70,6 +70,7 @@ export const ColorPalette: Record<string, ColorValue> = {
    */
   TextPrimary: '#333333',
   TextSecondary: '#606060',
+  TextTertiary: '#433E3F',
   TextInversePrimary: '#FFFFFF',
   TextInverseSecondary: '#FFFFFF8F',
   TextDisabled: '#ABA6B3',

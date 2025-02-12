@@ -9,31 +9,26 @@ import {headerStyles} from './Header.styles';
 import {HeaderProps} from './Header.types';
 
 export const Header: React.FC<HeaderProps> = ({
-  profileImage,
+  image,
   name,
   rightIcons,
+  variant = TypographyVariant.BODY_MEDIUM,
+  textColor = ColorPalette.TextPrimary,
 }) => {
   return (
     <View style={headerStyles.container}>
       <View style={headerStyles.leftSection}>
-        {profileImage ? (
+        {image && (
           <Image
-            source={{uri: profileImage}}
-            style={headerStyles.profileImage}
-          />
-        ) : (
-          <View
-            style={[
-              headerStyles.profileImage,
-              {backgroundColor: ColorPalette.DeepPurple100},
-            ]}
+            source={image.source || {uri: image.uri}}
+            style={[headerStyles.profileImage, image.style]}
           />
         )}
-        <View style={headerStyles.nameContainer}>
+        <View style={[headerStyles.nameContainer, !image && {marginLeft: 0}]}>
           <Typography
-            variant={TypographyVariant.BODY_MEDIUM}
+            variant={variant}
             text={name}
-            customTextStyles={{color: ColorPalette.TextPrimary}}
+            customTextStyles={{color: textColor}}
           />
         </View>
       </View>

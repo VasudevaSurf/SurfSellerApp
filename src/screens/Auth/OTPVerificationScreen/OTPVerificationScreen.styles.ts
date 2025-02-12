@@ -60,9 +60,9 @@ export const styles = StyleSheet.create({
   },
   otpInputContainer: {
     width: '100%',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
     gap: getFigmaDimension(16),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   otpBox: {
     borderWidth: 1,

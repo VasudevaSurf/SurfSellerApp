@@ -1,3 +1,5 @@
+import {TypographyVariant} from '../Typography/Typography.types';
+
 export interface HeaderIconProps {
   icon: React.FC<{
     size?: number;
@@ -12,7 +14,13 @@ export interface HeaderIconProps {
 }
 
 export interface HeaderProps {
-  profileImage?: string;
+  image?: {
+    uri?: string;
+    source?: any;
+    style?: any;
+  };
   name: string;
   rightIcons: HeaderIconProps[];
+  variant?: TypographyVariant;
+  textColor?: string;
 }
