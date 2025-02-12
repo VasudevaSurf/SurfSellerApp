@@ -12,7 +12,20 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: ColorPalette.BackgroundPrimary,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row'
+    flexDirection: 'row',
+  },
+  successContainer: {
+    paddingTop: Platform.OS === 'android' ? getScreenHeight(3) : 0,
+    flex: 1,
+    backgroundColor: ColorPalette.BackgroundPrimary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+  },
+  secondaryContainer: {
+    paddingTop: Platform.OS === 'android' ? getScreenHeight(3) : 0,
+    flex: 1,
+    backgroundColor: ColorPalette.BackgroundPrimary,
   },
   container: {
     flex: 1,

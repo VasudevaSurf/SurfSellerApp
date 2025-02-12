@@ -1,9 +1,9 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import {TouchableOpacity, Text} from 'react-native';
 
-import { TypographyProps } from './Typography.types';
+import {TypographyProps} from './Typography.types';
 
-import { textBaseStyles } from './Typography.styles';
+import {textBaseStyles} from './Typography.styles';
 
 /**
  * Typography: A component for displaying text with various styles and variants.

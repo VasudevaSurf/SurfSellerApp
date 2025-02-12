@@ -1,0 +1,43 @@
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../config/colorPalette';
+import { convertDipToPixels, getScreenWidth } from '../../../helpers/screenSize';
+import { BorderRadius, Spacing } from '../../../config/globalStyles';
+
+export const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: ColorPalette.BackgroundPrimary,
+    gap: getScreenWidth(1),
+  },
+  codeContainer: {
+    borderWidth: 1,
+    borderRadius: BorderRadius.Medium,
+    borderColor: ColorPalette.SurfacePrimary,
+    height: convertDipToPixels(58),
+    width: getScreenWidth(13.6),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: ColorPalette.SurfacePrimary,
+  },
+  codeText: {
+    color: ColorPalette.TextSecondary,
+    marginTop: Spacing.XXSmall,
+  },
+  hiddenInput: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0,
+  },
+  stick: {
+    width: 2,
+    height: 30,
+  },
+  dash: {
+    alignSelf: 'center',
+    marginHorizontal: getScreenWidth(1.5),
+  },
+  dashText: {
+    color: ColorPalette.TextSecondary,
+  },
+});

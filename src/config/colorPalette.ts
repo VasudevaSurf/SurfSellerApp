@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 /* eslint-disable typescript-sort-keys/string-enum */
 
-import { ColorValue } from 'react-native';
+import {ColorValue} from 'react-native';
 
 /**
  * Enum for color palette
@@ -12,6 +12,24 @@ export const ColorPalette: Record<string, ColorValue> = {
    */
   BackgroundPrimary: '#ffffff',
   BackgroundSecondary: '#302143',
+
+  InputBack: '#E8E8E8',
+
+  IconBack: '#DCFCE7',
+  countColor: '#22C55E',
+
+  smallBack: '#FEF3C7',
+
+  Warning500: '#DFB400',
+  Warning50: 'rgba(223, 180, 0, 0.10)',
+
+  Error500: '#D00416',
+  Error50: 'rgba(208, 4, 22, 0.10)',
+
+  Success500: '#1FC16B',
+  Success50: 'rgba(31, 193, 107, 0.10)',
+
+  TextName: '#8E8E8E',
 
   /**
    * Surface color tokens
@@ -27,11 +45,26 @@ export const ColorPalette: Record<string, ColorValue> = {
   /**
    * Border color tokens
    */
-  BorderPrimary: '#9101CF',
+  BorderPrimary: '#4A4A4A',
   BorderSecondary: '#EAE9EC',
   BorderError: '#D82948',
   BorderAction: '#302143',
 
+  ButtonPrimary: '#9101CF',
+
+  IconNotFocus: '#777777',
+
+  HomeBack: '#F7E3FF',
+
+  IconMini: '#FEE2E2',
+
+  ContainerBack: '#FAEEFF',
+
+  ButtonBackHome: '#F3F4F6',
+
+  ViewAll: '#BB20FE',
+
+  Divider: '#D2D2D2',
   /**
    * Text color tokens
    */
@@ -43,6 +76,8 @@ export const ColorPalette: Record<string, ColorValue> = {
   TextAction: '#302143',
   TextSuccess: '#198522',
   TextError: '#D82948',
+  TextSmall: '#4A4A4A',
+  TextUnfocus: '#B2B2B2',
 
   /**
    * Icon color tokens

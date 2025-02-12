@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../config/colorPalette';
-import {Spacing} from '../../config/globalStyles';
-import {getFigmaDimension} from '../../helpers/screenSize';
+import {ColorPalette} from '../../../config/colorPalette';
+import {Spacing} from '../../../config/globalStyles';
+import {getFigmaDimension} from '../../../helpers/screenSize';
 
 export const buttonStyles = StyleSheet.create({
   baseButton: {
@@ -12,13 +12,18 @@ export const buttonStyles = StyleSheet.create({
     width: '100%',
     height: getFigmaDimension(58),
   },
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   primaryButton: {
-    backgroundColor: ColorPalette.BorderPrimary,
+    backgroundColor: ColorPalette.ButtonPrimary,
   },
   secondaryButton: {
     backgroundColor: ColorPalette.White,
     borderWidth: getFigmaDimension(1),
-    borderColor: ColorPalette.BorderPrimary,
+    borderColor: ColorPalette.ButtonPrimary,
   },
   tertiaryButton: {
     backgroundColor: 'transparent',

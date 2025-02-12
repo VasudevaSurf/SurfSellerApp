@@ -1,10 +1,11 @@
 import React, {useEffect, useRef} from 'react';
-import {View, Image, Animated} from 'react-native';
-import {Typography} from '../../../components/Typography/Typography';
-import {TypographyVariant} from '../../../components/Typography/Typography.types';
+import {View, Animated} from 'react-native';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {STATIC_TEXT} from '../../../config/staticText';
 import {globalStyles} from '../../../config/globalStyles';
 import {styles} from './SplashScreen.styles';
+import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
 
 const {surfTitle, surfCaption} = STATIC_TEXT.screens.onboarding;
 
@@ -31,30 +32,17 @@ const SplashScreen = ({navigation}) => {
         {...globalStyles.primaryContainer, ...styles.mainContainer},
         {opacity: fadeAnim},
       ]}>
-      <View style={styles.primaryContainer}>
-        <Image
-          source={require('../../../assets/images/logo.png')}
-          style={styles.imgOne}
-          resizeMode="contain"
-        />
-        <Image
-          source={require('../../../assets/images/surfName.png')}
-          style={styles.imgTwo}
-          resizeMode="contain"
-        />
-      </View>
-      <View style={styles.secondaryContainer}>
-        <Typography
-          variant={TypographyVariant.HEADING_SMALL}
-          text="|"
-          customTextStyles={styles.separator}
-        />
-        <Typography
-          variant={TypographyVariant.HEADING_SMALL}
-          text={surfTitle}
-          customTextStyles={styles.modalHeading}
-        />
-      </View>
+      <MainBanner
+        surfTitle={surfTitle}
+        customStyles={{
+          primaryContainer: styles.primaryContainer,
+          secondaryContainer: styles.secondaryContainer,
+          logoImage: styles.imgOne,
+          surfNameImage: styles.imgTwo,
+          separator: styles.separator,
+          heading: styles.modalHeading,
+        }}
+      />
       <View style={styles.footerContainer}>
         <Typography
           variant={TypographyVariant.BODY_MEDIUM}

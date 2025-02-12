@@ -1,10 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Image, ScrollView, View } from 'react-native';
-import { Button } from '../../../components/Button/Button';
-import { ButtonVariant } from '../../../components/Button/Button.types';
-import { Typography } from '../../../components/Typography/Typography';
-import { TypographyVariant } from '../../../components/Typography/Typography.types';
-import { styles } from './WelcomeScreen.styles';
+import React, {useEffect, useRef, useState} from 'react';
+import {Animated, Dimensions, Image, ScrollView, View} from 'react-native';
+import {Button} from '../../../components/UserComponents/Button/Button';
+import {ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {styles} from './WelcomeScreen.styles';
+import {navigate} from '../../../navigation/utils/navigationRef';
+import {STATIC_TEXT} from '../../../config/staticText';
+
+const {createAccount, login} = STATIC_TEXT.screens.welcomeScreen;
 
 const AnimatedPaginationIndicator = ({scrollX, contentLength, width}) => {
   return (
@@ -126,6 +130,14 @@ const WelcomeScreen = () => {
     startAutoScroll();
   };
 
+  const handleLogin = () => {
+    navigate('Auth', {screen: 'PhoneNumber'});
+  };
+
+  const handleCreateNewAccount = () => {
+    navigate('Create', {screen: 'CreateAccount'});
+  };
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
@@ -173,17 +185,13 @@ const WelcomeScreen = () => {
 
         <View style={styles.buttonContainer}>
           <Button
-            text="Create New Account"
-            onPress={() => {
-              /* handle account creation */
-            }}
+            text={createAccount}
+            onPress={handleCreateNewAccount}
             variant={ButtonVariant.PRIMARY}
           />
           <Button
-            text="Login"
-            onPress={() => {
-              /* handle login */
-            }}
+            text={login}
+            onPress={handleLogin}
             variant={ButtonVariant.SECONDARY}
           />
         </View>
