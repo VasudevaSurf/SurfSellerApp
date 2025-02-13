@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {ScrollView, View} from 'react-native';
+import {ScrollView, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Header} from '../../../components/UserComponents/Header/Header';
 import {FilterModal} from '../../../components/MainComponents/FilterModal/FilterModal';
@@ -14,10 +14,18 @@ import {styles} from './ProductScreen.styles';
 import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {ProductInfo} from '../../../components/MainComponents/ProductInfo/ProductInfo';
+import PlusIcon from '../../../assets/icons/PlusIcon';
+import {AddModal} from '../../../components/MainComponents/AddModal/AddModal';
 
 const ProductScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const handleAddProduct = (method: 'csv' | 'manual') => {
+    console.log(`Adding product via ${method}`);
+    setShowAddModal(false);
+  };
 
   const [products, setProducts] = useState([
     {
@@ -191,7 +199,18 @@ const ProductScreen = () => {
           }}
           sections={filterSections}
         />
+        <AddModal
+          isVisible={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onUploadCsv={() => handleAddProduct('csv')}
+          onAddManually={() => handleAddProduct('manual')}
+        />
       </ScrollView>
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => setShowAddModal(true)}>
+        <PlusIcon size={24} color="#FFFFFF" style={undefined} />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

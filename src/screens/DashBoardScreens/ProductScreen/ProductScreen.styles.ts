@@ -1,5 +1,9 @@
 import {StyleSheet} from 'react-native';
-import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
+import {
+  getScreenWidth,
+  getScreenHeight,
+  getFigmaDimension,
+} from '../../../helpers/screenSize';
 import {ColorPalette} from '../../../config/colorPalette';
 
 export const styles = StyleSheet.create({
@@ -40,5 +44,17 @@ export const styles = StyleSheet.create({
     marginBottom: 0,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
+  },
+  floatingButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: ColorPalette.ButtonPrimary,
+    width: 48,
+    height: 48,
+    borderRadius: getFigmaDimension(12),
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: getFigmaDimension(12),
   },
 });
