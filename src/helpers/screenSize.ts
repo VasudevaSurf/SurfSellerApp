@@ -61,5 +61,5 @@ export {
   totalScreenWidth,
   totalScreenHeight,
   statusBarHeight,
-  getFigmaDimension
+  getFigmaDimension,
 };

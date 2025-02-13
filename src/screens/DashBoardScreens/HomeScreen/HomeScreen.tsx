@@ -1,5 +1,4 @@
 import React from 'react';
-import {View} from 'react-native';
 import {Header} from '../../../components/UserComponents/Header/Header';
 import SearchIcon from '../../../assets/icons/SearchIcon';
 import BellIcon from '../../../assets/icons/BellIcon';
@@ -20,6 +19,8 @@ import {getScreenHeight} from '../../../helpers/screenSize';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import {RecentOrder} from '../../../components/MainComponents/RecentOrder/RecentOrder';
 import CircularEuroIcon from '../../../assets/icons/CircularEuroIcon';
+
+const View = require('react-native/Libraries/Components/View/ViewNativeComponent').default;
 
 const HomeScreen = () => {
   return (

@@ -15,6 +15,8 @@ export const ColorPalette: Record<string, ColorValue> = {
 
   InputBack: '#E8E8E8',
 
+  textHalfBlack: '#000000B2',
+
   IconBack: '#DCFCE7',
   countColor: '#22C55E',
 
@@ -42,6 +44,8 @@ export const ColorPalette: Record<string, ColorValue> = {
   SurfaceError: '#FEEAEE',
   SurfaceErrorHighlighted: '#F02E50',
 
+  searchIcon: '#9F9C9C',
+
   /**
    * Border color tokens
    */
@@ -57,6 +61,8 @@ export const ColorPalette: Record<string, ColorValue> = {
   HomeBack: '#F7E3FF',
 
   IconMini: '#FEE2E2',
+
+  IconProduct: '#5A5555',
 
   ContainerBack: '#FAEEFF',
 

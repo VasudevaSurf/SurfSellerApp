@@ -115,6 +115,12 @@ export const textBaseStyles = StyleSheet.create({
     fontWeight: 'normal',
     fontFamily: Fonts.POPPINS_REGULAR,
   },
+  [TypographyVariant.BODY_MEDIUM_MAIN]: {
+    fontSize: 12,
+    lineHeight: 20,
+    fontWeight: 'normal',
+    fontFamily: Fonts.POPPINS_MEDIUM,
+  },
   [TypographyVariant.BODY_XXSMALL]: {
     fontSize: 10,
     lineHeight: 14,
