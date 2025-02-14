@@ -115,6 +115,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               onPress={handleReset}
               variant={ButtonVariant.SECONDARY}
               customButtonStyles={styles.customButton}
+              customTextStyles={styles.currentText}
             />
             <Button
               text="VIEW RESULTS"

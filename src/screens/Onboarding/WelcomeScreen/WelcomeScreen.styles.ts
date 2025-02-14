@@ -74,4 +74,8 @@ export const styles = StyleSheet.create({
     width: '100%',
     marginTop: getFigmaDimension(32),
   },
+  text: {
+    color: ColorPalette.ButtonPrimary,
+    fontWeight: 'bold',
+  },
 });

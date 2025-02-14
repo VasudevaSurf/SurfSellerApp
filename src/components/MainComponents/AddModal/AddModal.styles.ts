@@ -37,4 +37,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 12,
   },
+  customButton: {
+    color: ColorPalette.ButtonPrimary,
+    fontWeight: 'bold',
+  },
 });

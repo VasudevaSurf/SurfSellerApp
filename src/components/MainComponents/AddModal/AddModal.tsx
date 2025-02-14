@@ -47,13 +47,12 @@ export const AddModal: React.FC<AddModalProps> = ({
             text="Upload CSV file"
             onPress={onUploadCsv}
             variant={ButtonVariant.PRIMARY}
-            customButtonStyles={styles.customButton}
           />
           <Button
             text="Add product Manually"
             onPress={onAddManually}
             variant={ButtonVariant.SECONDARY}
-            customButtonStyles={styles.customButton}
+            customTextStyles={styles.customButton}
           />
         </View>
       </View>

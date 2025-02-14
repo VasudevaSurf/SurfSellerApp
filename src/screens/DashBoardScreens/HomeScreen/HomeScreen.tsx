@@ -20,7 +20,8 @@ import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import {RecentOrder} from '../../../components/MainComponents/RecentOrder/RecentOrder';
 import CircularEuroIcon from '../../../assets/icons/CircularEuroIcon';
 
-const View = require('react-native/Libraries/Components/View/ViewNativeComponent').default;
+const View =
+  require('react-native/Libraries/Components/View/ViewNativeComponent').default;
 
 const HomeScreen = () => {
   return (
@@ -30,6 +31,8 @@ const HomeScreen = () => {
         image={{
           source: require('../../../assets/images/placeholder-profile.png'),
         }}
+        variant={TypographyVariant.BODY_LARGE_PAGE}
+        textColor={ColorPalette.TextTertiary}
         rightIcons={[
           {
             icon: SearchIcon,

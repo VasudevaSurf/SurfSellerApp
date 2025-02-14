@@ -193,6 +193,7 @@ const WelcomeScreen = () => {
             text={login}
             onPress={handleLogin}
             variant={ButtonVariant.SECONDARY}
+            customTextStyles={styles.text}
           />
         </View>
       </View>

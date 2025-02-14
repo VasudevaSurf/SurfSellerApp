@@ -66,4 +66,8 @@ export const styles = StyleSheet.create({
   customButton: {
     width: getFigmaDimension(190),
   },
+  currentText: {
+    color: ColorPalette.ButtonPrimary,
+    fontWeight: 'bold',
+  },
 });
