@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: Spacing.Medium,
+    backgroundColor: ColorPalette.White,
   },
   successImage: {
     height: getFigmaDimension(208),
@@ -20,15 +21,13 @@ export const styles = StyleSheet.create({
     marginBottom: getFigmaDimension(32),
   },
   title: {
-    fontSize: getFigmaDimension(24),
-    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: Spacing.XSmall,
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
   },
   subtitle: {
     textAlign: 'center',
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.CreatedText,
   },
   buttonContainer: {
     width: '100%',

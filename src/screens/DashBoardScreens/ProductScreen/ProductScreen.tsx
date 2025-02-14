@@ -115,8 +115,8 @@ const ProductScreen = () => {
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
         name="Products"
-        variant={TypographyVariant.BODY_LARGE_PAGE}
-        textColor={ColorPalette.TextTertiary}
+        variant={TypographyVariant.LMEDIUM_BOLD}
+        textColor={ColorPalette.AgreeTerms}
         rightIcons={[
           {
             icon: InfoIcon,
@@ -166,7 +166,7 @@ const ProductScreen = () => {
         ]}
         showsVerticalScrollIndicator={false}>
         <Typography
-          variant={TypographyVariant.BODY_MEDIUM}
+          variant={TypographyVariant.LMEDIUM_REGULAR}
           text={`Total Items : ${products.length}`}
           customTextStyles={styles.textStyle}
         />

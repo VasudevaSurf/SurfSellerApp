@@ -129,8 +129,8 @@ function CustomTabBar({state, descriptors, navigation}) {
                 scaleAnim={scaleAnims[index]}
                 color={
                   isFocused
-                    ? ColorPalette.ButtonPrimary
-                    : ColorPalette.IconNotFocus
+                    ? ColorPalette.PURPLE_300
+                    : ColorPalette.GREY_TEXT_200
                 }
               />
               <Animated.View
@@ -141,7 +141,7 @@ function CustomTabBar({state, descriptors, navigation}) {
                   }),
                 }}>
                 <Typography
-                  variant={TypographyVariant.BODY_SMALL}
+                  variant={TypographyVariant.LXSMALL_MEDIUM}
                   customTextStyles={[
                     styles.tabText,
                     isFocused ? styles.focusedTabText : styles.unfocusedTabText,

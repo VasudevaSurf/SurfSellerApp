@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {SafeAreaView, View} from 'react-native';
 import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
 import {STATIC_TEXT} from '../../../config/staticText';
@@ -10,7 +10,11 @@ import {TypographyVariant} from '../../../components/UserComponents/Typography/T
 import {TextButton} from '../../../components/UserComponents/TextButton/TextButton';
 import {ColorPalette} from '../../../config/colorPalette';
 import {Button} from '../../../components/UserComponents/Button/Button';
-import {ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
+import {
+  ButtonSize,
+  ButtonState,
+  ButtonVariant,
+} from '../../../components/UserComponents/Button/Button.types';
 import {Fonts} from '../../../config/fonts';
 import {navigate} from '../../../navigation/utils/navigationRef';
 
@@ -27,6 +31,15 @@ const {
 
 const VATVerification = () => {
   const [vatNumber, setVatNumber] = useState('');
+  const [buttonState, setButtonState] = useState(ButtonState.DISABLED);
+
+  useEffect(() => {
+    if (vatNumber.trim() !== '') {
+      setButtonState(ButtonState.DEFAULT);
+    } else {
+      setButtonState(ButtonState.DISABLED);
+    }
+  }, [vatNumber]);
 
   const handleTermsPress = () => {
     console.log('Navigate to Terms of Use');
@@ -54,13 +67,13 @@ const VATVerification = () => {
       <View style={styles.subCaptionContainer}>
         <Typography
           text={heading}
-          variant={TypographyVariant.HEADING_SMALL}
+          variant={TypographyVariant.H6_BOLD}
           customTextStyles={styles.heading}
         />
         <View>
           <Typography
             text={subheading}
-            variant={TypographyVariant.BODY_SMALL}
+            variant={TypographyVariant.PXSMALL_REGULAR}
             customTextStyles={styles.subheading}
           />
         </View>
@@ -83,32 +96,30 @@ const VATVerification = () => {
     <View style={styles.termsContainer}>
       <Typography
         text={termsPrefix}
-        variant={TypographyVariant.BODY_XXSMALL}
+        variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={styles.caption}
       />
       <TextButton
         text={termsText}
         onPress={handleTermsPress}
-        variant={TypographyVariant.BODY_XXSMALL}
+        variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={{
           ...styles.linkText,
-          fontFamily: Fonts.POPPINS_REGULAR,
-          color: ColorPalette.ButtonPrimary,
+          color: ColorPalette.PURPLE_300,
         }}
       />
       <Typography
         text={connector}
-        variant={TypographyVariant.BODY_XXSMALL}
+        variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={styles.caption}
       />
       <TextButton
         text={privacyText}
         onPress={handlePrivacyPress}
-        variant={TypographyVariant.BODY_XXSMALL}
+        variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={{
           ...styles.linkText,
-          fontFamily: Fonts.POPPINS_REGULAR,
-          color: ColorPalette.ButtonPrimary,
+          color: ColorPalette.PURPLE_300,
         }}
       />
     </View>
@@ -120,9 +131,8 @@ const VATVerification = () => {
         text={verifyButton}
         onPress={handleSuccessNavigate}
         variant={ButtonVariant.PRIMARY}
-        customTextStyles={{
-          fontVariant: TypographyVariant.BODY_SMALL_LINE,
-        }}
+        state={buttonState}
+        size={ButtonSize.MEDIUM}
       />
     </View>
   );

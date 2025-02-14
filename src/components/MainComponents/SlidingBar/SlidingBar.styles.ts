@@ -1,10 +1,14 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
+import {
+  getScreenWidth,
+  getScreenHeight,
+  getFigmaDimension,
+} from '../../../helpers/screenSize';
 
 export const slidingBarStyles = StyleSheet.create({
   containerWrapper: {
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
   },
   scrollContent: {
     flexDirection: 'row',
@@ -19,10 +23,10 @@ export const slidingBarStyles = StyleSheet.create({
     backgroundColor: ColorPalette.ButtonBackHome,
   },
   selectedOption: {
-    backgroundColor: ColorPalette.SurfacePrimary,
+    backgroundColor: ColorPalette.MainHeading,
   },
   optionText: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.Black,
   },
   selectedOptionText: {
     color: ColorPalette.White,

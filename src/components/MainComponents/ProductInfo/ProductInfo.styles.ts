@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
     marginRight: getScreenWidth(3.2),
   },
   productNameText: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
     flexShrink: 1,
   },
   iconContainer: {
@@ -68,13 +68,13 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   labelText: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_TEXT_300,
   },
   valueText: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
   },
   toggleLabel: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
     fontWeight: '500',
   },
 });

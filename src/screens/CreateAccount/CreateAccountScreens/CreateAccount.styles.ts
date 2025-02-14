@@ -6,6 +6,7 @@ import {getFigmaDimension} from '../../../helpers/screenSize';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ColorPalette.White,
   },
   bannerContainer: {
     padding: Spacing.Large,
@@ -40,18 +41,18 @@ export const styles = StyleSheet.create({
   },
   heading: {
     paddingLeft: Spacing.Large,
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
   },
   subheading: {
     paddingLeft: Spacing.Large,
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_TEXT_300,
   },
   caption: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.AgreeTerms,
     textAlign: 'center',
   },
   captionTwo: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
     textAlign: 'center',
   },
   linkText: {

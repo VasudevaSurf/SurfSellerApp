@@ -1,11 +1,15 @@
 import {StyleSheet} from 'react-native';
-import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
+import {
+  getScreenWidth,
+  getScreenHeight,
+  getFigmaDimension,
+} from '../../../helpers/screenSize';
 import {ColorPalette} from '../../../config/colorPalette';
 
 export const styles = StyleSheet.create({
   container: {
     height: getScreenHeight(6),
-    backgroundColor: ColorPalette.ButtonBackHome,
+    backgroundColor: ColorPalette.SearchBack,
     borderRadius: getScreenWidth(2),
     flexDirection: 'row',
     alignItems: 'center',
@@ -16,14 +20,14 @@ export const styles = StyleSheet.create({
   input: {
     flex: 1,
     marginLeft: getScreenWidth(3),
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.Black,
     fontFamily: 'Poppins-Regular',
-    fontSize: getScreenWidth(3.5),
+    fontSize: getFigmaDimension(13),
     padding: 0,
   },
   searchIcon: {
     width: getScreenWidth(5),
     height: getScreenWidth(5),
-    tintColor: ColorPalette.TextSecondary,
+    tintColor: ColorPalette.SearchIcon,
   },
 });

@@ -30,7 +30,7 @@ const SplashScreen = ({navigation}) => {
     <Animated.View
       style={[
         {...globalStyles.primaryContainer, ...styles.mainContainer},
-        {opacity: fadeAnim},
+          {opacity: fadeAnim},
       ]}>
       <MainBanner
         surfTitle={surfTitle}
@@ -45,7 +45,7 @@ const SplashScreen = ({navigation}) => {
       />
       <View style={styles.footerContainer}>
         <Typography
-          variant={TypographyVariant.BODY_MEDIUM}
+          variant={TypographyVariant.PXSMALL_MEDIUM}
           text={surfCaption}
           customTextStyles={styles.footerText}
         />

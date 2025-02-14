@@ -5,7 +5,12 @@ import {styles} from './CreateSuccess.styles';
 import {globalStyles} from '../../../config/globalStyles';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
+import {
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+  ButtonVariant,
+} from '../../../components/UserComponents/Button/Button.types';
 import {Button} from '../../../components/UserComponents/Button/Button';
 import {navigate} from '../../../navigation/utils/navigationRef';
 
@@ -47,12 +52,12 @@ const CreateSuccess = () => {
       />
       <View style={styles.textContainer}>
         <Typography
-          variant={TypographyVariant.HEADING_MEDIUM_SUCCESS}
+          variant={TypographyVariant.H6_BOLD}
           text="Welcome to Surf! 🎉"
           customTextStyles={styles.title}
         />
         <Typography
-          variant={TypographyVariant.BODY_MEDIUM}
+          variant={TypographyVariant.LMEDIUM_REGULAR}
           text="Your account is created. Before you start selling, please verify your VAT number."
           customTextStyles={styles.subtitle}
         />
@@ -62,11 +67,17 @@ const CreateSuccess = () => {
           text="Verify Now"
           onPress={handleVATScreen}
           variant={ButtonVariant.PRIMARY}
+          size={ButtonSize.MEDIUM}
+          state={ButtonState.DEFAULT}
         />
         <Button
           text="Verify Later"
           onPress={() => {}}
-          variant={ButtonVariant.SECONDARY}
+          variant={ButtonVariant.PRIMARY}
+          type={ButtonType.OUTLINED}
+          size={ButtonSize.MEDIUM}
+          state={ButtonState.DEFAULT}
+          customStyles={styles.buttonContainerStyle}
         />
       </View>
     </SafeAreaView>

@@ -9,7 +9,7 @@ import {
 export const styles = StyleSheet.create({
   tabBarWrapper: {
     position: 'relative',
-    backgroundColor: 'white',
+    backgroundColor: ColorPalette.White,
     width: '100%',
     elevation: 8,
     shadowColor: '#000',
@@ -24,10 +24,10 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     top: -getScreenHeight(1),
     height: getScreenHeight(1),
-    backgroundColor: ColorPalette.ButtonPrimary,
+    backgroundColor: ColorPalette.PURPLE_300,
     borderTopLeftRadius: getScreenWidth(2),
     borderTopRightRadius: getScreenWidth(2),
-    shadowColor: ColorPalette.ButtonPrimary,
+    shadowColor: ColorPalette.PURPLE_300,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -55,10 +55,9 @@ export const styles = StyleSheet.create({
     fontSize: getScreenHeight(1.4),
   },
   focusedTabText: {
-    color: ColorPalette.ButtonPrimary,
-    fontWeight: '600',
+    color: ColorPalette.PURPLE_300,
   },
   unfocusedTabText: {
-    color: ColorPalette.IconNotFocus,
+    color: ColorPalette.GREY_TEXT_200,
   },
 });

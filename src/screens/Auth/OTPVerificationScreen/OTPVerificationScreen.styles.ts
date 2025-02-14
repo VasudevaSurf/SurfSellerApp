@@ -7,9 +7,9 @@ import {
 } from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
-  // Layout Containers
   container: {
     flex: 1,
+    backgroundColor: ColorPalette.White,
   },
   bannerContainer: {
     padding: Spacing.Large,
@@ -43,14 +43,14 @@ export const styles = StyleSheet.create({
   // Typography Styles
   heading: {
     paddingLeft: Spacing.Large,
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
   },
   subCaption: {
     paddingLeft: Spacing.Large,
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_300,
   },
   subCaptionTwo: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
   },
 
   // OTP Input Styles

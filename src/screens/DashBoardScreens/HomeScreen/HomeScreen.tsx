@@ -67,11 +67,12 @@ const HomeScreen = () => {
         <View style={styles.verifyContainer}>
           <View style={styles.textVerifyContainer}>
             <Typography
-              variant={TypographyVariant.BODY_SMALL_BOLD}
+              variant={TypographyVariant.H6_BOLD}
               text="Complete these steps to start selling"
+              customTextStyles={styles.textOne}
             />
             <Typography
-              variant={TypographyVariant.BODY_XSMALLLINE}
+              variant={TypographyVariant.LXSMALL_REGULAR}
               text="Complete the following tasks to activate your seller account"
               customTextStyles={styles.textTwo}
             />
@@ -88,7 +89,7 @@ const HomeScreen = () => {
                 </View>
                 <View style={styles.countBlock}>
                   <Typography
-                    variant={TypographyVariant.BODY_SMALL_BOLD}
+                    variant={TypographyVariant.PXSMALL_REGULAR}
                     text="+12.8%"
                     customTextStyles={styles.countText}
                   />
@@ -97,12 +98,12 @@ const HomeScreen = () => {
               </View>
               <View style={styles.salesTwo}>
                 <Typography
-                  variant={TypographyVariant.HEADING_MEDIUM_COUNT}
+                  variant={TypographyVariant.H4_BOLD}
                   text="€47,125.34"
                   customTextStyles={styles.countValue}
                 />
                 <Typography
-                  variant={TypographyVariant.BODY_SMALL}
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
                   text="Total Sales"
                   customTextStyles={styles.countCaption}
                 />
@@ -115,7 +116,7 @@ const HomeScreen = () => {
                 </View>
                 <View style={styles.countBlock}>
                   <Typography
-                    variant={TypographyVariant.BODY_SMALL_BOLD}
+                    variant={TypographyVariant.PXSMALL_REGULAR}
                     text="8.3%"
                     customTextStyles={styles.countText}
                   />
@@ -124,12 +125,12 @@ const HomeScreen = () => {
               </View>
               <View style={styles.salesTwo}>
                 <Typography
-                  variant={TypographyVariant.HEADING_MEDIUM_COUNT}
+                  variant={TypographyVariant.H4_BOLD}
                   text="1,592"
                   customTextStyles={styles.countValue}
                 />
                 <Typography
-                  variant={TypographyVariant.BODY_SMALL}
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
                   text="Total Orders"
                   customTextStyles={styles.countCaption}
                 />
@@ -144,12 +145,12 @@ const HomeScreen = () => {
                 </View>
                 <View style={styles.salesTwo}>
                   <Typography
-                    variant={TypographyVariant.HEADING_MEDIUM_COUNT}
+                    variant={TypographyVariant.H4_BOLD}
                     text="1312"
                     customTextStyles={styles.countValue}
                   />
                   <Typography
-                    variant={TypographyVariant.BODY_SMALL}
+                    variant={TypographyVariant.LMEDIUM_REGULAR}
                     text="Active Products"
                     customTextStyles={styles.countCaption}
                   />
@@ -158,7 +159,7 @@ const HomeScreen = () => {
 
               <View style={styles.countBlock}>
                 <Typography
-                  variant={TypographyVariant.BODY_SMALL_BOLD}
+                  variant={TypographyVariant.PXSMALL_REGULAR}
                   text="0%"
                   customTextStyles={styles.countText}
                 />
@@ -171,12 +172,12 @@ const HomeScreen = () => {
               </View>
               <View style={styles.salesTwo}>
                 <Typography
-                  variant={TypographyVariant.BODY_SMALL_CAPTION}
+                  variant={TypographyVariant.LSMALL_BOLD}
                   text="18"
                   customTextStyles={styles.countValue}
                 />
                 <Typography
-                  variant={TypographyVariant.BODY_XXSMALL}
+                  variant={TypographyVariant.LSMALL_REGULAR}
                   text="Out of Stock"
                   customTextStyles={styles.countCaption}
                 />
@@ -191,12 +192,12 @@ const HomeScreen = () => {
                 </View>
                 <View style={styles.salesTwo}>
                   <Typography
-                    variant={TypographyVariant.HEADING_MEDIUM_COUNT}
+                    variant={TypographyVariant.H4_BOLD}
                     text="€13,482"
                     customTextStyles={styles.countValue}
                   />
                   <Typography
-                    variant={TypographyVariant.BODY_SMALL}
+                    variant={TypographyVariant.LMEDIUM_REGULAR}
                     text="Your income"
                     customTextStyles={styles.countCaption}
                   />
@@ -205,7 +206,7 @@ const HomeScreen = () => {
 
               <View style={styles.countBlock}>
                 <Typography
-                  variant={TypographyVariant.BODY_SMALL_BOLD}
+                  variant={TypographyVariant.PXSMALL_REGULAR}
                   text="0%"
                   customTextStyles={styles.countText}
                 />
@@ -218,12 +219,12 @@ const HomeScreen = () => {
               </View>
               <View style={styles.salesTwo}>
                 <Typography
-                  variant={TypographyVariant.BODY_SMALL_CAPTION}
+                  variant={TypographyVariant.LSMALL_BOLD}
                   text="2,547.63"
                   customTextStyles={styles.countValue}
                 />
                 <Typography
-                  variant={TypographyVariant.BODY_XXSMALL}
+                  variant={TypographyVariant.LSMALL_REGULAR}
                   text="Taxes"
                   customTextStyles={styles.countCaption}
                 />
@@ -235,15 +236,22 @@ const HomeScreen = () => {
           <View style={styles.salesHeading}>
             <View style={styles.LeftHeading}>
               <Typography
-                variant={TypographyVariant.HEADING_SMALL}
+                variant={TypographyVariant.H5_BOLD}
                 text="Sales Overview"
                 customTextStyles={styles.countValue}
               />
-              <Typography
-                variant={TypographyVariant.BODY_XXSMALL}
-                text="Total sales this week - 25,000€"
-                customTextStyles={styles.countCaption}
-              />
+              <View style={styles.countCaptionContainer}>
+                <Typography
+                  variant={TypographyVariant.LSMALL_SEMIBOLD}
+                  text="Total sales this week - "
+                  customTextStyles={styles.countCaption}
+                />
+                <Typography
+                  variant={TypographyVariant.LSMALL_BOLD}
+                  text="25,000€"
+                  customTextStyles={styles.countCaptionOne}
+                />
+              </View>
             </View>
             <View style={styles.rightHeadingButtons}>
               <ToggleButtons />
@@ -254,13 +262,13 @@ const HomeScreen = () => {
         <View style={styles.recentOrdersContainer}>
           <View style={styles.recentOrderTitle}>
             <Typography
-              variant={TypographyVariant.BODY_SMALL_BOLD}
+              variant={TypographyVariant.H6_BOLD}
               text="Recent Orders"
               customTextStyles={styles.countValue}
             />
             <View style={styles.viewAll}>
               <Typography
-                variant={TypographyVariant.BODY_XSMALLLINE}
+                variant={TypographyVariant.LSMALL_REGULAR}
                 text="View All"
                 customTextStyles={styles.viewAllText}
               />

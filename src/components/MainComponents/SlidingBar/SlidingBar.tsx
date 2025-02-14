@@ -4,7 +4,7 @@ import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
 import {SlidingBarProps, SlidingBarOption} from './SlidingBar.types';
 import {slidingBarStyles} from './SlidingBar.styles';
-import { ColorPalette } from '../../../config/colorPalette';
+import {ColorPalette} from '../../../config/colorPalette';
 
 export const SlidingBar: React.FC<SlidingBarProps> = ({
   options,
@@ -25,7 +25,7 @@ export const SlidingBar: React.FC<SlidingBarProps> = ({
             key={option.id}
             style={[
               slidingBarStyles.option,
-              {backgroundColor: ColorPalette.ButtonBackHome},
+              {backgroundColor: ColorPalette.SearchBack},
               selectedOption.id === option.id &&
                 slidingBarStyles.selectedOption,
               customOptionStyle,
@@ -34,7 +34,7 @@ export const SlidingBar: React.FC<SlidingBarProps> = ({
             onPress={() => onOptionSelect(option)}
             activeOpacity={0.7}>
             <Typography
-              variant={TypographyVariant.BODY_MEDIUM}
+              variant={TypographyVariant.LXSMALL_MEDIUM}
               text={option.label}
               customTextStyles={[
                 slidingBarStyles.optionText,

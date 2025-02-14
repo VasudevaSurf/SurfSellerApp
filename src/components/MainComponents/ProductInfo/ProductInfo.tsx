@@ -36,7 +36,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         <View style={styles.infoContainerOne}>
           <View style={styles.productNameWrapper}>
             <Typography
-              variant={TypographyVariant.BODY_MEDIUM_MAIN}
+              variant={TypographyVariant.PXSMALL_BOLD}
               text={productName}
               customTextStyles={styles.productNameText}
               numberOfLines={2}
@@ -51,24 +51,24 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         <View style={styles.infoContainerTwo}>
           <View style={styles.sellerContainer}>
             <Typography
-              variant={TypographyVariant.BODY_XXSMALL}
+              variant={TypographyVariant.LXSMALL_REGULAR}
               text="Seller Price :"
               customTextStyles={styles.labelText}
             />
             <Typography
-              variant={TypographyVariant.BODY_SMALL_CAPTION}
+              variant={TypographyVariant.LMEDIUM_MEDIUM}
               text={sellerPrice}
               customTextStyles={styles.valueText}
             />
           </View>
           <View style={styles.platFormContainer}>
             <Typography
-              variant={TypographyVariant.BODY_XXSMALL}
+              variant={TypographyVariant.LXSMALL_REGULAR}
               text="Platform fee :"
               customTextStyles={styles.labelText}
             />
             <Typography
-              variant={TypographyVariant.BODY_SMALL_CAPTION}
+              variant={TypographyVariant.LMEDIUM_MEDIUM}
               text={platformFee}
               customTextStyles={styles.valueText}
             />
@@ -78,12 +78,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         <View style={styles.infoContainerThree}>
           <View style={styles.stockContainer}>
             <Typography
-              variant={TypographyVariant.BODY_XSMALLLINE}
+              variant={TypographyVariant.LSMALL_REGULAR}
               text="Stock :"
               customTextStyles={styles.labelText}
             />
             <Typography
-              variant={TypographyVariant.BODY_MEDIUM_MAIN}
+              variant={TypographyVariant.LSMALL_MEDIUM}
               text={stock}
               customTextStyles={styles.valueText}
             />

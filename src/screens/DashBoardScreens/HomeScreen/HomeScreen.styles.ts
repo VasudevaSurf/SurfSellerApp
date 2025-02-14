@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: getFigmaDimension(12),
     paddingVertical: getFigmaDimension(20),
     gap: getFigmaDimension(20),
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
     borderRadius: getFigmaDimension(12),
   },
   textVerifyContainer: {
@@ -26,22 +26,27 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: getFigmaDimension(4),
   },
+  textOne: {
+    fontSize: 16,
+    color: ColorPalette.GREY_TEXT_500,
+  },
   textTwo: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_TEXT_300,
+    fontSize: 11,
   },
   verifyStepsContainer: {
     display: 'flex',
     flexDirection: 'column',
     paddingHorizontal: getFigmaDimension(8),
     paddingVertical: getFigmaDimension(12),
-    backgroundColor: ColorPalette.ContainerBack,
+    backgroundColor: ColorPalette.PRIMARY_WHITE_SELLERL,
     borderRadius: getFigmaDimension(12),
     height: 300,
   },
   OrderContainer: {
     height: 250,
     borderRadius: getFigmaDimension(12),
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
   },
   statsContainer: {
     display: 'flex',
@@ -62,7 +67,7 @@ export const styles = StyleSheet.create({
   },
   totalSales: {
     flex: 2,
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
     paddingVertical: getFigmaDimension(20),
     paddingHorizontal: getFigmaDimension(16),
     borderRadius: getFigmaDimension(8),
@@ -84,25 +89,25 @@ export const styles = StyleSheet.create({
     display: 'flex',
     borderRadius: getFigmaDimension(8),
     padding: getFigmaDimension(8),
-    backgroundColor: ColorPalette.IconBack,
+    backgroundColor: ColorPalette.SmallIconBack,
   },
   iconBackOne: {
     display: 'flex',
     borderRadius: getFigmaDimension(8),
     padding: getFigmaDimension(8),
-    backgroundColor: ColorPalette.HomeBack,
+    backgroundColor: ColorPalette.SmallIconBack2,
   },
   iconBackTwo: {
     display: 'flex',
     borderRadius: getFigmaDimension(4),
     padding: getFigmaDimension(4),
-    backgroundColor: ColorPalette.IconMini,
+    backgroundColor: ColorPalette.VerySmallIcon,
   },
   iconBackThree: {
     display: 'flex',
     borderRadius: getFigmaDimension(4),
     padding: getFigmaDimension(4),
-    backgroundColor: ColorPalette.smallBack,
+    backgroundColor: ColorPalette.VerySmallIconBack,
   },
   countBlock: {
     display: 'flex',
@@ -112,20 +117,27 @@ export const styles = StyleSheet.create({
     gap: getFigmaDimension(4),
   },
   countText: {
-    color: ColorPalette.countColor,
+    color: ColorPalette.RiseText,
+    fontSize: 14,
   },
   countValue: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
+  },
+  countCaptionContainer: {
+    flexDirection: 'row',
   },
   countCaption: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_TEXT_300,
+  },
+  countCaptionOne: {
+    color: ColorPalette.PURPLE_300,
   },
   activeProduct: {
     flex: 1,
     display: 'flex',
     flexDirection: 'row',
     padding: getFigmaDimension(16),
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
     borderRadius: getFigmaDimension(8),
     gap: getFigmaDimension(20),
     alignItems: 'center',
@@ -136,7 +148,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: getFigmaDimension(8),
     padding: getFigmaDimension(16),
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
     borderRadius: getFigmaDimension(8),
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
@@ -144,7 +156,7 @@ export const styles = StyleSheet.create({
   salesOverview: {
     display: 'flex',
     borderRadius: getFigmaDimension(12),
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
     paddingVertical: getFigmaDimension(16),
     paddingHorizontal: getFigmaDimension(12),
     flexDirection: 'column',
@@ -179,7 +191,7 @@ export const styles = StyleSheet.create({
     paddingVertical: getFigmaDimension(20),
     paddingHorizontal: getFigmaDimension(12),
     gap: getFigmaDimension(20),
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
     borderRadius: getFigmaDimension(12),
   },
   recentOrderTitle: {
@@ -195,7 +207,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   viewAllText: {
-    color: ColorPalette.ViewAll,
+    color: ColorPalette.PURPLE_200,
   },
   recentAllOrders: {
     display: 'flex',

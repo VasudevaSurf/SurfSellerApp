@@ -39,8 +39,8 @@ export const STATIC_TEXT = {
       verifyButton: 'VERIFY',
     },
     vatSuccess: {
-      yourSet: `You're all set!`,
-      yourVerified: `Your VAT is verified, and your store is ready to go. Head to your dashboard to start selling!`,
+      yourSet: `VAT verification successful!`,
+      yourVerified: `Please finish setting your store to get started`,
       goDashboard: `Go to Dashboard`,
     },
   },

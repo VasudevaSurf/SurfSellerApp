@@ -17,7 +17,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     <View style={[styles.container, customContainerStyle]} testID={testID}>
       <SearchIcon
         size={20}
-        color={ColorPalette.searchIcon}
+        color={ColorPalette.SearchI}
         style={styles.searchIcon}
       />
       <TextInput

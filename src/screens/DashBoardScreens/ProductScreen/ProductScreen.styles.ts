@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
   },
   textStyle: {
-    color: ColorPalette.textHalfBlack,
+    color: ColorPalette.TotalText,
   },
   ProductContainer: {
     display: 'flex',

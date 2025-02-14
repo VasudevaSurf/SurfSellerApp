@@ -27,4 +27,7 @@ export const styles = StyleSheet.create({
   scrollContent: {
     gap: getScreenWidth(4),
   },
+  textStyle: {
+    color: ColorPalette.TotalText,
+  },
 });

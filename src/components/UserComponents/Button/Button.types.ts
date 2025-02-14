@@ -1,33 +1,42 @@
 import {StyleProp, TextStyle, ViewStyle} from 'react-native';
 
+export enum ButtonSize {
+  LARGE = 'large',
+  MEDIUM = 'medium',
+  SMALL = 'small',
+}
+
 export enum ButtonVariant {
   PRIMARY = 'primary',
   SECONDARY = 'secondary',
+}
+
+export enum ButtonType {
+  PRIMARY = 'primary',
+  OUTLINED = 'outlined',
   TERTIARY = 'tertiary',
+  LINK = 'link',
 }
 
-export enum IconPosition {
-  LEFT = 'left',
-  RIGHT = 'right',
-}
-
-interface IconProps {
-  size?: number;
-  color?: string;
-  strokeWidth?: number;
-  style?: any;
+export enum ButtonState {
+  DEFAULT = 'default',
+  HOVERED = 'hovered',
+  PRESSED = 'pressed',
+  FOCUSED = 'focused',
+  DISABLED = 'disabled',
 }
 
 export interface ButtonProps {
-  text?: string;
+  text: string;
   onPress: () => void;
+  size?: ButtonSize;
   variant?: ButtonVariant;
-  customTextStyles?: StyleProp<TextStyle>;
-  customButtonStyles?: StyleProp<ViewStyle>;
+  type?: ButtonType;
+  state?: ButtonState;
   disabled?: boolean;
-  IconComponent?: React.ComponentType<IconProps>;
-  iconProps?: IconProps;
-  iconPosition?: IconPosition;
-  iconSpacing?: number;
-  iconOnly?: boolean;
+  IconComponent?: React.ComponentType<any>;
+  iconPosition?: 'left' | 'right';
+  useGradient?: boolean;
+  customStyles?: StyleProp<ViewStyle>;
+  customTextStyles?: StyleProp<TextStyle>;
 }

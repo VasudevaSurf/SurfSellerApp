@@ -20,11 +20,11 @@ export const styles = StyleSheet.create({
   separator: {
     width: 2,
     height: getFigmaDimension(22),
-    backgroundColor: ColorPalette.SurfacePrimary,
+    backgroundColor: ColorPalette.MainHeading,
     marginHorizontal: Spacing.XXSmall,
   },
   heading: {
-    color: ColorPalette.SurfacePrimary,
+    color: ColorPalette.MainHeading,
     fontWeight: 'bold',
     fontSize: 18,
   },

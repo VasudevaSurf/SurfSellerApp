@@ -48,7 +48,7 @@ const AuthSuccessScreen = () => {
       />
       <View style={styles.textContainer}>
         <Typography
-          variant={TypographyVariant.HEADING_MEDIUM_SUCCESS}
+          variant={TypographyVariant.H6_BOLD}
           text={successTitle}
           customTextStyles={styles.title}
         />

@@ -25,7 +25,7 @@ export const MainBanner: React.FC<MainBannerProps> = ({
       />
       <View style={[styles.separator, customStyles.separator]} />
       <Typography
-        variant={TypographyVariant.HEADING_SMALL}
+        variant={TypographyVariant.H5_MEDIUM}
         text={surfTitle}
         customTextStyles={[styles.heading, customStyles.heading]}
       />

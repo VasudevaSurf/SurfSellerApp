@@ -104,7 +104,7 @@ const OrderScreen = () => {
         ]}
         showsVerticalScrollIndicator={false}>
         <Typography
-          variant={TypographyVariant.BODY_MEDIUM}
+          variant={TypographyVariant.LMEDIUM_REGULAR}
           text={`Total Items : ${products.length}`}
           customTextStyles={styles.textStyle}
         />

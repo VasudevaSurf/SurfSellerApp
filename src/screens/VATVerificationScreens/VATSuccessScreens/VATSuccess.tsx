@@ -4,7 +4,7 @@ import {styles} from './VATSuccess.styles';
 import {globalStyles} from '../../../config/globalStyles';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
+import {ButtonSize, ButtonState, ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
 import {Button} from '../../../components/UserComponents/Button/Button';
 import {STATIC_TEXT} from '../../../config/staticText';
 
@@ -44,12 +44,12 @@ const VATSuccess = () => {
       />
       <View style={styles.textContainer}>
         <Typography
-          variant={TypographyVariant.HEADING_MEDIUM_SUCCESS}
+          variant={TypographyVariant.H6_BOLD}
           text={yourSet}
           customTextStyles={styles.title}
         />
         <Typography
-          variant={TypographyVariant.BODY_MEDIUM}
+          variant={TypographyVariant.LMEDIUM_REGULAR}
           text={yourVerified}
           customTextStyles={styles.subtitle}
         />
@@ -59,6 +59,8 @@ const VATSuccess = () => {
           text={goDashboard}
           onPress={() => {}}
           variant={ButtonVariant.PRIMARY}
+          state={ButtonState.DEFAULT}
+          size={ButtonSize.MEDIUM}
         />
       </View>
     </SafeAreaView>

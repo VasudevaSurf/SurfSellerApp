@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {SafeAreaView, View} from 'react-native';
 import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
 import {STATIC_TEXT} from '../../../config/staticText';
@@ -10,7 +10,11 @@ import {TypographyVariant} from '../../../components/UserComponents/Typography/T
 import {TextButton} from '../../../components/UserComponents/TextButton/TextButton';
 import {ColorPalette} from '../../../config/colorPalette';
 import {Button} from '../../../components/UserComponents/Button/Button';
-import {ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
+import {
+  ButtonSize,
+  ButtonState,
+  ButtonVariant,
+} from '../../../components/UserComponents/Button/Button.types';
 import {Fonts} from '../../../config/fonts';
 import {navigate} from '../../../navigation/utils/navigationRef';
 
@@ -26,6 +30,15 @@ const CreateAccount = () => {
   const [countryCode, setCountryCode] = useState(INITIAL_COUNTRY_CODE);
   const [sellerName, setSellerName] = useState('');
   const [businessName, setBusinessName] = useState('');
+  const [buttonState, setButtonState] = useState(ButtonState.DISABLED);
+
+  useEffect(() => {
+    if (phoneNumber && sellerName && businessName) {
+      setButtonState(ButtonState.DEFAULT);
+    } else {
+      setButtonState(ButtonState.DISABLED);
+    }
+  }, [phoneNumber, sellerName, businessName]);
 
   // Event Handlers
   const handleCountryPress = () => {
@@ -53,7 +66,6 @@ const CreateAccount = () => {
     }
   };
 
-  // Component Sections
   const renderBanner = () => (
     <MainBanner
       surfTitle={surfTitle}
@@ -68,18 +80,18 @@ const CreateAccount = () => {
       <View style={styles.subCaptionContainer}>
         <Typography
           text="Create your seller account"
-          variant={TypographyVariant.HEADING_SMALL}
+          variant={TypographyVariant.H5_BOLD}
           customTextStyles={styles.heading}
         />
         <View>
           <Typography
             text="Please provide below details to help us with your"
-            variant={TypographyVariant.BODY_SMALL}
+            variant={TypographyVariant.PXSMALL_REGULAR}
             customTextStyles={styles.subheading}
           />
           <Typography
             text="onboarding."
-            variant={TypographyVariant.BODY_SMALL}
+            variant={TypographyVariant.PXSMALL_REGULAR}
             customTextStyles={styles.subheading}
           />
         </View>
@@ -90,16 +102,16 @@ const CreateAccount = () => {
           value={sellerName}
           onChangeText={setSellerName}
           keyboardType="default"
-          customLabelColorFocused={ColorPalette.TextPrimary}
-          customLabelColorUnfocused={ColorPalette.TextUnfocus}
+          customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+          customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
         />
         <AnimatedTextInput
           label="Business Name"
           value={businessName}
           onChangeText={setBusinessName}
           keyboardType="default"
-          customLabelColorFocused={ColorPalette.TextPrimary}
-          customLabelColorUnfocused={ColorPalette.TextUnfocus}
+          customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+          customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
         />
         <AnimatedTextInput
           label="Whatsapp Number"
@@ -110,8 +122,8 @@ const CreateAccount = () => {
           countryCode={countryCode}
           countryFlag={MALTA_FLAG_URL}
           onCountryPress={handleCountryPress}
-          customLabelColorFocused={ColorPalette.TextPrimary}
-          customLabelColorUnfocused={ColorPalette.TextUnfocus}
+          customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+          customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
         />
       </View>
     </View>
@@ -121,32 +133,32 @@ const CreateAccount = () => {
     <View style={styles.termsContainer}>
       <Typography
         text="By continuing you agree to the Surf's "
-        variant={TypographyVariant.BODY_XXSMALL}
+        variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={styles.caption}
       />
       <TextButton
         text="Terms of Use"
         onPress={handleTermsPress}
-        variant={TypographyVariant.BODY_XXSMALL}
+        variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={{
           ...styles.linkText,
           fontFamily: Fonts.POPPINS_REGULAR,
-          color: ColorPalette.ButtonPrimary,
+          color: ColorPalette.PURPLE_300,
         }}
       />
       <Typography
         text=" and "
-        variant={TypographyVariant.BODY_XXSMALL}
+        variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={styles.caption}
       />
       <TextButton
         text="Privacy Policy"
         onPress={handlePrivacyPress}
-        variant={TypographyVariant.BODY_XXSMALL}
+        variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={{
           ...styles.linkText,
           fontFamily: Fonts.POPPINS_REGULAR,
-          color: ColorPalette.ButtonPrimary,
+          color: ColorPalette.PURPLE_300,
         }}
       />
     </View>
@@ -159,21 +171,23 @@ const CreateAccount = () => {
           text="GET OTP"
           onPress={handleGetOtp}
           variant={ButtonVariant.PRIMARY}
+          state={buttonState}
+          size={ButtonSize.MEDIUM}
         />
       </View>
       <View style={styles.termsContainerTwo}>
         <Typography
           text="Already have an account? "
-          variant={TypographyVariant.BODY_SMALL}
+          variant={TypographyVariant.LMEDIUM_REGULAR}
           customTextStyles={styles.captionTwo}
         />
         <TextButton
           text="Login"
           onPress={handleCreateAccount}
-          variant={TypographyVariant.BODY_SMALL_LINE}
+          variant={TypographyVariant.PMEDIUM_SEMIBOLD}
           underline
           customTextStyles={{
-            color: ColorPalette.ButtonPrimary,
+            color: ColorPalette.PURPLE_300,
             fontFamily: Fonts.POPPINS_BOLD,
           }}
         />

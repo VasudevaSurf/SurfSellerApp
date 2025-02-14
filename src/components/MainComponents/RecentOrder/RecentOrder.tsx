@@ -20,23 +20,23 @@ export const RecentOrder: React.FC<RecentOrderProps> = ({
     switch (orderStatus) {
       case 'Pending':
         return {
-          container: {backgroundColor: ColorPalette.Warning50},
-          text: {color: ColorPalette.Warning500},
+          container: {backgroundColor: ColorPalette.YELLOW_00},
+          text: {color: ColorPalette.YELLOW_200},
         };
-      case 'Completed':
+      case 'Delivered':
         return {
-          container: {backgroundColor: ColorPalette.Success50},
-          text: {color: ColorPalette.Success500},
+          container: {backgroundColor: ColorPalette.GREEN_00},
+          text: {color: ColorPalette.Green_200},
         };
       case 'Cancelled':
         return {
-          container: {backgroundColor: ColorPalette.Error50},
-          text: {color: ColorPalette.Error500},
+          container: {backgroundColor: ColorPalette.RED_00},
+          text: {color: ColorPalette.RED_200},
         };
       default:
         return {
-          container: {backgroundColor: ColorPalette.Warning50},
-          text: {color: ColorPalette.Warning500},
+          container: {backgroundColor: ColorPalette.YELLOW_00},
+          text: {color: ColorPalette.YELLOW_200},
         };
     }
   };
@@ -54,40 +54,40 @@ export const RecentOrder: React.FC<RecentOrderProps> = ({
 
         <View style={styles.contentContainer}>
           <Typography
-            variant={TypographyVariant.BODY_SMALL_CAPTION}
+            variant={TypographyVariant.LMEDIUM_BOLD}
             text={productName}
-            customTextStyles={{color: ColorPalette.TextPrimary}}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <Typography
-            variant={TypographyVariant.BODY_XSMALLLINE}
+            variant={TypographyVariant.LSMALL_REGULAR}
             text={`Order ID - ${orderId}`}
             customTextStyles={styles.orderIdText}
           />
           <View style={styles.seperateContent}>
             <Typography
-              variant={TypographyVariant.BODY_XSMALLLINE}
+              variant={TypographyVariant.LSMALL_REGULAR}
               text={customerName}
-              customTextStyles={{color: ColorPalette.TextName}}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
             <View style={styles.separatorDot} />
             <Typography
-              variant={TypographyVariant.BODY_SMALL}
+              variant={TypographyVariant.LSMALL_REGULAR}
               text={orderDate}
-              customTextStyles={{color: ColorPalette.TextName}}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
           </View>
         </View>
 
         <View style={styles.customerRow}>
           <Typography
-            variant={TypographyVariant.BODY_SMALL_BOLD}
+            variant={TypographyVariant.LMEDIUM_BOLD}
             text={`€${orderAmount.toFixed(1)}`}
             customTextStyles={styles.amountText}
           />
           <View
             style={[styles.statusContainer, getStatusStyle(status).container]}>
             <Typography
-              variant={TypographyVariant.BODY_XSMALL_PRICE}
+              variant={TypographyVariant.LSMALL_MEDIUM}
               text={status}
               customTextStyles={getStatusStyle(status).text}
             />

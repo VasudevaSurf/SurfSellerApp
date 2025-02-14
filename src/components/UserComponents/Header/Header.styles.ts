@@ -10,7 +10,7 @@ export const headerStyles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.Medium,
     paddingVertical: Spacing.Small,
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
     width: '100%',
   },
   leftSection: {

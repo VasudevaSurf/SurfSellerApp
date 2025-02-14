@@ -12,6 +12,7 @@ export enum Fonts {
   CAIRO_BOLD = 'Cairo-Bold',
   POPPINS_REGULAR = 'Poppins-Regular',
   POPPINS_MEDIUM = 'Poppins-Medium',
+  POPPINS_EXTRABOLD = 'Poppins-ExtraBold',
   POPPINS_BOLD = 'Poppins-Bold',
   POPPINS_SEMIBOLD = 'Poppins-SemiBold',
 }

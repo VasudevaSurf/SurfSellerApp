@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {SafeAreaView, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {SafeAreaView, TouchableOpacity, View} from 'react-native';
 import {STATIC_TEXT} from '../../../config/staticText';
 import {styles} from './OTPVerificationScreen.styles';
 import {globalStyles} from '../../../config/globalStyles';
@@ -9,6 +9,8 @@ import {TextButton} from '../../../components/UserComponents/TextButton/TextButt
 import {ColorPalette} from '../../../config/colorPalette';
 import {Button} from '../../../components/UserComponents/Button/Button';
 import {
+  ButtonSize,
+  ButtonState,
   ButtonVariant,
   IconPosition,
 } from '../../../components/UserComponents/Button/Button.types';
@@ -28,6 +30,16 @@ const OTPVerificationScreen = ({route}) => {
   const {phoneNumber, flow = 'login'} = route.params;
 
   const [otp, setOtp] = useState('');
+  const [buttonState, setButtonState] = useState(ButtonState.DISABLED);
+
+  // Effect to update button state based on OTP length
+  useEffect(() => {
+    if (otp.length === OTP_LENGTH) {
+      setButtonState(ButtonState.DEFAULT);
+    } else {
+      setButtonState(ButtonState.DISABLED);
+    }
+  }, [otp]);
 
   // Event Handlers
   const handleOtpChange = (text: string) => setOtp(text);
@@ -50,52 +62,42 @@ const OTPVerificationScreen = ({route}) => {
   };
 
   const renderHeader = () => (
-    <View style={styles.bannerContainer}>
-      <Button
-        onPress={goBack}
-        IconComponent={ArrowLeftIcon}
-        iconOnly={true}
-        iconProps={{
-          size: 20,
-          color: '#4A4A4A',
-          strokeWidth: 2,
-        }}
+    <TouchableOpacity onPress={goBack} style={styles.bannerContainer}>
+      <ArrowLeftIcon
+        size={20}
+        color={ColorPalette.GREY_TEXT_400}
+        strokeWidth={2}
       />
-    </View>
+    </TouchableOpacity>
   );
 
   const renderTitle = () => (
     <View style={styles.contentWrapper}>
       <Typography
         text={promptTitle}
-        variant={TypographyVariant.HEADING_SMALL}
+        variant={TypographyVariant.H5_BOLD}
         customTextStyles={styles.heading}
       />
       <View style={styles.containerTwo}>
         <View style={styles.subContainer}>
           <Typography
             text={otpSent}
-            variant={TypographyVariant.BODY_SMALL}
+            variant={TypographyVariant.PSMALL_REGULAR}
             customTextStyles={styles.subCaption}
           />
           <Typography
             text={phoneNumber}
-            variant={TypographyVariant.BODY_SMALL_HIGH}
+            variant={TypographyVariant.PSMALL_MEDIUM}
             customTextStyles={styles.subCaptionTwo}
           />
         </View>
-        <View style={styles.iconContainer}>
-          <Button
-            onPress={() => {}}
-            IconComponent={FlowBite}
-            iconOnly={true}
-            iconProps={{
-              size: 20,
-              color: ColorPalette.BorderPrimary,
-              strokeWidth: 2,
-            }}
+        <TouchableOpacity style={styles.iconContainer}>
+          <FlowBite
+            size={20}
+            color={ColorPalette.GREY_TEXT_400}
+            strokeWidth={2}
           />
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -121,11 +123,11 @@ const OTPVerificationScreen = ({route}) => {
         <TextButton
           text={resendText}
           onPress={handleResendOtp}
-          variant={TypographyVariant.BODY_SMALL}
+          variant={TypographyVariant.PSMALL_MEDIUM}
           customTextStyles={{
             ...styles.linkText,
             fontFamily: Fonts.POPPINS_REGULAR,
-            color: ColorPalette.ButtonPrimary,
+            color: ColorPalette.PURPLE_300,
           }}
           underline
         />
@@ -139,6 +141,8 @@ const OTPVerificationScreen = ({route}) => {
         text={verifyText}
         onPress={handleNavigate}
         variant={ButtonVariant.PRIMARY}
+        state={buttonState}
+        size={ButtonSize.MEDIUM}
       />
     </View>
   );

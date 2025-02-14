@@ -7,6 +7,7 @@ export const styles = StyleSheet.create({
   // Layout Containers
   container: {
     flex: 1,
+    backgroundColor: ColorPalette.White,
   },
   bannerContainer: {
     padding: Spacing.Large,
@@ -40,25 +41,20 @@ export const styles = StyleSheet.create({
   // Typography
   heading: {
     paddingLeft: Spacing.Large,
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
   },
   caption: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_TEXT_300,
     textAlign: 'center',
   },
   captionTwo: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
     textAlign: 'center',
   },
 
   // Links
   linkText: {
-    color: ColorPalette.ButtonPrimary,
-  },
-  linkTextTwo: {
-    color: ColorPalette.ButtonPrimary,
-    textDecorationLine: 'underline',
-    fontWeight: 'bold',
+    color: ColorPalette.PURPLE_300,
   },
 
   // Navigation

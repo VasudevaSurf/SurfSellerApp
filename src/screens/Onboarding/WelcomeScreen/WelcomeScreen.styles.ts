@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: 'center',
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_TEXT_300,
     paddingHorizontal: Spacing.Medium,
   },
   paginationContainer: {
@@ -63,10 +63,10 @@ export const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: ColorPalette.Gray200,
+    backgroundColor: ColorPalette.PURPLE_00,
   },
   activeDot: {
-    backgroundColor: ColorPalette.BorderPrimary,
+    backgroundColor: ColorPalette.PURPLE_300,
   },
   buttonContainer: {
     gap: getFigmaDimension(16),
@@ -75,7 +75,9 @@ export const styles = StyleSheet.create({
     marginTop: getFigmaDimension(32),
   },
   text: {
-    color: ColorPalette.ButtonPrimary,
     fontWeight: 'bold',
   },
+  buttonContainerStyle:{ 
+    borderWidth: 1
+  }
 });

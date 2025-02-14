@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, Dimensions, Image, ScrollView, View} from 'react-native';
 import {Button} from '../../../components/UserComponents/Button/Button';
-import {ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
+import {ButtonSize, ButtonState, ButtonType, ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {styles} from './WelcomeScreen.styles';
@@ -160,12 +160,12 @@ const WelcomeScreen = () => {
                 />
                 <View style={styles.textContainer}>
                   <Typography
-                    variant={TypographyVariant.HEADING_MEDIUM}
+                    variant={TypographyVariant.H4_BOLD}
                     text={item.title}
                     customTextStyles={styles.title}
                   />
                   <Typography
-                    variant={TypographyVariant.BODY_MEDIUM}
+                    variant={TypographyVariant.PSMALL_REGULAR}
                     text={item.subtitle}
                     customTextStyles={styles.subtitle}
                   />
@@ -188,12 +188,18 @@ const WelcomeScreen = () => {
             text={createAccount}
             onPress={handleCreateNewAccount}
             variant={ButtonVariant.PRIMARY}
+            state={ButtonState.DEFAULT}
+            size={ButtonSize.MEDIUM}
+            customTextStyles={styles.text}
           />
           <Button
             text={login}
             onPress={handleLogin}
-            variant={ButtonVariant.SECONDARY}
+            variant={ButtonVariant.PRIMARY}
+            state={ButtonState.DEFAULT}
+            type={ButtonType.OUTLINED}
             customTextStyles={styles.text}
+            customStyles={styles.buttonContainerStyle}
           />
         </View>
       </View>

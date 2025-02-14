@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
     gap: Spacing.XSmall,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: ColorPalette.White,
   },
   primaryContainer: {
     gap: Spacing.XSmall,
@@ -36,13 +37,13 @@ export const styles = StyleSheet.create({
   },
   separator: {
     fontSize: 24,
-    color: ColorPalette.SurfacePrimary,
+    color: ColorPalette.MainHeading,
   },
   modalHeading: {
-    color: ColorPalette.SurfacePrimary,
+    color: ColorPalette.MainHeading,
     fontWeight: 'bold',
   },
   footerText: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
   },
 });

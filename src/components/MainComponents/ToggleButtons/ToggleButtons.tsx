@@ -14,7 +14,7 @@ const ToggleButtons = () => {
         style={[styles.button, activeButton === '7days' && styles.activeButton]}
         onPress={() => setActiveButton('7days')}>
         <Typography
-          variant={TypographyVariant.BODY_SMALL}
+          variant={TypographyVariant.LXSMALL_REGULAR}
           text="Last 7 days"
           customTextStyles={[
             styles.buttonText,
@@ -29,7 +29,7 @@ const ToggleButtons = () => {
         ]}
         onPress={() => setActiveButton('monthly')}>
         <Typography
-          variant={TypographyVariant.BODY_SMALL}
+          variant={TypographyVariant.LXSMALL_REGULAR}
           text="Monthly"
           customTextStyles={[
             styles.buttonText,
@@ -54,15 +54,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeButton: {
-    backgroundColor: ColorPalette.ButtonPrimary,
+    backgroundColor: ColorPalette.PURPLE_300,
   },
   buttonText: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.AgreeTerms,
     fontSize: getFigmaDimension(12),
     lineHeight: getFigmaDimension(16),
   },
   activeButtonText: {
-    color: ColorPalette.BackgroundPrimary,
+    color: ColorPalette.White,
   },
 });
 

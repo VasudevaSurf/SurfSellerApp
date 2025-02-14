@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
     paddingVertical: getFigmaDimension(16),
     borderBottomWidth: 1,
-    borderBottomColor: ColorPalette.Divider,
+    borderBottomColor: ColorPalette.GREY_200,
   },
   lastItem: {
     borderBottomWidth: 0,
@@ -52,10 +52,10 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   orderIdText: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_TEXT_300,
   },
   amountText: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
   },
   customerRow: {
     flexDirection: 'column',
@@ -67,7 +67,7 @@ export const styles = StyleSheet.create({
     width: 1,
     height: 10,
     borderRadius: 1,
-    backgroundColor: ColorPalette.TextName,
+    backgroundColor: ColorPalette.GREY_TEXT_100,
     marginHorizontal: 8,
   },
   statusContainer: {
