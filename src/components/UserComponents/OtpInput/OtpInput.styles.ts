@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
-import { ColorPalette } from '../../../config/colorPalette';
-import { convertDipToPixels, getScreenWidth } from '../../../helpers/screenSize';
-import { BorderRadius, Spacing } from '../../../config/globalStyles';
+import {StyleSheet} from 'react-native';
+import {ColorPalette} from '../../../config/colorPalette';
+import {convertDipToPixels, getScreenWidth} from '../../../helpers/screenSize';
+import {BorderRadius, Spacing} from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.SurfacePrimary,
   },
   codeText: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_TEXT_300,
     marginTop: Spacing.XXSmall,
   },
   hiddenInput: {
@@ -30,14 +30,14 @@ export const styles = StyleSheet.create({
     opacity: 0,
   },
   stick: {
-    width: 2,
-    height: 30,
+    width: 3,
+    height: 38,
   },
   dash: {
     alignSelf: 'center',
     marginHorizontal: getScreenWidth(1.5),
   },
   dashText: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.Black,
   },
 });

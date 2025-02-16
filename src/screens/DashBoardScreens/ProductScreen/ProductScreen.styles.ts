@@ -7,10 +7,6 @@ import {
 import {ColorPalette} from '../../../config/colorPalette';
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: ColorPalette.White,
-  },
   searchContainer: {
     padding: getScreenWidth(4),
     alignItems: 'center',
@@ -49,7 +45,7 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
-    backgroundColor: ColorPalette.ButtonPrimary,
+    backgroundColor: ColorPalette.PURPLE_300,
     width: 48,
     height: 48,
     borderRadius: getFigmaDimension(12),

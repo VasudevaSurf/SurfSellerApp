@@ -16,6 +16,7 @@ import {getScreenHeight} from '../../../helpers/screenSize';
 import {Spacing} from '../../../config/globalStyles';
 import {Typography} from '../Typography/Typography';
 import {TypographyVariant} from '../Typography/Typography.types';
+import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
 
 const AnimatedTextInput: React.FC<TextInputProps> = ({
   label,
@@ -136,8 +137,8 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     color: animatedLabelPosition.interpolate({
       inputRange: [0, 1],
       outputRange: [
-        customLabelColorUnfocused || ColorPalette.TextSecondary,
-        customLabelColorFocused || ColorPalette.TextAction,
+        customLabelColorUnfocused || ColorPalette.GREY_TEXT_00,
+        customLabelColorFocused || ColorPalette.GREY_TEXT_400,
       ],
     }),
     ...customLabelStyles,
@@ -167,16 +168,12 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
                       style={styles.countryFlag}
                       resizeMode="contain"
                     />
-                    <Typography
-                      variant={TypographyVariant.BODY_SMALL}
-                      customTextStyles={styles.dropdownSymbol}
-                      text="▼"
-                    />
+                    <ArrowDownIcon style={styles.dropdownSymbol} />
                   </View>
                 )}
                 {countryCode && (
                   <Typography
-                    variant={TypographyVariant.BODY_SMALL}
+                    variant={TypographyVariant.PSMALL_REGULAR}
                     customTextStyles={styles.countryCode}
                     text={countryCode}
                   />
@@ -202,7 +199,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
       <Animated.Text style={labelStyle}>{label}</Animated.Text>
       {(error || localError) && (
         <Typography
-          variant={TypographyVariant.BODY_SMALL}
+          variant={TypographyVariant.PSMALL_REGULAR}
           customTextStyles={styles.error}
           text={error || localError || ''}
         />

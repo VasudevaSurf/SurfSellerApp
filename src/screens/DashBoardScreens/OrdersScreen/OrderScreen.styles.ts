@@ -7,10 +7,6 @@ import {
 import {ColorPalette} from '../../../config/colorPalette';
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: ColorPalette.White,
-  },
   searchContainer: {
     padding: getScreenWidth(4),
     alignItems: 'center',
@@ -29,5 +25,10 @@ export const styles = StyleSheet.create({
   },
   textStyle: {
     color: ColorPalette.TotalText,
+  },
+  productContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: getScreenWidth(4),
   },
 });

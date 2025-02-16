@@ -54,6 +54,7 @@ export const styles = StyleSheet.create({
   },
 
   // OTP Input Styles
+  // OTP Input Styles
   otpContainer: {
     marginTop: Spacing.XXLarge,
     paddingHorizontal: Spacing.Large,
@@ -67,17 +68,19 @@ export const styles = StyleSheet.create({
   otpBox: {
     borderWidth: 1,
     borderRadius: BorderRadius.Medium,
-    borderColor: ColorPalette.InputBack,
-    backgroundColor: ColorPalette.TextInversePrimary,
+    borderColor: ColorPalette.GREY_100, // Default unfocused state
+    backgroundColor: ColorPalette.White,
     height: convertDipToPixels(68),
     width: convertDipToPixels(83),
   },
   otpBoxFocused: {
-    borderColor: ColorPalette.BorderPrimary,
+    borderColor: ColorPalette.GREY_TEXT_400, // Focused state
     borderWidth: 2,
   },
   otpBoxFilled: {
-    backgroundColor: ColorPalette.TextInversePrimary,
+    borderColor: ColorPalette.GREY_TEXT_400, // Filled but not focused state
+    borderWidth: 1,
+    backgroundColor: ColorPalette.White,
   },
 
   // Icon Styles

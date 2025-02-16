@@ -1,12 +1,12 @@
-import { forwardRef, useImperativeHandle } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
-import { styles } from './OtpInput.styles';
-import { OtpInputProps, OtpInputRef } from './OtpInput.types';
-import { VerticalStick } from './VerticalStick';
-import { useOtpInput } from './useOtpInput';
-import { Typography } from '../Typography/Typography';
-import { ColorPalette } from '../../../config/colorPalette';
-import { TypographyVariant } from '../Typography/Typography.types';
+import {forwardRef, useImperativeHandle} from 'react';
+import {Pressable, TextInput, View} from 'react-native';
+import {styles} from './OtpInput.styles';
+import {OtpInputProps, OtpInputRef} from './OtpInput.types';
+import {VerticalStick} from './VerticalStick';
+import {useOtpInput} from './useOtpInput';
+import {Typography} from '../Typography/Typography';
+import {ColorPalette} from '../../../config/colorPalette';
+import {TypographyVariant} from '../Typography/Typography.types';
 
 /**
  * A component for entering a sequence of digits (like an OTP).
@@ -28,9 +28,16 @@ import { TypographyVariant } from '../Typography/Typography.types';
  */
 export const OtpInput = forwardRef<OtpInputRef, OtpInputProps>((props, ref) => {
   const {
-    models: { text, inputRef, focusedInputIndex, isFocused },
-    actions: { clear, handlePress, handleTextChange, focus, handleFocus, handleBlur },
-    forms: { setTextWithRef },
+    models: {text, inputRef, focusedInputIndex, isFocused},
+    actions: {
+      clear,
+      handlePress,
+      handleTextChange,
+      focus,
+      handleFocus,
+      handleBlur,
+    },
+    forms: {setTextWithRef},
   } = useOtpInput(props);
 
   const {
@@ -55,12 +62,15 @@ export const OtpInput = forwardRef<OtpInputRef, OtpInputProps>((props, ref) => {
     disabledPinCodeContainerStyle,
   } = theme;
 
-  useImperativeHandle(ref, () => ({ clear, focus, setValue: setTextWithRef }));
+  useImperativeHandle(ref, () => ({clear, focus, setValue: setTextWithRef}));
 
-  const generatePinCodeContainerStyle = (isFocusedContainer: boolean, char: string) => {
+  const generatePinCodeContainerStyle = (
+    isFocusedContainer: boolean,
+    char: string,
+  ) => {
     const stylesArray = [styles.codeContainer, pinCodeContainerStyle];
     if (focusColor && isFocusedContainer) {
-      stylesArray.push({ borderColor: focusColor });
+      stylesArray.push({borderColor: focusColor});
     }
     if (focusedPinCodeContainerStyle && isFocusedContainer) {
       stylesArray.push(focusedPinCodeContainerStyle);
@@ -78,9 +88,12 @@ export const OtpInput = forwardRef<OtpInputRef, OtpInputProps>((props, ref) => {
     const inputs = [];
     for (let i = 0; i < numberOfDigits; i++) {
       const char = text[i];
-      const isFocusedInput = i === focusedInputIndex && !disabled && Boolean(isFocused);
-      const isFilledLastInput = text.length === numberOfDigits && i === text.length - 1;
-      const isFocusedContainer = isFocusedInput || (isFilledLastInput && Boolean(isFocused));
+      const isFocusedInput =
+        i === focusedInputIndex && !disabled && Boolean(isFocused);
+      const isFilledLastInput =
+        text.length === numberOfDigits && i === text.length - 1;
+      const isFocusedContainer =
+        isFocusedInput || (isFilledLastInput && Boolean(isFocused));
 
       inputs.push(
         <Pressable
@@ -97,23 +110,23 @@ export const OtpInput = forwardRef<OtpInputRef, OtpInputProps>((props, ref) => {
             />
           ) : (
             <Typography
-              variant={TypographyVariant.HEADING_MEDIUM}
+              variant={TypographyVariant.H1_MEDIUM}
               text={char && secureTextEntry ? '•' : char}
               customTextStyles={styles.codeText}
             />
           )}
-        </Pressable>
+        </Pressable>,
       );
 
       if (numberOfDigits === 6 && i === 2) {
         inputs.push(
           <View key={'dash'} style={styles.dash}>
             <Typography
-              variant={TypographyVariant.BODY_MEDIUM}
+              variant={TypographyVariant.H5_BOLD}
               text="–"
               customTextStyles={styles.dashText}
             />
-          </View>
+          </View>,
         );
       }
     }

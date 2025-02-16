@@ -74,10 +74,7 @@ export const styles = StyleSheet.create({
     width: '100%',
     marginTop: getFigmaDimension(32),
   },
-  text: {
-    fontWeight: 'bold',
+  buttonContainerStyle: {
+    borderWidth: 1,
   },
-  buttonContainerStyle:{ 
-    borderWidth: 1
-  }
 });

@@ -11,56 +11,81 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {styles} from './OrderScreen.styles';
 import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {OrderInfo} from '../../../components/MainComponents/OrderInfo/OrderInfo';
+import {OrderStatus} from '../../../components/MainComponents/OrderInfo/OrderInfo.types';
 
 const OrderScreen = () => {
   const [searchText, setSearchText] = useState('');
-  const [products, setProducts] = useState([
+  const [orders, setOrders] = useState([
     {
       id: '1',
-      orderImage: 'https://picsum.photos/200',
-      productName: 'Lunar whisper luna waha the rtua nahi...',
-      sellerPrice: '€495.00',
-      platformFee: '€5.00',
-      stock: '11',
-      active: true,
+      orderImage: 'https://picsum.photos/202',
+      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
+      orderPrice: '499.00',
+      orderNumber: 172,
+      orderEmail: 'revanthyadav@surf.mt',
+      orderPhone: 9970344320,
+      orderDate: '10/15/2024',
+      orderTime: '21:59',
+      orderStatus: 'Cancelled' as OrderStatus,
     },
     {
       id: '2',
-      orderImage: 'https://picsum.photos/200',
-      productName: 'Solar Eclipse Watch',
-      sellerPrice: '€299.99',
-      platformFee: '€4.50',
-      stock: '8',
-      active: true,
+      orderImage: 'https://picsum.photos/202',
+      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
+      orderPrice: '499.00',
+      orderNumber: 172,
+      orderEmail: 'revanthyadav@surf.mt',
+      orderPhone: 9970344320,
+      orderDate: '10/15/2024',
+      orderTime: '21:59',
+      orderStatus: 'Cancelled' as OrderStatus,
     },
     {
       id: '3',
       orderImage: 'https://picsum.photos/202',
-      productName: 'Celestial Dream Catcher',
-      sellerPrice: '€149.99',
-      platformFee: '€3.00',
-      stock: '15',
-      active: false,
+      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
+      orderPrice: '499.00',
+      orderNumber: 172,
+      orderEmail: 'revanthyadav@surf.mt',
+      orderPhone: 9970344320,
+      orderDate: '10/15/2024',
+      orderTime: '21:59',
+      orderStatus: 'Cancelled' as OrderStatus,
     },
     {
       id: '4',
-      orderImage: 'https://picsum.photos/203',
-      productName: 'Moonstone Pendant',
-      sellerPrice: '€199.99',
-      platformFee: '€3.50',
-      stock: '5',
-      active: true,
+      orderImage: 'https://picsum.photos/202',
+      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
+      orderPrice: '499.00',
+      orderNumber: 172,
+      orderEmail: 'revanthyadav@surf.mt',
+      orderPhone: 9970344320,
+      orderDate: '10/15/2024',
+      orderTime: '21:59',
+      orderStatus: 'Cancelled' as OrderStatus,
     },
     {
       id: '5',
-      orderImage: 'https://picsum.photos/204',
-      productName: 'Starlight Bracelet Collection',
-      sellerPrice: '€259.99',
-      platformFee: '€4.00',
-      stock: '7',
-      active: false,
+      orderImage: 'https://picsum.photos/202',
+      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
+      orderPrice: '499.00',
+      orderNumber: 172,
+      orderEmail: 'revanthyadav@surf.mt',
+      orderPhone: 9970344320,
+      orderDate: '10/15/2024',
+      orderTime: '21:59',
+      orderStatus: 'Cancelled' as OrderStatus,
     },
   ]);
+
+  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
+    setOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId ? {...order, orderStatus: newStatus} : order,
+      ),
+    );
+  };
 
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
@@ -69,7 +94,7 @@ const OrderScreen = () => {
         image={{
           source: require('../../../assets/images/placeholder-profile.png'),
         }}
-        variant={TypographyVariant.BODY_LARGE_PAGE}
+        variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.TextTertiary}
         rightIcons={[
           {
@@ -105,9 +130,26 @@ const OrderScreen = () => {
         showsVerticalScrollIndicator={false}>
         <Typography
           variant={TypographyVariant.LMEDIUM_REGULAR}
-          text={`Total Items : ${products.length}`}
+          text={`Total Items : ${orders.length}`}
           customTextStyles={styles.textStyle}
         />
+        <View style={styles.productContainer}>
+          {orders.map(order => (
+            <OrderInfo
+              key={order.id}
+              orderImage={order.orderImage}
+              orderName={order.orderName}
+              orderPrice={order.orderPrice}
+              orderNumber={order.orderNumber}
+              orderEmail={order.orderEmail}
+              orderPhone={order.orderPhone}
+              orderDate={order.orderDate}
+              orderTime={order.orderTime}
+              orderStatus={order.orderStatus}
+              onStatusChange={status => handleStatusChange(order.id, status)}
+            />
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

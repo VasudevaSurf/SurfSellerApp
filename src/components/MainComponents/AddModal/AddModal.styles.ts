@@ -23,13 +23,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingRight: 16,
   },
-  title: {
-    marginBottom: 4,
-    color: ColorPalette.TextPrimary,
-  },
-  subtitle: {
-    color: ColorPalette.TextSecondary,
-  },
   closeButton: {
     padding: 4,
   },
@@ -37,8 +30,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 12,
   },
-  customButton: {
-    color: ColorPalette.ButtonPrimary,
-    fontWeight: 'bold',
+  customButtonStyle: {
+    borderWidth: 1,
   },
 });

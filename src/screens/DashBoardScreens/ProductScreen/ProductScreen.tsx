@@ -115,7 +115,7 @@ const ProductScreen = () => {
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
         name="Products"
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
         rightIcons={[
           {
@@ -209,7 +209,7 @@ const ProductScreen = () => {
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={() => setShowAddModal(true)}>
-        <PlusIcon size={24} color="#FFFFFF" style={undefined} />
+        <PlusIcon size={24} color={ColorPalette.White} style={undefined} />
       </TouchableOpacity>
     </SafeAreaView>
   );

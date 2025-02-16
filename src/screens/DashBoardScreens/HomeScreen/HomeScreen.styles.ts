@@ -223,4 +223,20 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  containerAnother: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: getFigmaDimension(18),
+  },
+  containerAnotherOne: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: getFigmaDimension(16),
+  },
+  containerProportional: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: getFigmaDimension(16),
+  },
 });

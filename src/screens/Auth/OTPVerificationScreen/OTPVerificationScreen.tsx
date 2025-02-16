@@ -110,7 +110,7 @@ const OTPVerificationScreen = ({route}) => {
           onTextChange={handleOtpChange}
           onFilled={handleOtpComplete}
           autoFocus
-          focusColor={ColorPalette.ButtonPrimary}
+          focusColor={ColorPalette.GREY_TEXT_400}
           theme={{
             containerStyle: styles.otpInputContainer,
             pinCodeContainerStyle: styles.otpBox,

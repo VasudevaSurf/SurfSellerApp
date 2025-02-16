@@ -102,9 +102,6 @@ const PhoneNumberScreen = () => {
         countryCode={countryCode}
         countryFlag={MALTA_FLAG_URL}
         onCountryPress={handleCountryPress}
-        customLabelColorFocused={ColorPalette.TextPrimary}
-        customLabelColorUnfocused={ColorPalette.TextUnfocus}
-        autoFocus
       />
     </View>
   );

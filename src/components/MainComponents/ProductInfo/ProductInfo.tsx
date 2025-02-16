@@ -97,8 +97,22 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               labelStyle={styles.toggleLabel}
               size="small"
               onToggle={isOn => onActiveChange?.(isOn)}
-              thumbOnStyle={{backgroundColor: ColorPalette.White}}
-              thumbOffStyle={{backgroundColor: ColorPalette.White}}
+              thumbOnStyle={{
+                backgroundColor: ColorPalette.White,
+                elevation: 0,
+                shadowOpacity: 0,
+                shadowColor: 'transparent',
+                shadowOffset: {height: 0, width: 0},
+                shadowRadius: 0,
+              }}
+              thumbOffStyle={{
+                backgroundColor: ColorPalette.White,
+                elevation: 0,
+                shadowOpacity: 0,
+                shadowColor: 'transparent',
+                shadowOffset: {height: 0, width: 0},
+                shadowRadius: 0,
+              }}
               trackOnStyle={{
                 width: getFigmaDimension(40),
                 height: getFigmaDimension(24),

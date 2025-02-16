@@ -8,7 +8,13 @@ import CheckIcon from '../../../assets/icons/CheckIcon';
 import CloseIcon from '../../../assets/icons/CloseIcon';
 import {FilterModalProps, FilterSection} from './FilterModal.types';
 import {styles} from './FilterModal.styles';
-import {Button, ButtonVariant} from '../../UserComponents/Button';
+import {
+  Button,
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+  ButtonVariant,
+} from '../../UserComponents/Button';
 
 export const FilterModal: React.FC<FilterModalProps> = ({
   isVisible,
@@ -62,25 +68,25 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       onModalHide={onClose}
       swipeDirection="down"
       backdropOpacity={0.5}
-      backdropColor="#0000003D"
+      backdropColor={ColorPalette.OPACITY_24}
       onSwipeComplete={onClose}>
       <View style={styles.modalContainer}>
         <View style={styles.contentContainer}>
           <View style={styles.header}>
             <View style={styles.headerContent}>
               <Typography
-                variant={TypographyVariant.HEADING_SMALL}
+                variant={TypographyVariant.H5_BOLD}
                 text="Apply Filters"
                 customTextStyles={styles.title}
               />
               <Typography
-                variant={TypographyVariant.BODY_MEDIUM}
+                variant={TypographyVariant.LSMALL_REGULAR}
                 text="Filter by Status"
                 customTextStyles={styles.subtitle}
               />
             </View>
             <TouchableOpacity onPress={onClose}>
-              <CloseIcon color={ColorPalette.BorderPrimary} size={24} />
+              <CloseIcon color={ColorPalette.GREY_TEXT_400} size={24} />
             </TouchableOpacity>
           </View>
 
@@ -99,9 +105,20 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                       <View style={styles.uncheckedBox} />
                     )}
                     <Typography
-                      variant={TypographyVariant.BODY_MEDIUM}
+                      variant={
+                        option.isSelected
+                          ? TypographyVariant.PMEDIUM_MEDIUM
+                          : TypographyVariant.PMEDIUM_REGULAR
+                      }
                       text={option.label}
-                      customTextStyles={styles.optionLabel}
+                      customTextStyles={[
+                        styles.optionLabel,
+                        {
+                          color: option.isSelected
+                            ? ColorPalette.GREY_TEXT_500
+                            : ColorPalette.GREY_TEXT_300,
+                        },
+                      ]}
                     />
                   </TouchableOpacity>
                 ))}
@@ -113,9 +130,11 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             <Button
               text="RESET FILTERS"
               onPress={handleReset}
-              variant={ButtonVariant.SECONDARY}
-              customButtonStyles={styles.customButton}
-              customTextStyles={styles.currentText}
+              variant={ButtonVariant.PRIMARY}
+              state={ButtonState.DEFAULT}
+              type={ButtonType.OUTLINED}
+              size={ButtonSize.MEDIUM}
+              customStyles={styles.customButton}
             />
             <Button
               text="VIEW RESULTS"
@@ -124,7 +143,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 onClose();
               }}
               variant={ButtonVariant.PRIMARY}
-              customButtonStyles={styles.customButton}
+              state={ButtonState.DEFAULT}
+              size={ButtonSize.MEDIUM}
+              customStyles={styles.customButtonTwo}
             />
           </View>
         </View>

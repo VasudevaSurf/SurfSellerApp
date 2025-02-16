@@ -31,9 +31,11 @@ export const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },
-  title: {},
+  title: {
+    color: ColorPalette.GREY_TEXT_500,
+  },
   subtitle: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_TEXT_300,
   },
   sectionContainer: {
     paddingVertical: getFigmaDimension(8),
@@ -50,10 +52,11 @@ export const styles = StyleSheet.create({
     height: 24,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: ColorPalette.BorderSecondary,
+    borderColor: ColorPalette.GREY_200,
   },
   optionLabel: {
     marginLeft: getScreenWidth(0.03),
+    color: ColorPalette.GREY_TEXT_300,
   },
   footer: {
     display: 'flex',
@@ -65,9 +68,9 @@ export const styles = StyleSheet.create({
   },
   customButton: {
     width: getFigmaDimension(190),
+    borderWidth: 1,
   },
-  currentText: {
-    color: ColorPalette.ButtonPrimary,
-    fontWeight: 'bold',
+  customButtonTwo: {
+    width: getFigmaDimension(190),
   },
 });

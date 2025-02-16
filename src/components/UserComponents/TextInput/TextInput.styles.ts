@@ -20,14 +20,14 @@ export const createStyles = (
       borderWidth: 2,
       borderRadius: BorderRadius.XSmall,
       borderColor: hasError
-        ? ColorPalette.BorderError
+        ? ColorPalette.RED_100
         : isFocused
-        ? ColorPalette.BorderPrimary
-        : ColorPalette.BorderSecondary,
+        ? ColorPalette.GREY_TEXT_400
+        : ColorPalette.GREY_100,
       flexDirection: 'row',
       alignItems: 'center',
       minHeight: height || getScreenHeight(7),
-      backgroundColor: ColorPalette.BackgroundPrimary,
+      backgroundColor: ColorPalette.White,
     },
     countrySection: {
       flexDirection: 'row',
@@ -47,7 +47,7 @@ export const createStyles = (
     },
     countryCode: {
       fontSize: 16,
-      color: ColorPalette.TextSmall,
+      color: ColorPalette.GREY_TEXT_400,
     },
     inputWrapper: {
       flex: 1,
@@ -56,30 +56,29 @@ export const createStyles = (
     },
     input: {
       flex: 1,
-      fontSize: 16,
-      color: ColorPalette.TextPrimary,
+      fontSize: 14,
+      lineHeight: 16,
+      color: ColorPalette.GREY_TEXT_400,
     },
     label: {
       position: 'absolute',
-      backgroundColor: ColorPalette.BackgroundPrimary,
+      backgroundColor: ColorPalette.White,
       paddingHorizontal: Spacing.XXSmall,
       left: Spacing.XSmall,
       alignSelf: 'center',
       textAlign: 'center',
-      fontFamily: TypographyVariant.BODY_SMALL,
+      fontFamily: TypographyVariant.PSMALL_REGULAR,
     },
     flagContainer: {
       flexDirection: 'row',
       alignItems: 'center',
     },
     dropdownSymbol: {
-      fontSize: 10,
-      color: ColorPalette.TextSecondary,
       marginLeft: Spacing.XXSmall,
       marginRight: Spacing.Medium,
     },
     error: {
-      color: ColorPalette.TextError,
+      color: ColorPalette.RED_100,
       fontSize: 12,
       marginTop: Spacing.XXSmall,
       marginLeft: Spacing.Small,

@@ -31,7 +31,7 @@ const HomeScreen = () => {
         image={{
           source: require('../../../assets/images/placeholder-profile.png'),
         }}
-        variant={TypographyVariant.BODY_LARGE_PAGE}
+        variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.TextTertiary}
         rightIcons={[
           {
@@ -137,97 +137,99 @@ const HomeScreen = () => {
               </View>
             </View>
           </View>
-          <View style={styles.containerTwo}>
-            <View style={styles.activeProduct}>
-              <View style={styles.twoContainer}>
-                <View style={styles.iconBackOne}>
-                  <PackageIcon style={undefined} />
+          <View style={styles.containerAnother}>
+            <View style={styles.containerAnotherOne}>
+              <View style={styles.activeProduct}>
+                <View style={styles.twoContainer}>
+                  <View style={styles.iconBackOne}>
+                    <PackageIcon style={undefined} />
+                  </View>
+                  <View style={styles.salesTwo}>
+                    <Typography
+                      variant={TypographyVariant.H4_BOLD}
+                      text="1312"
+                      customTextStyles={styles.countValue}
+                    />
+                    <Typography
+                      variant={TypographyVariant.LMEDIUM_REGULAR}
+                      text="Active Products"
+                      customTextStyles={styles.countCaption}
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.countBlock}>
+                  <Typography
+                    variant={TypographyVariant.PXSMALL_REGULAR}
+                    text="0%"
+                    customTextStyles={styles.countText}
+                  />
+                  <TrendIcon size={18} style={undefined} />
+                </View>
+              </View>
+              <View style={styles.activeProduct}>
+                <View style={styles.twoContainer}>
+                  <View style={styles.iconBack}>
+                    <CircularEuroIcon style={undefined} />
+                  </View>
+                  <View style={styles.salesTwo}>
+                    <Typography
+                      variant={TypographyVariant.H4_BOLD}
+                      text="€13,482"
+                      customTextStyles={styles.countValue}
+                    />
+                    <Typography
+                      variant={TypographyVariant.LMEDIUM_REGULAR}
+                      text="Your income"
+                      customTextStyles={styles.countCaption}
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.countBlock}>
+                  <Typography
+                    variant={TypographyVariant.PXSMALL_REGULAR}
+                    text="0%"
+                    customTextStyles={styles.countText}
+                  />
+                  <TrendIcon size={18} style={undefined} />
+                </View>
+              </View>
+            </View>
+            <View style={styles.containerProportional}>
+              <View style={styles.stockContainer}>
+                <View style={styles.iconBackTwo}>
+                  <DownloadIcon style={undefined} />
                 </View>
                 <View style={styles.salesTwo}>
                   <Typography
-                    variant={TypographyVariant.H4_BOLD}
-                    text="1312"
+                    variant={TypographyVariant.LSMALL_BOLD}
+                    text="18"
                     customTextStyles={styles.countValue}
                   />
                   <Typography
-                    variant={TypographyVariant.LMEDIUM_REGULAR}
-                    text="Active Products"
+                    variant={TypographyVariant.LSMALL_REGULAR}
+                    text="Out of Stock"
                     customTextStyles={styles.countCaption}
                   />
                 </View>
               </View>
-
-              <View style={styles.countBlock}>
-                <Typography
-                  variant={TypographyVariant.PXSMALL_REGULAR}
-                  text="0%"
-                  customTextStyles={styles.countText}
-                />
-                <TrendIcon size={18} style={undefined} />
-              </View>
-            </View>
-            <View style={styles.stockContainer}>
-              <View style={styles.iconBackTwo}>
-                <DownloadIcon style={undefined} />
-              </View>
-              <View style={styles.salesTwo}>
-                <Typography
-                  variant={TypographyVariant.LSMALL_BOLD}
-                  text="18"
-                  customTextStyles={styles.countValue}
-                />
-                <Typography
-                  variant={TypographyVariant.LSMALL_REGULAR}
-                  text="Out of Stock"
-                  customTextStyles={styles.countCaption}
-                />
-              </View>
-            </View>
-          </View>
-          <View style={styles.containerTwo}>
-            <View style={styles.activeProduct}>
-              <View style={styles.twoContainer}>
-                <View style={styles.iconBack}>
-                  <CircularEuroIcon style={undefined} />
+              <View style={styles.stockContainer}>
+                <View style={styles.iconBackThree}>
+                  <BookmarkNoteIcon style={undefined} />
                 </View>
                 <View style={styles.salesTwo}>
                   <Typography
-                    variant={TypographyVariant.H4_BOLD}
-                    text="€13,482"
+                    variant={TypographyVariant.LSMALL_BOLD}
+                    text="2,547.63"
                     customTextStyles={styles.countValue}
                   />
                   <Typography
-                    variant={TypographyVariant.LMEDIUM_REGULAR}
-                    text="Your income"
+                    variant={TypographyVariant.LSMALL_REGULAR}
+                    text="Taxes"
                     customTextStyles={styles.countCaption}
                   />
                 </View>
-              </View>
-
-              <View style={styles.countBlock}>
-                <Typography
-                  variant={TypographyVariant.PXSMALL_REGULAR}
-                  text="0%"
-                  customTextStyles={styles.countText}
-                />
-                <TrendIcon size={18} style={undefined} />
-              </View>
-            </View>
-            <View style={styles.stockContainer}>
-              <View style={styles.iconBackThree}>
-                <BookmarkNoteIcon style={undefined} />
-              </View>
-              <View style={styles.salesTwo}>
-                <Typography
-                  variant={TypographyVariant.LSMALL_BOLD}
-                  text="2,547.63"
-                  customTextStyles={styles.countValue}
-                />
-                <Typography
-                  variant={TypographyVariant.LSMALL_REGULAR}
-                  text="Taxes"
-                  customTextStyles={styles.countCaption}
-                />
               </View>
             </View>
           </View>

@@ -1,7 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, Dimensions, Image, ScrollView, View} from 'react-native';
 import {Button} from '../../../components/UserComponents/Button/Button';
-import {ButtonSize, ButtonState, ButtonType, ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
+import {
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+  ButtonVariant,
+} from '../../../components/UserComponents/Button/Button.types';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {styles} from './WelcomeScreen.styles';
@@ -190,7 +195,6 @@ const WelcomeScreen = () => {
             variant={ButtonVariant.PRIMARY}
             state={ButtonState.DEFAULT}
             size={ButtonSize.MEDIUM}
-            customTextStyles={styles.text}
           />
           <Button
             text={login}
@@ -198,7 +202,6 @@ const WelcomeScreen = () => {
             variant={ButtonVariant.PRIMARY}
             state={ButtonState.DEFAULT}
             type={ButtonType.OUTLINED}
-            customTextStyles={styles.text}
             customStyles={styles.buttonContainerStyle}
           />
         </View>
