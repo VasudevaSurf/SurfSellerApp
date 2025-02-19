@@ -31,6 +31,7 @@ import {
   ButtonState,
   ButtonSize,
 } from '../../../components/UserComponents/Button';
+import {navigate} from '../../../navigation/utils/navigationRef';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -188,7 +189,14 @@ const AccountScreen = () => {
             label="Personal Info"
             leftIcon={<ProfileIcon style={undefined} />}
             rightIcon={<ArrowRightIcon style={undefined} />}
-            onPress={() => {}}
+            onPress={() => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {
+                  screen: 'PersonalInfo',
+                },
+              });
+            }}
             textStyle={{color: ColorPalette.GREY_TEXT_500}}
             variant={TypographyVariant.LMEDIUM_MEDIUM}
           />

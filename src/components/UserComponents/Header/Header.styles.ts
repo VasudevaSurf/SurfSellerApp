@@ -34,4 +34,8 @@ export const headerStyles = StyleSheet.create({
   nameContainer: {
     marginLeft: Spacing.XSmall,
   },
+  leftIconContainer: {
+    paddingVertical: getFigmaDimension(6),
+    paddingHorizontal: getFigmaDimension(8),
+  },
 });

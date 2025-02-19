@@ -28,8 +28,10 @@ export type DashboardStackParamList = {
   Home: undefined;
   Product: undefined;
   Orders: undefined;
-  
-  Account: undefined;
+  Account: {
+    screen?: string;
+    params?: object;
+  };
 };
 
 export type RootStackParamList = {
@@ -39,6 +41,21 @@ export type RootStackParamList = {
   Create: undefined;
   VAT: undefined;
   Dashboard: undefined;
+};
+
+export type AccountSettingsStackParamList = {
+  AccountSettings: undefined;
+  PersonalInfo: undefined;
+  EditName: undefined;
+  EditEmail: undefined;
+  EditPhone: undefined;
+  CompanyProfile: undefined;
+  BankDetails: undefined;
+  Payments: undefined;
+  StripAccount: undefined;
+  Notifications: undefined;
+  TermsConditions: undefined;
+  PrivacyPolicy: undefined;
 };
 
 declare global {

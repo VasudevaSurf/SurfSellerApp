@@ -1,3 +1,4 @@
+import {ReactNode} from 'react';
 import {TypographyVariant} from '../Typography/Typography.types';
 
 export interface HeaderIconProps {
@@ -20,7 +21,8 @@ export interface HeaderProps {
     style?: any;
   };
   name: string;
-  rightIcons: HeaderIconProps[];
+  rightIcons?: HeaderIconProps[];
   variant?: TypographyVariant;
   textColor?: string;
+  leftIcon?: ReactNode;
 }

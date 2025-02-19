@@ -41,7 +41,6 @@ const PhoneNumberScreen = () => {
   const [countryCode, setCountryCode] = useState(INITIAL_COUNTRY_CODE);
   const [buttonState, setButtonState] = useState(ButtonState.DISABLED);
 
-  // Effect to update button state based on phone number input
   useEffect(() => {
     if (phoneNumber.trim() !== '') {
       setButtonState(ButtonState.DEFAULT);
@@ -50,7 +49,6 @@ const PhoneNumberScreen = () => {
     }
   }, [phoneNumber]);
 
-  // Event Handlers
   const handleCountryPress = () => {
     console.log('Open country picker');
   };
@@ -76,7 +74,6 @@ const PhoneNumberScreen = () => {
     }
   };
 
-  // Component Sections
   const renderBanner = () => (
     <MainBanner
       surfTitle={surfTitle}

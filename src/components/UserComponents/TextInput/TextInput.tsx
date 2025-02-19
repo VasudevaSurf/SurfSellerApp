@@ -38,9 +38,21 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   countryCode,
   countryFlag,
   onCountryPress,
+  leftIcons = [],
+  leftText,
+  rightIcons = [],
+  rightText,
+  onRightTextPress,
   type = 'default',
   height,
   width,
+  customBorderColor,
+  customFocusedBorderColor,
+  customErrorBorderColor,
+  customBorderWidth = 1,
+  customFocusedBorderWidth = 2, // New default value
+  customErrorBorderWidth = 2, // New default value
+  disabled = false,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -57,11 +69,19 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     Boolean(value),
     height,
     width,
+    customBorderColor,
+    customFocusedBorderColor,
+    customErrorBorderColor,
+    customBorderWidth,
+    customFocusedBorderWidth,
+    customErrorBorderWidth,
   );
 
   const handleFocus = () => {
-    setIsFocused(true);
-    animateLabel(1);
+    if (!disabled) {
+      setIsFocused(true);
+      animateLabel(1);
+    }
   };
 
   const handleBlur = () => {
@@ -100,7 +120,9 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   }, [autoFocus]);
 
   const handleContainerPress = () => {
-    inputRef.current?.focus();
+    if (!disabled) {
+      inputRef.current?.focus();
+    }
   };
 
   const baseLabelPosition = showCountrySection
@@ -144,43 +166,144 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     ...customLabelStyles,
   };
 
-  const getInputContainerStyle = () => ({
-    ...styles.inputContainer,
-    paddingLeft: showCountrySection ? 0 : Spacing.Small,
-  });
+  const renderLeftSection = () => {
+    if (showCountrySection) {
+      return (
+        <View
+          style={styles.countrySection}
+          onLayout={handleCountrySectionLayout}>
+          <TouchableOpacity
+            style={styles.countryButton}
+            onPress={onCountryPress}
+            disabled={!onCountryPress}>
+            {countryFlag && (
+              <Image
+                source={{uri: countryFlag}}
+                style={styles.countryFlag}
+                resizeMode="contain"
+              />
+            )}
+            <ArrowDownIcon style={styles.dropdownSymbol} />
+            {leftText ? (
+              <Typography
+                variant={TypographyVariant.PSMALL_REGULAR}
+                customTextStyles={styles.countryCode}
+                text={leftText}
+              />
+            ) : (
+              countryCode && (
+                <Typography
+                  variant={TypographyVariant.PSMALL_REGULAR}
+                  customTextStyles={styles.countryCode}
+                  text={countryCode}
+                />
+              )
+            )}
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    if (leftIcons?.length > 0) {
+      return (
+        <View style={styles.leftSection}>
+          {leftIcons.map((iconConfig, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.iconContainer}
+              onPress={iconConfig.onPress}
+              disabled={!iconConfig.onPress}>
+              {typeof iconConfig.icon === 'string' ? (
+                <Image
+                  source={{uri: iconConfig.icon}}
+                  style={styles.iconSize}
+                  resizeMode="contain"
+                />
+              ) : (
+                React.isValidElement(iconConfig.icon) && iconConfig.icon
+              )}
+            </TouchableOpacity>
+          ))}
+          {leftText && (
+            <Typography
+              variant={TypographyVariant.PSMALL_REGULAR}
+              customTextStyles={styles.leftText}
+              text={leftText}
+            />
+          )}
+        </View>
+      );
+    }
+
+    return null;
+  };
+
+  const renderRightSection = () => {
+    if (rightIcons?.length > 0 || rightText) {
+      return (
+        <View style={styles.rightSection}>
+          {rightText && (
+            <TouchableOpacity onPress={onRightTextPress}>
+              <Typography
+                variant={TypographyVariant.PSMALL_REGULAR}
+                customTextStyles={styles.rightText}
+                text={rightText}
+              />
+            </TouchableOpacity>
+          )}
+          {rightIcons.map((iconConfig, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.iconContainer}
+              onPress={iconConfig.onPress}
+              disabled={!iconConfig.onPress}>
+              {typeof iconConfig.icon === 'string' ? (
+                <Image
+                  source={{uri: iconConfig.icon}}
+                  style={styles.iconSize}
+                  resizeMode="contain"
+                />
+              ) : (
+                React.isValidElement(iconConfig.icon) && iconConfig.icon
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+      );
+    }
+    return null;
+  };
+  const getInputContainerStyle = () => {
+    const hasLeftSection =
+      showCountrySection || (leftIcons && leftIcons.length > 0) || leftText;
+    return {
+      ...styles.inputContainer,
+      paddingLeft: hasLeftSection ? 0 : Spacing.XSmall,
+      backgroundColor: disabled ? ColorPalette.GREY_50 : undefined,
+    };
+  };
 
   return (
     <View style={[styles.container, customContainerStyles]}>
       <Pressable onPress={handleContainerPress}>
-        <View style={getInputContainerStyle()}>
-          {showCountrySection && (
-            <View
-              style={styles.countrySection}
-              onLayout={handleCountrySectionLayout}>
-              <TouchableOpacity
-                style={styles.countryButton}
-                onPress={onCountryPress}
-                disabled={!onCountryPress}>
-                {countryFlag && (
-                  <View style={styles.flagContainer}>
-                    <Image
-                      source={{uri: countryFlag}}
-                      style={styles.countryFlag}
-                      resizeMode="contain"
-                    />
-                    <ArrowDownIcon style={styles.dropdownSymbol} />
-                  </View>
-                )}
-                {countryCode && (
-                  <Typography
-                    variant={TypographyVariant.PSMALL_REGULAR}
-                    customTextStyles={styles.countryCode}
-                    text={countryCode}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
-          )}
+        <View
+          style={[
+            getInputContainerStyle(),
+            {
+              borderColor:
+                error || localError
+                  ? customErrorBorderColor || ColorPalette.RED_100
+                  : isFocused
+                  ? customFocusedBorderColor || ColorPalette.GREY_TEXT_400
+                  : customBorderColor || ColorPalette.GREY_100,
+              borderWidth:
+                error || localError
+                  ? customErrorBorderWidth
+                  : isFocused
+                  ? customFocusedBorderWidth
+                  : customBorderWidth,
+            },
+          ]}>
+          {renderLeftSection()}
           <View style={styles.inputWrapper}>
             <RNTextInput
               ref={inputRef}
@@ -192,8 +315,11 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
               autoCapitalize={autoCapitalize}
               secureTextEntry={secureTextEntry}
               keyboardType={keyboardType}
+              placeholder={placeholder}
+              editable={!disabled}
             />
           </View>
+          {renderRightSection()}
         </View>
       </Pressable>
       <Animated.Text style={labelStyle}>{label}</Animated.Text>

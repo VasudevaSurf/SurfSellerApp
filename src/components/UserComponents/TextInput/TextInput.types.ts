@@ -1,5 +1,10 @@
 import {TextStyle, ViewStyle} from 'react-native';
 
+interface IconConfig {
+  icon: React.ReactNode | string;
+  onPress?: () => void;
+}
+
 export interface TextInputProps {
   label: string;
   value: string;
@@ -11,8 +16,8 @@ export interface TextInputProps {
   customInputStyles?: TextStyle;
   customPlaceholderStyles?: TextStyle;
   customLabelStyles?: TextStyle;
-  customLabelColorFocused?: string; // New prop for focused label color
-  customLabelColorUnfocused?: string; // New prop for unfocused label color
+  customLabelColorFocused?: string;
+  customLabelColorUnfocused?: string;
   error?: string;
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'number-pad' | 'email-address' | 'phone-pad';
@@ -23,4 +28,16 @@ export interface TextInputProps {
   type?: 'email' | 'phone' | 'default';
   height?: number;
   width?: number | string;
+  leftIcons?: IconConfig[]; // Changed to array of IconConfig
+  leftText?: string;
+  rightIcons?: IconConfig[]; // Changed to array of IconConfig
+  rightText?: string;
+  onRightTextPress?: () => void;
+  customBorderColor?: string;
+  customFocusedBorderColor?: string;
+  customErrorBorderColor?: string;
+  customBorderWidth?: number;
+  customFocusedBorderWidth?: number; // New prop
+  customErrorBorderWidth?: number;
+  disabled?: boolean;
 }

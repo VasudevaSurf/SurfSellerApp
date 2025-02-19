@@ -12,6 +12,7 @@ export const Header: React.FC<HeaderProps> = ({
   rightIcons,
   variant = TypographyVariant.LSMALL_BOLD,
   textColor = ColorPalette.GREY_TEXT_500,
+  leftIcon,
 }) => {
   return (
     <View style={headerStyles.container}>
@@ -21,6 +22,9 @@ export const Header: React.FC<HeaderProps> = ({
             source={image.source || {uri: image.uri}}
             style={[headerStyles.profileImage, image.style]}
           />
+        )}
+        {leftIcon && (
+          <View style={[headerStyles.leftIconContainer]}>{leftIcon}</View>
         )}
         <View style={[headerStyles.nameContainer, !image && {marginLeft: 0}]}>
           <Typography
@@ -32,21 +36,22 @@ export const Header: React.FC<HeaderProps> = ({
       </View>
 
       <View style={headerStyles.rightSection}>
-        {rightIcons.map((iconProps, index) => {
-          const Icon = iconProps.icon;
-          return (
-            <TouchableOpacity
-              key={index}
-              onPress={iconProps.onPress}
-              style={headerStyles.iconButton}>
-              <Icon
-                size={iconProps.size || 24}
-                color={iconProps.color || ColorPalette.GREY_TEXT_400}
-                strokeWidth={iconProps.strokeWidth || 2}
-              />
-            </TouchableOpacity>
-          );
-        })}
+        {rightIcons &&
+          rightIcons.map((iconProps, index) => {
+            const Icon = iconProps.icon;
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={iconProps.onPress}
+                style={headerStyles.iconButton}>
+                <Icon
+                  size={iconProps.size || 24}
+                  color={iconProps.color || ColorPalette.GREY_TEXT_400}
+                  strokeWidth={iconProps.strokeWidth || 2}
+                />
+              </TouchableOpacity>
+            );
+          })}
       </View>
     </View>
   );

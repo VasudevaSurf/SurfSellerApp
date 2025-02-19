@@ -10,6 +10,12 @@ export const createStyles = (
   hasValue: boolean,
   height?: number,
   width?: number | string,
+  customBorderColor?: string,
+  customFocusedBorderColor?: string,
+  customErrorBorderColor?: string,
+  customBorderWidth: number = 1,
+  customFocusedBorderWidth: number = 2,
+  customErrorBorderWidth: number = 2,
 ) =>
   StyleSheet.create({
     container: {
@@ -17,13 +23,17 @@ export const createStyles = (
       position: 'relative',
     },
     inputContainer: {
-      borderWidth: 2,
+      borderWidth: hasError
+        ? customErrorBorderWidth
+        : isFocused
+        ? customFocusedBorderWidth
+        : customBorderWidth,
       borderRadius: BorderRadius.XSmall,
       borderColor: hasError
-        ? ColorPalette.RED_100
+        ? customErrorBorderColor || ColorPalette.RED_100
         : isFocused
-        ? ColorPalette.GREY_TEXT_400
-        : ColorPalette.GREY_100,
+        ? customFocusedBorderColor || ColorPalette.GREY_TEXT_400
+        : customBorderColor || ColorPalette.GREY_100,
       flexDirection: 'row',
       alignItems: 'center',
       minHeight: height || getScreenHeight(7),
@@ -59,6 +69,7 @@ export const createStyles = (
       fontSize: 14,
       lineHeight: 16,
       color: ColorPalette.GREY_TEXT_400,
+      paddingVertical: Spacing.Small,
     },
     label: {
       position: 'absolute',
@@ -82,5 +93,31 @@ export const createStyles = (
       fontSize: 12,
       marginTop: Spacing.XXSmall,
       marginLeft: Spacing.Small,
+    },
+    rightSection: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingRight: Spacing.Small,
+    },
+    rightText: {
+      marginRight: Spacing.XXSmall,
+      color: ColorPalette.GREY_TEXT_400,
+    },
+    rightIcon: {
+      padding: Spacing.XXSmall,
+    },
+    iconSize: {
+      width: getFigmaDimension(24),
+      height: getFigmaDimension(24),
+    },
+    iconContainer: {
+      marginHorizontal: Spacing.XXSmall,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    leftSection: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingLeft: Spacing.XSmall,
     },
   });
