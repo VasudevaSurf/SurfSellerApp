@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
     gap: getScreenWidth(4),
   },
   textStyle: {
-    color: ColorPalette.TotalText,
+    color: ColorPalette.GREY_TEXT_500,
   },
   productContainer: {
     display: 'flex',

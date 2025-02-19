@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Image} from 'react-native';
 import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
@@ -9,6 +9,13 @@ import {styles} from './ProductInfo.styles';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {ColorPalette} from '../../../config/colorPalette';
 import {getFigmaDimension} from '../../../helpers/screenSize';
+import {AddModal, ButtonConfig} from '../AddModal/AddModal';
+import {
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+  ButtonVariant,
+} from '../../UserComponents/Button';
 
 export const ProductInfo: React.FC<ProductInfoProps> = ({
   orderImage,
@@ -22,6 +29,45 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   onShare,
   onMoreOptions,
 }) => {
+  const [showModal, setShowModal] = useState(false);
+
+  const handleUploadCsv = () => {
+    console.log('Upload CSV pressed');
+  };
+
+  const handleAddManually = () => {
+    console.log('Add manually pressed');
+  };
+
+  const buttonsTwo: ButtonConfig[] = [
+    {
+      text: 'Preview',
+      onPress: () => handleUploadCsv(),
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      size: ButtonSize.MEDIUM,
+    },
+    {
+      text: 'Delete',
+      onPress: () => handleAddManually(),
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      type: ButtonType.OUTLINED,
+      size: ButtonSize.MEDIUM,
+      customStyles: {borderWidth: 1, borderColor: ColorPalette.GREY_TEXT_400},
+      customTextStyles: {color: ColorPalette.GREY_TEXT_400},
+    },
+    {
+      text: 'Cancel',
+      onPress: () => handleAddManually(),
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      type: ButtonType.OUTLINED,
+      size: ButtonSize.MEDIUM,
+      customStyles: {borderWidth: 1},
+    },
+  ];
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.imageContainer}>
@@ -43,8 +89,10 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             />
           </View>
           <View style={styles.iconContainer}>
-            <ShareIcon onPress={onShare} />
-            <MoreVerticalIcon onPress={onMoreOptions} />
+            <MoreVerticalIcon
+              onPress={() => setShowModal(true)}
+              style={undefined}
+            />
           </View>
         </View>
 
@@ -126,6 +174,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             />
           </View>
         </View>
+
+        <AddModal
+          isVisible={showModal}
+          onClose={() => setShowModal(false)}
+          buttons={buttonsTwo}
+        />
       </View>
     </View>
   );

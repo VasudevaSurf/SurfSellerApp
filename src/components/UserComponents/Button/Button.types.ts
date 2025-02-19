@@ -39,4 +39,5 @@ export interface ButtonProps {
   useGradient?: boolean;
   customStyles?: StyleProp<ViewStyle>;
   customTextStyles?: StyleProp<TextStyle>;
+  bgColor?: string;
 }

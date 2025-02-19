@@ -1,9 +1,10 @@
 import React from 'react';
 import Svg, {Path} from 'react-native-svg';
+import { ColorPalette } from '../../config/colorPalette';
 
 const ArrowRightIcon = ({
   size = 24,
-  color = '#BB20FE',
+  color = ColorPalette.GREY_TEXT_500,
   strokeWidth = 1.5,
   style,
 }) => {

@@ -38,21 +38,21 @@ const HomeScreen = () => {
             icon: SearchIcon,
             onPress: () => console.log('Arrow left pressed'),
             size: 20,
-            color: ColorPalette.BorderPrimary,
+            color: ColorPalette.GREY_TEXT_400,
             strokeWidth: 2,
           },
           {
             icon: BellIcon,
             onPress: () => console.log('Arrow left pressed'),
             size: 20,
-            color: ColorPalette.BorderPrimary,
+            color: ColorPalette.GREY_TEXT_400,
             strokeWidth: 2,
           },
           {
             icon: QuestionMarkIcon,
             onPress: () => console.log('Arrow left pressed'),
             size: 24,
-            color: ColorPalette.BorderPrimary,
+            color: ColorPalette.GREY_TEXT_400,
             strokeWidth: 2,
           },
         ]}
@@ -274,7 +274,10 @@ const HomeScreen = () => {
                 text="View All"
                 customTextStyles={styles.viewAllText}
               />
-              <ArrowRightIcon style={undefined} />
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.PURPLE_200}
+              />
             </View>
           </View>
           <View style={styles.recentAllOrders}>

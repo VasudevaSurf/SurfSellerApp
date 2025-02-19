@@ -101,14 +101,14 @@ const OrderScreen = () => {
             icon: BellIcon,
             onPress: () => console.log('Bell icon pressed'),
             size: 24,
-            color: ColorPalette.IconProduct,
+            color: ColorPalette.GREY_TEXT_400,
             strokeWidth: 2,
           },
           {
             icon: QuestionMarkIcon,
             onPress: () => {},
             size: 24,
-            color: ColorPalette.Black,
+            color: ColorPalette.GREY_TEXT_400,
             strokeWidth: 2,
           },
         ]}

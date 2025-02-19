@@ -28,6 +28,7 @@ export type DashboardStackParamList = {
   Home: undefined;
   Product: undefined;
   Orders: undefined;
+  
   Account: undefined;
 };
 

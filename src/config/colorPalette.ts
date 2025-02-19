@@ -33,6 +33,7 @@ export const ColorPalette: Record<string, ColorTypes> = {
   SearchIcon: '#9F9C9C',
   SearchBack: '#F3F4F6',
   TotalText: '#000000B2',
+  IconColor: '#5A5555',
 
   //Feedback Colors
   Green_200: '#1FC16B',

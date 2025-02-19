@@ -16,21 +16,26 @@ export const styles = StyleSheet.create({
     gap: getFigmaDimension(16),
   },
   header: {
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   headerContent: {
     flex: 1,
-    paddingRight: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerText: {
+    textAlign: 'center',
   },
   closeButton: {
-    padding: 4,
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   footer: {
     flexDirection: 'column',
-    gap: 12,
-  },
-  customButtonStyle: {
-    borderWidth: 1,
+    gap: getFigmaDimension(12),
   },
 });

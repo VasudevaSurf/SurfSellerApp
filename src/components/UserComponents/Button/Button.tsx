@@ -31,17 +31,24 @@ export const Button: React.FC<ButtonProps> = ({
   useGradient = false,
   customStyles,
   customTextStyles,
+  bgColor, // Add this prop to accept custom background color
 }) => {
   const buttonHeight = getButtonHeight(size);
   const currentState = disabled ? ButtonState.DISABLED : state;
   const styles = createButtonStyles(buttonHeight);
   const backgroundColor = getBackgroundColor(variant, type, currentState);
 
+  // Determine if custom background color should be used
+  const useCustomBgColor = bgColor && type === ButtonType.PRIMARY && !disabled;
+
   const containerStyle = [
     styles.container,
     {
-      backgroundColor:
-        typeof backgroundColor === 'object' ? 'transparent' : backgroundColor,
+      backgroundColor: useCustomBgColor
+        ? bgColor
+        : typeof backgroundColor === 'object'
+        ? 'transparent'
+        : backgroundColor,
       opacity: currentState === ButtonState.DISABLED ? 0.5 : 1,
     },
     type === ButtonType.OUTLINED && {
@@ -76,12 +83,15 @@ export const Button: React.FC<ButtonProps> = ({
     </View>
   );
 
-  if (
+  // Determine if gradient should be used
+  const shouldUseGradient =
     (useGradient ||
       (typeof backgroundColor === 'object' && backgroundColor.isGradient)) &&
     type === ButtonType.PRIMARY &&
-    !disabled
-  ) {
+    !disabled &&
+    !useCustomBgColor; // Don't use gradient if custom background color is provided
+
+  if (shouldUseGradient) {
     const gradientConfig =
       typeof backgroundColor === 'object'
         ? backgroundColor

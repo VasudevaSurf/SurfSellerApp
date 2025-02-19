@@ -15,17 +15,39 @@ import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingB
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {ProductInfo} from '../../../components/MainComponents/ProductInfo/ProductInfo';
 import PlusIcon from '../../../assets/icons/PlusIcon';
-import {AddModal} from '../../../components/MainComponents/AddModal/AddModal';
+import {
+  AddModal,
+  ButtonConfig,
+} from '../../../components/MainComponents/AddModal/AddModal';
+import {
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+  ButtonVariant,
+} from '../../../components/UserComponents/Button';
 
 const ProductScreen = () => {
   const [searchText, setSearchText] = useState('');
-  const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const handleAddProduct = (method: 'csv' | 'manual') => {
-    console.log(`Adding product via ${method}`);
-    setShowAddModal(false);
-  };
+  const buttons: ButtonConfig[] = [
+    {
+      text: 'Upload CSV file',
+      onPress: () => handleUploadCsv(),
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      size: ButtonSize.MEDIUM,
+    },
+    {
+      text: 'Add product Manually',
+      onPress: () => handleAddManually(),
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      type: ButtonType.OUTLINED,
+      size: ButtonSize.MEDIUM,
+      customStyles: {borderWidth: 1},
+    },
+  ];
 
   const [products, setProducts] = useState([
     {
@@ -122,23 +144,23 @@ const ProductScreen = () => {
             icon: InfoIcon,
             onPress: () => console.log('Info icon pressed'),
             size: 24,
-            color: ColorPalette.IconProduct,
+            color: ColorPalette.IconColor,
             strokeWidth: 2,
           },
           {
             icon: BellIcon,
             onPress: () => console.log('Bell icon pressed'),
             size: 24,
-            color: ColorPalette.IconProduct,
+            color: ColorPalette.IconColor,
             strokeWidth: 2,
           },
-          {
-            icon: AlignCenterIcon,
-            onPress: () => setShowModal(true),
-            size: 24,
-            color: ColorPalette.Black,
-            strokeWidth: 2,
-          },
+          // {
+          //   icon: AlignCenterIcon,
+          //   onPress: () => setShowModal(true),
+          //   size: 24,
+          //   color: ColorPalette.Black,
+          //   strokeWidth: 2,
+          // },
         ]}
       />
 
@@ -190,7 +212,7 @@ const ProductScreen = () => {
             />
           ))}
         </View>
-        <FilterModal
+        {/* <FilterModal
           isVisible={showModal}
           onClose={() => setShowModal(false)}
           onApply={selectedFilters => {
@@ -198,12 +220,11 @@ const ProductScreen = () => {
             setShowModal(false);
           }}
           sections={filterSections}
-        />
+        /> */}
         <AddModal
           isVisible={showAddModal}
           onClose={() => setShowAddModal(false)}
-          onUploadCsv={() => handleAddProduct('csv')}
-          onAddManually={() => handleAddProduct('manual')}
+          buttons={buttons}
         />
       </ScrollView>
       <TouchableOpacity
