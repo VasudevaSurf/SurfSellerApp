@@ -46,9 +46,7 @@ export type RootStackParamList = {
 export type AccountSettingsStackParamList = {
   AccountSettings: undefined;
   PersonalInfo: undefined;
-  EditName: undefined;
-  EditEmail: undefined;
-  EditPhone: undefined;
+  EditField: EditFieldParams;
   CompanyProfile: undefined;
   BankDetails: undefined;
   Payments: undefined;
