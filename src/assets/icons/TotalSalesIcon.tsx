@@ -1,12 +1,7 @@
 import React from 'react';
 import Svg, {Path} from 'react-native-svg';
 
-const TotalSalesIcon = ({
-  size = 24,
-  color = '#22C55E',
-  strokeWidth = 1.5,
-  style,
-}) => {
+const TotalSalesIcon = ({size = 24, color = '#1FC16B', style}) => {
   return (
     <Svg
       width={size}
@@ -15,11 +10,8 @@ const TotalSalesIcon = ({
       fill="none"
       style={style}>
       <Path
-        d="M14.4 7.47324C12.7115 6.87775 10.7564 7.25526 9.40591 8.60579C7.5314 10.4803 7.5314 13.5195 9.40591 15.394C10.7564 16.7445 12.7115 17.1221 14.4 16.5266M7.20002 10.3999H12.8M7.20002 13.5999H12.8M21.6 11.9999C21.6 17.3018 17.302 21.5999 12 21.5999C6.69809 21.5999 2.40002 17.3018 2.40002 11.9999C2.40002 6.69797 6.69809 2.3999 12 2.3999C17.302 2.3999 21.6 6.69797 21.6 11.9999Z"
-        stroke={color}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M21.41 11.41L12.58 2.58C12.21 2.21 11.7 2 11.17 2H4C2.9 2 2 2.9 2 4V11.17C2 11.7 2.21 12.21 2.59 12.58L11.42 21.41C12.2 22.19 13.47 22.19 14.25 21.41L21.42 14.24C22.2 13.46 22.2 12.2 21.41 11.41ZM6.5 8C5.67 8 5 7.33 5 6.5C5 5.67 5.67 5 6.5 5C7.33 5 8 5.67 8 6.5C8 7.33 7.33 8 6.5 8Z"
+        fill={color}
       />
     </Svg>
   );

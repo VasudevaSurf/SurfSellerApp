@@ -34,6 +34,7 @@ export const ColorPalette: Record<string, ColorTypes> = {
   SearchBack: '#F3F4F6',
   TotalText: '#000000B2',
   IconColor: '#5A5555',
+  HomeIcon: '#CC7914',
 
   //Feedback Colors
   Green_200: '#1FC16B',
@@ -116,7 +117,7 @@ export const ColorPalette: Record<string, ColorTypes> = {
     end: {x: 1, y: 1},
     locations: [0.0291, 1],
   },
-  PRIMARY_WHITE_SELLERL: '#FAEEFF',
+  PRIMARY_WHITE_SELLER: '#FAEEFF',
 
   //Gradients
 

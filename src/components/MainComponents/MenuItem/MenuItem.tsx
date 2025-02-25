@@ -6,9 +6,6 @@ import {ColorPalette} from '../../../config/colorPalette';
 import {MenuItemProps} from './MenuItem.types';
 import {styles} from './MenuItem.styles';
 
-/**
- * ArrowRight component used as the default right icon
- */
 const ArrowRight = () => (
   <View style={styles.arrowContainer}>
     <Typography
@@ -19,17 +16,6 @@ const ArrowRight = () => (
   </View>
 );
 
-/**
- * MenuItem component: A reusable component for menu/list items with customizable icons and styles.
- * Supports left and right icons, subtitles, and various style customizations.
- *
- * @example
- * <MenuItem
- *   label="Personal Info"
- *   leftIcon={<UserIcon />}
- *   onPress={() => navigate('Profile')}
- * />
- */
 export const MenuItem: React.FC<MenuItemProps> = ({
   label,
   onPress,
@@ -39,29 +25,36 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   disabled = false,
   variant = TypographyVariant.LMEDIUM_SEMIBOLD,
   containerStyle,
+  contentStyle,
   textStyle,
   leftIconContainerStyle,
   rightIconContainerStyle,
-  showBottomBorder = true,
   subtitle,
+  leftIconBackgroundColor,
+  showBottomBorder = false,
+  isLastItem = false,
 }) => {
+  const leftIconStyles = [
+    styles.leftIconContainer,
+    leftIconContainerStyle,
+    leftIconBackgroundColor && {
+      backgroundColor: leftIconBackgroundColor,
+    },
+  ];
+
   return (
     <TouchableOpacity
       style={[
         styles.container,
-        showBottomBorder && styles.bottomBorder,
+        showBottomBorder && !isLastItem && styles.bottomBorder,
         containerStyle,
       ]}
       onPress={onPress}
       activeOpacity={0.7}
       disabled={disabled}
       testID={testID}>
-      <View style={styles.content}>
-        {leftIcon && (
-          <View style={[styles.leftIconContainer, leftIconContainerStyle]}>
-            {leftIcon}
-          </View>
-        )}
+      <View style={[styles.content, contentStyle]}>
+        {leftIcon && <View style={leftIconStyles}>{leftIcon}</View>}
         <View>
           <Typography
             variant={variant}

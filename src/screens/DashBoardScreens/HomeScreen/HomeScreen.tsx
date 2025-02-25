@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Header} from '../../../components/UserComponents/Header/Header';
 import SearchIcon from '../../../assets/icons/SearchIcon';
 import BellIcon from '../../../assets/icons/BellIcon';
@@ -15,15 +15,53 @@ import DownloadIcon from '../../../assets/icons/DownloadIcon';
 import BookmarkNoteIcon from '../../../assets/icons/BookmarkNoteIcon';
 import ToggleButtons from '../../../components/MainComponents/ToggleButtons/ToggleButtons';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {getScreenHeight} from '../../../helpers/screenSize';
+import {getFigmaDimension, getScreenHeight} from '../../../helpers/screenSize';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import {RecentOrder} from '../../../components/MainComponents/RecentOrder/RecentOrder';
 import CircularEuroIcon from '../../../assets/icons/CircularEuroIcon';
+import {MenuItem} from '../../../components/MainComponents/MenuItem/MenuItem';
+import CompanyProfile from '../../../assets/icons/AccountIcons/CompanyProfile';
+import BankIcon from '../../../assets/icons/AccountIcons/BankIcon';
+import PaymentIcon from '../../../assets/icons/AccountIcons/PaymentIcon';
+import BrainIcon from '../../../assets/icons/BrainIcon';
+import CurrencyIcon from '../../../assets/icons/CurrencyIcon';
 
 const View =
   require('react-native/Libraries/Components/View/ViewNativeComponent').default;
 
 const HomeScreen = () => {
+  const menuItems = useMemo(
+    () => [
+      {
+        label: 'No new orders',
+        leftIcon: (
+          <PackageIcon style={undefined} color={ColorPalette.HomeIcon} />
+        ),
+        rightIcon: <ArrowRightIcon style={undefined} />,
+        onPress: () => {},
+        leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
+      },
+      {
+        label: 'No orders to ship',
+        leftIcon: (
+          <PackageIcon style={undefined} color={ColorPalette.PURPLE_200} />
+        ),
+        rightIcon: <ArrowRightIcon style={undefined} />,
+        onPress: () => {},
+        leftIconBackgroundColor: 'rgba(145, 1, 207, 0.10)',
+      },
+      {
+        label: 'No orders delivered',
+        leftIcon: (
+          <PackageIcon style={undefined} color={ColorPalette.Green_200} />
+        ),
+        rightIcon: <ArrowRightIcon style={undefined} />,
+        onPress: () => {},
+        leftIconBackgroundColor: 'rgba(31, 193, 107, 0.10)',
+      },
+    ],
+    [],
+  );
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
@@ -79,12 +117,37 @@ const HomeScreen = () => {
           </View>
           <View style={styles.verifyStepsContainer}></View>
         </View>
-        <View style={styles.OrderContainer}></View>
+        <View style={styles.OrderContainer}>
+          {menuItems.map((item, index) => (
+            <MenuItem
+              key={index}
+              label={item.label}
+              leftIcon={item.leftIcon}
+              rightIcon={item.rightIcon}
+              onPress={item.onPress}
+              textStyle={{color: ColorPalette.GREY_TEXT_500}}
+              variant={TypographyVariant.LMEDIUM_MEDIUM}
+              containerStyle={styles.menuContainer}
+              contentStyle={{
+                gap: 16,
+              }}
+              leftIconBackgroundColor={item.leftIconBackgroundColor}
+              leftIconContainerStyle={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: getFigmaDimension(8),
+                borderRadius: getFigmaDimension(8),
+              }}
+              showBottomBorder={true}
+              isLastItem={index === menuItems.length - 1}
+            />
+          ))}
+        </View>
         <View style={styles.statsContainer}>
           <View style={styles.containerOne}>
             <View style={styles.totalSales}>
               <View style={styles.salesOne}>
-                <View style={styles.iconBack}>
+                <View style={styles.iconBackSale}>
                   <TotalSalesIcon style={undefined} />
                 </View>
                 <View style={styles.countBlock}>
@@ -142,12 +205,12 @@ const HomeScreen = () => {
               <View style={styles.activeProduct}>
                 <View style={styles.twoContainer}>
                   <View style={styles.iconBackOne}>
-                    <PackageIcon style={undefined} />
+                    <BrainIcon style={undefined} />
                   </View>
                   <View style={styles.salesTwo}>
                     <Typography
                       variant={TypographyVariant.H4_BOLD}
-                      text="1312"
+                      text="312"
                       customTextStyles={styles.countValue}
                     />
                     <Typography
@@ -170,12 +233,12 @@ const HomeScreen = () => {
               <View style={styles.activeProduct}>
                 <View style={styles.twoContainer}>
                   <View style={styles.iconBack}>
-                    <CircularEuroIcon style={undefined} />
+                    <CurrencyIcon style={undefined} />
                   </View>
                   <View style={styles.salesTwo}>
                     <Typography
                       variant={TypographyVariant.H4_BOLD}
-                      text="€13,482"
+                      text="€13,48"
                       customTextStyles={styles.countValue}
                     />
                     <Typography

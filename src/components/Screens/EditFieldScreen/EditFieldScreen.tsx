@@ -34,9 +34,13 @@ interface UpdatedEditFieldScreenProps {
 const submitFormAction = (actionType: string, values: any) => {
   switch (actionType) {
     case 'updateName':
-      break;
+    case 'updateBusinessName':
+    case 'updateVATNumber':
+    case 'updateStreetName':
+    case 'updateCityName':
+    case 'updatePostalCode':
+    case 'updateCountry':
     case 'updateEmail':
-      break;
     case 'updatePhone':
       break;
     default:
@@ -68,6 +72,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     iconComponent = null,
     iconImage = '',
     size = 16,
+    originScreen = 'PersonalInfo', // Default to PersonalInfo if not specified
   } = route.params;
 
   const [fieldValue, setFieldValue] = useState<string>(initialValue);
@@ -124,6 +129,36 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
               return 'Please enter a valid phone number';
             return true;
           };
+        case 'businessName':
+          return value => {
+            if (!value.trim()) return 'Business name cannot be empty';
+            return true;
+          };
+        case 'vatNumber':
+          return value => {
+            if (!value.trim()) return 'VAT number cannot be empty';
+            return true;
+          };
+        case 'streetName':
+          return value => {
+            if (!value.trim()) return 'Street address cannot be empty';
+            return true;
+          };
+        case 'cityName':
+          return value => {
+            if (!value.trim()) return 'City cannot be empty';
+            return true;
+          };
+        case 'postalCode':
+          return value => {
+            if (!value.trim()) return 'Postal code cannot be empty';
+            return true;
+          };
+        case 'country':
+          return value => {
+            if (!value.trim()) return 'Country cannot be empty';
+            return true;
+          };
         default:
           return () => true;
       }
@@ -139,6 +174,25 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
   const handleMultiFieldChange = (field: string, text: string): void => {
     setFieldValues(prev => ({...prev, [field]: text}));
     setErrors(prev => ({...prev, [field]: ''}));
+  };
+
+  const navigateBack = (updatedData: any) => {
+    navigation.goBack();
+
+    // Determine where to navigate based on originScreen
+    if (originScreen === 'CompanyProfile') {
+      navigation.navigate('CompanyProfile', updatedData);
+    } else if (fieldType === 'email') {
+      navigation.navigate('Dashboard', {
+        screen: 'Account',
+        params: {
+          screen: 'PersonalInfo',
+          params: updatedData,
+        },
+      });
+    } else {
+      navigation.navigate('PersonalInfo', updatedData);
+    }
   };
 
   const handleSubmit = (): void => {
@@ -162,9 +216,20 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
       }
 
       submitFormAction(onSubmitActionType, fieldValues);
-      const fullName = `${fieldValues.firstName} ${fieldValues.lastName}`;
-      navigation.goBack();
-      navigation.navigate('PersonalInfo', {updatedName: fullName});
+
+      if (originScreen === 'CompanyProfile') {
+        // For CompanyProfile, we may still need name combinations in some cases
+        if (fieldValues.firstName && fieldValues.lastName) {
+          const fullName = `${fieldValues.firstName} ${fieldValues.lastName}`;
+          navigateBack({updatedName: fullName});
+        } else {
+          navigateBack(fieldValues);
+        }
+      } else {
+        // Default PersonalInfo handling
+        const fullName = `${fieldValues.firstName} ${fieldValues.lastName}`;
+        navigateBack({updatedName: fullName});
+      }
     } else {
       const validationFn = getValidationForType(validationType || fieldType);
       const validationResult = validationFn(fieldValue);
@@ -183,28 +248,39 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
             phoneNumber: `${countryCode} ${fieldValue}`,
             flow: 'update',
             returnData: {updatedPhone: fieldValue},
-            returnScreen: 'PersonalInfo',
+            returnScreen: originScreen,
             returnStack: 'Account',
           },
         });
-      } else if (fieldType === 'email') {
-        navigation.goBack();
-        navigation.navigate('Dashboard', {
-          screen: 'Account',
-          params: {
-            screen: 'PersonalInfo',
-            params: {updatedEmail: fieldValue},
-          },
-        });
       } else {
-        navigation.goBack();
-        navigation.navigate('Dashboard', {
-          screen: 'Account',
-          params: {
-            screen: 'PersonalInfo',
-            params: {updatedName: fieldValue},
-          },
-        });
+        // Create the appropriate updated data object based on field type
+        let updatedData = {};
+        switch (fieldType) {
+          case 'businessName':
+            updatedData = {updatedName: fieldValue};
+            break;
+          case 'vatNumber':
+            updatedData = {updatedVat: fieldValue};
+            break;
+          case 'streetName':
+            updatedData = {updatedStreet: fieldValue};
+            break;
+          case 'cityName':
+            updatedData = {updatedCity: fieldValue};
+            break;
+          case 'postalCode':
+            updatedData = {updatedPostal: fieldValue};
+            break;
+          case 'country':
+            updatedData = {updatedCountry: fieldValue};
+            break;
+          case 'email':
+            updatedData = {updatedEmail: fieldValue};
+            break;
+          default:
+            updatedData = {updatedName: fieldValue};
+        }
+        navigateBack(updatedData);
       }
     }
   };

@@ -1,0 +1,302 @@
+import React, {useState} from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Alert,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import {getScreenHeight} from '../../../../../helpers/screenSize';
+import {styles} from './CompanyProfile.styles';
+import {ColorPalette} from '../../../../../config/colorPalette';
+import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
+import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
+import {Header} from '../../../../../components/UserComponents/Header/Header';
+import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
+import {useFocusEffect, useRoute} from '@react-navigation/native';
+import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
+import LockIcon from '../../../../../assets/icons/LockIcon';
+import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
+import {containerStyles} from './ImageContainer.styles';
+import PencilIcon from '../../../../../assets/icons/PencilIcon';
+
+const MALTA_FLAG_URL =
+  'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
+
+const CompanyProfile = () => {
+  const route = useRoute();
+  const [businessName, setBusinessName] = useState('Annies flower Shop');
+  const [vatNumber, setVATNumber] = useState('MT10927393');
+  const [streetName, setStreetName] = useState('Triq San Pawl');
+  const [cityName, setCityName] = useState('Valletta');
+  const [postalCode, setPostalCode] = useState('CLT 1210');
+  const [country, setCountry] = useState('Malta');
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params) {
+        const {
+          updatedName,
+          updatedVat,
+          updatedStreet,
+          updatedCity,
+          updatedPostal,
+          updatedCountry,
+        } = route.params;
+        if (updatedName) setBusinessName(updatedName);
+        if (updatedVat) setVATNumber(updatedVat);
+        if (updatedStreet) setStreetName(updatedStreet);
+        if (updatedCity) setCityName(updatedCity);
+        if (updatedPostal) setPostalCode(updatedPostal);
+        if (updatedCountry) setCountry(updatedCountry);
+      }
+    }, [route.params]),
+  );
+
+  const handleEditBusinessName = () => {
+    navigate('EditField', {
+      fieldType: 'businessName',
+      initialValue: businessName,
+      headerTitle: 'Update business name',
+      label: 'Business name',
+      description:
+        'Please update your business name to ensure buyers recognize you.',
+      keyboardType: 'default',
+      validationType: 'businessName',
+      onSubmitActionType: 'updateBusinessName',
+      originScreen: 'CompanyProfile',
+    });
+  };
+
+  const handleEditVATNumber = () => {
+    navigate('EditField', {
+      fieldType: 'vatNumber',
+      initialValue: vatNumber,
+      headerTitle: 'Update your VAT number',
+      label: 'VAT number',
+      description:
+        'Please update your VAT number to ensure accurate billing and compliance.',
+      keyboardType: 'default',
+      captionText: 'VAT number verified',
+      iconImage: require('../../../../../assets/images/success.png'),
+      validationType: 'vatNumber',
+      onSubmitActionType: 'updateVATNumber',
+      originScreen: 'CompanyProfile',
+    });
+  };
+
+  const handleEditStreet = () => {
+    navigate('EditField', {
+      fieldType: 'streetName',
+      initialValue: streetName,
+      headerTitle: 'Update your street name and number',
+      label: 'Street name and number',
+      description:
+        'Please update your Street name and number for better experience.',
+      keyboardType: 'default',
+      validationType: 'streetName',
+      onSubmitActionType: 'updateStreetName',
+      originScreen: 'CompanyProfile',
+    });
+  };
+
+  const handleEditCity = () => {
+    navigate('EditField', {
+      fieldType: 'cityName',
+      initialValue: cityName,
+      headerTitle: 'Update your city name',
+      label: 'City',
+      description: 'Please update your city name for better experience.',
+      keyboardType: 'default',
+      validationType: 'cityName',
+      onSubmitActionType: 'updateCityName',
+      originScreen: 'CompanyProfile',
+    });
+  };
+
+  const handleEditPostalCode = () => {
+    navigate('EditField', {
+      fieldType: 'postalCode',
+      initialValue: postalCode,
+      headerTitle: 'Update postal code',
+      label: 'Postal code',
+      description: 'Please enter your valid postal code.',
+      keyboardType: 'default',
+      validationType: 'postalCode',
+      onSubmitActionType: 'updatePostalCode',
+      originScreen: 'CompanyProfile',
+    });
+  };
+
+  const handleEditCompanyLogo = () => {
+    Alert.alert('Edit Company Logo', 'Upload or change your company logo');
+  };
+
+  const handleEditInvoiceLogo = () => {
+    Alert.alert('Edit Invoice Logo', 'Upload or change your invoice logo');
+  };
+
+  return (
+    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+      <Header
+        name="Company Profile"
+        variant={TypographyVariant.LMEDIUM_BOLD}
+        textColor={ColorPalette.AgreeTerms}
+        leftIcon={
+          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
+        }
+        rightIcons={null}
+      />
+      <ScrollView
+        style={styles.mainContainer}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {paddingTop: getScreenHeight(2)},
+        ]}
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.mainContainerTwo}>
+          <View style={styles.imageContainer}>
+            <View style={containerStyles.wrapper}>
+              {/* Company Logo Section */}
+              <View style={containerStyles.logoContainer}>
+                <View style={containerStyles.imageWrapper}>
+                  <Image
+                    source={require('../../../../../assets/images/companyProfile.png')}
+                    style={containerStyles.image}
+                    resizeMode="cover"
+                  />
+                  <TouchableOpacity
+                    style={containerStyles.editButton}
+                    onPress={() => {}}>
+                    <PencilIcon size={12} color="#000000" />
+                  </TouchableOpacity>
+                </View>
+                <Typography
+                  text="Company logo"
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
+                  customTextStyles={containerStyles.labelText}
+                />
+              </View>
+
+              {/* Divider */}
+              <View style={containerStyles.divider} />
+
+              {/* Invoice Logo Section */}
+              <View style={containerStyles.logoContainer}>
+                <View style={containerStyles.imageWrapper}>
+                  <Image
+                    source={require('../../../../../assets/images/invoiceLogo.png')}
+                    style={[
+                      containerStyles.image,
+                      containerStyles.invoiceImage,
+                    ]}
+                    resizeMode="cover"
+                  />
+                  <TouchableOpacity
+                    style={containerStyles.editButton}
+                    onPress={() => {}}>
+                    <PencilIcon size={12} color="#000000" />
+                  </TouchableOpacity>
+                </View>
+
+                <Typography
+                  text="Invoice logo"
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
+                  customTextStyles={containerStyles.labelText}
+                />
+              </View>
+            </View>
+          </View>
+          <AnimatedTextInput
+            label="Business name"
+            value={businessName}
+            onChangeText={setBusinessName}
+            keyboardType="default"
+            customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            rightText="Edit"
+            onRightTextPress={handleEditBusinessName}
+            customBorderColor={ColorPalette.GREY_TEXT_400}
+            customBorderWidth={1}
+            disabled={true}
+          />
+          <AnimatedTextInput
+            label="VAT number"
+            value={vatNumber}
+            onChangeText={setVATNumber}
+            keyboardType="default"
+            customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            rightText="Edit"
+            onRightTextPress={handleEditVATNumber}
+            customBorderColor={ColorPalette.GREY_TEXT_400}
+            customBorderWidth={1}
+            disabled={true}
+          />
+          <AnimatedTextInput
+            label="Street name and number"
+            value={streetName}
+            onChangeText={setStreetName}
+            keyboardType="default"
+            customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            rightText="Edit"
+            onRightTextPress={handleEditStreet}
+            customBorderColor={ColorPalette.GREY_TEXT_400}
+            customBorderWidth={1}
+            disabled={true}
+          />
+          <AnimatedTextInput
+            label="City"
+            value={cityName}
+            onChangeText={setCityName}
+            keyboardType="default"
+            customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            rightText="Edit"
+            onRightTextPress={handleEditCity}
+            customBorderColor={ColorPalette.GREY_TEXT_400}
+            customBorderWidth={1}
+            disabled={true}
+          />
+          <AnimatedTextInput
+            label="Postal code"
+            value={postalCode}
+            onChangeText={setPostalCode}
+            keyboardType="default"
+            customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            rightText="Edit"
+            onRightTextPress={handleEditPostalCode}
+            customBorderColor={ColorPalette.GREY_TEXT_400}
+            customBorderWidth={1}
+            disabled={true}
+          />
+          <AnimatedTextInput
+            label="Country"
+            value={country}
+            onChangeText={setCountry}
+            keyboardType="default"
+            customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            showCountrySection
+            countryFlag={MALTA_FLAG_URL}
+            onCountryPress={() => {}}
+            customBorderColor={ColorPalette.GREY_TEXT_400}
+            customBorderWidth={1}
+            disabled={true}
+            rightIcons={[
+              {
+                icon: <LockIcon size={20} color="#4A4A4A" />,
+                onPress: () => {},
+              },
+            ]}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+export default CompanyProfile;

@@ -15,6 +15,10 @@ export const styles = StyleSheet.create({
     paddingHorizontal: getFigmaDimension(16),
     backgroundColor: ColorPalette.White,
   },
+  bottomBorder: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: ColorPalette.GREY_200,
+  },
   content: {
     flexDirection: 'row',
     alignItems: 'center',

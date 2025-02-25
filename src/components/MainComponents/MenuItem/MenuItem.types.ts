@@ -1,19 +1,21 @@
-import {ReactNode} from 'react';
-import {StyleProp, TextStyle, ViewStyle} from 'react-native';
+import {StyleProp, ViewStyle, TextStyle} from 'react-native';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
 
 export interface MenuItemProps {
   label: string;
   onPress: () => void;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
   testID?: string;
   disabled?: boolean;
   variant?: TypographyVariant;
   containerStyle?: StyleProp<ViewStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   leftIconContainerStyle?: StyleProp<ViewStyle>;
   rightIconContainerStyle?: StyleProp<ViewStyle>;
-  showBottomBorder?: boolean;
   subtitle?: string;
+  leftIconBackgroundColor?: string;
+  showBottomBorder?: boolean;
+  isLastItem?: boolean;
 }
