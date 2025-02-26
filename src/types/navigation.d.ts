@@ -49,11 +49,8 @@ export type AccountSettingsStackParamList = {
   EditField: EditFieldParams;
   CompanyProfile: undefined;
   BankDetails: undefined;
-  Payments: undefined;
-  StripAccount: undefined;
-  Notifications: undefined;
-  TermsConditions: undefined;
-  PrivacyPolicy: undefined;
+  PaymentInfo: undefined;
+  WithdrawScreen: undefined;
 };
 
 declare global {

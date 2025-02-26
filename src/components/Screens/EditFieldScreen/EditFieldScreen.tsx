@@ -42,6 +42,9 @@ const submitFormAction = (actionType: string, values: any) => {
     case 'updateCountry':
     case 'updateEmail':
     case 'updatePhone':
+    case 'updateAccountName':
+    case 'updateAccountNumber':
+    case 'updateBicCode':
       break;
     default:
       console.warn(`Unhandled action type: ${actionType}`);
@@ -72,7 +75,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     iconComponent = null,
     iconImage = '',
     size = 16,
-    originScreen = 'PersonalInfo', // Default to PersonalInfo if not specified
+    originScreen = 'PersonalInfo',
   } = route.params;
 
   const [fieldValue, setFieldValue] = useState<string>(initialValue);
@@ -182,6 +185,9 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     // Determine where to navigate based on originScreen
     if (originScreen === 'CompanyProfile') {
       navigation.navigate('CompanyProfile', updatedData);
+    } else if (originScreen === 'BankDetails') {
+      // Add this condition
+      navigation.navigate('BankDetails', updatedData);
     } else if (fieldType === 'email') {
       navigation.navigate('Dashboard', {
         screen: 'Account',
@@ -253,7 +259,6 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           },
         });
       } else {
-        // Create the appropriate updated data object based on field type
         let updatedData = {};
         switch (fieldType) {
           case 'businessName':
@@ -276,6 +281,15 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
             break;
           case 'email':
             updatedData = {updatedEmail: fieldValue};
+            break;
+          case 'accountName':
+            updatedData = {updatedAccountName: fieldValue};
+            break;
+          case 'accountNumber':
+            updatedData = {updatedAccountNumber: fieldValue};
+            break;
+          case 'bicCode':
+            updatedData = {updatedBicCode: fieldValue};
             break;
           default:
             updatedData = {updatedName: fieldValue};

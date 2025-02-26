@@ -35,6 +35,8 @@ export const ColorPalette: Record<string, ColorTypes> = {
   TotalText: '#000000B2',
   IconColor: '#5A5555',
   HomeIcon: '#CC7914',
+  ConnectColor: '#7FB31E',
+  BalanceColor: '#1E1E1E',
 
   //Feedback Colors
   Green_200: '#1FC16B',

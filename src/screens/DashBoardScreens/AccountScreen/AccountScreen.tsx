@@ -139,13 +139,23 @@ const AccountScreen = () => {
         label: 'Bank Details',
         leftIcon: <BankIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {},
+        onPress: () => {
+          navigate('Dashboard', {
+            screen: 'Account',
+            params: {screen: 'BankDetails'},
+          });
+        },
       },
       {
         label: 'Payments',
         leftIcon: <PaymentIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {},
+        onPress: () => {
+          navigate('Dashboard', {
+            screen: 'Account',
+            params: {screen: 'PaymentInfo'},
+          });
+        },
       },
       {
         label: 'Strip Account',

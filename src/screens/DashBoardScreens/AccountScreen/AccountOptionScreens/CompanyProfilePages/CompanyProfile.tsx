@@ -70,62 +70,86 @@ const CompanyProfile = () => {
   };
 
   const handleEditVATNumber = () => {
-    navigate('EditField', {
-      fieldType: 'vatNumber',
-      initialValue: vatNumber,
-      headerTitle: 'Update your VAT number',
-      label: 'VAT number',
-      description:
-        'Please update your VAT number to ensure accurate billing and compliance.',
-      keyboardType: 'default',
-      captionText: 'VAT number verified',
-      iconImage: require('../../../../../assets/images/success.png'),
-      validationType: 'vatNumber',
-      onSubmitActionType: 'updateVATNumber',
-      originScreen: 'CompanyProfile',
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'vatNumber',
+          initialValue: vatNumber,
+          headerTitle: 'Update your VAT number',
+          label: 'VAT number',
+          description:
+            'Please update your VAT number to ensure accurate billing and compliance.',
+          keyboardType: 'default',
+          captionText: 'VAT number verified',
+          iconImage: require('../../../../../assets/images/success.png'),
+          validationType: 'vatNumber',
+          onSubmitActionType: 'updateVATNumber',
+          originScreen: 'CompanyProfile',
+        },
+      },
     });
   };
 
   const handleEditStreet = () => {
-    navigate('EditField', {
-      fieldType: 'streetName',
-      initialValue: streetName,
-      headerTitle: 'Update your street name and number',
-      label: 'Street name and number',
-      description:
-        'Please update your Street name and number for better experience.',
-      keyboardType: 'default',
-      validationType: 'streetName',
-      onSubmitActionType: 'updateStreetName',
-      originScreen: 'CompanyProfile',
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'streetName',
+          initialValue: streetName,
+          headerTitle: 'Update your street name and number',
+          label: 'Street name and number',
+          description:
+            'Please update your Street name and number for better experience.',
+          keyboardType: 'default',
+          validationType: 'streetName',
+          onSubmitActionType: 'updateStreetName',
+          originScreen: 'CompanyProfile',
+        },
+      },
     });
   };
 
   const handleEditCity = () => {
-    navigate('EditField', {
-      fieldType: 'cityName',
-      initialValue: cityName,
-      headerTitle: 'Update your city name',
-      label: 'City',
-      description: 'Please update your city name for better experience.',
-      keyboardType: 'default',
-      validationType: 'cityName',
-      onSubmitActionType: 'updateCityName',
-      originScreen: 'CompanyProfile',
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'cityName',
+          initialValue: cityName,
+          headerTitle: 'Update your city name',
+          label: 'City',
+          description: 'Please update your city name for better experience.',
+          keyboardType: 'default',
+          validationType: 'cityName',
+          onSubmitActionType: 'updateCityName',
+          originScreen: 'CompanyProfile',
+        },
+      },
     });
   };
 
   const handleEditPostalCode = () => {
-    navigate('EditField', {
-      fieldType: 'postalCode',
-      initialValue: postalCode,
-      headerTitle: 'Update postal code',
-      label: 'Postal code',
-      description: 'Please enter your valid postal code.',
-      keyboardType: 'default',
-      validationType: 'postalCode',
-      onSubmitActionType: 'updatePostalCode',
-      originScreen: 'CompanyProfile',
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'postalCode',
+          initialValue: postalCode,
+          headerTitle: 'Update postal code',
+          label: 'Postal code',
+          description: 'Please enter your valid postal code.',
+          keyboardType: 'default',
+          validationType: 'postalCode',
+          onSubmitActionType: 'updatePostalCode',
+          originScreen: 'CompanyProfile',
+        },
+      },
     });
   };
 

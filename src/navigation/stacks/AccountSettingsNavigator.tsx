@@ -5,6 +5,9 @@ import AccountScreen from '../../screens/DashBoardScreens/AccountScreen/AccountS
 import PersonalInfo from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PersonalInfo/PersonalInfo';
 import EditFieldScreen from '../../components/Screens/EditFieldScreen/EditFieldScreen';
 import CompanyProfile from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/CompanyProfilePages/CompanyProfile';
+import BankDetails from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BankDetailsPages/BankDetails';
+import PaymentInfo from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PaymentScreens/PaymentInfoPages/PaymentInfo';
+import WithdrawScreen from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PaymentScreens/WithdrawPages/WithdrawScreen';
 
 const Stack = createStackNavigator<AccountSettingsStackParamList>();
 
@@ -18,6 +21,9 @@ export const AccountSettingsNavigator = () => {
       <Stack.Screen name="PersonalInfo" component={PersonalInfo} />
       <Stack.Screen name="EditField" component={EditFieldScreen} />
       <Stack.Screen name="CompanyProfile" component={CompanyProfile} />
+      <Stack.Screen name="BankDetails" component={BankDetails} />
+      <Stack.Screen name="PaymentInfo" component={PaymentInfo} />
+      <Stack.Screen name="WithdrawScreen" component={WithdrawScreen} />
     </Stack.Navigator>
   );
 };

@@ -177,13 +177,15 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
             onPress={onCountryPress}
             disabled={!onCountryPress}>
             {countryFlag && (
-              <Image
-                source={{uri: countryFlag}}
-                style={styles.countryFlag}
-                resizeMode="contain"
-              />
+              <>
+                <Image
+                  source={{uri: countryFlag}}
+                  style={styles.countryFlag}
+                  resizeMode="contain"
+                />
+                <ArrowDownIcon style={styles.dropdownSymbol} />
+              </>
             )}
-            <ArrowDownIcon style={styles.dropdownSymbol} />
             {leftText ? (
               <Typography
                 variant={TypographyVariant.PSMALL_REGULAR}
