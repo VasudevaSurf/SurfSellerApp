@@ -25,10 +25,18 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../../components/UserComponents/Button';
+import {navigate} from '../../../navigation/utils/navigationRef';
 
 const ProductScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const handleAddManually = () => {
+    navigate('Dashboard', {
+      screen: 'Product',
+      params: {screen: 'AddProduct'},
+    });
+  };
 
   const buttons: ButtonConfig[] = [
     {

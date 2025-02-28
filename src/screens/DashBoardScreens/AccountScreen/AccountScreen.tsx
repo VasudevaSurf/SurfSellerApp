@@ -167,7 +167,12 @@ const AccountScreen = () => {
         label: 'Notifications',
         leftIcon: <NotificationIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {},
+        onPress: () => {
+          navigate('Dashboard', {
+            screen: 'Account',
+            params: {screen: 'NotificationScreen'},
+          });
+        },
       },
       {
         label: 'Terms and Conditions',

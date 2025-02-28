@@ -11,6 +11,7 @@ export type OrderStatus =
   | 'Exchanged';
 
 export interface OrderInfoProps {
+  orderId: string;
   orderImage: string;
   orderName: string;
   orderPrice: string;
@@ -21,5 +22,6 @@ export interface OrderInfoProps {
   orderTime: string;
   orderStatus: OrderStatus;
   onStatusChange: (status: OrderStatus) => void;
+  onCardPress?: (params: OrderDetailParams) => void;
   style?: StyleProp<ViewStyle>;
 }

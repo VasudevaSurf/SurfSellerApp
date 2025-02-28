@@ -5,35 +5,84 @@ import {TypographyVariant} from '../../../components/UserComponents/Typography/T
 import {ColorPalette} from '../../../config/colorPalette';
 import {getFigmaDimension} from '../../../helpers/screenSize';
 
-const ToggleButtons = () => {
-  const [activeButton, setActiveButton] = useState('7days');
+const ToggleButtons = ({
+  initialActiveButton = '7days',
+  leftButtonText = 'Last 7 days',
+  rightButtonText = 'Monthly',
+  leftButtonValue = '7days',
+  rightButtonValue = 'monthly',
+  onSelectionChange = () => {},
+  containerStyle = {},
+  buttonStyle = {},
+  activeButtonStyle = {},
+  textStyle = {},
+  activeTextStyle = {},
+  inactiveBackgroundColor = 'transparent',
+  activeBackgroundColor = ColorPalette.PURPLE_300,
+  inactiveTextColor = ColorPalette.AgreeTerms,
+  activeTextColor = ColorPalette.White,
+  typographyVariant = TypographyVariant.LXSMALL_REGULAR,
+}) => {
+  const [activeButton, setActiveButton] = useState(initialActiveButton);
+
+  const handlePress = buttonValue => {
+    setActiveButton(buttonValue);
+    onSelectionChange(buttonValue);
+  };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <TouchableOpacity
-        style={[styles.button, activeButton === '7days' && styles.activeButton]}
-        onPress={() => setActiveButton('7days')}>
+        style={[
+          styles.button,
+          {backgroundColor: inactiveBackgroundColor},
+          buttonStyle,
+          activeButton === leftButtonValue && [
+            styles.activeButton,
+            {backgroundColor: activeBackgroundColor},
+            activeButtonStyle,
+          ],
+        ]}
+        onPress={() => handlePress(leftButtonValue)}>
         <Typography
-          variant={TypographyVariant.LXSMALL_REGULAR}
-          text="Last 7 days"
+          variant={typographyVariant}
+          text={leftButtonText}
           customTextStyles={[
             styles.buttonText,
-            activeButton === '7days' && styles.activeButtonText,
+            {color: inactiveTextColor},
+            textStyle,
+            activeButton === leftButtonValue && [
+              styles.activeButtonText,
+              {color: activeTextColor},
+              activeTextStyle,
+            ],
           ]}
         />
       </TouchableOpacity>
       <TouchableOpacity
         style={[
           styles.button,
-          activeButton === 'monthly' && styles.activeButton,
+          {backgroundColor: inactiveBackgroundColor},
+          buttonStyle,
+          activeButton === rightButtonValue && [
+            styles.activeButton,
+            {backgroundColor: activeBackgroundColor},
+            activeButtonStyle,
+          ],
         ]}
-        onPress={() => setActiveButton('monthly')}>
+        onPress={() => handlePress(rightButtonValue)}>
         <Typography
-          variant={TypographyVariant.LXSMALL_REGULAR}
-          text="Monthly"
+          variant={typographyVariant}
+          text={rightButtonText}
           customTextStyles={[
             styles.buttonText,
-            activeButton === 'monthly' && styles.activeButtonText,
+            {color: inactiveTextColor},
+            textStyle,
+            activeButton === rightButtonValue && [
+              styles.activeButtonText,
+              {color: activeTextColor},
+              activeTextStyle,
+            ],
           ]}
         />
       </TouchableOpacity>
@@ -53,17 +102,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  activeButton: {
-    backgroundColor: ColorPalette.PURPLE_300,
-  },
+  activeButton: {},
   buttonText: {
-    color: ColorPalette.AgreeTerms,
     fontSize: getFigmaDimension(12),
     lineHeight: getFigmaDimension(16),
   },
-  activeButtonText: {
-    color: ColorPalette.White,
-  },
+  activeButtonText: {},
 });
 
 export default ToggleButtons;

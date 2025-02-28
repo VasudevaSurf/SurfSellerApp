@@ -37,6 +37,9 @@ export const ColorPalette: Record<string, ColorTypes> = {
   HomeIcon: '#CC7914',
   ConnectColor: '#7FB31E',
   BalanceColor: '#1E1E1E',
+  toggleColor: '#111827',
+  toggleBorder: '#E5E7EB',
+  DataText: '#00000099',
 
   //Feedback Colors
   Green_200: '#1FC16B',

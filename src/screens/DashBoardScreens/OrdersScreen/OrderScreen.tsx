@@ -1,18 +1,21 @@
 import React, {useState} from 'react';
-import {ScrollView, Text, View} from 'react-native';
-import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox';
+import {ScrollView, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import BellIcon from '../../../assets/icons/BellIcon';
+import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
+import {OrderInfo} from '../../../components/MainComponents/OrderInfo/OrderInfo';
+import {
+  OrderDetailParams,
+  OrderStatus,
+} from '../../../components/MainComponents/OrderInfo/OrderInfo.types';
 import {Header} from '../../../components/UserComponents/Header/Header';
+import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
-import InfoIcon from '../../../assets/icons/InfoIcon';
-import BellIcon from '../../../assets/icons/BellIcon';
 import {getScreenHeight} from '../../../helpers/screenSize';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {styles} from './OrderScreen.styles';
-import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {OrderInfo} from '../../../components/MainComponents/OrderInfo/OrderInfo';
-import {OrderStatus} from '../../../components/MainComponents/OrderInfo/OrderInfo.types';
+import {navigate} from '../../../navigation/utils/navigationRef';
 
 const OrderScreen = () => {
   const [searchText, setSearchText] = useState('');
@@ -45,7 +48,7 @@ const OrderScreen = () => {
       id: '3',
       orderImage: 'https://picsum.photos/202',
       orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
-      orderPrice: '499.00',
+      orderPrice: '10.00',
       orderNumber: 172,
       orderEmail: 'revanthyadav@surf.mt',
       orderPhone: 9970344320,
@@ -85,6 +88,16 @@ const OrderScreen = () => {
         order.id === orderId ? {...order, orderStatus: newStatus} : order,
       ),
     );
+  };
+
+  const handleCardPress = params => {
+    navigate('Dashboard', {
+      screen: 'Orders',
+      params: {
+        screen: 'OrderDetail',
+        params: params,
+      },
+    });
   };
 
   return (
@@ -137,6 +150,7 @@ const OrderScreen = () => {
           {orders.map(order => (
             <OrderInfo
               key={order.id}
+              orderId={order.id}
               orderImage={order.orderImage}
               orderName={order.orderName}
               orderPrice={order.orderPrice}
@@ -147,6 +161,7 @@ const OrderScreen = () => {
               orderTime={order.orderTime}
               orderStatus={order.orderStatus}
               onStatusChange={status => handleStatusChange(order.id, status)}
+              onCardPress={handleCardPress}
             />
           ))}
         </View>

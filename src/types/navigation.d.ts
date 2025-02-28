@@ -51,6 +51,17 @@ export type AccountSettingsStackParamList = {
   BankDetails: undefined;
   PaymentInfo: undefined;
   WithdrawScreen: undefined;
+  NotificationScreen: undefined;
+};
+
+export type OrderNavigator = {
+  OrderPage: undefined;
+  orderDetail: undefined;
+};
+
+export type ProductNavigator = {
+  ProductsPage: undefined;
+  AddProduct: undefined;
 };
 
 declare global {

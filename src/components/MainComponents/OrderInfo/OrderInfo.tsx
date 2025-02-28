@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Image} from 'react-native';
+import {View, Image, TouchableOpacity} from 'react-native';
 import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
 import {OrderInfoProps, OrderStatus} from './OrderInfo.types';
@@ -46,6 +46,7 @@ const getStatusColors = (
 };
 
 export const OrderInfo: React.FC<OrderInfoProps> = ({
+  orderId,
   orderImage,
   orderName,
   orderPrice,
@@ -56,13 +57,31 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
   orderTime,
   orderStatus,
   onStatusChange,
+  onCardPress,
   style,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const statusColors = getStatusColors(orderStatus);
 
   return (
-    <View style={[styles.container, style]}>
+    <TouchableOpacity
+      style={[styles.container, style]}
+      onPress={() =>
+        onCardPress &&
+        onCardPress({
+          orderId,
+          orderImage,
+          orderName,
+          orderPrice,
+          orderNumber,
+          orderEmail,
+          orderPhone,
+          orderDate,
+          orderTime,
+          orderStatus,
+        })
+      }
+      activeOpacity={0.7}>
       <View style={styles.topContainer}>
         <View style={styles.imageContainer}>
           <Image
@@ -142,7 +161,10 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
               type={getStatusBadgeType(orderStatus)}
               variant={BadgeVariant.OUTLINE}
               rightIcon={ArrowDownIcon}
-              onPress={() => setIsModalVisible(true)}
+              onPress={e => {
+                e.stopPropagation(); // Prevent triggering card press
+                setIsModalVisible(true);
+              }}
               customBorderColor={statusColors.borderColor}
               textVariant={TypographyVariant.LMEDIUM_BOLD}
               customContainerStyle={styles.containerStyle}
@@ -158,6 +180,6 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
           initialStatus={orderStatus}
         />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
