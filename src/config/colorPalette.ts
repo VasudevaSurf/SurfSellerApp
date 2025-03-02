@@ -40,6 +40,10 @@ export const ColorPalette: Record<string, ColorTypes> = {
   toggleColor: '#111827',
   toggleBorder: '#E5E7EB',
   DataText: '#00000099',
+  ConnectLine: '#D9DADC',
+  LabelColor: '#161A1E',
+  InactiveLabelColor: '#8E9091',
+  ProgressLine: '#3A5AFE',
 
   //Feedback Colors
   Green_200: '#1FC16B',

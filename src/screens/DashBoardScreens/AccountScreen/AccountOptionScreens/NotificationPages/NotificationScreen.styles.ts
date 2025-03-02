@@ -56,8 +56,6 @@ export const styles = StyleSheet.create({
     borderColor: ColorPalette.toggleBorder,
   },
   toggleButtonText: {
-    fontSize: getFigmaDimension(12),
-    fontWeight: '500',
     textAlign: 'center',
   },
   mainInputContainer: {

@@ -185,4 +185,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: getFigmaDimension(40),
   },
+  customButton: {
+    borderWidth: 1,
+    borderColor: ColorPalette.PURPLE_300,
+  },
 });

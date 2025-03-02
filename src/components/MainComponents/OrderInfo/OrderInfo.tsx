@@ -178,6 +178,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
           onClose={() => setIsModalVisible(false)}
           onSubmit={onStatusChange}
           initialStatus={orderStatus}
+          showSearch={false}
         />
       </View>
     </TouchableOpacity>

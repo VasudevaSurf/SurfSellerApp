@@ -32,10 +32,18 @@ const ProductScreen = () => {
   const [showAddModal, setShowAddModal] = useState(false);
 
   const handleAddManually = () => {
-    navigate('Dashboard', {
-      screen: 'Product',
-      params: {screen: 'AddProduct'},
-    });
+    setShowAddModal(false);
+    setTimeout(() => {
+      navigate('Dashboard', {
+        screen: 'Product',
+        params: {screen: 'AddProduct'},
+      });
+    }, 300);
+  };
+
+  const handleUploadCsv = () => {
+    setShowAddModal(false);
+    console.log('Upload CSV pressed');
   };
 
   const buttons: ButtonConfig[] = [
@@ -220,15 +228,6 @@ const ProductScreen = () => {
             />
           ))}
         </View>
-        {/* <FilterModal
-          isVisible={showModal}
-          onClose={() => setShowModal(false)}
-          onApply={selectedFilters => {
-            console.log('Selected filters:', selectedFilters);
-            setShowModal(false);
-          }}
-          sections={filterSections}
-        /> */}
         <AddModal
           isVisible={showAddModal}
           onClose={() => setShowAddModal(false)}

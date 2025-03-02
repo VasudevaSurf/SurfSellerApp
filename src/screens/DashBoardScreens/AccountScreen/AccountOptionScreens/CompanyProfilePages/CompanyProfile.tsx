@@ -20,6 +20,13 @@ import LockIcon from '../../../../../assets/icons/LockIcon';
 import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
 import {containerStyles} from './ImageContainer.styles';
 import PencilIcon from '../../../../../assets/icons/PencilIcon';
+import {
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+  ButtonVariant,
+} from '../../../../../components/UserComponents/Button';
+import {AddModal} from '../../../../../components/MainComponents/AddModal/AddModal';
 
 const MALTA_FLAG_URL =
   'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
@@ -32,6 +39,40 @@ const CompanyProfile = () => {
   const [cityName, setCityName] = useState('Valletta');
   const [postalCode, setPostalCode] = useState('CLT 1210');
   const [country, setCountry] = useState('Malta');
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
+  const handleUpload = () => {
+    setIsAddModalVisible(true);
+  };
+
+  const modalButtons = [
+    {
+      text: 'Upload from Gallery',
+      onPress: () => {},
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      type: ButtonType.PRIMARY,
+      size: ButtonSize.MEDIUM,
+    },
+    {
+      text: 'Select from Drive',
+      onPress: () => {},
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      type: ButtonType.OUTLINED,
+      size: ButtonSize.MEDIUM,
+      customStyles: styles.customButton,
+    },
+    {
+      text: 'Take a Photo',
+      onPress: () => {},
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      type: ButtonType.OUTLINED,
+      size: ButtonSize.MEDIUM,
+      customTextStyles: styles.customText,
+    },
+  ];
 
   useFocusEffect(
     React.useCallback(() => {
@@ -192,7 +233,7 @@ const CompanyProfile = () => {
                   />
                   <TouchableOpacity
                     style={containerStyles.editButton}
-                    onPress={() => {}}>
+                    onPress={handleUpload}>
                     <PencilIcon size={12} color="#000000" />
                   </TouchableOpacity>
                 </View>
@@ -219,7 +260,7 @@ const CompanyProfile = () => {
                   />
                   <TouchableOpacity
                     style={containerStyles.editButton}
-                    onPress={() => {}}>
+                    onPress={handleUpload}>
                     <PencilIcon size={12} color="#000000" />
                   </TouchableOpacity>
                 </View>
@@ -318,6 +359,14 @@ const CompanyProfile = () => {
             ]}
           />
         </View>
+        <AddModal
+          isVisible={isAddModalVisible}
+          onClose={() => setIsAddModalVisible(false)}
+          buttons={modalButtons}
+          showCloseIcon={true}
+          containerStyle={{paddingVertical: 16}}
+          footerStyle={{flexDirection: 'column', gap: 12}}
+        />
       </ScrollView>
     </SafeAreaView>
   );

@@ -35,4 +35,11 @@ export const styles = StyleSheet.create({
     marginTop: getFigmaDimension(10),
     marginBottom: getFigmaDimension(10),
   },
+  customButton: {
+    borderWidth: 1,
+    borderColor: ColorPalette.PURPLE_300,
+  },
+  customText: {
+    color: ColorPalette.GREY_TEXT_400,
+  },
 });

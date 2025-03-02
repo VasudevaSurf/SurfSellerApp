@@ -16,6 +16,12 @@ export const styles = StyleSheet.create({
     borderTopLeftRadius: getFigmaDimension(8),
     borderTopRightRadius: getFigmaDimension(8),
   },
+  searchContainer: {
+    padding: getScreenWidth(4),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: ColorPalette.White,
+  },
   contentContainer: {
     paddingTop: getScreenHeight(1),
   },
@@ -33,7 +39,6 @@ export const styles = StyleSheet.create({
     color: ColorPalette.GREY_TEXT_500,
   },
   closeButton: {
-    padding: getScreenWidth(2),
     marginLeft: getScreenWidth(2),
   },
   scrollContainer: {
@@ -84,5 +89,16 @@ export const styles = StyleSheet.create({
     padding: getScreenWidth(5),
     borderTopWidth: 1,
     borderColor: ColorPalette.GREY_200,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: ColorPalette.GREY_200,
+  },
+  checkboxSelected: {
+    borderColor: ColorPalette.PURPLE_300,
+    backgroundColor: ColorPalette.PURPLE_300,
   },
 });

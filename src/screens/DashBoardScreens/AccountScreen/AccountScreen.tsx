@@ -115,7 +115,7 @@ const AccountScreen = () => {
     () => [
       {
         label: 'Personal Info',
-        leftIcon: <ProfileIcon style={undefined} />,
+        // leftIcon: <ProfileIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -126,7 +126,7 @@ const AccountScreen = () => {
       },
       {
         label: 'Company Profile',
-        leftIcon: <CompanyProfile style={undefined} />,
+        // leftIcon: <CompanyProfile style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -137,7 +137,7 @@ const AccountScreen = () => {
       },
       {
         label: 'Bank Details',
-        leftIcon: <BankIcon style={undefined} />,
+        // leftIcon: <BankIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -148,7 +148,7 @@ const AccountScreen = () => {
       },
       {
         label: 'Payments',
-        leftIcon: <PaymentIcon style={undefined} />,
+        // leftIcon: <PaymentIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -159,13 +159,13 @@ const AccountScreen = () => {
       },
       {
         label: 'Strip Account',
-        leftIcon: <StripIcon style={undefined} />,
+        // leftIcon: <StripIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {},
       },
       {
         label: 'Notifications',
-        leftIcon: <NotificationIcon style={undefined} />,
+        // leftIcon: <NotificationIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -176,25 +176,25 @@ const AccountScreen = () => {
       },
       {
         label: 'Terms and Conditions',
-        leftIcon: <TermsIcon style={undefined} />,
+        // leftIcon: <TermsIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {},
       },
       {
         label: 'Privacy Policy',
-        leftIcon: <PolicyIcon style={undefined} />,
+        // leftIcon: <PolicyIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {},
       },
       {
         label: 'Logout',
-        leftIcon: <LogOutIcon style={undefined} />,
+        // leftIcon: <LogOutIcon style={undefined} />,
         rightIcon: null,
         onPress: () => setShowLogoutModal(true),
       },
       {
         label: 'Delete Account',
-        leftIcon: <DeleteIcon style={undefined} />,
+        // leftIcon: <DeleteIcon style={undefined} />,
         rightIcon: null,
         onPress: () => setShowDeleteModal(true),
       },

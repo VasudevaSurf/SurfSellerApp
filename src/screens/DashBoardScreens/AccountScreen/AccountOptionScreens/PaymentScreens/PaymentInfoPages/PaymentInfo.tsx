@@ -28,11 +28,13 @@ import {
   Button,
   ButtonSize,
   ButtonState,
+  ButtonType,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import {styles} from './PaymentInfo.styles';
 import {SlidingBar} from '../../../../../../components/MainComponents/SlidingBar/SlidingBar';
+import {AddModal} from '../../../../../../components/MainComponents/AddModal/AddModal';
 
 const initialLayout = {width: Dimensions.get('window').width};
 
@@ -50,6 +52,7 @@ const PaymentInfo = () => {
     {key: 'payouts', title: 'Payouts'},
     {key: 'withdrawals', title: 'Withdrawals'},
   ]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleFilterChange = option => {
     setSelectedFilter(option);
@@ -57,6 +60,18 @@ const PaymentInfo = () => {
 
   const navigateToWithdraw = () => {
     navigate('WithdrawScreen');
+  };
+
+  const openEditModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleEditStripeConnect = () => {
+    closeModal();
   };
 
   const getStatusColors = status => {
@@ -212,6 +227,26 @@ const PaymentInfo = () => {
     </View>
   );
 
+  const modalButtons = [
+    {
+      text: 'Edit stripe connect',
+      onPress: handleEditStripeConnect,
+      variant: ButtonVariant.PRIMARY,
+      type: ButtonType.PRIMARY,
+      size: ButtonSize.MEDIUM,
+      state: ButtonState.DEFAULT,
+    },
+    {
+      text: 'Cancel',
+      onPress: closeModal,
+      variant: ButtonVariant.SECONDARY,
+      type: ButtonType.OUTLINED,
+      size: ButtonSize.MEDIUM,
+      state: ButtonState.DEFAULT,
+      customStyles: styles.customButton,
+    },
+  ];
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <Header
@@ -255,7 +290,7 @@ const PaymentInfo = () => {
           </View>
           <TextButton
             text="Edit"
-            onPress={() => {}}
+            onPress={openEditModal}
             variant={TypographyVariant.PMEDIUM_MEDIUM}
             underline
             customContainerStyles={styles.editButton}
@@ -305,6 +340,14 @@ const PaymentInfo = () => {
           />
         </View>
       </ScrollView>
+
+      {/* Modal Component */}
+      <AddModal
+        isVisible={isModalVisible}
+        onClose={closeModal}
+        showCloseIcon={false}
+        buttons={modalButtons}
+      />
     </SafeAreaView>
   );
 };
