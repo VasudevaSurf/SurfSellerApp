@@ -25,4 +25,6 @@ export interface HeaderProps {
   variant?: TypographyVariant;
   textColor?: string;
   leftIcon?: ReactNode;
+  subHeader?: boolean;
+  subText?: string;
 }

@@ -98,6 +98,7 @@ const PhoneNumberScreen = () => {
         countryCode={countryCode}
         countryFlag={MALTA_FLAG_URL}
         onCountryPress={handleCountryPress}
+        autoFocus
       />
     </View>
   );

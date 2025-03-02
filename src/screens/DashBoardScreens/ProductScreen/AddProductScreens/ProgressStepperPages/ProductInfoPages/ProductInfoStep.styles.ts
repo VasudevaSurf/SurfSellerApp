@@ -6,6 +6,8 @@ export const styles = StyleSheet.create({
   container: {
     display: 'flex',
     gap: getFigmaDimension(12),
+    marginBottom: getFigmaDimension(16),
+    backgroundColor: ColorPalette.SearchBack,
   },
   section: {
     display: 'flex',

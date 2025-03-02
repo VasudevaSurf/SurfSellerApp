@@ -5,6 +5,8 @@ import {getFigmaDimension} from '../../../../../../helpers/screenSize';
 export const styles = StyleSheet.create({
   container: {
     display: 'flex',
+    marginBottom: getFigmaDimension(16),
+    backgroundColor: ColorPalette.SearchBack,
   },
   section: {
     display: 'flex',

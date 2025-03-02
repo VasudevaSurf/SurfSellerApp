@@ -1,15 +1,11 @@
 import {StyleSheet} from 'react-native';
-import {
-  getFigmaDimension,
-  getScreenWidth,
-  getScreenHeight,
-} from '../../../../../helpers/screenSize';
 import {ColorPalette} from '../../../../../config/colorPalette';
+import {getFigmaDimension} from '../../../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: ColorPalette.SearchBack,
   },
   mainContainer: {
     flex: 1,

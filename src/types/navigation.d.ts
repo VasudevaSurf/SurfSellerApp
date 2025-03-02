@@ -52,6 +52,8 @@ export type AccountSettingsStackParamList = {
   PaymentInfo: undefined;
   WithdrawScreen: undefined;
   NotificationScreen: undefined;
+  FAQScreen: undefined;
+  ChatScreen: undefined;
 };
 
 export type OrderNavigator = {
@@ -62,6 +64,7 @@ export type OrderNavigator = {
 export type ProductNavigator = {
   ProductsPage: undefined;
   AddProduct: undefined;
+  CategoryScreen: undefined;
 };
 
 declare global {

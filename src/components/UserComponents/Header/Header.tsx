@@ -5,6 +5,9 @@ import {Typography} from '../Typography/Typography';
 import {TypographyVariant} from '../Typography/Typography.types';
 import {headerStyles} from './Header.styles';
 import {HeaderProps} from './Header.types';
+import {Badge} from '../Badges/Badge';
+import {BadgeType, BadgeVariant} from '../Badges/Badge.types';
+import DotIcon from '../../../assets/icons/DotIcon';
 
 export const Header: React.FC<HeaderProps> = ({
   image,
@@ -13,6 +16,8 @@ export const Header: React.FC<HeaderProps> = ({
   variant = TypographyVariant.LSMALL_BOLD,
   textColor = ColorPalette.GREY_TEXT_500,
   leftIcon,
+  subHeader,
+  subText,
 }) => {
   return (
     <View style={headerStyles.container}>
@@ -32,6 +37,20 @@ export const Header: React.FC<HeaderProps> = ({
             text={name}
             customTextStyles={{color: textColor}}
           />
+          {subHeader && (
+            <View style={headerStyles.badgeWrapper}>
+              <Badge
+                text={subText}
+                type={BadgeType.PRIMARY}
+                variant={BadgeVariant.FILLED}
+                onPress={() => {}}
+                customContainerStyle={headerStyles.badgeContainer}
+                textVariant={TypographyVariant.LXSMALL_MEDIUM}
+                leftIcon={DotIcon}
+                iconSize={6}
+              />
+            </View>
+          )}
         </View>
       </View>
 

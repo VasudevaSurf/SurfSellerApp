@@ -32,10 +32,26 @@ export const headerStyles = StyleSheet.create({
     padding: Spacing.XXSmall,
   },
   nameContainer: {
+    display: 'flex',
+    flexDirection: 'column',
     marginLeft: Spacing.XSmall,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: getFigmaDimension(2),
   },
   leftIconContainer: {
     paddingVertical: getFigmaDimension(6),
     paddingHorizontal: getFigmaDimension(8),
+  },
+  badgeWrapper: {
+    alignSelf: 'flex-start',
+    marginTop: getFigmaDimension(2),
+  },
+  badgeContainer: {
+    backgroundColor: ColorPalette.Green_200,
+    paddingVertical: getFigmaDimension(2),
+    paddingHorizontal: getFigmaDimension(6),
+    minWidth: 0,
+    alignSelf: 'flex-start',
   },
 });

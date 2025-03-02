@@ -6,6 +6,8 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     gap: getFigmaDimension(20),
+    marginBottom: getFigmaDimension(16),
+    backgroundColor: ColorPalette.SearchBack,
   },
   mainHeader: {
     display: 'flex',

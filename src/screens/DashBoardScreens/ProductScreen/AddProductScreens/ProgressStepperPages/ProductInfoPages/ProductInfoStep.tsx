@@ -25,12 +25,14 @@ import {TypographyVariant} from '../../../../../../components/UserComponents/Typ
 import {ColorPalette} from '../../../../../../config/colorPalette';
 import {getFigmaDimension} from '../../../../../../helpers/screenSize';
 import {styles} from './ProductInfoStep.styles';
+import {navigate} from '../../../../../../navigation/utils/navigationRef';
 
 interface ProductInfoStepProps {
   formData: {
     productName: string;
     price: string;
     category: string;
+    subcategory?: string;
     description: string;
   };
   updateFormData: (data: any) => void;
@@ -50,6 +52,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
     underline: false,
   });
 
+  // Handle text editor focus
   const handleTextAreaFocus = () => {
     setIsFocused(true);
   };
@@ -58,6 +61,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
     setIsFocused(false);
   };
 
+  // Text format handlers
   const handleAlignmentChange = (alignment: 'left' | 'center' | 'right') => {
     setTextAlignment(alignment);
   };
@@ -67,6 +71,41 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
       ...prev,
       [format]: !prev[format],
     }));
+  };
+
+  // Fix navigation to CategorySelection
+  const navigateToCategorySelection = () => {
+    navigate('Dashboard', {
+      screen: 'Product',
+      params: {
+        screen: 'CategoryScreen',
+        params: {
+          // Add nested params properly
+          onSelectCategory: handleCategorySelection,
+          initialCategory: formData.category,
+          initialSubcategory: formData.subcategory,
+        },
+      },
+    });
+  };
+
+  const handleCategorySelection = (category: string, subcategory?: string) => {
+    const categoryData = subcategory
+      ? {category, subcategory}
+      : {category, subcategory: undefined};
+
+    updateFormData(categoryData);
+  };
+
+  // Format the category display text
+  const getCategoryDisplayText = () => {
+    if (!formData.category) {
+      return 'Select category*';
+    }
+
+    return formData.subcategory
+      ? `${formData.category} - ${formData.subcategory}`
+      : formData.category;
   };
 
   return (
@@ -104,10 +143,11 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
           <View style={{paddingHorizontal: getFigmaDimension(16)}}>
             <TouchableOpacity
               style={[styles.inputContainer, styles.selectContainer]}
-              onPress={() => console.log('Open category selection')}>
+              activeOpacity={0.7}
+              onPress={navigateToCategorySelection}>
               <Typography
                 variant={TypographyVariant.PSMALL_REGULAR}
-                text={formData.category || 'Select category*'}
+                text={getCategoryDisplayText()}
                 customTextStyles={{
                   color: formData.category
                     ? ColorPalette.GREY_TEXT_500

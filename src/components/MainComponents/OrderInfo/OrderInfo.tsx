@@ -162,7 +162,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
               variant={BadgeVariant.OUTLINE}
               rightIcon={ArrowDownIcon}
               onPress={e => {
-                e.stopPropagation(); // Prevent triggering card press
+                e.stopPropagation();
                 setIsModalVisible(true);
               }}
               customBorderColor={statusColors.borderColor}

@@ -171,6 +171,17 @@ const AccountScreen = () => {
         onPress: () => {},
       },
       {
+        label: `FAQ'S`,
+        // leftIcon: <TermsIcon style={undefined} />,
+        rightIcon: <ArrowRightIcon style={undefined} />,
+        onPress: () => {
+          navigate('Dashboard', {
+            screen: 'Account',
+            params: {screen: 'FAQScreen'},
+          });
+        },
+      },
+      {
         label: 'Privacy Policy',
         // leftIcon: <PolicyIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
