@@ -1,5 +1,5 @@
-import {getScreenHeight, getScreenWidth} from '../helpers/screenSize';
 import {Platform, StyleSheet} from 'react-native';
+import {getScreenHeight, getScreenWidth} from '../helpers/screenSize';
 import {ColorPalette} from './colorPalette';
 
 export const globalStyles = StyleSheet.create({

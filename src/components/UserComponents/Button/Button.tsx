@@ -1,15 +1,8 @@
 import React from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {Typography} from '../Typography/Typography';
 import {ColorPalette} from '../../../config/colorPalette';
-import {
-  ButtonProps,
-  ButtonSize,
-  ButtonState,
-  ButtonType,
-  ButtonVariant,
-} from './Button.types';
+import {Typography} from '../Typography/Typography';
 import {
   createButtonStyles,
   getBackgroundColor,
@@ -17,6 +10,13 @@ import {
   getTextColor,
   getTypographyVariant,
 } from './Button.styles';
+import {
+  ButtonProps,
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+  ButtonVariant,
+} from './Button.types';
 
 export const Button: React.FC<ButtonProps> = ({
   text,

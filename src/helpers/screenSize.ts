@@ -55,11 +55,11 @@ const totalScreenHeight = getScreenHeight(100);
 const statusBarHeight = getStatusBarHeight();
 
 export {
-  getScreenWidth,
-  getScreenHeight,
   convertDipToPixels,
-  totalScreenWidth,
-  totalScreenHeight,
-  statusBarHeight,
   getFigmaDimension,
+  getScreenHeight,
+  getScreenWidth,
+  statusBarHeight,
+  totalScreenHeight,
+  totalScreenWidth,
 };

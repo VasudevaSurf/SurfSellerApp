@@ -1,11 +1,11 @@
 import React, {useEffect} from 'react';
 import {Animated, SafeAreaView, View} from 'react-native';
-import {styles} from './AuthSuccessScreen.styles';
-import {globalStyles} from '../../../config/globalStyles';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {navigateToMain} from '../../../navigation/utils/navigationRef';
+import {globalStyles} from '../../../config/globalStyles';
 import {STATIC_TEXT} from '../../../config/staticText';
+import {navigateToMain} from '../../../navigation/utils/navigationRef';
+import {styles} from './AuthSuccessScreen.styles';
 
 const successTitle = STATIC_TEXT.screens.authSuccess.successTitle;
 

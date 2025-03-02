@@ -1,24 +1,23 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
+  Modal as RNModal,
   ScrollView,
   TouchableOpacity,
   View,
-  Modal as RNModal,
 } from 'react-native';
-import {Typography} from '../../UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
-import {styles} from './StatusModal.styles';
+import CheckIcon from '../../../assets/icons/CheckIcon';
+import CloseIcon from '../../../assets/icons/CloseIcon';
 import {
   Button,
   ButtonSize,
   ButtonState,
   ButtonVariant,
 } from '../../UserComponents/Button';
-import CloseIcon from '../../../assets/icons/CloseIcon';
-import {StatusModalProps, Option, SelectionType} from './StatusModal.types';
 import {SearchBox} from '../../UserComponents/SearchBox/SearchBox';
-import CheckIcon from '../../../assets/icons/CheckIcon';
+import {Typography} from '../../UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
+import {styles} from './StatusModal.styles';
+import {Option, StatusModalProps} from './StatusModal.types';
 
 const DEFAULT_OPTIONS: Option[] = [
   {value: 'All', label: 'All', isSelected: false},

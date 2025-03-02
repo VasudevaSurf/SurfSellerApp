@@ -1,8 +1,8 @@
-import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {OnboardingStackParamList} from '../../types/navigation';
+import React from 'react';
 import SplashScreen from '../../screens/Onboarding/SplashScreen/SplashScreen';
 import WelcomeScreen from '../../screens/Onboarding/WelcomeScreen/WelcomeScreen';
+import {OnboardingStackParamList} from '../../types/navigation';
 
 const Stack = createStackNavigator<OnboardingStackParamList>();
 

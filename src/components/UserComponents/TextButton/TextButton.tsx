@@ -1,9 +1,9 @@
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 import {Typography} from '../Typography/Typography';
-import {TextButtonProps} from './TextButtonProps.types';
-import {textButtonStyles} from './TextButton.styles';
 import {TypographyVariant} from '../Typography/Typography.types';
+import {textButtonStyles} from './TextButton.styles';
+import {TextButtonProps} from './TextButtonProps.types';
 
 /**
  * TextButton: A button component that uses Typography for text display with additional styling options.

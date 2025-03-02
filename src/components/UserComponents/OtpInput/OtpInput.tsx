@@ -1,12 +1,12 @@
 import {forwardRef, useImperativeHandle} from 'react';
 import {Pressable, TextInput, View} from 'react-native';
+import {ColorPalette} from '../../../config/colorPalette';
+import {Typography} from '../Typography/Typography';
+import {TypographyVariant} from '../Typography/Typography.types';
 import {styles} from './OtpInput.styles';
 import {OtpInputProps, OtpInputRef} from './OtpInput.types';
 import {VerticalStick} from './VerticalStick';
 import {useOtpInput} from './useOtpInput';
-import {Typography} from '../Typography/Typography';
-import {ColorPalette} from '../../../config/colorPalette';
-import {TypographyVariant} from '../Typography/Typography.types';
 
 /**
  * A component for entering a sequence of digits (like an OTP).

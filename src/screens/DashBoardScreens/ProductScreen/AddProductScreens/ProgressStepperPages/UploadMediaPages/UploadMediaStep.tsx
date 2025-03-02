@@ -1,16 +1,11 @@
 import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from 'react-native';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../../config/colorPalette';
+import {Alert, Image, TouchableOpacity, View} from 'react-native';
 import InfoIcon from '../../../../../../assets/icons/InfoIcon';
+import CircleOutlineClose from '../../../../../../assets/icons/NewProductIcons/CircleOutlineClose';
+import CloudManIcon from '../../../../../../assets/icons/NewProductIcons/CloudManIcon';
+import CrossArrowsIcon from '../../../../../../assets/icons/NewProductIcons/CrossArrowsIcon';
+import {AddModal} from '../../../../../../components/MainComponents/AddModal/AddModal';
+import FileItem from '../../../../../../components/MainComponents/FileItem/FileItem';
 import {
   Button,
   ButtonSize,
@@ -18,14 +13,11 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
 import {getFigmaDimension} from '../../../../../../helpers/screenSize';
-import CloudManIcon from '../../../../../../assets/icons/NewProductIcons/CloudManIcon';
 import {styles} from './UploadMediaStep.styles';
-import CrossArrowsIcon from '../../../../../../assets/icons/NewProductIcons/CrossArrowsIcon';
-import CloseCircleIcon from '../../../../../../assets/icons/CloseCircleIcon';
-import CircleOutlineClose from '../../../../../../assets/icons/NewProductIcons/CircleOutlineClose';
-import FileItem from '../../../../../../components/MainComponents/FileItem/FileItem';
-import {AddModal} from '../../../../../../components/MainComponents/AddModal/AddModal';
 
 const UploadMediaStep = () => {
   const [uploadStatus, setUploadStatus] = useState('initial');

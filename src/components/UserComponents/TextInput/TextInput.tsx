@@ -1,22 +1,22 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
-  View,
-  TextInput as RNTextInput,
-  Image,
-  TouchableOpacity,
   Animated,
-  Pressable,
+  Image,
   LayoutChangeEvent,
+  Pressable,
+  TextInput as RNTextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {TextInputProps} from './TextInput.types';
-import {createStyles} from './TextInput.styles';
-import {validateInput} from './TextInput.utils';
+import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight} from '../../../helpers/screenSize';
 import {Spacing} from '../../../config/globalStyles';
+import {getScreenHeight} from '../../../helpers/screenSize';
 import {Typography} from '../Typography/Typography';
 import {TypographyVariant} from '../Typography/Typography.types';
-import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
+import {createStyles} from './TextInput.styles';
+import {TextInputProps} from './TextInput.types';
+import {validateInput} from './TextInput.utils';
 
 const AnimatedTextInput: React.FC<TextInputProps> = ({
   label,

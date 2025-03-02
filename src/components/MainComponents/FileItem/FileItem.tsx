@@ -1,14 +1,13 @@
 import React from 'react';
-import {View, Image, TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity, View} from 'react-native';
+import ImageWithStarIcon from '../../../assets/icons/NewProductIcons/ImageWithStarIcon';
+import TrashIcon from '../../../assets/icons/NewProductIcons/TrashIcon';
+import {ColorPalette} from '../../../config/colorPalette';
+import {Button, ButtonSize, ButtonType} from '../../UserComponents/Button';
 import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import {Button} from '../../UserComponents/Button';
-import {ButtonSize, ButtonType} from '../../UserComponents/Button';
-import TrashIcon from '../../../assets/icons/NewProductIcons/TrashIcon';
-import ImageWithStarIcon from '../../../assets/icons/NewProductIcons/ImageWithStarIcon';
 import {styles} from './FileItem.styles';
 import {FileItemProps} from './FileItem.types';
-import {ColorPalette} from '../../../config/colorPalette';
 
 /**
  * FileItem: A component for displaying file information with optional actions

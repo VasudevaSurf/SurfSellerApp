@@ -1,8 +1,8 @@
 import React from 'react';
-import {View, Image, TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity, View} from 'react-native';
+import {ColorPalette} from '../../../config/colorPalette';
 import {Typography} from '../Typography/Typography';
 import {TypographyVariant} from '../Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
 import {headerStyles} from './Header.styles';
 import {HeaderProps} from './Header.types';
 

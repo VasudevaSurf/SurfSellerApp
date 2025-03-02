@@ -1,11 +1,11 @@
 import React, {useEffect, useRef} from 'react';
-import {View, Animated} from 'react-native';
+import {Animated, View} from 'react-native';
+import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {STATIC_TEXT} from '../../../config/staticText';
 import {globalStyles} from '../../../config/globalStyles';
+import {STATIC_TEXT} from '../../../config/staticText';
 import {styles} from './SplashScreen.styles';
-import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
 
 const {surfTitle, surfCaption} = STATIC_TEXT.screens.onboarding;
 
@@ -30,7 +30,7 @@ const SplashScreen = ({navigation}) => {
     <Animated.View
       style={[
         {...globalStyles.primaryContainer, ...styles.mainContainer},
-          {opacity: fadeAnim},
+        {opacity: fadeAnim},
       ]}>
       <MainBanner
         surfTitle={surfTitle}

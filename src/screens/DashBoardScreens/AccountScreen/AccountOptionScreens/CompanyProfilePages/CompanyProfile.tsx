@@ -1,32 +1,32 @@
+import {useFocusEffect, useRoute} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
+  Alert,
+  Image,
   SafeAreaView,
   ScrollView,
-  View,
-  Alert,
   TouchableOpacity,
-  Image,
+  View,
 } from 'react-native';
-import {getScreenHeight} from '../../../../../helpers/screenSize';
-import {styles} from './CompanyProfile.styles';
-import {ColorPalette} from '../../../../../config/colorPalette';
-import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
-import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
-import {Header} from '../../../../../components/UserComponents/Header/Header';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
-import {useFocusEffect, useRoute} from '@react-navigation/native';
-import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
 import LockIcon from '../../../../../assets/icons/LockIcon';
-import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
-import {containerStyles} from './ImageContainer.styles';
 import PencilIcon from '../../../../../assets/icons/PencilIcon';
+import {AddModal} from '../../../../../components/MainComponents/AddModal/AddModal';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../../../../components/UserComponents/Button';
-import {AddModal} from '../../../../../components/MainComponents/AddModal/AddModal';
+import {Header} from '../../../../../components/UserComponents/Header/Header';
+import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
+import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../config/colorPalette';
+import {getScreenHeight} from '../../../../../helpers/screenSize';
+import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
+import {styles} from './CompanyProfile.styles';
+import {containerStyles} from './ImageContainer.styles';
 
 const MALTA_FLAG_URL =
   'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';

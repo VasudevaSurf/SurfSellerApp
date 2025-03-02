@@ -1,20 +1,20 @@
-import React, {useEffect, useRef} from 'react';
-import {View, TouchableOpacity, Animated} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
-import HomeScreen from '../../../screens/DashBoardScreens/HomeScreen/HomeScreen';
+import React, {useEffect, useRef} from 'react';
+import {Animated, TouchableOpacity, View} from 'react-native';
 import {
   AccountIcon,
   HomeIcon,
   OrdersIcon,
   ProductIcon,
 } from '../../../assets/icons/BottomNavIcons';
-import ProductScreen from '../../../screens/DashBoardScreens/ProductScreen/ProductScreen';
-import OrderScreen from '../../../screens/DashBoardScreens/OrdersScreen/OrderScreen';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../config/colorPalette';
+import {getScreenWidth} from '../../../helpers/screenSize';
 import AccountScreen from '../../../screens/DashBoardScreens/AccountScreen/AccountScreen';
+import HomeScreen from '../../../screens/DashBoardScreens/HomeScreen/HomeScreen';
+import OrderScreen from '../../../screens/DashBoardScreens/OrdersScreen/OrderScreen';
+import ProductScreen from '../../../screens/DashBoardScreens/ProductScreen/ProductScreen';
 import {styles} from './BottomTabNavigator.styles';
 
 const Tab = createBottomTabNavigator();

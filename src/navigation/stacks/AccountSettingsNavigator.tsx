@@ -1,14 +1,14 @@
-import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {AccountSettingsStackParamList} from '../../types/navigation';
-import AccountScreen from '../../screens/DashBoardScreens/AccountScreen/AccountScreen';
-import PersonalInfo from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PersonalInfo/PersonalInfo';
+import React from 'react';
 import EditFieldScreen from '../../components/Screens/EditFieldScreen/EditFieldScreen';
-import CompanyProfile from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/CompanyProfilePages/CompanyProfile';
 import BankDetails from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BankDetailsPages/BankDetails';
+import CompanyProfile from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/CompanyProfilePages/CompanyProfile';
+import NotificationScreen from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/NotificationPages/NotificationScreen';
 import PaymentInfo from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PaymentScreens/PaymentInfoPages/PaymentInfo';
 import WithdrawScreen from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PaymentScreens/WithdrawPages/WithdrawScreen';
-import NotificationScreen from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/NotificationPages/NotificationScreen';
+import PersonalInfo from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PersonalInfo/PersonalInfo';
+import AccountScreen from '../../screens/DashBoardScreens/AccountScreen/AccountScreen';
+import {AccountSettingsStackParamList} from '../../types/navigation';
 
 const Stack = createStackNavigator<AccountSettingsStackParamList>();
 

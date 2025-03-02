@@ -1,13 +1,6 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {SafeAreaView, View, ScrollView, Image} from 'react-native';
-import {Header} from '../../../components/UserComponents/Header/Header';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
+import React, {useCallback, useState} from 'react';
+import {Image, SafeAreaView, ScrollView, View} from 'react-native';
 import ArrowLeftIcon from '../../../assets/icons/ArrowLeftIcon';
-import {goBack, navigate} from '../../../navigation/utils/navigationRef';
-import {getFigmaDimension, getScreenHeight} from '../../../helpers/screenSize';
-import AnimatedTextInput from '../../../components/UserComponents/TextInput/TextInput';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import CloseCircleIcon from '../../../assets/icons/CloseCircleIcon';
 import {
   Button,
@@ -15,11 +8,18 @@ import {
   ButtonState,
   ButtonVariant,
 } from '../../../components/UserComponents/Button';
+import {Header} from '../../../components/UserComponents/Header/Header';
+import AnimatedTextInput from '../../../components/UserComponents/TextInput/TextInput';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../config/colorPalette';
+import {getFigmaDimension, getScreenHeight} from '../../../helpers/screenSize';
+import {goBack, navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './EditFieldScreen.styles';
 import {
-  FieldValues,
-  ErrorValues,
   EditFieldParams,
+  ErrorValues,
+  FieldValues,
 } from './EditFieldScreen.types';
 
 type ValidationFunction = (value: string) => string | true;

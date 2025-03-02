@@ -1,8 +1,8 @@
 import React from 'react';
-import {View, Image} from 'react-native';
+import {Image, View} from 'react-native';
+import {ColorPalette} from '../../../config/colorPalette';
 import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
 import {styles} from './RecentOrder.styles';
 import {RecentOrderProps} from './RecentOrder.types';
 

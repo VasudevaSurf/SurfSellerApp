@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity, StyleSheet} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';

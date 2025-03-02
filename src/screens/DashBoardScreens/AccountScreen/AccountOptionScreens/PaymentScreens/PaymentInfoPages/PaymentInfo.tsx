@@ -1,29 +1,19 @@
 import React, {useState} from 'react';
 import {
+  Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
-  View,
   TouchableOpacity,
-  Dimensions,
+  View,
 } from 'react-native';
-import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
+import {SceneMap, TabBar, TabView} from 'react-native-tab-view';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
-import {
-  goBack,
-  navigate,
-} from '../../../../../../navigation/utils/navigationRef';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {Header} from '../../../../../../components/UserComponents/Header/Header';
-import {
-  getFigmaDimension,
-  getScreenHeight,
-} from '../../../../../../helpers/screenSize';
 import BankOutlineIcon from '../../../../../../assets/icons/BankOutlineIcon';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {TextButton} from '../../../../../../components/UserComponents/TextButton';
+import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import WalletIcon from '../../../../../../assets/icons/WalletIcon';
+import {AddModal} from '../../../../../../components/MainComponents/AddModal/AddModal';
+import {SlidingBar} from '../../../../../../components/MainComponents/SlidingBar/SlidingBar';
 import {
   Button,
   ButtonSize,
@@ -31,10 +21,17 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button';
-import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
+import {Header} from '../../../../../../components/UserComponents/Header/Header';
+import {TextButton} from '../../../../../../components/UserComponents/TextButton';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
+import {getScreenHeight} from '../../../../../../helpers/screenSize';
+import {
+  goBack,
+  navigate,
+} from '../../../../../../navigation/utils/navigationRef';
 import {styles} from './PaymentInfo.styles';
-import {SlidingBar} from '../../../../../../components/MainComponents/SlidingBar/SlidingBar';
-import {AddModal} from '../../../../../../components/MainComponents/AddModal/AddModal';
 
 const initialLayout = {width: Dimensions.get('window').width};
 

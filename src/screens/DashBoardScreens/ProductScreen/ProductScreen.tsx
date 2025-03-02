@@ -1,31 +1,29 @@
 import React, {useState} from 'react';
 import {ScrollView, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Header} from '../../../components/UserComponents/Header/Header';
-import {FilterModal} from '../../../components/MainComponents/FilterModal/FilterModal';
-import {ColorPalette} from '../../../config/colorPalette';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import BellIcon from '../../../assets/icons/BellIcon';
-import AlignCenterIcon from '../../../assets/icons/AlignCenterIcon';
 import InfoIcon from '../../../assets/icons/InfoIcon';
-import {getScreenHeight} from '../../../helpers/screenSize';
-import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox';
-import {styles} from './ProductScreen.styles';
-import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {ProductInfo} from '../../../components/MainComponents/ProductInfo/ProductInfo';
 import PlusIcon from '../../../assets/icons/PlusIcon';
 import {
   AddModal,
   ButtonConfig,
 } from '../../../components/MainComponents/AddModal/AddModal';
+import {ProductInfo} from '../../../components/MainComponents/ProductInfo/ProductInfo';
+import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../../components/UserComponents/Button';
+import {Header} from '../../../components/UserComponents/Header/Header';
+import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../config/colorPalette';
+import {getScreenHeight} from '../../../helpers/screenSize';
 import {navigate} from '../../../navigation/utils/navigationRef';
+import {styles} from './ProductScreen.styles';
 
 const ProductScreen = () => {
   const [searchText, setSearchText] = useState('');

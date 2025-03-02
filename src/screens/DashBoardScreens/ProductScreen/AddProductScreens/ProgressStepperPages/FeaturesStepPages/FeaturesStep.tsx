@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import InfoIcon from '../../../../../../assets/icons/InfoIcon';
-import {styles} from './FeaturesStep.styles';
 import ArrowDownIcon from '../../../../../../assets/icons/ArrowDownIcon';
-import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
+import InfoIcon from '../../../../../../assets/icons/InfoIcon';
 import {StatusModal} from '../../../../../../components/MainComponents/StatusModal/StatusModal';
 import {Option} from '../../../../../../components/MainComponents/StatusModal/StatusModal.types';
+import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
+import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {styles} from './FeaturesStep.styles';
 
 const BRAND_OPTIONS: Option[] = [
   {value: 'Kinnie', label: 'Kinnie', isSelected: false},

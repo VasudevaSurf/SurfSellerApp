@@ -1,11 +1,11 @@
-import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
+import React from 'react';
 import {RootStackParamList} from '../types/navigation';
-import {OnboardingNavigator} from './stacks/OnboardingNavigator';
 import {AuthNavigator} from './stacks/AuthNavigator';
 import {CreateNavigator} from './stacks/CreateNavigator';
-import {VATNavigator} from './stacks/VATNavigator';
 import {DashboardNavigator} from './stacks/DashBoardNavigator';
+import {OnboardingNavigator} from './stacks/OnboardingNavigator';
+import {VATNavigator} from './stacks/VATNavigator';
 
 const Stack = createStackNavigator<RootStackParamList>();
 

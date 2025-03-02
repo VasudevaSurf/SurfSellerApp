@@ -1,22 +1,22 @@
 import React, {useState} from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
-import {Header} from '../../../../../../components/UserComponents/Header/Header';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../../config/colorPalette';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
-import {goBack} from '../../../../../../navigation/utils/navigationRef';
-import {getScreenHeight} from '../../../../../../helpers/screenSize';
-import {styles} from './WithdrawScreen.styles';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
 import InfoIconOutline from '../../../../../../assets/icons/InfoIconOutline';
-import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
+import {Button} from '../../../../../../components/UserComponents/Button/Button';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button/Button.types';
-import {Button} from '../../../../../../components/UserComponents/Button/Button';
+import {Header} from '../../../../../../components/UserComponents/Header/Header';
+import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
+import {getScreenHeight} from '../../../../../../helpers/screenSize';
+import {goBack} from '../../../../../../navigation/utils/navigationRef';
+import {styles} from './WithdrawScreen.styles';
 
 const WithdrawScreen = () => {
   const [amount, setAmount] = useState('');

@@ -1,13 +1,17 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import InfoIcon from '../../../../../../assets/icons/InfoIcon';
+import {TextInput, TouchableOpacity, View} from 'react-native';
+import ArrowDownIcon from '../../../../../../assets/icons/ArrowDownIcon';
 import ArrowRightIcon from '../../../../../../assets/icons/ArrowRightIcon';
-import {styles} from './ProductInfoStep.styles';
-import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import InfoIcon from '../../../../../../assets/icons/InfoIcon';
+import AlignTextCenterIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextCenterIcon';
+import AlignTextLeftIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextLeftIcon';
+import AlignTextRightIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextRightIcon';
+import PencilUnderlineIcon from '../../../../../../assets/icons/NewProductIcons/PencilUnderlineIcon';
+import TextSymbolIcon from '../../../../../../assets/icons/NewProductIcons/TextSymbolIcon';
+import UnderlineIcon from '../../../../../../assets/icons/NewProductIcons/UnderlineIcon';
+import UnderlineTextIcon from '../../../../../../assets/icons/NewProductIcons/UnderlineTextIcon';
+import {Badge} from '../../../../../../components/UserComponents/Badges/Badge';
+import {BadgeVariant} from '../../../../../../components/UserComponents/Badges/Badge.types';
 import {
   Button,
   ButtonSize,
@@ -15,16 +19,12 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button';
-import {Badge} from '../../../../../../components/UserComponents/Badges/Badge';
-import {BadgeVariant} from '../../../../../../components/UserComponents/Badges/Badge.types';
-import ArrowDownIcon from '../../../../../../assets/icons/ArrowDownIcon';
-import TextSymbolIcon from '../../../../../../assets/icons/NewProductIcons/TextSymbolIcon';
-import UnderlineIcon from '../../../../../../assets/icons/NewProductIcons/UnderlineIcon';
-import PencilUnderlineIcon from '../../../../../../assets/icons/NewProductIcons/PencilUnderlineIcon';
-import UnderlineTextIcon from '../../../../../../assets/icons/NewProductIcons/UnderlineTextIcon';
-import AlignTextLeftIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextLeftIcon';
-import AlignTextCenterIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextCenterIcon';
-import AlignTextRightIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextRightIcon';
+import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
+import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {styles} from './ProductInfoStep.styles';
 
 interface ProductInfoStepProps {
   formData: {

@@ -1,8 +1,8 @@
-import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
+import React from 'react';
 import {DashboardStackParamList} from '../../types/navigation';
-import BottomNavigation from './BottomTabNavigator/BottomTabNavigator';
 import {AccountSettingsNavigator} from './AccountSettingsNavigator';
+import BottomNavigation from './BottomTabNavigator/BottomTabNavigator';
 import {OrderNavigator} from './OrderNavigator';
 import {ProductNavigator} from './ProductNavigator';
 

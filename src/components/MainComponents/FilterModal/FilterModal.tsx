@@ -1,13 +1,9 @@
 import React, {useState} from 'react';
 import {ScrollView, TouchableOpacity, View} from 'react-native';
 import Modal from 'react-native-modal';
-import {Typography} from '../../UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
 import CheckIcon from '../../../assets/icons/CheckIcon';
 import CloseIcon from '../../../assets/icons/CloseIcon';
-import {FilterModalProps, FilterSection} from './FilterModal.types';
-import {styles} from './FilterModal.styles';
+import {ColorPalette} from '../../../config/colorPalette';
 import {
   Button,
   ButtonSize,
@@ -15,6 +11,10 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../UserComponents/Button';
+import {Typography} from '../../UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
+import {styles} from './FilterModal.styles';
+import {FilterModalProps, FilterSection} from './FilterModal.types';
 
 export const FilterModal: React.FC<FilterModalProps> = ({
   isVisible,

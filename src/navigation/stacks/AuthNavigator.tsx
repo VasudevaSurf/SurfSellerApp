@@ -1,9 +1,9 @@
-import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {AuthStackParamList} from '../../types/navigation';
-import PhoneNumberScreen from '../../screens/Auth/PhoneNumberScreen/PhoneNumberScreen';
-import OTPVerificationScreen from '../../screens/Auth/OTPVerificationScreen/OTPVerificationScreen';
+import React from 'react';
 import AuthSuccessScreen from '../../screens/Auth/AuthSuccessScreen/AuthSuccessScreen';
+import OTPVerificationScreen from '../../screens/Auth/OTPVerificationScreen/OTPVerificationScreen';
+import PhoneNumberScreen from '../../screens/Auth/PhoneNumberScreen/PhoneNumberScreen';
+import {AuthStackParamList} from '../../types/navigation';
 
 const Stack = createStackNavigator<AuthStackParamList>();
 

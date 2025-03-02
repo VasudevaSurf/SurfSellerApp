@@ -1,16 +1,13 @@
 import React from 'react';
 import {
-  View,
-  TouchableOpacity,
-  ViewStyle,
-  StyleProp,
   Modal as RNModal,
+  StyleProp,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from 'react-native';
-import {Typography} from '../../UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
 import CloseIcon from '../../../assets/icons/CloseIcon';
-import {styles} from './AddModal.styles';
+import {ColorPalette} from '../../../config/colorPalette';
 import {
   Button,
   ButtonSize,
@@ -18,6 +15,9 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../UserComponents/Button';
+import {Typography} from '../../UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
+import {styles} from './AddModal.styles';
 
 export interface ButtonConfig {
   text: string;

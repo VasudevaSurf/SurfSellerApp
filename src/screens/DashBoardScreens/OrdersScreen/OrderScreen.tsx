@@ -4,18 +4,15 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import BellIcon from '../../../assets/icons/BellIcon';
 import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
 import {OrderInfo} from '../../../components/MainComponents/OrderInfo/OrderInfo';
-import {
-  OrderDetailParams,
-  OrderStatus,
-} from '../../../components/MainComponents/OrderInfo/OrderInfo.types';
+import {OrderStatus} from '../../../components/MainComponents/OrderInfo/OrderInfo.types';
 import {Header} from '../../../components/UserComponents/Header/Header';
 import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight} from '../../../helpers/screenSize';
-import {styles} from './OrderScreen.styles';
 import {navigate} from '../../../navigation/utils/navigationRef';
+import {styles} from './OrderScreen.styles';
 
 const OrderScreen = () => {
   const [searchText, setSearchText] = useState('');

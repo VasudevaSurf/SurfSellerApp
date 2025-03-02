@@ -1,21 +1,20 @@
 import React, {useState} from 'react';
-import {View, Image} from 'react-native';
-import {Typography} from '../../UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import ShareIcon from '../../../assets/icons/ShareIcon';
-import MoreVerticalIcon from '../../../assets/icons/MoreVerticalIcon';
-import {ProductInfoProps} from './ProductInfo.types';
-import {styles} from './ProductInfo.styles';
+import {Image, View} from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
+import MoreVerticalIcon from '../../../assets/icons/MoreVerticalIcon';
 import {ColorPalette} from '../../../config/colorPalette';
 import {getFigmaDimension} from '../../../helpers/screenSize';
-import {AddModal, ButtonConfig} from '../AddModal/AddModal';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../UserComponents/Button';
+import {Typography} from '../../UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
+import {AddModal, ButtonConfig} from '../AddModal/AddModal';
+import {styles} from './ProductInfo.styles';
+import {ProductInfoProps} from './ProductInfo.types';
 
 export const ProductInfo: React.FC<ProductInfoProps> = ({
   orderImage,

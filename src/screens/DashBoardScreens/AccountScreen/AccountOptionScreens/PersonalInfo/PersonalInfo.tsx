@@ -1,14 +1,14 @@
+import {useFocusEffect, useRoute} from '@react-navigation/native';
 import React, {useState} from 'react';
-import {SafeAreaView, View, ScrollView} from 'react-native';
+import {SafeAreaView, ScrollView, View} from 'react-native';
+import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
 import {Header} from '../../../../../components/UserComponents/Header/Header';
+import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../config/colorPalette';
-import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
-import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import {getScreenHeight} from '../../../../../helpers/screenSize';
+import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './PerosanlInfo.styles';
-import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
-import {useFocusEffect, useRoute} from '@react-navigation/native';
 
 const INITIAL_COUNTRY_CODE = '+356';
 const MALTA_FLAG_URL =

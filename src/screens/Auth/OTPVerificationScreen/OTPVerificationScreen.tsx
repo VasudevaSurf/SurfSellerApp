@@ -1,23 +1,23 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView, TouchableOpacity, View} from 'react-native';
-import {STATIC_TEXT} from '../../../config/staticText';
-import {styles} from './OTPVerificationScreen.styles';
-import {globalStyles} from '../../../config/globalStyles';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {TextButton} from '../../../components/UserComponents/TextButton/TextButton';
-import {ColorPalette} from '../../../config/colorPalette';
+import ArrowLeftIcon from '../../../assets/icons/ArrowLeft';
+import FlowBite from '../../../assets/icons/FlowBite';
 import {Button} from '../../../components/UserComponents/Button/Button';
 import {
   ButtonSize,
   ButtonState,
   ButtonVariant,
 } from '../../../components/UserComponents/Button/Button.types';
-import {Fonts} from '../../../config/fonts';
-import {goBack} from '../../../navigation/utils/navigationRef';
-import ArrowLeftIcon from '../../../assets/icons/ArrowLeft';
-import FlowBite from '../../../assets/icons/FlowBite';
 import {OtpInput} from '../../../components/UserComponents/OtpInput/OtpInput';
+import {TextButton} from '../../../components/UserComponents/TextButton/TextButton';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../config/colorPalette';
+import {Fonts} from '../../../config/fonts';
+import {globalStyles} from '../../../config/globalStyles';
+import {STATIC_TEXT} from '../../../config/staticText';
+import {goBack} from '../../../navigation/utils/navigationRef';
+import {styles} from './OTPVerificationScreen.styles';
 
 const {promptTitle, otpSent, resendText, verifyText} =
   STATIC_TEXT.screens.otpScreen;

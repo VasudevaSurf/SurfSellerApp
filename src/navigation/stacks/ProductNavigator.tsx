@@ -1,8 +1,8 @@
-import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {AccountSettingsStackParamList} from '../../types/navigation';
+import React from 'react';
 import AddProduct from '../../screens/DashBoardScreens/ProductScreen/AddProductScreens/AddProduct';
 import ProductScreen from '../../screens/DashBoardScreens/ProductScreen/ProductScreen';
+import {AccountSettingsStackParamList} from '../../types/navigation';
 
 const Stack = createStackNavigator<AccountSettingsStackParamList>();
 

@@ -1,36 +1,26 @@
-import React, {useState, useMemo, useCallback} from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import React, {useCallback, useMemo, useState} from 'react';
 import {Image, ScrollView, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
+import CircularEuroIcon from '../../../assets/icons/CircularEuroIcon';
+import LanguageIcon from '../../../assets/icons/LanguageIcon';
+import PackageIcon from '../../../assets/icons/PackageIcon';
+import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
+import {AddModal} from '../../../components/MainComponents/AddModal/AddModal';
+import {MenuItem} from '../../../components/MainComponents/MenuItem/MenuItem';
+import {
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+  ButtonVariant,
+} from '../../../components/UserComponents/Button';
 import {Header} from '../../../components/UserComponents/Header/Header';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight} from '../../../helpers/screenSize';
-import {styles} from './AccountScreen.styles';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {MenuItem} from '../../../components/MainComponents/MenuItem/MenuItem';
-import {AddModal} from '../../../components/MainComponents/AddModal/AddModal';
-import {
-  ButtonVariant,
-  ButtonType,
-  ButtonState,
-  ButtonSize,
-} from '../../../components/UserComponents/Button';
 import {navigate} from '../../../navigation/utils/navigationRef';
-import LanguageIcon from '../../../assets/icons/LanguageIcon';
-import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
-import ProfileIcon from '../../../assets/icons/AccountIcons/ProfileIcon';
-import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
-import CompanyProfile from '../../../assets/icons/AccountIcons/CompanyProfile';
-import BankIcon from '../../../assets/icons/AccountIcons/BankIcon';
-import PaymentIcon from '../../../assets/icons/AccountIcons/PaymentIcon';
-import StripIcon from '../../../assets/icons/AccountIcons/StripIcon';
-import NotificationIcon from '../../../assets/icons/AccountIcons/NotificationIcon';
-import TermsIcon from '../../../assets/icons/AccountIcons/TermsIcon';
-import PolicyIcon from '../../../assets/icons/AccountIcons/PolicyIcon';
-import LogOutIcon from '../../../assets/icons/AccountIcons/LogOutIcon';
-import DeleteIcon from '../../../assets/icons/AccountIcons/DeleteIcon';
-import CircularEuroIcon from '../../../assets/icons/CircularEuroIcon';
-import PackageIcon from '../../../assets/icons/PackageIcon';
+import {styles} from './AccountScreen.styles';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);

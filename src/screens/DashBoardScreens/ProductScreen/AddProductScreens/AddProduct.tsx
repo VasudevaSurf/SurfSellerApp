@@ -1,24 +1,24 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ArrowLeftIcon from '../../../../assets/icons/ArrowLeftIcon';
-import {Header} from '../../../../components/UserComponents/Header/Header';
-import {TypographyVariant} from '../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../config/colorPalette';
-import {goBack} from '../../../../navigation/utils/navigationRef';
-import ProgressStepper from './ProgressStepperPages/ProgressStepper';
-import ProductInfoStep from './ProgressStepperPages/ProductInfoPages/ProductInfoStep';
-import UploadMediaStep from './ProgressStepperPages/UploadMediaPages/UploadMediaStep';
-import InventoryStep from './ProgressStepperPages/InventoryStepPages/InventoryStep';
-import FeaturesStep from './ProgressStepperPages/FeaturesStepPages/FeaturesStep';
 import {
   Button,
   ButtonSize,
-  ButtonVariant,
   ButtonState,
+  ButtonVariant,
 } from '../../../../components/UserComponents/Button';
+import {Header} from '../../../../components/UserComponents/Header/Header';
+import {TypographyVariant} from '../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../config/colorPalette';
 import {getScreenHeight} from '../../../../helpers/screenSize';
+import {goBack} from '../../../../navigation/utils/navigationRef';
 import {styles} from './AddProduct.styles';
+import FeaturesStep from './ProgressStepperPages/FeaturesStepPages/FeaturesStep';
+import InventoryStep from './ProgressStepperPages/InventoryStepPages/InventoryStep';
+import ProductInfoStep from './ProgressStepperPages/ProductInfoPages/ProductInfoStep';
+import ProgressStepper from './ProgressStepperPages/ProgressStepper';
+import UploadMediaStep from './ProgressStepperPages/UploadMediaPages/UploadMediaStep';
 
 const STEPS = [
   {id: 1, label: 'Product Info'},

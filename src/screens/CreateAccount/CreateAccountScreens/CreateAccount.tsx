@@ -1,22 +1,22 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView, View} from 'react-native';
 import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
-import {STATIC_TEXT} from '../../../config/staticText';
-import {styles} from './CreateAccount.styles';
-import {globalStyles} from '../../../config/globalStyles';
-import AnimatedTextInput from '../../../components/UserComponents/TextInput/TextInput';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {TextButton} from '../../../components/UserComponents/TextButton/TextButton';
-import {ColorPalette} from '../../../config/colorPalette';
 import {Button} from '../../../components/UserComponents/Button/Button';
 import {
   ButtonSize,
   ButtonState,
   ButtonVariant,
 } from '../../../components/UserComponents/Button/Button.types';
+import {TextButton} from '../../../components/UserComponents/TextButton/TextButton';
+import AnimatedTextInput from '../../../components/UserComponents/TextInput/TextInput';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../config/colorPalette';
 import {Fonts} from '../../../config/fonts';
+import {globalStyles} from '../../../config/globalStyles';
+import {STATIC_TEXT} from '../../../config/staticText';
 import {navigate} from '../../../navigation/utils/navigationRef';
+import {styles} from './CreateAccount.styles';
 
 const {surfTitle} = STATIC_TEXT.screens.onboarding;
 

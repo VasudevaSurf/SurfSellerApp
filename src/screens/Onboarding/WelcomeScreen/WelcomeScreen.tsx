@@ -9,9 +9,9 @@ import {
 } from '../../../components/UserComponents/Button/Button.types';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {styles} from './WelcomeScreen.styles';
-import {navigate} from '../../../navigation/utils/navigationRef';
 import {STATIC_TEXT} from '../../../config/staticText';
+import {navigate} from '../../../navigation/utils/navigationRef';
+import {styles} from './WelcomeScreen.styles';
 
 const {createAccount, login} = STATIC_TEXT.screens.welcomeScreen;
 

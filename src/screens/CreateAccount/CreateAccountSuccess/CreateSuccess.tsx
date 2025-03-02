@@ -1,18 +1,17 @@
 import React, {useEffect} from 'react';
-import {Animated, Image, SafeAreaView, View} from 'react-native';
-import {Text} from 'react-native-gesture-handler';
-import {styles} from './CreateSuccess.styles';
-import {globalStyles} from '../../../config/globalStyles';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {Animated, SafeAreaView, View} from 'react-native';
+import {Button} from '../../../components/UserComponents/Button/Button';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../../components/UserComponents/Button/Button.types';
-import {Button} from '../../../components/UserComponents/Button/Button';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {globalStyles} from '../../../config/globalStyles';
 import {navigate} from '../../../navigation/utils/navigationRef';
+import {styles} from './CreateSuccess.styles';
 
 const CreateSuccess = () => {
   const scaleValue = new Animated.Value(0);

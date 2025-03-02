@@ -1,9 +1,9 @@
 import React from 'react';
-import {View, TextInput} from 'react-native';
-import {SearchBoxProps} from './SearchBox.types';
-import {styles} from './SearchBox.styles';
-import {ColorPalette} from '../../../config/colorPalette';
+import {TextInput, View} from 'react-native';
 import SearchIcon from '../../../assets/icons/SearchIcon';
+import {ColorPalette} from '../../../config/colorPalette';
+import {styles} from './SearchBox.styles';
+import {SearchBoxProps} from './SearchBox.types';
 
 export const SearchBox: React.FC<SearchBoxProps> = ({
   placeholder = 'Search products...',

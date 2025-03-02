@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity} from 'react-native';
-import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import InfoIcon from '../../../../../../assets/icons/InfoIcon';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {styles} from './InventoryStep.styles';
-import ToggleButtons from '../../../../../../components/MainComponents/ToggleButtons/ToggleButtons';
+import {TouchableOpacity, View} from 'react-native';
 import CheckIcon from '../../../../../../assets/icons/CheckIcon';
+import InfoIcon from '../../../../../../assets/icons/InfoIcon';
+import ToggleButtons from '../../../../../../components/MainComponents/ToggleButtons/ToggleButtons';
+import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
+import {styles} from './InventoryStep.styles';
 
 const InventoryStep = () => {
   const [productCode, setProductCode] = useState('');

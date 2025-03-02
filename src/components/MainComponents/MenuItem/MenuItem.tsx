@@ -1,10 +1,10 @@
 import React from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
+import {ColorPalette} from '../../../config/colorPalette';
 import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
-import {MenuItemProps} from './MenuItem.types';
 import {styles} from './MenuItem.styles';
+import {MenuItemProps} from './MenuItem.types';
 
 const ArrowRight = () => (
   <View style={styles.arrowContainer}>

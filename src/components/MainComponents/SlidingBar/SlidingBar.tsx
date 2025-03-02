@@ -1,10 +1,10 @@
 import React from 'react';
 import {ScrollView, TouchableOpacity, View} from 'react-native';
+import {ColorPalette} from '../../../config/colorPalette';
 import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import {SlidingBarProps, SlidingBarOption} from './SlidingBar.types';
 import {slidingBarStyles} from './SlidingBar.styles';
-import {ColorPalette} from '../../../config/colorPalette';
+import {SlidingBarOption, SlidingBarProps} from './SlidingBar.types';
 
 export const SlidingBar: React.FC<SlidingBarProps> = ({
   options,

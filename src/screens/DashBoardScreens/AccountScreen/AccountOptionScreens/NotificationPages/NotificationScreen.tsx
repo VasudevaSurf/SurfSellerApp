@@ -1,18 +1,18 @@
 import React, {useState} from 'react';
-import {SafeAreaView, ScrollView, View, Switch} from 'react-native';
+import {SafeAreaView, ScrollView, View} from 'react-native';
+import ToggleSwitch from 'toggle-switch-react-native';
+import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
+import ToggleButtons from '../../../../../components/MainComponents/ToggleButtons/ToggleButtons';
 import {Header} from '../../../../../components/UserComponents/Header/Header';
+import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../config/colorPalette';
-import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
-import {goBack} from '../../../../../navigation/utils/navigationRef';
 import {
   getFigmaDimension,
   getScreenHeight,
 } from '../../../../../helpers/screenSize';
+import {goBack} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './NotificationScreen.styles';
-import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
-import ToggleButtons from '../../../../../components/MainComponents/ToggleButtons/ToggleButtons';
-import ToggleSwitch from 'toggle-switch-react-native';
 
 const NotificationScreen: React.FC = () => {
   const [autoAcceptOrders, setAutoAcceptOrders] = useState('yes');

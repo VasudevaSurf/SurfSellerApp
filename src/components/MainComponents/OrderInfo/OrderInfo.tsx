@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
-import {View, Image, TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity, View} from 'react-native';
+import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
+import {ColorPalette} from '../../../config/colorPalette';
+import {Badge} from '../../UserComponents/Badges/Badge';
+import {BadgeType, BadgeVariant} from '../../UserComponents/Badges/Badge.types';
 import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import {OrderInfoProps, OrderStatus} from './OrderInfo.types';
-import {styles} from './OrderInfo.styles';
-import {Badge} from '../../UserComponents/Badges/Badge';
-import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
-import {BadgeType, BadgeVariant} from '../../UserComponents/Badges/Badge.types';
-import {ColorPalette} from '../../../config/colorPalette';
 import {StatusModal} from '../StatusModal/StatusModal';
+import {styles} from './OrderInfo.styles';
+import {OrderInfoProps, OrderStatus} from './OrderInfo.types';
 
 const getStatusBadgeType = (status: OrderStatus): BadgeType => {
   switch (status) {

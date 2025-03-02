@@ -1,31 +1,25 @@
 import React, {useState} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  getFigmaDimension,
-  getScreenHeight,
-} from '../../../../helpers/screenSize';
-import ArrowLeftIcon from '../../../../assets/icons/ArrowLeftIcon';
-import {goBack} from '../../../../navigation/utils/navigationRef';
-import {TypographyVariant} from '../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../config/colorPalette';
-import {Header} from '../../../../components/UserComponents/Header/Header';
-import {Typography} from '../../../../components/UserComponents/Typography/Typography';
+import {Image, SafeAreaView, ScrollView, View} from 'react-native';
+import Accordion from 'react-native-collapsible/Accordion';
 import ChevronDownIcon from '../../../../assets/icons/ArrowDownIcon';
-import {OrderDetailProps} from './OrderDetail.types';
-import {styles} from './OrderDetail.styles';
+import ArrowLeftIcon from '../../../../assets/icons/ArrowLeftIcon';
 import {
   Button,
   ButtonSize,
   ButtonState,
   ButtonType,
 } from '../../../../components/UserComponents/Button';
-import Accordion from 'react-native-collapsible/Accordion';
+import {Header} from '../../../../components/UserComponents/Header/Header';
+import {Typography} from '../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../config/colorPalette';
+import {
+  getFigmaDimension,
+  getScreenHeight,
+} from '../../../../helpers/screenSize';
+import {goBack} from '../../../../navigation/utils/navigationRef';
+import {styles} from './OrderDetail.styles';
+import {OrderDetailProps} from './OrderDetail.types';
 
 const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
   const orderData = route?.params || {

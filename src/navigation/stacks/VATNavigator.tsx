@@ -1,8 +1,8 @@
-import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {VATStackParamList} from '../../types/navigation';
-import VATVerification from '../../screens/VATVerificationScreens/VATVerificationScreens/VATVerification';
+import React from 'react';
 import VATSuccess from '../../screens/VATVerificationScreens/VATSuccessScreens/VATSuccess';
+import VATVerification from '../../screens/VATVerificationScreens/VATVerificationScreens/VATVerification';
+import {VATStackParamList} from '../../types/navigation';
 
 const Stack = createStackNavigator<VATStackParamList>();
 

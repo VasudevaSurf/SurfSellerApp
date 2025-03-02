@@ -1,12 +1,16 @@
 import React, {useEffect} from 'react';
 import {Animated, SafeAreaView, View} from 'react-native';
-import {styles} from './VATSuccess.styles';
-import {globalStyles} from '../../../config/globalStyles';
+import {Button} from '../../../components/UserComponents/Button/Button';
+import {
+  ButtonSize,
+  ButtonState,
+  ButtonVariant,
+} from '../../../components/UserComponents/Button/Button.types';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ButtonSize, ButtonState, ButtonVariant} from '../../../components/UserComponents/Button/Button.types';
-import {Button} from '../../../components/UserComponents/Button/Button';
+import {globalStyles} from '../../../config/globalStyles';
 import {STATIC_TEXT} from '../../../config/staticText';
+import {styles} from './VATSuccess.styles';
 
 const {yourSet, yourVerified, goDashboard} = STATIC_TEXT.screens.vatSuccess;
 

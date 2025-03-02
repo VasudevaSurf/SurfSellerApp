@@ -1,7 +1,7 @@
 import {
+  CommonActions,
   createNavigationContainerRef,
   StackActions,
-  CommonActions,
 } from '@react-navigation/native';
 import {RootStackParamList} from '../../types/navigation';
 

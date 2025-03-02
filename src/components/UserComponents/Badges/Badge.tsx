@@ -1,9 +1,9 @@
 import React from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {Typography} from '../Typography/Typography';
-import {BadgeProps, BadgeType, BadgeVariant} from './Badge.types';
-import {createBadgeStyles, getTextColor} from './Badge.styles';
 import {TypographyVariant} from '../Typography/Typography.types';
+import {createBadgeStyles, getTextColor} from './Badge.styles';
+import {BadgeProps, BadgeType, BadgeVariant} from './Badge.types';
 
 export const Badge: React.FC<BadgeProps> = ({
   text,

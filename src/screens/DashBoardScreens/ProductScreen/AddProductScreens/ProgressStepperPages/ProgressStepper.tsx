@@ -1,8 +1,8 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../../../config/colorPalette';
+import {StyleSheet, View} from 'react-native';
 import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../config/colorPalette';
 import {getFigmaDimension} from '../../../../../helpers/screenSize';
 
 interface Step {
