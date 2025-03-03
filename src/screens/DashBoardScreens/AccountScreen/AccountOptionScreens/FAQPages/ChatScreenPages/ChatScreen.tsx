@@ -1,27 +1,24 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  TextInput,
-  TouchableOpacity,
+  Image,
   KeyboardAvoidingView,
   Platform,
-  Image,
+  SafeAreaView,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {
-  getFigmaDimension,
-  getScreenHeight,
-} from '../../../../../../helpers/screenSize';
-import {goBack} from '../../../../../../navigation/utils/navigationRef';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
-import {Header} from '../../../../../../components/UserComponents/Header/Header';
-import SendIcon from '../../../../../../assets/icons/SendIcon';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {styles} from './ChatScreen.styles';
 import ImageUploadIcon from '../../../../../../assets/icons/ImageUploadIcon';
+import SendIcon from '../../../../../../assets/icons/SendIcon';
+import {Header} from '../../../../../../components/UserComponents/Header/Header';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
+import {getScreenHeight} from '../../../../../../helpers/screenSize';
+import {goBack} from '../../../../../../navigation/utils/navigationRef';
+import {styles} from './ChatScreen.styles';
 
 const ChatScreen = () => {
   const [message, setMessage] = useState('');

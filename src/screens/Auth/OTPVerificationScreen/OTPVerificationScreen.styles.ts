@@ -3,7 +3,8 @@ import {BorderRadius, Spacing} from '../../../config/globalStyles';
 import {ColorPalette} from '../../../config/colorPalette';
 import {
   convertDipToPixels,
-  getFigmaDimension,
+  getScreenHeight,
+  getScreenWidth,
 } from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
@@ -17,26 +18,26 @@ export const styles = StyleSheet.create({
     marginBottom: Spacing.XXLarge,
   },
   mainTwoContainer: {
-    gap: getFigmaDimension(12),
+    gap: getScreenWidth(3), // Using getScreenWidth instead of getFigmaDimension(12)
     marginTop: Spacing.XXLarge,
   },
   mainContainerTwo: {
     paddingHorizontal: Spacing.Large,
-    paddingVertical: getFigmaDimension(24),
+    paddingVertical: getScreenHeight(3), // Using getScreenHeight instead of getFigmaDimension(24)
   },
 
   // Content Wrappers
   contentWrapper: {
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1), // Using getScreenWidth instead of getFigmaDimension(4)
   },
   containerTwo: {
     flexDirection: 'row',
-    gap: getFigmaDimension(8),
+    gap: getScreenWidth(2), // Using getScreenWidth instead of getFigmaDimension(8)
     alignItems: 'center',
   },
   subContainer: {
     flexDirection: 'row',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1), // Using getScreenWidth instead of getFigmaDimension(4)
     alignItems: 'center',
   },
 
@@ -54,14 +55,13 @@ export const styles = StyleSheet.create({
   },
 
   // OTP Input Styles
-  // OTP Input Styles
   otpContainer: {
     marginTop: Spacing.XXLarge,
     paddingHorizontal: Spacing.Large,
   },
   otpInputContainer: {
     width: '100%',
-    gap: getFigmaDimension(16),
+    gap: getScreenWidth(4), // Using getScreenWidth instead of getFigmaDimension(16)
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -70,8 +70,8 @@ export const styles = StyleSheet.create({
     borderRadius: BorderRadius.Medium,
     borderColor: ColorPalette.GREY_100, // Default unfocused state
     backgroundColor: ColorPalette.White,
-    height: convertDipToPixels(68),
-    width: convertDipToPixels(83),
+    height: getScreenHeight(8), // Using getScreenHeight instead of convertDipToPixels(68)
+    width: getScreenWidth(20), // Using getScreenWidth instead of convertDipToPixels(83)
   },
   otpBoxFocused: {
     borderColor: ColorPalette.GREY_TEXT_400, // Focused state

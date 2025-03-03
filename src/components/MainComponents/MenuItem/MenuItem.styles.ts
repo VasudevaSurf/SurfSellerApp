@@ -1,18 +1,15 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
-import {
-  getFigmaDimension,
-  getScreenHeight,
-  getScreenWidth,
-} from '../../../helpers/screenSize';
+import {getScreenWidth} from '../../../helpers/screenSize';
+import {BorderRadius, Spacing} from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
+    paddingVertical: Spacing.Small,
+    paddingHorizontal: Spacing.Medium,
     backgroundColor: ColorPalette.White,
   },
   bottomBorder: {
@@ -23,11 +20,11 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: getFigmaDimension(8),
+    gap: Spacing.XSmall,
   },
   leftIconContainer: {
-    paddingVertical: getFigmaDimension(6),
-    paddingHorizontal: getFigmaDimension(8),
+    paddingVertical: Spacing.XXSmall,
+    paddingHorizontal: Spacing.XSmall,
   },
   rightIconContainer: {
     flexDirection: 'row',

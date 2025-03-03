@@ -1,28 +1,32 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../../helpers/screenSize';
+import {BorderRadius, Spacing} from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
     display: 'flex',
-    gap: getFigmaDimension(12),
-    marginBottom: getFigmaDimension(16),
+    gap: Spacing.Small,
+    marginBottom: Spacing.Medium,
     backgroundColor: ColorPalette.SearchBack,
   },
   section: {
     display: 'flex',
     flexDirection: 'column',
-    paddingVertical: getFigmaDimension(12),
+    paddingVertical: Spacing.Small,
     backgroundColor: ColorPalette.White,
-    gap: getFigmaDimension(16),
+    gap: Spacing.Medium,
   },
   sectionHeader: {
     display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(4),
+    gap: Spacing.XXSmall,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: getFigmaDimension(16),
+    paddingHorizontal: Spacing.Medium,
   },
   sectionTitle: {
     color: ColorPalette.GREY_TEXT_500,
@@ -30,14 +34,14 @@ export const styles = StyleSheet.create({
   inputContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(16),
+    gap: Spacing.Medium,
   },
   sectionItem: {
     flexDirection: 'column',
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
-    gap: getFigmaDimension(6),
+    paddingVertical: Spacing.Small,
+    paddingHorizontal: Spacing.Medium,
+    gap: Spacing.XXSmall,
   },
   textContainer: {
     flexDirection: 'row',
@@ -49,18 +53,18 @@ export const styles = StyleSheet.create({
   },
   secondaryText: {
     color: ColorPalette.GREY_TEXT_300,
-    marginRight: getFigmaDimension(20),
+    marginRight: Spacing.Medium,
   },
   toggleContainer: {
-    height: getFigmaDimension(32),
+    height: getScreenHeight(4),
     backgroundColor: ColorPalette.White,
-    borderRadius: getFigmaDimension(16),
-    gap: getFigmaDimension(10),
+    borderRadius: BorderRadius.Medium,
+    gap: Spacing.XSmall,
   },
   toggleButton: {
-    borderRadius: getFigmaDimension(48),
-    paddingVertical: getFigmaDimension(8),
-    paddingHorizontal: getFigmaDimension(24),
+    borderRadius: BorderRadius.Full,
+    paddingVertical: Spacing.XSmall,
+    paddingHorizontal: Spacing.XLarge,
     borderWidth: 1,
     borderColor: ColorPalette.toggleBorder,
   },
@@ -70,9 +74,9 @@ export const styles = StyleSheet.create({
   taxCheckContainer: {
     display: 'flex',
     flexDirection: 'column',
-    paddingHorizontal: getFigmaDimension(16),
-    paddingVertical: getFigmaDimension(12),
-    gap: getFigmaDimension(8),
+    paddingHorizontal: Spacing.Medium,
+    paddingVertical: Spacing.Small,
+    gap: Spacing.XSmall,
     backgroundColor: ColorPalette.White,
   },
   checkBoxContainer: {
@@ -82,12 +86,12 @@ export const styles = StyleSheet.create({
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: getFigmaDimension(12),
+    gap: Spacing.Small,
   },
   checkbox: {
     width: 24,
     height: 24,
-    borderRadius: getFigmaDimension(4),
+    borderRadius: BorderRadius.XXSmall,
     borderWidth: 1,
     borderColor: ColorPalette.GREY_200,
     backgroundColor: 'transparent',

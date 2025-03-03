@@ -1,9 +1,10 @@
 import {StyleSheet} from 'react-native';
 import {
-  getFigmaDimension,
   getScreenWidth,
+  getScreenHeight,
 } from '../../../../../../helpers/screenSize';
 import {ColorPalette} from '../../../../../../config/colorPalette';
+import {BorderRadius} from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -19,39 +20,40 @@ export const styles = StyleSheet.create({
   mainContainerTwo: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(24),
-    paddingVertical: getFigmaDimension(18),
+    gap: getScreenHeight(3),
+    paddingVertical: getScreenHeight(2),
     backgroundColor: ColorPalette.White,
   },
   inputBorder: {
     borderColor: ColorPalette.GREY_TEXT_400,
     borderWidth: 1,
+    borderRadius: BorderRadius.XSmall,
   },
   buttonContainer: {
     backgroundColor: ColorPalette.White,
-    padding: getFigmaDimension(16),
-    borderTopStartRadius: getFigmaDimension(12),
-    borderTopEndRadius: getFigmaDimension(12),
-    gap: getFigmaDimension(8),
+    padding: getScreenWidth(4),
+    borderTopStartRadius: BorderRadius.Small,
+    borderTopEndRadius: BorderRadius.Small,
+    gap: getScreenHeight(1),
   },
   mainInputContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(2),
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(12),
+    paddingVertical: getScreenHeight(1.5),
   },
   nameContainer: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: getFigmaDimension(4),
-    paddingHorizontal: getFigmaDimension(16),
+    gap: getScreenWidth(1),
+    paddingHorizontal: getScreenWidth(4),
   },
   inputContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(2),
   },
 });

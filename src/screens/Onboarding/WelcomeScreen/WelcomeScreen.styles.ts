@@ -1,7 +1,11 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
-import {Spacing} from '../../../config/globalStyles';
-import {getFigmaDimension} from '../../../helpers/screenSize';
+import {Spacing, BorderRadius} from '../../../config/globalStyles';
+import {
+  getScreenWidth,
+  getScreenHeight,
+  totalScreenWidth,
+} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   mainContainer: {
@@ -11,7 +15,7 @@ export const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingVertical: getFigmaDimension(64),
+    paddingVertical: getScreenHeight(8),
   },
   scrollViewWrapper: {
     alignItems: 'center',
@@ -20,18 +24,16 @@ export const styles = StyleSheet.create({
   slide: {
     alignItems: 'center',
     justifyContent: 'center',
-    gap: getFigmaDimension(64),
+    gap: getScreenHeight(8),
   },
   image: {
-    width: getFigmaDimension(240),
-    height: getFigmaDimension(220),
+    width: getScreenWidth(60),
+    height: getScreenHeight(30),
   },
   textContainer: {
     alignItems: 'center',
   },
   title: {
-    fontSize: getFigmaDimension(24),
-    fontWeight: '600',
     textAlign: 'center',
     marginBottom: Spacing.XSmall,
     color: ColorPalette.TextPrimary,
@@ -51,7 +53,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   paginationGap: {
-    marginTop: getFigmaDimension(32),
+    marginTop: getScreenHeight(4),
   },
   dotContainer: {
     width: 10,
@@ -62,17 +64,17 @@ export const styles = StyleSheet.create({
   dot: {
     width: 10,
     height: 10,
-    borderRadius: 5,
+    borderRadius: BorderRadius.XXSmall,
     backgroundColor: ColorPalette.PURPLE_00,
   },
   activeDot: {
     backgroundColor: ColorPalette.PURPLE_300,
   },
   buttonContainer: {
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(2),
     paddingHorizontal: Spacing.Medium,
     width: '100%',
-    marginTop: getFigmaDimension(32),
+    marginTop: getScreenHeight(4),
   },
   buttonContainerStyle: {
     borderWidth: 1,

@@ -3,7 +3,8 @@ import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import {BorderRadius, Spacing} from '../../../config/globalStyles';
 
 const ToggleButtons = ({
   initialActiveButton = '7days',
@@ -96,16 +97,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    paddingVertical: getFigmaDimension(4),
-    paddingHorizontal: getFigmaDimension(8),
-    borderRadius: getFigmaDimension(8),
+    paddingVertical: getScreenHeight(0.5),
+    paddingHorizontal: getScreenWidth(2),
+    borderRadius: BorderRadius.XSmall,
     justifyContent: 'center',
     alignItems: 'center',
   },
   activeButton: {},
   buttonText: {
-    fontSize: getFigmaDimension(12),
-    lineHeight: getFigmaDimension(16),
+    fontSize: getScreenHeight(1.5),
+    lineHeight: getScreenHeight(2),
   },
   activeButtonText: {},
 });

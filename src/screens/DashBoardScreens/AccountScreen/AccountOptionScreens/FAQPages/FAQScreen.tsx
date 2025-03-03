@@ -1,27 +1,17 @@
 import React, {useState} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {SafeAreaView, ScrollView, TouchableOpacity, View} from 'react-native';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
+import ArrowRightIcon from '../../../../../assets/icons/ArrowRightIcon';
+import MessageIcon from '../../../../../assets/icons/MessageIcon';
+import {MenuItem} from '../../../../../components/MainComponents/MenuItem/MenuItem';
 import {Header} from '../../../../../components/UserComponents/Header/Header';
+import {SearchBox} from '../../../../../components/UserComponents/SearchBox/SearchBox';
 import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../config/colorPalette';
-import {
-  getFigmaDimension,
-  getScreenHeight,
-  getScreenWidth,
-} from '../../../../../helpers/screenSize';
+import {getScreenHeight} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
-import {SearchBox} from '../../../../../components/UserComponents/SearchBox/SearchBox';
-import {MenuItem} from '../../../../../components/MainComponents/MenuItem/MenuItem';
-import MessageIcon from '../../../../../assets/icons/MessageIcon';
 import {styles} from './FAQScreen.styles';
-import ArrowRightIcon from '../../../../../assets/icons/ArrowRightIcon';
 
 const FAQScreen = () => {
   const [searchText, setSearchText] = useState('');

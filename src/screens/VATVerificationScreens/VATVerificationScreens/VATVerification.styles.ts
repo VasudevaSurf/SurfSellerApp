@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {Spacing} from '../../../config/globalStyles';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension} from '../../../helpers/screenSize';
+import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
@@ -20,10 +20,10 @@ export const styles = StyleSheet.create({
     gap: Spacing.XLarge,
   },
   containerTwo: {
-    gap: getFigmaDimension(24),
+    gap: getScreenHeight(3),
   },
   inputContainer: {
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(2),
   },
   termsContainer: {
     flexDirection: 'row',
@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: Spacing.Medium, // Added for better spacing
   },
   subCaptionContainer: {
-    gap: getFigmaDimension(4),
+    gap: getScreenHeight(0.5),
   },
   heading: {
     paddingLeft: Spacing.Large,

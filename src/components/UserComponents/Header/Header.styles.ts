@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {BorderRadius, Spacing} from '../../../config/globalStyles';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension, getScreenWidth} from '../../../helpers/screenSize';
+import {getScreenWidth} from '../../../helpers/screenSize';
 
 export const headerStyles = StyleSheet.create({
   container: {
@@ -16,12 +16,12 @@ export const headerStyles = StyleSheet.create({
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: getFigmaDimension(4),
+    gap: Spacing.XXSmall,
   },
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: getFigmaDimension(16),
+    gap: Spacing.Medium,
   },
   profileImage: {
     width: getScreenWidth(8),
@@ -37,20 +37,20 @@ export const headerStyles = StyleSheet.create({
     marginLeft: Spacing.XSmall,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: getFigmaDimension(2),
+    gap: Spacing.Zero,
   },
   leftIconContainer: {
-    paddingVertical: getFigmaDimension(6),
-    paddingHorizontal: getFigmaDimension(8),
+    paddingVertical: Spacing.XXSmall,
+    paddingHorizontal: Spacing.XSmall,
   },
   badgeWrapper: {
     alignSelf: 'flex-start',
-    marginTop: getFigmaDimension(2),
+    marginTop: Spacing.Zero,
   },
   badgeContainer: {
     backgroundColor: ColorPalette.Green_200,
-    paddingVertical: getFigmaDimension(2),
-    paddingHorizontal: getFigmaDimension(6),
+    paddingVertical: getScreenWidth(0.5),
+    paddingHorizontal: Spacing.XXSmall,
     minWidth: 0,
     alignSelf: 'flex-start',
   },

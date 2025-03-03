@@ -1,27 +1,31 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {
+  getScreenWidth,
+  getScreenHeight,
+} from '../../../../../../helpers/screenSize';
+import {BorderRadius, Spacing} from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
     display: 'flex',
-    marginBottom: getFigmaDimension(16),
+    marginBottom: getScreenHeight(2), // Converted from getFigmaDimension(16)
     backgroundColor: ColorPalette.SearchBack,
   },
   section: {
     display: 'flex',
     flexDirection: 'column',
-    paddingVertical: getFigmaDimension(12),
+    paddingVertical: getScreenHeight(1.5), // Converted from getFigmaDimension(12)
     backgroundColor: ColorPalette.White,
-    gap: getFigmaDimension(16),
+    gap: getScreenWidth(4), // Converted from getFigmaDimension(16)
   },
   sectionHeader: {
     display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1), // Converted from getFigmaDimension(4)
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: getFigmaDimension(16),
+    paddingHorizontal: getScreenWidth(4), // Converted from getFigmaDimension(16)
   },
   sectionTitle: {
     color: ColorPalette.GREY_TEXT_500,
@@ -29,23 +33,23 @@ export const styles = StyleSheet.create({
   inputContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(16),
-    paddingHorizontal: getFigmaDimension(16),
+    gap: getScreenWidth(4), // Converted from getFigmaDimension(16)
+    paddingHorizontal: getScreenWidth(4), // Converted from getFigmaDimension(16)
   },
   inputContainerOne: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(16),
+    gap: getScreenWidth(4), // Converted from getFigmaDimension(16)
   },
   selectContainer: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: getFigmaDimension(12),
-    paddingVertical: getFigmaDimension(18),
+    paddingHorizontal: getScreenWidth(3), // Converted from getFigmaDimension(12)
+    paddingVertical: getScreenHeight(2.25), // Converted from getFigmaDimension(18)
     borderWidth: 1,
     borderColor: ColorPalette.GREY_100,
-    borderRadius: getFigmaDimension(8),
+    borderRadius: BorderRadius.XSmall, // Using the enum instead of getFigmaDimension(8)
   },
 });

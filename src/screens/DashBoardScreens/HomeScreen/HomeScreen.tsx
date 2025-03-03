@@ -1,5 +1,6 @@
 import React, {useMemo} from 'react';
-import {ScrollView} from 'react-native-gesture-handler';
+import {ScrollView, View} from 'react-native';
+import {ScrollView as GestureScrollView} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import BellIcon from '../../../assets/icons/BellIcon';
@@ -19,11 +20,8 @@ import {Header} from '../../../components/UserComponents/Header/Header';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension, getScreenHeight} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {styles} from './HomeScreen.styles';
-
-const View =
-  require('react-native/Libraries/Components/View/ViewNativeComponent').default;
 
 const HomeScreen = () => {
   const menuItems = useMemo(
@@ -58,6 +56,7 @@ const HomeScreen = () => {
     ],
     [],
   );
+
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
@@ -70,21 +69,21 @@ const HomeScreen = () => {
         rightIcons={[
           {
             icon: SearchIcon,
-            onPress: () => console.log('Arrow left pressed'),
+            onPress: () => console.log('Search pressed'),
             size: 20,
             color: ColorPalette.GREY_TEXT_400,
             strokeWidth: 2,
           },
           {
             icon: BellIcon,
-            onPress: () => console.log('Arrow left pressed'),
+            onPress: () => console.log('Bell pressed'),
             size: 20,
             color: ColorPalette.GREY_TEXT_400,
             strokeWidth: 2,
           },
           {
             icon: QuestionMarkIcon,
-            onPress: () => console.log('Arrow left pressed'),
+            onPress: () => console.log('Help pressed'),
             size: 24,
             color: ColorPalette.GREY_TEXT_400,
             strokeWidth: 2,
@@ -104,11 +103,15 @@ const HomeScreen = () => {
               variant={TypographyVariant.H6_BOLD}
               text="Complete these steps to start selling"
               customTextStyles={styles.textOne}
+              numberOfLines={2}
+              adjustsFontSizeToFit
             />
             <Typography
               variant={TypographyVariant.LXSMALL_REGULAR}
               text="Complete the following tasks to activate your seller account"
               customTextStyles={styles.textTwo}
+              numberOfLines={2}
+              adjustsFontSizeToFit
             />
           </View>
           <View style={styles.verifyStepsContainer}></View>
@@ -125,14 +128,14 @@ const HomeScreen = () => {
               variant={TypographyVariant.LMEDIUM_MEDIUM}
               containerStyle={styles.menuContainer}
               contentStyle={{
-                gap: 16,
+                gap: getScreenWidth(4),
               }}
               leftIconBackgroundColor={item.leftIconBackgroundColor}
               leftIconContainerStyle={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: getFigmaDimension(8),
-                borderRadius: getFigmaDimension(8),
+                padding: getScreenWidth(2),
+                borderRadius: getScreenWidth(2),
               }}
               showBottomBorder={true}
               isLastItem={index === menuItems.length - 1}
@@ -151,6 +154,7 @@ const HomeScreen = () => {
                     variant={TypographyVariant.PXSMALL_REGULAR}
                     text="+12.8%"
                     customTextStyles={styles.countText}
+                    numberOfLines={1}
                   />
                   <TrendIcon size={18} style={undefined} />
                 </View>
@@ -160,11 +164,14 @@ const HomeScreen = () => {
                   variant={TypographyVariant.H4_BOLD}
                   text="€47,125.34"
                   customTextStyles={styles.countValue}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
                 />
                 <Typography
                   variant={TypographyVariant.LMEDIUM_REGULAR}
                   text="Total Sales"
                   customTextStyles={styles.countCaption}
+                  numberOfLines={1}
                 />
               </View>
             </View>
@@ -178,6 +185,7 @@ const HomeScreen = () => {
                     variant={TypographyVariant.PXSMALL_REGULAR}
                     text="8.3%"
                     customTextStyles={styles.countText}
+                    numberOfLines={1}
                   />
                   <TrendIcon size={18} style={undefined} />
                 </View>
@@ -187,11 +195,14 @@ const HomeScreen = () => {
                   variant={TypographyVariant.H4_BOLD}
                   text="1,592"
                   customTextStyles={styles.countValue}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
                 />
                 <Typography
                   variant={TypographyVariant.LMEDIUM_REGULAR}
                   text="Total Orders"
                   customTextStyles={styles.countCaption}
+                  numberOfLines={1}
                 />
               </View>
             </View>
@@ -208,11 +219,14 @@ const HomeScreen = () => {
                       variant={TypographyVariant.H4_BOLD}
                       text="312"
                       customTextStyles={styles.countValue}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
                     />
                     <Typography
                       variant={TypographyVariant.LMEDIUM_REGULAR}
                       text="Active Products"
                       customTextStyles={styles.countCaption}
+                      numberOfLines={1}
                     />
                   </View>
                 </View>
@@ -222,6 +236,7 @@ const HomeScreen = () => {
                     variant={TypographyVariant.PXSMALL_REGULAR}
                     text="0%"
                     customTextStyles={styles.countText}
+                    numberOfLines={1}
                   />
                   <TrendIcon size={18} style={undefined} />
                 </View>
@@ -236,11 +251,14 @@ const HomeScreen = () => {
                       variant={TypographyVariant.H4_BOLD}
                       text="€13,48"
                       customTextStyles={styles.countValue}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
                     />
                     <Typography
                       variant={TypographyVariant.LMEDIUM_REGULAR}
                       text="Your income"
                       customTextStyles={styles.countCaption}
+                      numberOfLines={1}
                     />
                   </View>
                 </View>
@@ -250,6 +268,7 @@ const HomeScreen = () => {
                     variant={TypographyVariant.PXSMALL_REGULAR}
                     text="0%"
                     customTextStyles={styles.countText}
+                    numberOfLines={1}
                   />
                   <TrendIcon size={18} style={undefined} />
                 </View>
@@ -265,11 +284,13 @@ const HomeScreen = () => {
                     variant={TypographyVariant.LSMALL_BOLD}
                     text="18"
                     customTextStyles={styles.countValue}
+                    numberOfLines={1}
                   />
                   <Typography
                     variant={TypographyVariant.LSMALL_REGULAR}
                     text="Out of Stock"
                     customTextStyles={styles.countCaption}
+                    numberOfLines={1}
                   />
                 </View>
               </View>
@@ -282,11 +303,14 @@ const HomeScreen = () => {
                     variant={TypographyVariant.LSMALL_BOLD}
                     text="2,547.63"
                     customTextStyles={styles.countValue}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
                   />
                   <Typography
                     variant={TypographyVariant.LSMALL_REGULAR}
                     text="Taxes"
                     customTextStyles={styles.countCaption}
+                    numberOfLines={1}
                   />
                 </View>
               </View>
@@ -300,17 +324,20 @@ const HomeScreen = () => {
                 variant={TypographyVariant.H5_BOLD}
                 text="Sales Overview"
                 customTextStyles={styles.countValue}
+                numberOfLines={1}
               />
               <View style={styles.countCaptionContainer}>
                 <Typography
                   variant={TypographyVariant.LSMALL_SEMIBOLD}
                   text="Total sales this week - "
                   customTextStyles={styles.countCaption}
+                  numberOfLines={1}
                 />
                 <Typography
                   variant={TypographyVariant.LSMALL_BOLD}
                   text="25,000€"
                   customTextStyles={styles.countCaptionOne}
+                  numberOfLines={1}
                 />
               </View>
             </View>
@@ -326,12 +353,14 @@ const HomeScreen = () => {
               variant={TypographyVariant.H6_BOLD}
               text="Recent Orders"
               customTextStyles={styles.countValue}
+              numberOfLines={1}
             />
             <View style={styles.viewAll}>
               <Typography
                 variant={TypographyVariant.LSMALL_REGULAR}
                 text="View All"
                 customTextStyles={styles.viewAllText}
+                numberOfLines={1}
               />
               <ArrowRightIcon
                 style={undefined}

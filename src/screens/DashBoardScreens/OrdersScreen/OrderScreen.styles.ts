@@ -1,10 +1,6 @@
 import {StyleSheet} from 'react-native';
-import {
-  getScreenWidth,
-  getScreenHeight,
-  getFigmaDimension,
-} from '../../../helpers/screenSize';
 import {ColorPalette} from '../../../config/colorPalette';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   searchContainer: {

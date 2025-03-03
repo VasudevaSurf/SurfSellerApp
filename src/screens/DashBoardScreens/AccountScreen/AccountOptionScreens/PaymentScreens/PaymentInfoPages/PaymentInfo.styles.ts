@@ -2,9 +2,9 @@ import {StyleSheet} from 'react-native';
 import {
   getScreenWidth,
   getScreenHeight,
-  getFigmaDimension,
 } from '../../../../../../helpers/screenSize';
 import {ColorPalette} from '../../../../../../config/colorPalette';
+import {BorderRadius} from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -26,80 +26,80 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: ColorPalette.White,
-    padding: getFigmaDimension(16),
+    padding: getScreenWidth(4),
   },
   stripEditContainerOne: {
     display: 'flex',
     flexDirection: 'row',
-    marginLeft: getFigmaDimension(12),
-    gap: getFigmaDimension(10),
+    marginLeft: getScreenWidth(3),
+    gap: getScreenWidth(2.5),
     alignItems: 'center',
     justifyContent: 'center',
   },
   connectContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1),
   },
   connectContainerOne: {
     display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(6),
+    gap: getScreenWidth(1.5),
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
   statusIcon: {
-    width: getFigmaDimension(16),
-    height: getFigmaDimension(16),
+    width: getScreenWidth(4),
+    height: getScreenWidth(4),
   },
   editButton: {
-    marginRight: getFigmaDimension(12),
+    marginRight: getScreenWidth(3),
   },
 
   // Balance Section
   withdrawContainer: {
-    padding: getFigmaDimension(16),
+    padding: getScreenWidth(4),
     backgroundColor: ColorPalette.White,
   },
   bgContainer: {
     display: 'flex',
     flexDirection: 'row',
-    paddingVertical: getFigmaDimension(24),
-    paddingHorizontal: getFigmaDimension(12),
+    paddingVertical: getScreenHeight(3),
+    paddingHorizontal: getScreenWidth(3),
     backgroundColor: 'rgba(145, 1, 207, 0.10)',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: getFigmaDimension(12),
+    borderRadius: BorderRadius.Small,
   },
   walletBalanceContainer: {
     display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(12),
+    gap: getScreenWidth(3),
     alignItems: 'center',
     justifyContent: 'center',
   },
   walletBalanceContainerOne: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(2),
+    gap: getScreenWidth(0.5),
     alignItems: 'flex-start',
     justifyContent: 'center',
   },
   withdrawButton: {
-    width: getFigmaDimension(102),
-    height: getFigmaDimension(36),
-    borderRadius: getFigmaDimension(18),
-    paddingHorizontal: getFigmaDimension(10),
+    width: getScreenWidth(26),
+    height: getScreenHeight(4),
+    borderRadius: BorderRadius.Full,
+    paddingHorizontal: getScreenWidth(2.5),
   },
   withdrawButtonText: {
-    fontSize: getFigmaDimension(12),
+    fontSize: getScreenWidth(3),
   },
 
   // Tab Navigation
   tabsContainer: {
     backgroundColor: ColorPalette.White,
     flex: 1,
-    paddingVertical: getFigmaDimension(12),
+    paddingVertical: getScreenHeight(1.5),
   },
   tabView: {
     backgroundColor: ColorPalette.White,
@@ -118,9 +118,9 @@ export const styles = StyleSheet.create({
     width: 'auto',
   },
   tabButton: {
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(48),
-    borderRadius: getFigmaDimension(8),
+    paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(12),
+    borderRadius: BorderRadius.XSmall,
     backgroundColor: 'transparent',
   },
   activeTabButton: {
@@ -129,31 +129,31 @@ export const styles = StyleSheet.create({
 
   // Tab Content
   divider: {
-    height: getScreenHeight(2),
+    height: getScreenHeight(0.2),
     backgroundColor: ColorPalette.SearchBack,
-    marginTop: getFigmaDimension(10),
+    marginTop: getScreenHeight(1),
   },
   tabContent: {
-    padding: getFigmaDimension(10),
+    padding: getScreenWidth(2.5),
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(16),
+    paddingVertical: getScreenHeight(2),
   },
   sectionTitle: {
     color: ColorPalette.GREY_TEXT_500,
-    marginBottom: getFigmaDimension(16),
+    marginBottom: getScreenHeight(2),
   },
   slidingBarContainer: {
-    marginBottom: getFigmaDimension(8),
+    marginBottom: getScreenHeight(1),
   },
 
   // History Items
   payoutsList: {
-    marginTop: getFigmaDimension(8),
+    marginTop: getScreenHeight(1),
   },
   payoutItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: getFigmaDimension(20),
+    paddingVertical: getScreenHeight(2.5),
     borderBottomWidth: 1,
     borderBottomColor: ColorPalette.GREY_100,
   },
@@ -161,29 +161,29 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    gap: getFigmaDimension(4),
+    gap: getScreenHeight(0.5),
   },
   payoutItemHeader: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1),
   },
   payoutItemRight: {
     alignItems: 'center',
-    gap: getFigmaDimension(4),
+    gap: getScreenHeight(0.5),
     justifyContent: 'center',
   },
   statusBadge: {
-    paddingVertical: getFigmaDimension(2),
-    paddingHorizontal: getFigmaDimension(8),
-    borderRadius: getFigmaDimension(12),
+    paddingVertical: getScreenHeight(0.25),
+    paddingHorizontal: getScreenWidth(2),
+    borderRadius: BorderRadius.Small,
   },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: getFigmaDimension(40),
+    paddingVertical: getScreenHeight(5),
   },
   customButton: {
     borderWidth: 1,

@@ -8,7 +8,7 @@ import AnimatedTextInput from '../../../../../../components/UserComponents/TextI
 import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {getScreenWidth} from '../../../../../../helpers/screenSize';
 import {styles} from './FeaturesStep.styles';
 
 const BRAND_OPTIONS: Option[] = [
@@ -97,7 +97,7 @@ const FeaturesStep = () => {
           />
         </View>
 
-        <View style={{gap: getFigmaDimension(16)}}>
+        <View style={{gap: getScreenWidth(4)}}>
           <View style={styles.inputContainer}>
             <TouchableOpacity
               style={[styles.inputContainer, styles.selectContainer]}
@@ -188,7 +188,7 @@ const FeaturesStep = () => {
             style={[
               styles.inputContainer,
               styles.selectContainer,
-              {marginHorizontal: getFigmaDimension(16)},
+              {marginHorizontal: getScreenWidth(4)},
             ]}
             onPress={() => setIsCountryModalVisible(true)}>
             <Typography

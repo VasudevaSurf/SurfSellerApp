@@ -1,44 +1,48 @@
 import {StyleSheet} from 'react-native';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {
+  getScreenWidth,
+  getScreenHeight,
+} from '../../../../../../helpers/screenSize';
 import {ColorPalette} from '../../../../../../config/colorPalette';
+import {BorderRadius} from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: getFigmaDimension(20),
-    marginBottom: getFigmaDimension(16),
+    gap: getScreenHeight(2.5),
+    marginBottom: getScreenHeight(2),
     backgroundColor: ColorPalette.SearchBack,
   },
   mainHeader: {
     display: 'flex',
     flexDirection: 'column',
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
-    gap: getFigmaDimension(16),
+    paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(4),
+    gap: getScreenWidth(4),
     backgroundColor: ColorPalette.White,
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1),
   },
   uploadContainer: {
     display: 'flex',
     flexDirection: 'column',
-    padding: getFigmaDimension(16),
+    padding: getScreenWidth(4),
     alignItems: 'center',
     justifyContent: 'center',
-    gap: getFigmaDimension(12),
+    gap: getScreenWidth(3),
     borderWidth: 1.5,
     borderStyle: 'dashed',
     borderColor: ColorPalette.SearchBack,
-    borderRadius: getFigmaDimension(8),
+    borderRadius: BorderRadius.XSmall,
   },
   uploadBox: {
     justifyContent: 'center',
     alignItems: 'center',
-    gap: getFigmaDimension(16),
+    gap: getScreenWidth(4),
   },
   buttonMain: {
     shadowColor: 'rgba(16, 24, 40, 0.08)',
@@ -48,45 +52,45 @@ export const styles = StyleSheet.create({
     elevation: 6,
   },
   tipsContainer: {
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
+    paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(4),
   },
   mainTips: {
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: ColorPalette.White,
-    padding: getFigmaDimension(16),
-    gap: getFigmaDimension(16),
-    borderRadius: getFigmaDimension(12),
+    padding: getScreenWidth(4),
+    gap: getScreenWidth(4),
+    borderRadius: BorderRadius.Small,
   },
   tipMatter: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(20),
+    gap: getScreenHeight(2.5),
   },
   tipRow: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: getFigmaDimension(8),
+    gap: getScreenWidth(2),
   },
   tipIcon: {
-    height: getFigmaDimension(40),
-    width: getFigmaDimension(40),
+    height: getScreenWidth(10),
+    width: getScreenWidth(10),
     resizeMode: 'contain',
   },
   uploadProgress: {
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: ColorPalette.White,
-    padding: getFigmaDimension(12),
-    gap: getFigmaDimension(12),
+    padding: getScreenWidth(3),
+    gap: getScreenWidth(3),
   },
   mainProgress: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1),
   },
   progressHeader: {
     display: 'flex',
@@ -97,16 +101,16 @@ export const styles = StyleSheet.create({
   imageShowing: {
     display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(6),
+    gap: getScreenWidth(1.5),
   },
   sampleImage: {
-    width: 60,
-    height: 60,
+    width: getScreenWidth(15),
+    height: getScreenWidth(15),
   },
   progressLine: {
     backgroundColor: ColorPalette.ProgressLine,
-    borderRadius: getFigmaDimension(8),
-    height: getFigmaDimension(8),
+    borderRadius: BorderRadius.XSmall,
+    height: getScreenHeight(1),
   },
   progressPercent: {
     display: 'flex',
@@ -117,9 +121,9 @@ export const styles = StyleSheet.create({
   showCaseContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(12),
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
+    gap: getScreenWidth(3),
+    paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(4),
     backgroundColor: ColorPalette.White,
   },
   showCaseHeader: {

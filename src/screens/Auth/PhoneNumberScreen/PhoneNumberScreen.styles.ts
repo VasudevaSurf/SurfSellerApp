@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
-import {Spacing} from '../../../config/globalStyles';
+import {Spacing, BorderRadius} from '../../../config/globalStyles';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   // Layout Containers
@@ -16,13 +16,13 @@ export const styles = StyleSheet.create({
   },
   mainContainerTwo: {
     paddingHorizontal: Spacing.Large,
-    paddingVertical: getFigmaDimension(24),
+    paddingVertical: getScreenHeight(3),
   },
   contentWrapper: {
-    gap: getFigmaDimension(24),
+    gap: getScreenHeight(3),
   },
   twoContainer: {
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(2),
   },
 
   // Terms Containers
@@ -30,12 +30,14 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    flexWrap: 'wrap', // Added for better text wrapping
+    paddingHorizontal: Spacing.Medium, // Added for better spacing
   },
   termsContainerTwo: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: getFigmaDimension(4),
+    gap: getScreenHeight(0.5),
   },
 
   // Typography
@@ -59,7 +61,7 @@ export const styles = StyleSheet.create({
 
   // Navigation
   backButton: {
-    padding: 16,
+    padding: getScreenHeight(2),
     position: 'absolute',
     top: 0,
     left: 0,

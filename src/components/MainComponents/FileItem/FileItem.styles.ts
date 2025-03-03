@@ -1,26 +1,26 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension, getScreenWidth} from '../../../helpers/screenSize';
+import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
+import {BorderRadius} from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: getFigmaDimension(12),
+    paddingVertical: getScreenHeight(1.5),
     backgroundColor: ColorPalette.White,
   },
   fileInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: getFigmaDimension(6),
+    gap: getScreenWidth(1.5),
   },
   thumbnailContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    position: 'relative',
+    width: getScreenWidth(15),
+    height: getScreenWidth(15),
+    borderRadius: BorderRadius.XSmall,
     position: 'relative',
   },
   thumbnail: {
@@ -37,11 +37,11 @@ export const styles = StyleSheet.create({
   },
   deleteIconOverlay: {
     position: 'absolute',
-    top: getFigmaDimension(-10),
-    left: getFigmaDimension(-10),
+    top: getScreenHeight(-1.25),
+    left: getScreenWidth(-2.5),
     backgroundColor: ColorPalette.White,
-    borderRadius: getFigmaDimension(20),
-    padding: 4,
+    borderRadius: getScreenWidth(5),
+    padding: getScreenWidth(1),
     zIndex: 10,
     shadowColor: 'rgba(0, 0, 0, 0.15)',
     shadowOffset: {width: 0, height: 0},
@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
     elevation: 3,
   },
   textContainer: {
-    gap: getFigmaDimension(4),
+    gap: getScreenHeight(0.5),
     justifyContent: 'center',
     flex: 1,
   },
@@ -65,6 +65,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optimiseButton: {
-    borderRadius: 18,
+    borderRadius: getScreenWidth(4.5),
   },
 });

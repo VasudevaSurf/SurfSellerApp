@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {Spacing} from '../../../config/globalStyles';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension} from '../../../helpers/screenSize';
+import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
@@ -12,17 +12,17 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
   },
   successImage: {
-    height: getFigmaDimension(208),
-    width: getFigmaDimension(208),
-    marginBottom: getFigmaDimension(24),
+    height: getScreenHeight(208 / 8), // Converting pixel values to percentage
+    width: getScreenWidth(208 / 4), // Converting pixel values to percentage
+    marginBottom: getScreenHeight(24 / 8),
   },
   textContainer: {
     alignItems: 'center',
-    marginBottom: getFigmaDimension(32),
-    gap: getFigmaDimension(8)
+    marginBottom: getScreenHeight(32 / 8),
+    gap: getScreenHeight(8 / 8),
   },
   title: {
-    fontSize: getFigmaDimension(24),
+    fontSize: getScreenHeight(24 / 8),
     textAlign: 'center',
     marginBottom: Spacing.XSmall,
     color: ColorPalette.GREY_TEXT_500,
@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(16 / 8),
   },
   buttonContainerStyle: {
     borderWidth: 1,

@@ -1,9 +1,10 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../../../config/colorPalette';
 import {
-  getFigmaDimension,
   getScreenWidth,
+  getScreenHeight,
 } from '../../../../../helpers/screenSize';
+import {BorderRadius} from '../../../../../config/globalStyles';
 
 export const containerStyles = StyleSheet.create({
   wrapper: {
@@ -11,34 +12,34 @@ export const containerStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: getScreenWidth(4),
-    marginBottom: getFigmaDimension(12),
+    marginBottom: getScreenHeight(1.5),
   },
   logoContainer: {
     alignItems: 'center',
     width: '45%',
-    gap: getFigmaDimension(6),
+    gap: getScreenHeight(0.75),
   },
   imageWrapper: {
     position: 'relative',
-    marginBottom: getFigmaDimension(8),
+    marginBottom: getScreenHeight(1),
   },
   image: {
-    width: getFigmaDimension(80),
-    height: getFigmaDimension(80),
-    borderRadius: getScreenWidth(35) / 2,
+    width: getScreenWidth(20),
+    height: getScreenWidth(20),
+    borderRadius: getScreenWidth(10),
   },
   invoiceImage: {
     backgroundColor: '#f0e6ff',
   },
   editButton: {
-    height: getFigmaDimension(20),
-    width: getFigmaDimension(20),
+    height: getScreenWidth(5),
+    width: getScreenWidth(5),
     position: 'absolute',
     top: 0,
     right: 0,
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 8,
+    borderRadius: BorderRadius.Full,
+    padding: getScreenWidth(2),
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -48,8 +49,8 @@ export const containerStyles = StyleSheet.create({
   },
   divider: {
     width: 1,
-    height: getFigmaDimension(100),
+    height: getScreenHeight(12),
     backgroundColor: ColorPalette.GREY_200,
-    marginHorizontal: getScreenWidth(2),
+    marginHorizontal: getScreenWidth(0.5),
   },
 });

@@ -1,8 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {
-  getFigmaDimension,
-  getScreenWidth,
-} from '../../../../helpers/screenSize';
+import {getScreenWidth, getScreenHeight} from '../../../../helpers/screenSize';
 import {ColorPalette} from '../../../../config/colorPalette';
 
 export const styles = StyleSheet.create({
@@ -10,10 +7,10 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
-    padding: 16,
+    padding: getScreenWidth(4),
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(11),
-    paddingHorizontal: getFigmaDimension(18),
+    paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(4.5),
   },
   mainContainer: {
     flex: 1,
@@ -21,6 +18,6 @@ export const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'space-between',
-    paddingVertical: getFigmaDimension(16),
+    paddingVertical: getScreenHeight(2),
   },
 });

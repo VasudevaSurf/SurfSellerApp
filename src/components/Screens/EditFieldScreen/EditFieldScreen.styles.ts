@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
-import {getFigmaDimension, getScreenWidth} from '../../../helpers/screenSize';
+import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
 import {ColorPalette} from '../../../config/colorPalette';
+import {BorderRadius} from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -16,19 +17,20 @@ export const styles = StyleSheet.create({
   mainContainerTwo: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(24),
-    paddingVertical: getFigmaDimension(18),
+    gap: getScreenHeight(3),
+    paddingVertical: getScreenHeight(2.25),
     backgroundColor: ColorPalette.White,
   },
   inputBorder: {
     borderColor: ColorPalette.GREY_TEXT_400,
     borderWidth: 1,
+    borderRadius: BorderRadius.XSmall,
   },
   buttonContainer: {
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(20),
-    paddingHorizontal: getFigmaDimension(16),
-    borderTopStartRadius: getFigmaDimension(12),
-    borderTopEndRadius: getFigmaDimension(12),
+    paddingVertical: getScreenHeight(2.5),
+    paddingHorizontal: getScreenWidth(4),
+    borderTopStartRadius: BorderRadius.Small,
+    borderTopEndRadius: BorderRadius.Small,
   },
 });

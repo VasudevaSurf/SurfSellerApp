@@ -23,7 +23,7 @@ import AnimatedTextInput from '../../../../../../components/UserComponents/TextI
 import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {getScreenWidth} from '../../../../../../helpers/screenSize';
 import {styles} from './ProductInfoStep.styles';
 import {navigate} from '../../../../../../navigation/utils/navigationRef';
 
@@ -140,7 +140,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
             showCountrySection
           />
 
-          <View style={{paddingHorizontal: getFigmaDimension(16)}}>
+          <View style={{paddingHorizontal: getScreenWidth(4)}}>
             <TouchableOpacity
               style={[styles.inputContainer, styles.selectContainer]}
               activeOpacity={0.7}

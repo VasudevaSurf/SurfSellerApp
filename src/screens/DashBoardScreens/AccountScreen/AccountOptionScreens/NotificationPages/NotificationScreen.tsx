@@ -8,9 +8,10 @@ import {Typography} from '../../../../../components/UserComponents/Typography/Ty
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../config/colorPalette';
 import {
-  getFigmaDimension,
   getScreenHeight,
+  getScreenWidth,
 } from '../../../../../helpers/screenSize';
+import {BorderRadius} from '../../../../../config/globalStyles';
 import {goBack} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './NotificationScreen.styles';
 
@@ -94,8 +95,8 @@ const NotificationScreen: React.FC = () => {
             </View>
 
             <ToggleSwitch
-              isOn={whatsappNotifications} // Use your state value here
-              onToggle={handleWhatsappToggle} // This was missing
+              isOn={whatsappNotifications}
+              onToggle={handleWhatsappToggle}
               onColor={ColorPalette.Success}
               offColor={ColorPalette.Gray}
               size="small"
@@ -116,14 +117,14 @@ const NotificationScreen: React.FC = () => {
                 shadowRadius: 0,
               }}
               trackOnStyle={{
-                width: getFigmaDimension(40),
-                height: getFigmaDimension(24),
-                borderRadius: getFigmaDimension(12),
+                width: getScreenWidth(10),
+                height: getScreenHeight(3),
+                borderRadius: BorderRadius.Medium,
               }}
               trackOffStyle={{
-                width: getFigmaDimension(40),
-                height: getFigmaDimension(24),
-                borderRadius: getFigmaDimension(12),
+                width: getScreenWidth(10),
+                height: getScreenHeight(3),
+                borderRadius: BorderRadius.Medium,
               }}
             />
           </View>

@@ -1,260 +1,260 @@
 import {StyleSheet} from 'react-native';
-import {getFigmaDimension, getScreenHeight} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {ColorPalette} from '../../../config/colorPalette';
 
 export const styles = StyleSheet.create({
   mainContainer: {
-    display: 'flex',
+    flex: 1,
     flexDirection: 'column',
-    paddingHorizontal: getFigmaDimension(16),
-    paddingVertical: getFigmaDimension(16),
+    paddingHorizontal: getScreenWidth(4),
+    paddingVertical: getScreenHeight(2),
   },
   scrollContent: {
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(2),
   },
   verifyContainer: {
-    display: 'flex',
     flexDirection: 'column',
-    paddingHorizontal: getFigmaDimension(12),
-    paddingVertical: getFigmaDimension(20),
-    gap: getFigmaDimension(20),
+    paddingHorizontal: getScreenWidth(3),
+    paddingVertical: getScreenHeight(2.5),
+    gap: getScreenHeight(2.5),
     backgroundColor: ColorPalette.White,
-    borderRadius: getFigmaDimension(12),
+    borderRadius: getScreenWidth(3),
   },
   textVerifyContainer: {
-    display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(4),
+    gap: getScreenHeight(0.5),
   },
   textOne: {
-    fontSize: 16,
+    fontSize: getScreenWidth(4), // Responsive font size
+    lineHeight: getScreenHeight(2.5), // Add line height for text wrapping
     color: ColorPalette.GREY_TEXT_500,
+    flexShrink: 1, // Allow text to shrink
   },
   textTwo: {
     color: ColorPalette.GREY_TEXT_300,
-    fontSize: 11,
+    fontSize: getScreenWidth(2.8), // Responsive font size
+    lineHeight: getScreenHeight(1.8), // Add line height for text wrapping
+    flexShrink: 1, // Allow text to shrink
   },
   verifyStepsContainer: {
-    display: 'flex',
     flexDirection: 'column',
-    paddingHorizontal: getFigmaDimension(8),
-    paddingVertical: getFigmaDimension(12),
+    paddingHorizontal: getScreenWidth(2),
+    paddingVertical: getScreenHeight(1.5),
     backgroundColor: ColorPalette.PRIMARY_WHITE_SELLER,
-    borderRadius: getFigmaDimension(12),
-    height: 300,
+    borderRadius: getScreenWidth(3),
+    minHeight: getScreenHeight(30), // Use min-height instead of fixed height
+    maxHeight: getScreenHeight(40), // Add max-height constraint
   },
   OrderContainer: {
-    borderRadius: getFigmaDimension(12),
+    borderRadius: getScreenWidth(3),
     backgroundColor: ColorPalette.White,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    paddingVertical: getFigmaDimension(8),
+    paddingVertical: getScreenHeight(1),
+    width: '100%', // Ensure full width
   },
   menuContainer: {
-    padding: getFigmaDimension(12),
+    padding: getScreenHeight(1.5),
+    width: '100%', // Ensure full width
   },
   leftIconBackgroundColor: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: getFigmaDimension(8),
-    borderRadius: getFigmaDimension(8),
+    padding: getScreenHeight(1),
+    borderRadius: getScreenWidth(2),
   },
   statsContainer: {
-    display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(2),
+    width: '100%', // Ensure full width
   },
   containerOne: {
-    display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(16),
+    gap: getScreenWidth(4),
+    width: '100%', // Ensure full width
   },
   containerTwo: {
-    display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(16),
+    gap: getScreenWidth(4),
     alignItems: 'center',
     justifyContent: 'space-between',
+    width: '100%', // Ensure full width
   },
   totalSales: {
-    flex: 2,
+    flex: 1, // Changed from flex: 2 to flex: 1 for better proportional scaling
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(20),
-    paddingHorizontal: getFigmaDimension(16),
-    borderRadius: getFigmaDimension(8),
+    paddingVertical: getScreenHeight(2),
+    paddingHorizontal: getScreenWidth(3), // Reduced padding
+    borderRadius: getScreenWidth(2),
     flexDirection: 'column',
-    gap: getFigmaDimension(17),
+    gap: getScreenHeight(1.5), // Reduced gap
   },
   salesOne: {
-    display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    gap: getFigmaDimension(39),
+    gap: getScreenWidth(2), // Reduced gap
   },
   salesTwo: {
-    display: 'flex',
     flexDirection: 'column',
+    flexShrink: 1, // Allow content to shrink
   },
   iconBack: {
-    display: 'flex',
-    borderRadius: getFigmaDimension(8),
-    padding: getFigmaDimension(8),
+    borderRadius: getScreenWidth(2),
+    padding: getScreenHeight(1),
     backgroundColor: 'rgba(31, 193, 107, 0.10)',
   },
   iconBackSale: {
-    display: 'flex',
-    borderRadius: getFigmaDimension(8),
-    padding: getFigmaDimension(8),
+    borderRadius: getScreenWidth(2),
+    padding: getScreenHeight(1),
     backgroundColor: 'rgba(31, 193, 107, 0.10)',
   },
   iconBackOne: {
-    display: 'flex',
-    borderRadius: getFigmaDimension(8),
-    padding: getFigmaDimension(8),
+    borderRadius: getScreenWidth(2),
+    padding: getScreenHeight(1),
     backgroundColor: 'rgba(145, 1, 207, 0.10)',
   },
   iconBackTwo: {
-    display: 'flex',
-    borderRadius: getFigmaDimension(4),
-    padding: getFigmaDimension(4),
+    borderRadius: getScreenWidth(1),
+    padding: getScreenHeight(0.5),
     backgroundColor: 'rgba(208, 4, 22, 0.10)',
   },
   iconBackThree: {
-    display: 'flex',
-    borderRadius: getFigmaDimension(4),
-    padding: getFigmaDimension(4),
+    borderRadius: getScreenWidth(1),
+    padding: getScreenHeight(0.5),
     backgroundColor: 'rgba(223, 180, 0, 0.10)',
   },
   countBlock: {
-    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1),
+    flexShrink: 1, // Allow content to shrink
   },
   countText: {
     color: ColorPalette.RiseText,
-    fontSize: 14,
+    fontSize: getScreenWidth(3.5), // Responsive font size
   },
   countValue: {
     color: ColorPalette.GREY_TEXT_500,
+    fontSize: getScreenWidth(4.2), // Responsive font size
+    flexShrink: 1, // Allow content to shrink
   },
   countCaptionContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap', // Allow text to wrap
   },
   countCaption: {
     color: ColorPalette.GREY_TEXT_300,
+    fontSize: getScreenWidth(3.2), // Responsive font size
   },
   countCaptionOne: {
     color: ColorPalette.PURPLE_300,
+    fontSize: getScreenWidth(3.2), // Responsive font size
   },
   activeProduct: {
     flex: 1,
-    display: 'flex',
     flexDirection: 'row',
-    padding: getFigmaDimension(16),
+    padding: getScreenHeight(1.5), // Reduced padding
     backgroundColor: ColorPalette.White,
-    borderRadius: getFigmaDimension(8),
-    gap: getFigmaDimension(20),
+    borderRadius: getScreenWidth(2),
+    gap: getScreenWidth(3), // Reduced gap
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   stockContainer: {
-    display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(8),
-    padding: getFigmaDimension(16),
+    gap: getScreenHeight(1),
+    padding: getScreenHeight(1.5), // Reduced padding
     backgroundColor: ColorPalette.White,
-    borderRadius: getFigmaDimension(8),
+    borderRadius: getScreenWidth(2),
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },
   salesOverview: {
-    display: 'flex',
-    borderRadius: getFigmaDimension(12),
+    borderRadius: getScreenWidth(3),
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(16),
-    paddingHorizontal: getFigmaDimension(12),
+    paddingVertical: getScreenHeight(2),
+    paddingHorizontal: getScreenWidth(3),
     flexDirection: 'column',
-    gap: getFigmaDimension(24),
+    gap: getScreenHeight(3),
+    width: '100%', // Ensure full width
   },
   salesHeading: {
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width: '100%', // Ensure full width
   },
   LeftHeading: {
-    display: 'flex',
     flexDirection: 'column',
+    flex: 1, // Allow it to take available space
   },
   rightHeadingButtons: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: getFigmaDimension(4),
+    padding: getScreenHeight(0.5),
     flexDirection: 'row',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1),
     backgroundColor: ColorPalette.ButtonBackHome,
-    borderRadius: getFigmaDimension(8),
+    borderRadius: getScreenWidth(2),
   },
   salesGraph: {
-    display: 'flex',
-    width: getFigmaDimension(334),
-    height: getFigmaDimension(250),
+    width: '100%', // Use percentage instead of fixed width
+    height: getScreenHeight(30), // Adjusted height
+    minHeight: getScreenHeight(20), // Add min-height
   },
   recentOrdersContainer: {
-    display: 'flex',
     flexDirection: 'column',
-    paddingVertical: getFigmaDimension(20),
-    paddingHorizontal: getFigmaDimension(12),
-    gap: getFigmaDimension(20),
+    paddingVertical: getScreenHeight(2.5),
+    paddingHorizontal: getScreenWidth(3),
+    gap: getScreenHeight(2.5),
     backgroundColor: ColorPalette.White,
-    borderRadius: getFigmaDimension(12),
+    borderRadius: getScreenWidth(3),
+    width: '100%', // Ensure full width
   },
   recentOrderTitle: {
-    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    width: '100%', // Ensure full width
   },
   viewAll: {
-    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: getScreenWidth(1), // Add gap between text and icon
   },
   viewAllText: {
     color: ColorPalette.PURPLE_200,
+    fontSize: getScreenWidth(3.2), // Responsive font size
   },
   recentAllOrders: {
-    display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
   },
   twoContainer: {
-    display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(20),
+    gap: getScreenWidth(3), // Reduced gap
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start', // Changed to flex-start for better alignment
+    flexShrink: 1, // Allow content to shrink
   },
   containerAnother: {
-    display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(18),
+    gap: getScreenWidth(4),
+    width: '100%', // Ensure full width
   },
   containerAnotherOne: {
     flex: 1,
-    display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(2),
   },
   containerProportional: {
-    display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(16),
+    gap: getScreenHeight(2),
+    flex: 0.5, // Allocate less space compared to containerAnotherOne
   },
 });

@@ -1,10 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
-import {
-  getFigmaDimension,
-  getScreenHeight,
-  getScreenWidth,
-} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import {BorderRadius} from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   modal: {
@@ -13,22 +10,22 @@ export const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: ColorPalette.White,
-    borderTopLeftRadius: getFigmaDimension(8),
-    borderTopRightRadius: getFigmaDimension(8),
+    borderTopLeftRadius: BorderRadius.XSmall, // Using enum instead of getFigmaDimension(8)
+    borderTopRightRadius: BorderRadius.XSmall, // Using enum instead of getFigmaDimension(8)
   },
   searchContainer: {
-    padding: getScreenWidth(4),
+    padding: getScreenWidth(4), // Already using getScreenWidth
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: ColorPalette.White,
   },
   contentContainer: {
-    paddingTop: getScreenHeight(1),
+    paddingTop: getScreenHeight(1), // Already using getScreenHeight
   },
   header: {
     flexDirection: 'row',
-    paddingHorizontal: getScreenWidth(5),
-    paddingVertical: getScreenHeight(2),
+    paddingHorizontal: getScreenWidth(5), // Already using getScreenWidth
+    paddingVertical: getScreenHeight(2), // Already using getScreenHeight
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -39,25 +36,25 @@ export const styles = StyleSheet.create({
     color: ColorPalette.GREY_TEXT_500,
   },
   closeButton: {
-    marginLeft: getScreenWidth(2),
+    marginLeft: getScreenWidth(2), // Already using getScreenWidth
   },
   scrollContainer: {
     flexGrow: 0,
   },
   sectionContainer: {
-    paddingHorizontal: getScreenWidth(5),
+    paddingHorizontal: getScreenWidth(5), // Already using getScreenWidth
   },
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: getScreenHeight(1.5),
-    gap: getScreenWidth(3),
+    paddingVertical: getScreenHeight(1.5), // Already using getScreenHeight
+    gap: getScreenWidth(3), // Already using getScreenWidth
   },
   radioButton: {
-    width: getScreenWidth(6),
-    height: getScreenWidth(6),
-    borderRadius: getScreenWidth(3),
-    borderWidth: getScreenWidth(0.5),
+    width: getScreenWidth(6), // Already using getScreenWidth
+    height: getScreenWidth(6), // Already using getScreenWidth
+    borderRadius: getScreenWidth(3), // Already using getScreenWidth
+    borderWidth: getScreenWidth(0.5), // Already using getScreenWidth
     borderColor: ColorPalette.GREY_200,
     justifyContent: 'center',
     alignItems: 'center',
@@ -67,15 +64,15 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
   },
   radioButtonInner: {
-    width: getScreenWidth(2.5),
-    height: getScreenWidth(2.5),
-    borderRadius: getScreenWidth(1.25),
+    width: getScreenWidth(2.5), // Already using getScreenWidth
+    height: getScreenWidth(2.5), // Already using getScreenWidth
+    borderRadius: getScreenWidth(1.25), // Already using getScreenWidth
     backgroundColor: ColorPalette.PURPLE_300,
   },
   optionLabel: {
     flex: 1,
-    fontSize: getScreenWidth(4),
-    lineHeight: getScreenHeight(3),
+    fontSize: getScreenWidth(4), // Already using getScreenWidth
+    lineHeight: getScreenHeight(3), // Already using getScreenHeight
   },
   optionLabelSelected: {
     color: ColorPalette.GREY_TEXT_500,
@@ -86,14 +83,14 @@ export const styles = StyleSheet.create({
     fontWeight: '400',
   },
   footer: {
-    padding: getScreenWidth(5),
+    padding: getScreenWidth(5), // Already using getScreenWidth
     borderTopWidth: 1,
     borderColor: ColorPalette.GREY_200,
   },
   checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
+    width: getScreenWidth(6), // Updated from fixed 24px
+    height: getScreenWidth(6), // Updated from fixed 24px
+    borderRadius: BorderRadius.XXSmall, // Using enum instead of fixed 4px
     borderWidth: 1,
     borderColor: ColorPalette.GREY_200,
   },

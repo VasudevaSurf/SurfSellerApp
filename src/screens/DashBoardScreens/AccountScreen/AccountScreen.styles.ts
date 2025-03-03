@@ -1,18 +1,12 @@
 import {StyleSheet} from 'react-native';
-import {
-  getScreenWidth,
-  getScreenHeight,
-  getFigmaDimension,
-} from '../../../helpers/screenSize';
+import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
 import {ColorPalette} from '../../../config/colorPalette';
+import {BorderRadius, Spacing} from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   mainContainer: {
     display: 'flex',
     flexDirection: 'column',
-    // paddingHorizontal: getScreenWidth(4),
-    // paddingVertical: getScreenHeight(1),
-    // marginTop: getScreenHeight(2),
   },
   scrollContent: {
     gap: getScreenWidth(4),
@@ -20,16 +14,16 @@ export const styles = StyleSheet.create({
   profileContainer: {
     display: 'flex',
     flexDirection: 'row',
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
+    paddingVertical: Spacing.Small,
+    paddingHorizontal: Spacing.Medium,
     backgroundColor: ColorPalette.White,
-    gap: getFigmaDimension(12),
+    gap: Spacing.Small,
     marginTop: getScreenHeight(2),
   },
   imageContainer: {
-    width: getFigmaDimension(60),
-    height: getFigmaDimension(60),
-    borderRadius: getScreenWidth(2),
+    width: getScreenWidth(15),
+    height: getScreenWidth(15),
+    borderRadius: BorderRadius.XSmall,
     overflow: 'hidden',
   },
   orderImage: {
@@ -41,7 +35,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    gap: getFigmaDimension(2),
+    gap: Spacing.Zero,
   },
   profileName: {
     color: ColorPalette.GREY_TEXT_500,
@@ -52,9 +46,9 @@ export const styles = StyleSheet.create({
   salesContainer: {
     display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(8),
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
+    gap: Spacing.XSmall,
+    paddingVertical: Spacing.Small,
+    paddingHorizontal: Spacing.Medium,
     backgroundColor: ColorPalette.White,
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -63,25 +57,25 @@ export const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(10),
+    gap: Spacing.XSmall,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    paddingHorizontal: getFigmaDimension(10),
-    paddingVertical: getFigmaDimension(10),
-    borderRadius: getFigmaDimension(12),
+    paddingHorizontal: Spacing.XSmall,
+    paddingVertical: Spacing.XSmall,
+    borderRadius: BorderRadius.Small,
     borderColor: ColorPalette.SearchBack,
   },
   iconBack: {
     display: 'flex',
-    borderRadius: getFigmaDimension(8),
-    padding: getFigmaDimension(8),
+    borderRadius: BorderRadius.XSmall,
+    padding: Spacing.XSmall,
     backgroundColor: ColorPalette.SmallIconBack,
   },
   iconBackOne: {
     display: 'flex',
-    borderRadius: getFigmaDimension(8),
-    padding: getFigmaDimension(8),
+    borderRadius: BorderRadius.XSmall,
+    padding: Spacing.XSmall,
     backgroundColor: ColorPalette.SmallIconBack2,
   },
   salesTwo: {

@@ -1,10 +1,10 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../../../../config/colorPalette';
 import {
-  getFigmaDimension,
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../../helpers/screenSize';
+import {BorderRadius} from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    gap: getFigmaDimension(10),
+    gap: getScreenHeight(1.2),
     paddingHorizontal: getScreenWidth(4),
   },
   searchContainer: {
@@ -32,9 +32,9 @@ export const styles = StyleSheet.create({
   },
   messageRow: {
     flexDirection: 'row',
-    gap: getFigmaDimension(6), // Consistent gap for both user and bot messages
+    gap: getScreenWidth(1.5), // Consistent gap for both user and bot messages
     position: 'relative',
-    paddingVertical: getFigmaDimension(4),
+    paddingVertical: getScreenHeight(0.5),
   },
   userMessageRow: {
     justifyContent: 'flex-end',
@@ -43,18 +43,18 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   avatarImage: {
-    width: getFigmaDimension(32),
-    height: getFigmaDimension(32),
-    borderRadius: 15,
+    width: getScreenWidth(8),
+    height: getScreenWidth(8),
+    borderRadius: BorderRadius.Medium,
   },
   avatarPlaceholder: {
-    width: getFigmaDimension(32),
-    height: getFigmaDimension(32),
+    width: getScreenWidth(8),
+    height: getScreenWidth(8),
   },
   messageBubble: {
     maxWidth: '70%',
-    padding: getFigmaDimension(12),
-    borderRadius: 16,
+    padding: getScreenHeight(1.5),
+    borderRadius: BorderRadius.Medium,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -65,11 +65,11 @@ export const styles = StyleSheet.create({
   },
   botMessageBubble: {
     backgroundColor: ColorPalette.White,
-    borderTopLeftRadius: getFigmaDimension(4),
+    borderTopLeftRadius: getScreenWidth(1),
   },
   userMessageBubble: {
     backgroundColor: ColorPalette.PURPLE_300,
-    borderTopRightRadius: getFigmaDimension(4),
+    borderTopRightRadius: getScreenWidth(1),
   },
   botMessageText: {
     color: ColorPalette.GREY_TEXT_500,
@@ -82,10 +82,10 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   userMessageTime: {
-    marginRight: getFigmaDimension(10),
+    marginRight: getScreenWidth(2.5),
   },
   botMessageTime: {
-    marginLeft: getFigmaDimension(10),
+    marginLeft: getScreenWidth(2.5),
   },
   inputContainer: {
     flexDirection: 'row',
@@ -93,27 +93,27 @@ export const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: ColorPalette.GREY_200,
     backgroundColor: ColorPalette.White,
-    paddingHorizontal: getFigmaDimension(16),
-    paddingVertical: getFigmaDimension(12),
-    gap: getFigmaDimension(6),
+    paddingHorizontal: getScreenWidth(4),
+    paddingVertical: getScreenHeight(1.5),
+    gap: getScreenWidth(1.5),
   },
   textInputContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: ColorPalette.SearchBack,
-    borderRadius: getFigmaDimension(48),
-    paddingHorizontal: getFigmaDimension(12),
-    minHeight: getFigmaDimension(64),
+    borderRadius: BorderRadius.Full,
+    paddingHorizontal: getScreenWidth(3),
+    minHeight: getScreenHeight(8),
   },
   textInput: {
     flex: 1,
-    paddingVertical: getFigmaDimension(14),
+    paddingVertical: getScreenHeight(1.75),
   },
   sendButton: {
-    width: getFigmaDimension(40),
-    height: getFigmaDimension(40),
-    borderRadius: getFigmaDimension(80),
+    width: getScreenWidth(10),
+    height: getScreenWidth(10),
+    borderRadius: BorderRadius.Full,
     backgroundColor: ColorPalette.PURPLE_300,
     justifyContent: 'center',
     alignItems: 'center',
@@ -121,17 +121,17 @@ export const styles = StyleSheet.create({
   quickRepliesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingVertical: getFigmaDimension(8),
-    gap: getFigmaDimension(8),
-    paddingLeft: getFigmaDimension(38),
+    paddingVertical: getScreenHeight(1),
+    gap: getScreenWidth(2),
+    paddingLeft: getScreenWidth(9.5),
   },
   quickReplyButton: {
     borderColor: ColorPalette.RED_100,
     borderWidth: 1,
-    borderRadius: getFigmaDimension(12),
+    borderRadius: BorderRadius.Small,
     borderStyle: 'dashed',
-    paddingHorizontal: getFigmaDimension(12),
-    paddingVertical: getFigmaDimension(8),
+    paddingHorizontal: getScreenWidth(3),
+    paddingVertical: getScreenHeight(1),
   },
   quickReplyText: {
     color: ColorPalette.RED_100,
@@ -143,9 +143,9 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   uploadContainer: {
-    width: getFigmaDimension(40),
-    height: getFigmaDimension(40),
-    borderRadius: getFigmaDimension(80),
+    width: getScreenWidth(10),
+    height: getScreenWidth(10),
+    borderRadius: BorderRadius.Full,
     backgroundColor: ColorPalette.SearchBack,
     justifyContent: 'center',
     alignItems: 'center',

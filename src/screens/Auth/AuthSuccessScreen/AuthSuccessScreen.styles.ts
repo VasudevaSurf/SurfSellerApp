@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {Spacing} from '../../../config/globalStyles';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
@@ -12,13 +12,13 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
   },
   successImage: {
-    height: getFigmaDimension(208),
-    width: getFigmaDimension(208),
-    marginBottom: getFigmaDimension(24),
+    height: getScreenHeight(26),
+    width: getScreenWidth(53),
+    marginBottom: getScreenHeight(3),
   },
   textContainer: {
     alignItems: 'center',
-    marginBottom: getFigmaDimension(32),
+    marginBottom: getScreenHeight(4),
   },
   title: {
     textAlign: 'center',

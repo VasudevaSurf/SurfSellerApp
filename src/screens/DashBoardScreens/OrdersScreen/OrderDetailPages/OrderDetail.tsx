@@ -13,10 +13,7 @@ import {Header} from '../../../../components/UserComponents/Header/Header';
 import {Typography} from '../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../config/colorPalette';
-import {
-  getFigmaDimension,
-  getScreenHeight,
-} from '../../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../../helpers/screenSize';
 import {goBack} from '../../../../navigation/utils/navigationRef';
 import {styles} from './OrderDetail.styles';
 import {OrderDetailProps} from './OrderDetail.types';
@@ -177,7 +174,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    gap: getFigmaDimension(4),
+                    gap: getScreenWidth(1),
                   }}>
                   <Typography
                     text="Inventory: "

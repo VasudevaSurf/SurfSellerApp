@@ -71,6 +71,7 @@ export enum BorderRadius {
   XLarge = 24,
   Full = 999,
 }
+
 const figmaScreenWidth = 393;
 
 const calculateWidthPercentage = (x: number) =>

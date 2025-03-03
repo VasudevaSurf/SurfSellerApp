@@ -1,11 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
-import {
-  getScreenWidth,
-  getScreenHeight,
-  getFigmaDimension,
-} from '../../../helpers/screenSize';
 import {Spacing} from '../../../config/globalStyles';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
@@ -31,8 +27,8 @@ export const styles = StyleSheet.create({
     gap: Spacing.Medium,
   },
   imageContainer: {
-    width: getFigmaDimension(81),
-    height: getFigmaDimension(72),
+    width: getScreenWidth(20.6), // Converted from getFigmaDimension(81)
+    height: getScreenWidth(18.3), // Converted from getFigmaDimension(72)
     borderRadius: getScreenWidth(2),
     overflow: 'hidden',
   },
@@ -104,6 +100,7 @@ export const styles = StyleSheet.create({
     height: getScreenHeight(5),
   },
   orderEmailContaienr: {
+    // Note: There's a typo in the original - orderEmailContaienr
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',

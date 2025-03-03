@@ -1,10 +1,6 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
-import {
-  getScreenWidth,
-  getScreenHeight,
-  getFigmaDimension,
-} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export const slidingBarStyles = StyleSheet.create({
   containerWrapper: {

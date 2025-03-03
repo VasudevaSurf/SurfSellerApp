@@ -3,7 +3,11 @@ import {StyleSheet, View} from 'react-native';
 import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../config/colorPalette';
-import {getFigmaDimension} from '../../../../../helpers/screenSize';
+import {
+  getScreenWidth,
+  getScreenHeight,
+} from '../../../../../helpers/screenSize';
+import {BorderRadius} from '../../../../../config/globalStyles';
 
 interface Step {
   id: number;
@@ -76,6 +80,8 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
                 styles.stepLabel,
                 isActive ? styles.activeStepLabel : styles.inactiveStepLabel,
               ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
             />
           </View>
         );
@@ -89,25 +95,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: getScreenWidth(4),
+    paddingVertical: getScreenHeight(1.5),
     backgroundColor: ColorPalette.White,
     position: 'relative',
   },
   connectorContainer: {
     position: 'absolute',
     flexDirection: 'row',
-    top: 27,
+    top: getScreenHeight(3.5),
     left: 0,
     right: 0,
     zIndex: 1,
     justifyContent: 'space-between',
-    paddingHorizontal: 50,
+    paddingHorizontal: getScreenWidth(12.5),
   },
   connector: {
-    height: 2,
+    height: getScreenHeight(0.25),
     flex: 1,
-    marginHorizontal: 4,
+    marginHorizontal: getScreenWidth(1),
   },
   activeConnector: {
     backgroundColor: ColorPalette.PURPLE_300,
@@ -121,15 +127,15 @@ const styles = StyleSheet.create({
     zIndex: 2,
     flex: 1,
     display: 'flex',
-    gap: getFigmaDimension(8),
+    gap: getScreenWidth(2),
   },
   circle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: getScreenWidth(8),
+    height: getScreenWidth(8),
+    borderRadius: getScreenWidth(4),
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: getScreenHeight(0.5),
   },
   activeCircle: {
     backgroundColor: ColorPalette.White,
@@ -157,6 +163,8 @@ const styles = StyleSheet.create({
   },
   stepLabel: {
     textAlign: 'center',
+    flexShrink: 1,
+    maxWidth: getScreenWidth(20),
   },
   activeStepLabel: {
     color: ColorPalette.LabelColor,

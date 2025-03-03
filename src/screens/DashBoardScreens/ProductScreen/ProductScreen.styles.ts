@@ -1,9 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {
-  getScreenWidth,
-  getScreenHeight,
-  getFigmaDimension,
-} from '../../../helpers/screenSize';
+import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
 import {ColorPalette} from '../../../config/colorPalette';
 
 export const styles = StyleSheet.create({
@@ -48,9 +44,9 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.PURPLE_300,
     width: 48,
     height: 48,
-    borderRadius: getFigmaDimension(12),
     justifyContent: 'center',
     alignItems: 'center',
-    padding: getFigmaDimension(12),
+    borderRadius: getScreenWidth(3),
+    padding: getScreenWidth(3),
   },
 });

@@ -1,10 +1,10 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../../../config/colorPalette';
 import {
-  getFigmaDimension,
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
+import {BorderRadius} from '../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    gap: getFigmaDimension(12),
+    gap: getScreenHeight(1.5),
   },
   searchContainer: {
     padding: getScreenWidth(4),
@@ -33,8 +33,8 @@ export const styles = StyleSheet.create({
     width: '100%',
   },
   titleContainer: {
-    paddingVertical: getFigmaDimension(20),
-    paddingHorizontal: getFigmaDimension(16),
+    paddingVertical: getScreenHeight(2.5),
+    paddingHorizontal: getScreenWidth(4),
     borderBottomWidth: 1,
     borderBottomColor: ColorPalette.GREY_200,
   },
@@ -45,24 +45,24 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   menuItemContainer: {
-    paddingVertical: getFigmaDimension(20),
-    paddingHorizontal: getFigmaDimension(32),
+    paddingVertical: getScreenHeight(2.5),
+    paddingHorizontal: getScreenWidth(8),
     borderBottomWidth: 1,
     borderBottomColor: ColorPalette.GREY_200,
   },
   menuItemText: {
     color: ColorPalette.GREY_TEXT_500,
     flex: 1,
-    marginRight: getFigmaDimension(40),
+    marginRight: getScreenWidth(10),
   },
   floatingChatButton: {
     position: 'absolute',
     bottom: getScreenHeight(8),
     right: getScreenWidth(5),
-    borderRadius: getFigmaDimension(48),
+    borderRadius: BorderRadius.Full,
     backgroundColor: ColorPalette.PURPLE_300,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: getFigmaDimension(12),
+    padding: getScreenHeight(1.5),
   },
 });

@@ -1,6 +1,10 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../../../config/colorPalette';
-import {getFigmaDimension} from '../../../../../helpers/screenSize';
+import {
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../helpers/screenSize';
+import {BorderRadius} from '../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -17,20 +21,20 @@ export const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    gap: getFigmaDimension(12),
+    gap: getScreenHeight(1.5),
   },
   sectionItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
+    paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(4),
   },
   textContainer: {
     flexDirection: 'column',
     flex: 1,
-    gap: getFigmaDimension(3),
+    gap: getScreenHeight(0.5),
   },
   primaryText: {
     color: ColorPalette.GREY_TEXT_500,
@@ -39,15 +43,15 @@ export const styles = StyleSheet.create({
     color: ColorPalette.GREY_TEXT_300,
   },
   toggleContainer: {
-    height: getFigmaDimension(32),
+    height: getScreenHeight(4),
     backgroundColor: ColorPalette.White,
-    borderRadius: getFigmaDimension(16),
-    gap: getFigmaDimension(10),
+    borderRadius: BorderRadius.XLarge,
+    gap: getScreenWidth(2.5),
   },
   toggleButton: {
-    borderRadius: getFigmaDimension(48),
-    paddingVertical: getFigmaDimension(8),
-    paddingHorizontal: getFigmaDimension(24),
+    borderRadius: BorderRadius.Full,
+    paddingVertical: getScreenHeight(1),
+    paddingHorizontal: getScreenWidth(6),
     borderWidth: 1,
     borderColor: ColorPalette.toggleBorder,
   },
@@ -60,7 +64,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
+    paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(4),
   },
 });

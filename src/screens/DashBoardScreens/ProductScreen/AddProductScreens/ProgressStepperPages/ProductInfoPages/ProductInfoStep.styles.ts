@@ -1,28 +1,32 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {
+  getScreenWidth,
+  getScreenHeight,
+} from '../../../../../../helpers/screenSize';
+import {BorderRadius} from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
     display: 'flex',
-    gap: getFigmaDimension(12),
-    marginBottom: getFigmaDimension(16),
+    gap: getScreenWidth(3),
+    marginBottom: getScreenHeight(2),
     backgroundColor: ColorPalette.SearchBack,
   },
   section: {
     display: 'flex',
     flexDirection: 'column',
-    paddingVertical: getFigmaDimension(12),
+    paddingVertical: getScreenHeight(1.5),
     backgroundColor: ColorPalette.White,
-    gap: getFigmaDimension(16),
+    gap: getScreenWidth(4),
   },
   sectionHeader: {
     display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1),
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: getFigmaDimension(16),
+    paddingHorizontal: getScreenWidth(4),
   },
   sectionTitle: {
     color: ColorPalette.GREY_TEXT_500,
@@ -30,25 +34,25 @@ export const styles = StyleSheet.create({
   inputContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getFigmaDimension(16),
+    gap: getScreenWidth(4),
   },
   selectContainer: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: getFigmaDimension(12),
-    paddingVertical: getFigmaDimension(16),
+    paddingHorizontal: getScreenWidth(3),
+    paddingVertical: getScreenHeight(2),
     borderWidth: 1,
     borderColor: ColorPalette.GREY_100,
-    borderRadius: getFigmaDimension(8),
+    borderRadius: BorderRadius.XSmall,
   },
   sectionTwo: {
     display: 'flex',
     backgroundColor: ColorPalette.White,
-    gap: getFigmaDimension(16),
-    paddingVertical: getFigmaDimension(12),
-    paddingHorizontal: getFigmaDimension(16),
+    gap: getScreenWidth(4),
+    paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(4),
   },
   sectionTwoHeader: {
     display: 'flex',
@@ -61,7 +65,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: getFigmaDimension(4),
+    gap: getScreenWidth(1),
   },
   toolbar: {
     display: 'flex',
@@ -69,40 +73,40 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderRadius: getFigmaDimension(8),
-    paddingVertical: getFigmaDimension(6),
-    paddingHorizontal: getFigmaDimension(12),
+    borderRadius: BorderRadius.XSmall,
+    paddingVertical: getScreenHeight(0.75),
+    paddingHorizontal: getScreenWidth(3),
     borderColor: ColorPalette.SearchBack,
   },
   toolbarIcons: {
     display: 'flex',
     flexDirection: 'row',
-    gap: getFigmaDimension(8),
+    gap: getScreenWidth(2),
     alignItems: 'center',
     justifyContent: 'center',
   },
   containerStyle: {
     backgroundColor: ColorPalette.SearchBack,
-    paddingVertical: getFigmaDimension(6),
-    paddingHorizontal: getFigmaDimension(8),
-    borderRadius: getFigmaDimension(8),
+    paddingVertical: getScreenHeight(0.75),
+    paddingHorizontal: getScreenWidth(2),
+    borderRadius: BorderRadius.XSmall,
   },
   textAreaContainer: {
-    borderRadius: getFigmaDimension(8),
+    borderRadius: BorderRadius.XSmall,
     borderWidth: 1,
     borderColor: ColorPalette.SearchBack,
-    paddingHorizontal: getFigmaDimension(12),
-    paddingVertical: getFigmaDimension(8),
-    minHeight: getFigmaDimension(160),
+    paddingHorizontal: getScreenWidth(3),
+    paddingVertical: getScreenHeight(1),
+    minHeight: getScreenHeight(20),
   },
   textAreaContainerFocused: {
     borderColor: ColorPalette.Primary,
   },
   textArea: {
     flex: 1,
-    minHeight: getFigmaDimension(100),
+    minHeight: getScreenHeight(12.5),
     fontFamily: 'Inter-Regular',
-    fontSize: getFigmaDimension(14),
+    fontSize: getScreenWidth(3.5), // Responsive font size
     color: ColorPalette.GREY_TEXT_500,
     padding: 0,
   },
@@ -117,8 +121,7 @@ export const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   activeFormatButton: {
-    backgroundColor: ColorPalette.Primary + '10',
-    borderRadius: getFigmaDimension(4),
-    padding: getFigmaDimension(2),
+    borderRadius: getScreenWidth(1),
+    padding: getScreenWidth(0.5),
   },
 });

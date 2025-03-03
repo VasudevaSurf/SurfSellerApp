@@ -13,7 +13,7 @@ import AnimatedTextInput from '../../../components/UserComponents/TextInput/Text
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension, getScreenHeight} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {goBack, navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './EditFieldScreen.styles';
 import {
@@ -331,16 +331,16 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           showsVerticalScrollIndicator={false}>
           <View style={styles.mainContainerTwo}>
             {description && (
-              <View style={{paddingHorizontal: getFigmaDimension(16)}}>
+              <View style={{paddingHorizontal: getScreenWidth(4)}}>
                 <Typography
                   variant={TypographyVariant.PSMALL_REGULAR}
                   text={description}
                 />
               </View>
             )}
-            <View style={{flexDirection: 'column', gap: getFigmaDimension(8)}}>
+            <View style={{flexDirection: 'column', gap: getScreenHeight(1)}}>
               {multipleFields ? (
-                <View style={{gap: getFigmaDimension(16)}}>
+                <View style={{gap: getScreenHeight(2)}}>
                   {fields.map(field => (
                     <AnimatedTextInput
                       key={field.key}
@@ -400,9 +400,9 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
               {captionText && (
                 <View
                   style={{
-                    paddingHorizontal: getFigmaDimension(16),
+                    paddingHorizontal: getScreenWidth(4),
                     flexDirection: 'row',
-                    gap: getFigmaDimension(6),
+                    gap: getScreenHeight(0.75),
                     alignItems: 'center',
                   }}>
                   {renderIconOrImage()}

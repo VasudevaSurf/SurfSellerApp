@@ -1,8 +1,8 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
+import {BorderRadius} from '../../../config/globalStyles';
+import {getScreenWidth} from '../../../helpers/screenSize';
 import {BadgeType, BadgeVariant} from './Badge.types';
-import {getFigmaDimension} from '../../../helpers/screenSize';
-import {Spacing, BorderRadius} from '../../../config/globalStyles';
 
 const getBackgroundColor = (type: BadgeType, variant: BadgeVariant) => {
   if (variant === BadgeVariant.GHOST) {
@@ -71,8 +71,8 @@ export const createBadgeStyles = (
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: Spacing.Medium,
-      paddingVertical: Spacing.XXSmall,
+      paddingHorizontal: getScreenWidth(4), // Changed from Spacing.Medium
+      paddingVertical: getScreenWidth(1), // Changed from Spacing.XXSmall
       borderRadius: BorderRadius.Small,
       backgroundColor: getBackgroundColor(type, variant),
       borderWidth: variant === BadgeVariant.OUTLINE ? 1 : 0,
@@ -83,10 +83,10 @@ export const createBadgeStyles = (
     },
     text: {
       color: getTextColor(type, variant, customTextColor),
-      marginHorizontal: Spacing.XXSmall,
+      marginHorizontal: getScreenWidth(1), // Changed from Spacing.XXSmall
     },
     icon: {
-      marginHorizontal: Spacing.XXSmall,
+      marginHorizontal: getScreenWidth(1), // Changed from Spacing.XXSmall
     },
     disabled: {
       opacity: 0.5,
