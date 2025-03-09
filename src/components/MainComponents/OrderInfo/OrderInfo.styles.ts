@@ -5,57 +5,56 @@ import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
-    display: 'flex',
     flexDirection: 'column',
-    paddingVertical: Spacing.Medium,
-    paddingHorizontal: Spacing.Small,
+    paddingHorizontal: Spacing.Medium,
     backgroundColor: ColorPalette.White,
-    borderRadius: Spacing.XSmall,
-    gap: Spacing.Medium,
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
+    borderRadius: Spacing.Small,
   },
-  topContainer: {
-    display: 'flex',
+  headerContainer: {
+    paddingVertical: getScreenHeight(2),
     flexDirection: 'row',
-    gap: Spacing.Medium,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  orderNumberText: {
+    color: ColorPalette.GREY_TEXT_500,
+  },
+  dateTimeText: {
+    color: ColorPalette.GREY_TEXT_300,
+  },
+  productContainer: {
+    flexDirection: 'row',
+    gap: Spacing.XSmall,
   },
   imageContainer: {
-    width: getScreenWidth(20.6), // Converted from getFigmaDimension(81)
-    height: getScreenWidth(18.3), // Converted from getFigmaDimension(72)
-    borderRadius: getScreenWidth(2),
+    width: getScreenWidth(24),
+    height: getScreenWidth(24),
+    borderRadius: Spacing.XSmall,
     overflow: 'hidden',
+    backgroundColor: ColorPalette.GREY_50,
   },
   orderImage: {
     width: '100%',
     height: '100%',
   },
-  contentContainer: {
+  productDetailsContainer: {
     flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: Spacing.Small,
-  },
-  namePriceContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: Spacing.XXSmall,
+    justifyContent: 'space-between',
   },
   orderName: {
-    flexShrink: 1,
+    color: ColorPalette.GREY_TEXT_500,
+  },
+  quantityText: {
     color: ColorPalette.GREY_TEXT_500,
   },
   priceContainer: {
-    display: 'flex',
     flexDirection: 'row',
-    gap: Spacing.XXSmall,
     alignItems: 'center',
+    gap: Spacing.XXSmall,
   },
   totalText: {
     color: ColorPalette.GREY_TEXT_300,
@@ -63,58 +62,17 @@ export const styles = StyleSheet.create({
   priceText: {
     color: ColorPalette.GREY_TEXT_500,
   },
-  infoContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: Spacing.XXLarge,
+  statusSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: getScreenHeight(2),
   },
-  infoRow: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: Spacing.XXSmall,
-  },
-  infoRowTwo: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-    gap: Spacing.XXSmall,
-  },
-  label: {
+  statusLabel: {
     color: ColorPalette.GREY_TEXT_300,
   },
-  value: {
-    color: ColorPalette.GREY_TEXT_500,
-  },
-  valueAbove: {
-    color: ColorPalette.GREY_TEXT_300,
-  },
-  statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.XXSmall,
-  },
-  containerStyle: {
-    paddingHorizontal: Spacing.Medium,
-    paddingVertical: Spacing.XXSmall,
-    height: getScreenHeight(5),
-  },
-  orderEmailContaienr: {
-    // Note: There's a typo in the original - orderEmailContaienr
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  dateContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: Spacing.XXSmall,
-  },
-  dateStatusContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  statusBadge: {
+    borderRadius: Spacing.XSmall,
+    paddingVertical: getScreenHeight(1.5),
   },
 });

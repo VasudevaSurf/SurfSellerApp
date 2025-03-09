@@ -40,4 +40,5 @@ export interface ButtonProps {
   customStyles?: StyleProp<ViewStyle>;
   customTextStyles?: StyleProp<TextStyle>;
   bgColor?: string;
+  withShadow?: boolean; // New prop to enable shadow
 }

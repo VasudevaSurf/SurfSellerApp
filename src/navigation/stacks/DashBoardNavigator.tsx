@@ -2,7 +2,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
 import {DashboardStackParamList} from '../../types/navigation';
 import {AccountSettingsNavigator} from './AccountSettingsNavigator';
-import BottomNavigation from './BottomTabNavigator/BottomTabNavigator';
+import {HomeNavigator} from './HomeNavigator';
 import {OrderNavigator} from './OrderNavigator';
 import {ProductNavigator} from './ProductNavigator';
 
@@ -14,7 +14,7 @@ export const DashboardNavigator = () => {
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="Home" component={BottomNavigation} />
+      <Stack.Screen name="Home" component={HomeNavigator} />
       <Stack.Screen name="Product" component={ProductNavigator} />
       <Stack.Screen name="Orders" component={OrderNavigator} />
       <Stack.Screen name="Account" component={AccountSettingsNavigator} />

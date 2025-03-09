@@ -1,6 +1,5 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {ScrollView, View} from 'react-native';
-import {ScrollView as GestureScrollView} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import BellIcon from '../../../assets/icons/BellIcon';
@@ -15,6 +14,7 @@ import TotalSalesIcon from '../../../assets/icons/TotalSalesIcon';
 import TrendIcon from '../../../assets/icons/TrendIcon';
 import {MenuItem} from '../../../components/MainComponents/MenuItem/MenuItem';
 import {RecentOrder} from '../../../components/MainComponents/RecentOrder/RecentOrder';
+import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
 import ToggleButtons from '../../../components/MainComponents/ToggleButtons/ToggleButtons';
 import {Header} from '../../../components/UserComponents/Header/Header';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
@@ -22,8 +22,19 @@ import {TypographyVariant} from '../../../components/UserComponents/Typography/T
 import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {styles} from './HomeScreen.styles';
+import {navigate} from '../../../navigation/utils/navigationRef';
 
 const HomeScreen = () => {
+  const handleNewOrderPress = params => {
+    navigate('Dashboard', {
+      screen: 'Home',
+      params: {
+        screen: 'NewOrders',
+        params: params,
+      },
+    });
+  };
+
   const menuItems = useMemo(
     () => [
       {
@@ -32,7 +43,9 @@ const HomeScreen = () => {
           <PackageIcon style={undefined} color={ColorPalette.HomeIcon} />
         ),
         rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {},
+        onPress: () => {
+          handleNewOrderPress();
+        },
         leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
       },
       {
@@ -57,15 +70,23 @@ const HomeScreen = () => {
     [],
   );
 
+  const statusOptions = [
+    {id: 'pending', label: 'Pending'},
+    {id: 'accepted', label: 'Accepted'},
+    {id: 'cancelled', label: 'Cancelled'},
+  ];
+
+  const [selectedOption, setSelectedOption] = useState(statusOptions[0]);
+
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
-        name="WOW Shop"
+        name="Hello, Aditya! 👋"
         image={{
           source: require('../../../assets/images/placeholder-profile.png'),
         }}
         variant={TypographyVariant.LMEDIUM_BOLD}
-        textColor={ColorPalette.TextTertiary}
+        textColor={ColorPalette.GREY_TEXT_500}
         rightIcons={[
           {
             icon: SearchIcon,
@@ -135,6 +156,7 @@ const HomeScreen = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: getScreenWidth(2),
+                paddingVertical: getScreenWidth(2),
                 borderRadius: getScreenWidth(2),
               }}
               showBottomBorder={true}
@@ -220,7 +242,6 @@ const HomeScreen = () => {
                       text="312"
                       customTextStyles={styles.countValue}
                       numberOfLines={1}
-                      adjustsFontSizeToFit
                     />
                     <Typography
                       variant={TypographyVariant.LMEDIUM_REGULAR}
@@ -342,7 +363,7 @@ const HomeScreen = () => {
               </View>
             </View>
             <View style={styles.rightHeadingButtons}>
-              <ToggleButtons />
+              <ToggleButtons buttonStyle={styles.buttonStyles} />
             </View>
           </View>
           <View style={styles.salesGraph}></View>
@@ -368,12 +389,23 @@ const HomeScreen = () => {
               />
             </View>
           </View>
+          <View>
+            <SlidingBar
+              options={statusOptions}
+              selectedOption={selectedOption}
+              onOptionSelect={setSelectedOption}
+              customOptionStyle={{
+                paddingVertical: getScreenHeight(1.5),
+                paddingHorizontal: getScreenWidth(7),
+              }}
+            />
+          </View>
           <View style={styles.recentAllOrders}>
             {[
               {
                 orderImage:
                   'https://prosodylondon.com/wp-content/uploads/2024/01/perfume-bottles-ingredients.jpg',
-                productName: 'Perfume Z',
+                productName: 'Nike Air Max 270 React Premium Shoes',
                 orderId: '448448',
                 customerName: 'John Smith',
                 orderDate: 'Oct 28, 2024',
@@ -383,7 +415,7 @@ const HomeScreen = () => {
               {
                 orderImage:
                   'https://prosodylondon.com/wp-content/uploads/2024/01/perfume-bottles-ingredients.jpg',
-                productName: 'Perfume Z',
+                productName: 'Nike Air Max 270 React Premium Shoes',
                 orderId: '448448',
                 customerName: 'John Smith',
                 orderDate: 'Oct 28, 2024',
@@ -393,7 +425,7 @@ const HomeScreen = () => {
               {
                 orderImage:
                   'https://prosodylondon.com/wp-content/uploads/2024/01/perfume-bottles-ingredients.jpg',
-                productName: 'Perfume Z',
+                productName: 'Nike Air Max 270 React Premium Shoes',
                 orderId: '448448',
                 customerName: 'John Smith',
                 orderDate: 'Oct 28, 2024',
@@ -403,7 +435,7 @@ const HomeScreen = () => {
               {
                 orderImage:
                   'https://prosodylondon.com/wp-content/uploads/2024/01/perfume-bottles-ingredients.jpg',
-                productName: 'Perfume Z',
+                productName: 'Nike Air Max 270 React Premium Shoes',
                 orderId: '448448',
                 customerName: 'John Smith',
                 orderDate: 'Oct 28, 2024',

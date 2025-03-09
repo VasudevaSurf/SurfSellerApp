@@ -9,7 +9,7 @@ export const globalStyles = StyleSheet.create({
   primaryContainer: {
     paddingTop: Platform.OS === 'android' ? getScreenHeight(3) : 0,
     flex: 1,
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -17,7 +17,7 @@ export const globalStyles = StyleSheet.create({
   successContainer: {
     paddingTop: Platform.OS === 'android' ? getScreenHeight(3) : 0,
     flex: 1,
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
@@ -25,7 +25,7 @@ export const globalStyles = StyleSheet.create({
   secondaryContainer: {
     paddingTop: Platform.OS === 'android' ? getScreenHeight(3) : 0,
     flex: 1,
-    backgroundColor: ColorPalette.BackgroundPrimary,
+    backgroundColor: ColorPalette.White,
   },
   container: {
     flex: 1,
@@ -55,10 +55,10 @@ export const globalStyles = StyleSheet.create({
     paddingBottom: getScreenHeight(4),
   },
   primaryText: {
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_400,
   },
   secondaryText: {
-    color: ColorPalette.TextSecondary,
+    color: ColorPalette.GREY_400,
   },
 });
 
@@ -86,4 +86,5 @@ export enum Spacing {
   Large = calculateWidthPercentage(20),
   XLarge = calculateWidthPercentage(24),
   XXLarge = calculateWidthPercentage(32),
+  XXXLarge = calculateWidthPercentage(48),
 }

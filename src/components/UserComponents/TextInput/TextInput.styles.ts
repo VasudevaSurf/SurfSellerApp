@@ -87,6 +87,7 @@ export const createStyles = (
     dropdownSymbol: {
       marginLeft: Spacing.XXSmall,
       marginRight: Spacing.Medium,
+      color: ColorPalette.GREY_TEXT_300,
     },
     error: {
       color: ColorPalette.RED_100,

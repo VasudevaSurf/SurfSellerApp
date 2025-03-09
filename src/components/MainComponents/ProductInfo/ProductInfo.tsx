@@ -81,7 +81,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         <View style={styles.infoContainerOne}>
           <View style={styles.productNameWrapper}>
             <Typography
-              variant={TypographyVariant.PXSMALL_BOLD}
+              variant={TypographyVariant.LMEDIUM_MEDIUM}
               text={productName}
               customTextStyles={styles.productNameText}
               numberOfLines={2}
@@ -98,24 +98,24 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         <View style={styles.infoContainerTwo}>
           <View style={styles.sellerContainer}>
             <Typography
-              variant={TypographyVariant.LXSMALL_REGULAR}
+              variant={TypographyVariant.LSMALL_REGULAR}
               text="Seller Price :"
               customTextStyles={styles.labelText}
             />
             <Typography
-              variant={TypographyVariant.LMEDIUM_MEDIUM}
+              variant={TypographyVariant.H5_BOLD}
               text={sellerPrice}
               customTextStyles={styles.valueText}
             />
           </View>
           <View style={styles.platFormContainer}>
             <Typography
-              variant={TypographyVariant.LXSMALL_REGULAR}
+              variant={TypographyVariant.LSMALL_REGULAR}
               text="Platform fee :"
               customTextStyles={styles.labelText}
             />
             <Typography
-              variant={TypographyVariant.LMEDIUM_MEDIUM}
+              variant={TypographyVariant.H5_BOLD}
               text={platformFee}
               customTextStyles={styles.valueText}
             />

@@ -20,6 +20,12 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: ColorPalette.SurfacePrimary,
+    // Adding default shadow
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    elevation: 2, // For Android
   },
   codeText: {
     color: ColorPalette.GREY_TEXT_300,

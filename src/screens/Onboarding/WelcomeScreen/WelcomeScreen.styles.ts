@@ -1,11 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
-import {Spacing, BorderRadius} from '../../../config/globalStyles';
-import {
-  getScreenWidth,
-  getScreenHeight,
-  totalScreenWidth,
-} from '../../../helpers/screenSize';
+import {BorderRadius, Spacing} from '../../../config/globalStyles';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   mainContainer: {
@@ -25,6 +21,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: getScreenHeight(8),
+    paddingHorizontal: getScreenWidth(4),
   },
   image: {
     width: getScreenWidth(60),
@@ -32,16 +29,22 @@ export const styles = StyleSheet.create({
   },
   textContainer: {
     alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: getScreenHeight(1),
+    width: getScreenWidth(85),
   },
   title: {
     textAlign: 'center',
     marginBottom: Spacing.XSmall,
-    color: ColorPalette.TextPrimary,
+    color: ColorPalette.GREY_TEXT_500,
+    width: '100%',
   },
   subtitle: {
     textAlign: 'center',
     color: ColorPalette.GREY_TEXT_300,
-    paddingHorizontal: Spacing.Medium,
+    width: '100%',
+    paddingHorizontal: getScreenWidth(2),
   },
   paginationContainer: {
     flexDirection: 'row',
@@ -56,19 +59,13 @@ export const styles = StyleSheet.create({
     marginTop: getScreenHeight(4),
   },
   dotContainer: {
-    width: 10,
     height: 10,
-    marginHorizontal: 4,
+    marginHorizontal: getScreenWidth(1),
     overflow: 'hidden',
   },
   dot: {
-    width: 10,
     height: 10,
-    borderRadius: BorderRadius.XXSmall,
-    backgroundColor: ColorPalette.PURPLE_00,
-  },
-  activeDot: {
-    backgroundColor: ColorPalette.PURPLE_300,
+    borderRadius: BorderRadius.Large,
   },
   buttonContainer: {
     gap: getScreenHeight(2),
@@ -77,6 +74,6 @@ export const styles = StyleSheet.create({
     marginTop: getScreenHeight(4),
   },
   buttonContainerStyle: {
-    borderWidth: 1,
+    borderWidth: 1.5,
   },
 });

@@ -5,22 +5,13 @@ import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
 import {styles} from './MenuItem.styles';
 import {MenuItemProps} from './MenuItem.types';
-
-const ArrowRight = () => (
-  <View style={styles.arrowContainer}>
-    <Typography
-      variant={TypographyVariant.LMEDIUM_SEMIBOLD}
-      text=">"
-      customTextStyles={{color: ColorPalette.GREY_400}}
-    />
-  </View>
-);
+import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 
 export const MenuItem: React.FC<MenuItemProps> = ({
   label,
   onPress,
   leftIcon,
-  rightIcon = <ArrowRight />,
+  rightIcon = <ArrowRightIcon style={undefined} />,
   testID,
   disabled = false,
   variant = TypographyVariant.LMEDIUM_SEMIBOLD,

@@ -20,30 +20,34 @@ export const SlidingBar: React.FC<SlidingBarProps> = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={slidingBarStyles.scrollContent}>
-        {options.map((option: SlidingBarOption, index: number) => (
-          <TouchableOpacity
-            key={option.id}
-            style={[
-              slidingBarStyles.option,
-              {backgroundColor: ColorPalette.SearchBack},
-              selectedOption.id === option.id &&
-                slidingBarStyles.selectedOption,
-              customOptionStyle,
-              selectedOption.id === option.id && customSelectedStyle,
-            ]}
-            onPress={() => onOptionSelect(option)}
-            activeOpacity={0.7}>
-            <Typography
-              variant={TypographyVariant.LMEDIUM_REGULAR}
-              text={option.label}
-              customTextStyles={[
-                slidingBarStyles.optionText,
-                selectedOption.id === option.id &&
-                  slidingBarStyles.selectedOptionText,
-              ]}
-            />
-          </TouchableOpacity>
-        ))}
+        {options.map((option: SlidingBarOption, index: number) => {
+          // Create the style array with proper precedence
+          const optionStyles = [
+            slidingBarStyles.option,
+            {backgroundColor: ColorPalette.SearchBack},
+            customOptionStyle, // Apply custom option style
+            selectedOption.id === option.id && slidingBarStyles.selectedOption,
+            selectedOption.id === option.id && customSelectedStyle,
+          ];
+
+          return (
+            <TouchableOpacity
+              key={option.id}
+              style={optionStyles}
+              onPress={() => onOptionSelect(option)}
+              activeOpacity={0.7}>
+              <Typography
+                variant={TypographyVariant.LMEDIUM_REGULAR}
+                text={option.label}
+                customTextStyles={[
+                  slidingBarStyles.optionText,
+                  selectedOption.id === option.id &&
+                    slidingBarStyles.selectedOptionText,
+                ]}
+              />
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );

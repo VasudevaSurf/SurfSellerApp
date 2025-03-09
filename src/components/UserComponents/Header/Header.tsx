@@ -56,17 +56,41 @@ export const Header: React.FC<HeaderProps> = ({
 
       <View style={headerStyles.rightSection}>
         {rightIcons &&
-          rightIcons.map((iconProps, index) => {
-            const Icon = iconProps.icon;
+          rightIcons.map((item, index) => {
+            // Check if the item is a badge config
+            if (item.isBadge) {
+              return (
+                <Badge
+                  key={index}
+                  text={item.text || ''}
+                  type={item.badgeType || BadgeType.PRIMARY}
+                  variant={item.badgeVariant || BadgeVariant.FILLED}
+                  onPress={item.onPress}
+                  customContainerStyle={item.customContainerStyle}
+                  textVariant={
+                    item.textVariant || TypographyVariant.LXSMALL_MEDIUM
+                  }
+                  leftIcon={item.leftIcon}
+                  rightIcon={item.rightIcon}
+                  iconSize={item.iconSize || 16}
+                  iconStrokeWidth={item.iconStrokeWidth || 2}
+                  customTextColor={item.customTextColor}
+                  customBorderColor={item.customBorderColor}
+                  disabled={item.disabled}
+                />
+              );
+            }
+            // Regular icon case
+            const Icon = item.icon;
             return (
               <TouchableOpacity
                 key={index}
-                onPress={iconProps.onPress}
+                onPress={item.onPress}
                 style={headerStyles.iconButton}>
                 <Icon
-                  size={iconProps.size || 24}
-                  color={iconProps.color || ColorPalette.GREY_TEXT_400}
-                  strokeWidth={iconProps.strokeWidth || 2}
+                  size={item.size || 24}
+                  color={item.color || ColorPalette.GREY_TEXT_400}
+                  strokeWidth={item.strokeWidth || 2}
                 />
               </TouchableOpacity>
             );

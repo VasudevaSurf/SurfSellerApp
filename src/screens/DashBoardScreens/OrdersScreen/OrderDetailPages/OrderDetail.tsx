@@ -2,23 +2,28 @@ import React, {useState} from 'react';
 import {Image, SafeAreaView, ScrollView, View} from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import ChevronDownIcon from '../../../../assets/icons/ArrowDownIcon';
-import ArrowLeftIcon from '../../../../assets/icons/ArrowLeftIcon';
+import ArrowLeft from '../../../../assets/icons/ArrowLeft';
+import PrintIcon from '../../../../assets/icons/PrintIcon';
 import {
-  Button,
-  ButtonSize,
-  ButtonState,
-  ButtonType,
-} from '../../../../components/UserComponents/Button';
+  BadgeType,
+  BadgeVariant,
+} from '../../../../components/UserComponents/Badges/Badge.types';
 import {Header} from '../../../../components/UserComponents/Header/Header';
 import {Typography} from '../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../config/colorPalette';
+import {Spacing} from '../../../../config/globalStyles';
 import {getScreenHeight, getScreenWidth} from '../../../../helpers/screenSize';
 import {goBack} from '../../../../navigation/utils/navigationRef';
 import {styles} from './OrderDetail.styles';
 import {OrderDetailProps} from './OrderDetail.types';
+import {Badge} from '../../../../components/UserComponents/Badges/Badge';
+import ArrowDownIcon from '../../../../assets/icons/ArrowDownIcon';
+import {StatusModal} from '../../../../components/MainComponents/StatusModal/StatusModal';
 
 const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState('Completed');
   const orderData = route?.params || {
     orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
     orderImage: 'https://picsum.photos/202',
@@ -26,6 +31,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     orderNumber: 172,
     orderDate: '10 Jul 2024',
     orderStatus: 'Completed',
+    orderTime: '10:30 AM',
   };
 
   const [activeSections, setActiveSections] = useState([]);
@@ -42,7 +48,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
       title: 'Customer Information',
       content: (
         <View style={styles.accordionContent}>
-          {/* Customer information content would go here */}
           <Typography
             text="This is customer information section"
             variant={TypographyVariant.PMEDIUM_REGULAR}
@@ -107,17 +112,46 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     setActiveSections(activeSections);
   };
 
+  // Handle print invoice action
+  const handlePrintInvoice = () => {
+    console.log('Print invoice clicked');
+    // Add your print functionality here
+  };
+
+  // Handle status change
+  const handleStatusChange = newStatus => {
+    setCurrentStatus(newStatus);
+    console.log('Status changed to:', newStatus);
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
-        name="Order details"
+        name="Order summary"
         variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
-        }
-        rightIcons={null}
+        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+        rightIcons={[
+          {
+            isBadge: true,
+            text: 'Print Invoice',
+            badgeType: BadgeType.PRIMARY,
+            badgeVariant: BadgeVariant.OUTLINE,
+            onPress: handlePrintInvoice,
+            customContainerStyle: {
+              borderColor: ColorPalette.ProgressLine,
+              borderRadius: Spacing.XXXLarge,
+              paddingVertical: getScreenHeight(1.5),
+              paddingHorizontal: getScreenWidth(3),
+            },
+            textVariant: TypographyVariant.LMEDIUM_MEDIUM,
+            customTextColor: ColorPalette.PRIMARY_500,
+            leftIcon: PrintIcon,
+            iconSize: 16,
+          },
+        ]}
       />
+
       <View style={styles.mainContainer}>
         <ScrollView
           style={styles.mainContainer}
@@ -127,6 +161,20 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
           ]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.productCard}>
+            <View style={styles.headerContainer}>
+              <View style={{gap: getScreenHeight(0.5)}}>
+                <Typography
+                  text={`Order #${orderData.orderNumber}`}
+                  variant={TypographyVariant.H5_BOLD}
+                  customTextStyles={styles.orderNumberText}
+                />
+                <Typography
+                  text={`${orderData.orderDate} • ${orderData.orderTime}`}
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
+                  customTextStyles={styles.dateTimeText}
+                />
+              </View>
+            </View>
             <View style={styles.productRow}>
               <View style={styles.imageContainer}>
                 <Image
@@ -138,51 +186,29 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
               <View style={styles.productInfo}>
                 <Typography
                   text={orderData.orderName}
-                  variant={TypographyVariant.LMEDIUM_BOLD}
-                  customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
-                  numberOfLines={2}
+                  variant={TypographyVariant.PSMALL_MEDIUM}
+                  customTextStyles={{
+                    color: ColorPalette.GREY_TEXT_500,
+                    flexWrap: 'wrap',
+                    width: '100%',
+                  }}
+                  numberOfLines={0} // Force text to break regardless of width
                 />
-                <View style={styles.priceContainer}>
-                  <View style={styles.priceContainerOne}>
-                    <Typography
-                      text="Your Price:"
-                      variant={TypographyVariant.LXSMALL_REGULAR}
-                      customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
-                    />
-                    <Typography
-                      text={`€${orderData.orderPrice}`}
-                      variant={TypographyVariant.LMEDIUM_BOLD}
-                      customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
-                    />
-                  </View>
-                  <View style={styles.priceContainerOne}>
-                    <Typography
-                      text="Surf Price:"
-                      variant={TypographyVariant.LXSMALL_REGULAR}
-                      customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
-                    />
-                    <Typography
-                      text={`€${orderData.orderPrice}`}
-                      variant={TypographyVariant.LMEDIUM_BOLD}
-                      customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
-                    />
-                  </View>
-                </View>
                 <View
                   style={{
-                    display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
                     gap: getScreenWidth(1),
+                    width: '100%',
                   }}>
                   <Typography
                     text="Inventory: "
-                    variant={TypographyVariant.LSMALL_REGULAR}
+                    variant={TypographyVariant.PSMALL_REGULAR}
                     customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
                   />
                   <Typography
-                    text={inventory}
+                    text={inventory.toString()}
                     variant={TypographyVariant.LSMALL_BOLD}
                     customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
                   />
@@ -193,27 +219,14 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
             <View style={styles.dataContainer}>
               <View style={styles.totalRow}>
                 <Typography
-                  text="Date:"
-                  variant={TypographyVariant.PMEDIUM_REGULAR}
-                  customTextStyles={{color: ColorPalette.DataText}}
-                />
-                <Typography
-                  text={orderData.orderDate}
-                  variant={TypographyVariant.PMEDIUM_REGULAR}
-                  customTextStyles={{color: ColorPalette.DataText}}
-                />
-              </View>
-
-              <View style={styles.totalRow}>
-                <Typography
                   text="Sub Total:"
                   variant={TypographyVariant.PMEDIUM_REGULAR}
-                  customTextStyles={{color: ColorPalette.DataText}}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
                 />
                 <Typography
                   text={subTotal}
                   variant={TypographyVariant.PMEDIUM_REGULAR}
-                  customTextStyles={{color: ColorPalette.DataText}}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
                 />
               </View>
 
@@ -221,20 +234,20 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
                 <Typography
                   text="Shipping Cost:"
                   variant={TypographyVariant.PMEDIUM_REGULAR}
-                  customTextStyles={{color: ColorPalette.DataText}}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
                 />
                 <Typography
                   text={shippingCost}
                   variant={TypographyVariant.PMEDIUM_REGULAR}
-                  customTextStyles={{color: ColorPalette.DataText}}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
                 />
               </View>
 
               <View style={styles.totalRow}>
                 <Typography
                   text="Total:"
-                  variant={TypographyVariant.H6_BOLD}
-                  customTextStyles={{color: ColorPalette.Black}}
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
                 />
                 <Typography
                   text={totalPrice}
@@ -259,26 +272,33 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
           </View>
 
           <View style={styles.buttonContainer}>
-            <Button
-              text="Print Invoice"
-              state={ButtonState.DEFAULT}
-              size={ButtonSize.MEDIUM}
-              type={ButtonType.OUTLINED}
-              customStyles={{
-                borderWidth: 1,
-                borderColor: ColorPalette.GREY_TEXT_400,
-              }}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            <Typography
+              text="Order Status:"
+              variant={TypographyVariant.PSMALL_MEDIUM}
+              customTextStyles={ColorPalette.GREY_TEXT_100}
             />
-            <Button
-              text="Completed"
-              state={ButtonState.DEFAULT}
-              size={ButtonSize.MEDIUM}
-              type={ButtonType.PRIMARY}
-              bgColor={ColorPalette.Green_200}
+            <Badge
+              text={currentStatus}
+              variant={BadgeVariant.FILLED}
+              type={BadgeType.PRIMARY}
+              onPress={() => setIsModalVisible(true)}
+              customContainerStyle={{
+                paddingVertical: getScreenHeight(1.5),
+                paddingHorizontal: getScreenHeight(2),
+                backgroundColor: ColorPalette.Green_200,
+              }}
+              textVariant={TypographyVariant.LMEDIUM_MEDIUM}
+              rightIcon={ArrowDownIcon}
             />
           </View>
         </ScrollView>
+        <StatusModal
+          isVisible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          onSubmit={handleStatusChange}
+          showSearch={false}
+          initialStatus={currentStatus}
+        />
       </View>
     </SafeAreaView>
   );

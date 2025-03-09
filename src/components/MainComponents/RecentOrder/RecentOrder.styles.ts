@@ -1,84 +1,70 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getFigmaDimension} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import {Spacing} from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
+    flexDirection: 'row',
     width: '100%',
     backgroundColor: ColorPalette.White,
-    paddingVertical: getFigmaDimension(16),
+    padding: Spacing.Medium,
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderBottomColor: ColorPalette.GREY_200,
   },
   lastItem: {
     borderBottomWidth: 0,
   },
-  containerOne: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: getFigmaDimension(8),
-    alignItems: 'center',
+  contentSection: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  textSection: {
     width: '100%',
   },
-  imageContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: getFigmaDimension(4),
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
+  rightSection: {
+    alignItems: 'flex-end',
+    gap: Spacing.XSmall,
+  },
+  statusMain: {
+    borderRadius: getScreenWidth(6.1), // 24/393*100 ≈ 6.1
+    alignSelf: 'flex-start',
   },
   productImage: {
-    width: '100%',
-    height: '100%',
+    width: getScreenWidth(15), // 60/393*100 ≈ 15.3
+    height: getScreenWidth(15), // 60/393*100 ≈ 15.3
+    borderRadius: Spacing.XXSmall,
   },
-  contentContainer: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: getFigmaDimension(4),
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+  priceSection: {
+    alignItems: 'flex-end',
+    gap: Spacing.XXSmall,
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  seperateContent: {
-    display: 'flex',
+  infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: Spacing.XXSmall,
   },
   orderIdText: {
+    color: ColorPalette.GREY_TEXT_500,
+    marginBottom: Spacing.XXSmall,
+  },
+  productNameText: {
     color: ColorPalette.GREY_TEXT_300,
+    flexWrap: 'wrap',
+    width: '90%',
   },
   amountText: {
     color: ColorPalette.GREY_TEXT_500,
   },
-  customerRow: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: getFigmaDimension(4),
+  dateText: {
+    color: ColorPalette.GREY_TEXT_300,
   },
-  separatorDot: {
-    width: 1,
-    height: 10,
-    borderRadius: 1,
-    backgroundColor: ColorPalette.GREY_TEXT_100,
-    marginHorizontal: 8,
+  customerText: {
+    color: ColorPalette.GREY_TEXT_300,
   },
-  statusContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: getFigmaDimension(40),
-    paddingVertical: getFigmaDimension(4),
-    paddingHorizontal: getFigmaDimension(12),
-  },
-  statusText: {
-    color: ColorPalette.Warning500,
+  dotIcon: {
+    marginHorizontal: Spacing.XXSmall,
   },
 });

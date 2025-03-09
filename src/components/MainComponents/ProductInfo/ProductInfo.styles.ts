@@ -6,9 +6,10 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    padding: getScreenWidth(3),
+    padding: getScreenWidth(4),
     backgroundColor: ColorPalette.White,
-    borderRadius: getScreenWidth(2),
+    gap: getScreenHeight(1.5),
+    borderRadius: getScreenWidth(3),
   },
   imageContainer: {
     width: getScreenWidth(26),
@@ -21,7 +22,6 @@ export const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
-    marginLeft: getScreenWidth(2.7),
     justifyContent: 'space-between',
   },
   infoContainerOne: {
@@ -68,7 +68,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   labelText: {
-    color: ColorPalette.GREY_TEXT_300,
+    color: ColorPalette.GREY_TEXT_100,
   },
   valueText: {
     color: ColorPalette.GREY_TEXT_500,

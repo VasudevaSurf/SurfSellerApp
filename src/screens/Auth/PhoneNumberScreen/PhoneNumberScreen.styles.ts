@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
   bannerContainer: {
     padding: Spacing.Large,
     paddingTop: Spacing.Medium,
-    marginBottom: Spacing.XXLarge,
+    marginBottom: Spacing.Large,
   },
   mainContainerTwo: {
     paddingHorizontal: Spacing.Large,

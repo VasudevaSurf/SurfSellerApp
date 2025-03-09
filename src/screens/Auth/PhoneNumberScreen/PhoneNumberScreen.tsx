@@ -143,6 +143,7 @@ const PhoneNumberScreen = () => {
           variant={ButtonVariant.PRIMARY}
           state={buttonState}
           size={ButtonSize.MEDIUM}
+          withShadow
         />
       </View>
       <View style={styles.termsContainerTwo}>

@@ -120,8 +120,8 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   }, [autoFocus]);
 
   const handleContainerPress = () => {
-    if (!disabled) {
-      inputRef.current?.focus();
+    if (!disabled && inputRef.current) {
+      inputRef.current.focus();
     }
   };
 
@@ -131,9 +131,9 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
 
   const getLabelColor = () => {
     if (isFocused) {
-      return customLabelColorFocused || ColorPalette.TextAction;
+      return customLabelColorFocused || ColorPalette.GREY_TEXT_400;
     }
-    return customLabelColorUnfocused || ColorPalette.TextSecondary;
+    return customLabelColorUnfocused || ColorPalette.GREY_TEXT_400;
   };
 
   const labelStyle = {
@@ -160,7 +160,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
       inputRange: [0, 1],
       outputRange: [
         customLabelColorUnfocused || ColorPalette.GREY_TEXT_00,
-        customLabelColorFocused || ColorPalette.GREY_TEXT_400,
+        getLabelColor(),
       ],
     }),
     ...customLabelStyles,
@@ -285,45 +285,45 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   };
 
   return (
-    <View style={[styles.container, customContainerStyles]}>
-      <Pressable onPress={handleContainerPress}>
-        <View
-          style={[
-            getInputContainerStyle(),
-            {
-              borderColor:
-                error || localError
-                  ? customErrorBorderColor || ColorPalette.RED_100
-                  : isFocused
-                  ? customFocusedBorderColor || ColorPalette.GREY_TEXT_400
-                  : customBorderColor || ColorPalette.GREY_100,
-              borderWidth:
-                error || localError
-                  ? customErrorBorderWidth
-                  : isFocused
-                  ? customFocusedBorderWidth
-                  : customBorderWidth,
-            },
-          ]}>
-          {renderLeftSection()}
-          <View style={styles.inputWrapper}>
-            <RNTextInput
-              ref={inputRef}
-              style={[styles.input, customInputStyles]}
-              value={value}
-              onChangeText={onChangeText}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              autoCapitalize={autoCapitalize}
-              secureTextEntry={secureTextEntry}
-              keyboardType={keyboardType}
-              placeholder={placeholder}
-              editable={!disabled}
-            />
-          </View>
-          {renderRightSection()}
+    <Pressable
+      onPress={handleContainerPress}
+      style={[styles.container, customContainerStyles]}>
+      <View
+        style={[
+          getInputContainerStyle(),
+          {
+            borderColor:
+              error || localError
+                ? customErrorBorderColor || ColorPalette.RED_100
+                : isFocused
+                ? customFocusedBorderColor || ColorPalette.GREY_TEXT_400
+                : customBorderColor || ColorPalette.GREY_100,
+            borderWidth:
+              error || localError
+                ? customErrorBorderWidth
+                : isFocused
+                ? customFocusedBorderWidth
+                : customBorderWidth,
+          },
+        ]}>
+        {renderLeftSection()}
+        <View style={styles.inputWrapper}>
+          <RNTextInput
+            ref={inputRef}
+            style={[styles.input, customInputStyles]}
+            value={value}
+            onChangeText={onChangeText}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            autoCapitalize={autoCapitalize}
+            secureTextEntry={secureTextEntry}
+            keyboardType={keyboardType}
+            placeholder={placeholder}
+            editable={!disabled}
+          />
         </View>
-      </Pressable>
+        {renderRightSection()}
+      </View>
       <Animated.Text style={labelStyle}>{label}</Animated.Text>
       {(error || localError) && (
         <Typography
@@ -332,7 +332,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
           text={error || localError || ''}
         />
       )}
-    </View>
+    </Pressable>
   );
 };
 

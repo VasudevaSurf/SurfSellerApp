@@ -11,13 +11,10 @@ export const styles = StyleSheet.create({
   bannerContainer: {
     padding: Spacing.Large,
     paddingTop: Spacing.Medium,
-    marginBottom: Spacing.XXLarge,
+    marginBottom: Spacing.XLarge,
   },
   mainContainerTwo: {
     paddingHorizontal: Spacing.Large,
-  },
-  contentWrapper: {
-    gap: Spacing.XLarge,
   },
   containerTwo: {
     gap: getScreenWidth(6),

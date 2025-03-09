@@ -11,6 +11,7 @@ import {
 import {ProductInfo} from '../../../components/MainComponents/ProductInfo/ProductInfo';
 import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
 import {
+  Button,
   ButtonSize,
   ButtonState,
   ButtonType,
@@ -21,7 +22,7 @@ import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox'
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './ProductScreen.styles';
 
@@ -67,7 +68,7 @@ const ProductScreen = () => {
     {
       id: '1',
       orderImage: 'https://picsum.photos/200',
-      productName: 'Lunar whisper luna waha the rtua nahi...',
+      productName: 'Nike Air Max 270 React Premium Men’s Running...',
       sellerPrice: '€495.00',
       platformFee: '€5.00',
       stock: '11',
@@ -75,8 +76,8 @@ const ProductScreen = () => {
     },
     {
       id: '2',
-      orderImage: 'https://picsum.photos/200',
-      productName: 'Solar Eclipse Watch',
+      orderImage: 'https://picsum.photos/199',
+      productName: 'Nike Air Max 270 React Premium Men’s Running...',
       sellerPrice: '€299.99',
       platformFee: '€4.50',
       stock: '8',
@@ -85,7 +86,7 @@ const ProductScreen = () => {
     {
       id: '3',
       orderImage: 'https://picsum.photos/202',
-      productName: 'Celestial Dream Catcher',
+      productName: 'Nike Air Max 270 React Premium Men’s Running...',
       sellerPrice: '€149.99',
       platformFee: '€3.00',
       stock: '15',
@@ -110,6 +111,8 @@ const ProductScreen = () => {
       active: false,
     },
   ]);
+
+  const searchBarHeight = getScreenHeight(6);
 
   const filterSections = [
     {
@@ -183,6 +186,25 @@ const ProductScreen = () => {
           value={searchText}
           onChangeText={setSearchText}
           placeholder="Search products..."
+          customContainerStyle={{
+            flex: 1,
+            height: searchBarHeight,
+          }}
+        />
+        <Button
+          text="Add"
+          type={ButtonType.PRIMARY}
+          variant={ButtonVariant.PRIMARY}
+          size={ButtonSize.MEDIUM}
+          state={ButtonState.DEFAULT}
+          customStyles={{
+            height: searchBarHeight,
+            paddingHorizontal: getScreenWidth(3),
+          }}
+          IconComponent={() => <PlusIcon color={ColorPalette.White} />}
+          iconPosition="right"
+          withShadow
+          onPress={() => setShowAddModal(true)}
         />
       </View>
 
@@ -201,11 +223,6 @@ const ProductScreen = () => {
           {paddingBottom: getScreenHeight(4)},
         ]}
         showsVerticalScrollIndicator={false}>
-        <Typography
-          variant={TypographyVariant.LMEDIUM_REGULAR}
-          text={`Total Items : ${products.length}`}
-          customTextStyles={styles.textStyle}
-        />
         <View style={styles.ProductContainer}>
           {products.map(product => (
             <ProductInfo

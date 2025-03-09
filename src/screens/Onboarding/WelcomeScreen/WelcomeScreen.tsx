@@ -12,17 +12,34 @@ import {TypographyVariant} from '../../../components/UserComponents/Typography/T
 import {STATIC_TEXT} from '../../../config/staticText';
 import {navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './WelcomeScreen.styles';
+import {ColorPalette} from '../../../config/colorPalette';
 
 const {createAccount, login} = STATIC_TEXT.screens.welcomeScreen;
 
+// Separated pagination indicator component
 const AnimatedPaginationIndicator = ({scrollX, contentLength, width}) => {
+  // Constants for dot dimensions
+  const defaultWidth = 10;
+  const activeWidth = 35;
+
   return (
     <View style={styles.paginationContainer}>
       <View style={styles.paginationTrack}>
         {Array.from({length: contentLength}).map((_, i) => {
+          // Calculate animated properties
           const animatedWidth = scrollX.interpolate({
             inputRange: [(i - 1) * width, i * width, (i + 1) * width],
-            outputRange: [10, 20, 10],
+            outputRange: [defaultWidth, activeWidth, defaultWidth],
+            extrapolate: 'clamp',
+          });
+
+          const dotColor = scrollX.interpolate({
+            inputRange: [(i - 1) * width, i * width, (i + 1) * width],
+            outputRange: [
+              ColorPalette.SearchBack,
+              ColorPalette.PURPLE_300,
+              ColorPalette.SearchBack,
+            ],
             extrapolate: 'clamp',
           });
 
@@ -44,10 +61,10 @@ const AnimatedPaginationIndicator = ({scrollX, contentLength, width}) => {
               <Animated.View
                 style={[
                   styles.dot,
-                  styles.activeDot,
                   {
                     opacity,
                     width: animatedWidth,
+                    backgroundColor: dotColor,
                   },
                 ]}
               />
@@ -60,12 +77,16 @@ const AnimatedPaginationIndicator = ({scrollX, contentLength, width}) => {
 };
 
 const WelcomeScreen = () => {
+  // State and refs
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef(null);
-  const screenWidth = Dimensions.get('window').width;
   const autoScrollTimer = useRef(null);
 
+  // Screen dimensions
+  const screenWidth = Dimensions.get('window').width;
+
+  // Content for carousel
   const content = [
     {
       image: require('../../../assets/images/welcomeBanner2.jpg'),
@@ -85,13 +106,12 @@ const WelcomeScreen = () => {
     },
   ];
 
+  // Scroll handling functions
   const scrollToIndex = index => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({
-        x: index * screenWidth,
-        animated: true,
-      });
-    }
+    scrollViewRef.current?.scrollTo({
+      x: index * screenWidth,
+      animated: true,
+    });
   };
 
   const startAutoScroll = () => {
@@ -108,11 +128,7 @@ const WelcomeScreen = () => {
     }
   };
 
-  useEffect(() => {
-    startAutoScroll();
-    return () => stopAutoScroll();
-  }, [currentIndex]);
-
+  // Scroll event handler
   const handleScroll = Animated.event(
     [{nativeEvent: {contentOffset: {x: scrollX}}}],
     {
@@ -127,25 +143,21 @@ const WelcomeScreen = () => {
     },
   );
 
-  const handleScrollBeginDrag = () => {
-    stopAutoScroll();
-  };
-
-  const handleScrollEndDrag = () => {
+  // Auto-scroll effect
+  useEffect(() => {
     startAutoScroll();
-  };
+    return () => stopAutoScroll();
+  }, [currentIndex]);
 
-  const handleLogin = () => {
-    navigate('Auth', {screen: 'PhoneNumber'});
-  };
-
-  const handleCreateNewAccount = () => {
+  // Navigation handlers
+  const handleLogin = () => navigate('Auth', {screen: 'PhoneNumber'});
+  const handleCreateNewAccount = () =>
     navigate('Create', {screen: 'CreateAccount'});
-  };
 
   return (
     <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
+        {/* Carousel */}
         <View style={styles.scrollViewWrapper}>
           <ScrollView
             ref={scrollViewRef}
@@ -154,8 +166,8 @@ const WelcomeScreen = () => {
             showsHorizontalScrollIndicator={false}
             onScroll={handleScroll}
             scrollEventThrottle={16}
-            onScrollBeginDrag={handleScrollBeginDrag}
-            onScrollEndDrag={handleScrollEndDrag}>
+            onScrollBeginDrag={stopAutoScroll}
+            onScrollEndDrag={startAutoScroll}>
             {content.map((item, index) => (
               <View key={index} style={[styles.slide, {width: screenWidth}]}>
                 <Image
@@ -180,6 +192,7 @@ const WelcomeScreen = () => {
           </ScrollView>
         </View>
 
+        {/* Pagination indicator */}
         <View style={styles.paginationGap}>
           <AnimatedPaginationIndicator
             scrollX={scrollX}
@@ -188,6 +201,7 @@ const WelcomeScreen = () => {
           />
         </View>
 
+        {/* Buttons */}
         <View style={styles.buttonContainer}>
           <Button
             text={createAccount}

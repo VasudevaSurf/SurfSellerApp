@@ -13,7 +13,7 @@ export const getTypographyVariant = (size: ButtonSize): TypographyVariant => {
     case ButtonSize.LARGE:
       return TypographyVariant.H5_SEMIBOLD;
     case ButtonSize.MEDIUM:
-      return TypographyVariant.PMEDIUM_BOLD;
+      return TypographyVariant.LMEDIUM_EXTRABOLD;
     case ButtonSize.SMALL:
       return TypographyVariant.LMEDIUM_MEDIUM;
     default:

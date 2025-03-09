@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {ColorPalette} from '../../../../config/colorPalette';
 import {BorderRadius, Spacing} from '../../../../config/globalStyles';
-import {getScreenWidth} from '../../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
@@ -9,30 +9,35 @@ export const styles = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
+    position: 'relative', // Add this to allow absolute positioning of children
   },
   scrollContent: {
     flexGrow: 1,
-    paddingVertical: Spacing.XSmall,
-    paddingHorizontal: Spacing.Medium,
     gap: Spacing.Medium,
+    paddingBottom: getScreenHeight(8), // Add padding to ensure content doesn't get hidden behind the button
   },
   productCard: {
     backgroundColor: ColorPalette.White,
-    padding: Spacing.Medium,
+    paddingHorizontal: Spacing.Medium,
     display: 'flex',
     flexDirection: 'column',
     gap: Spacing.Medium,
     borderRadius: BorderRadius.XSmall,
+    paddingBottom: Spacing.Medium,
   },
   productRow: {
     display: 'flex',
     flexDirection: 'row',
     gap: Spacing.Medium,
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    borderBottomWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: ColorPalette.GREY_300,
+    paddingBottom: getScreenHeight(2),
   },
   imageContainer: {
-    width: getScreenWidth(25),
-    height: getScreenWidth(25),
+    width: getScreenWidth(15.1),
+    height: getScreenWidth(15.1),
     borderRadius: BorderRadius.XSmall,
     overflow: 'hidden',
     flexShrink: 0,
@@ -46,8 +51,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: Spacing.XSmall,
     flex: 1,
-    overflow: 'hidden',
-    justifyContent: 'center',
+    maxWidth: '70%',
+    justifyContent: 'flex-start',
   },
   priceContainer: {
     display: 'flex',
@@ -72,7 +77,6 @@ export const styles = StyleSheet.create({
   downContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: Spacing.XSmall,
   },
   sectionContainer: {
     backgroundColor: ColorPalette.White,
@@ -85,9 +89,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: ColorPalette.White,
-    borderRadius: BorderRadius.XSmall,
-    paddingVertical: Spacing.Medium,
-    paddingHorizontal: Spacing.Medium,
+    paddingVertical: getScreenHeight(2.5),
+    paddingHorizontal: getScreenHeight(2),
   },
   accordionContent: {
     backgroundColor: ColorPalette.White,
@@ -101,11 +104,33 @@ export const styles = StyleSheet.create({
   accordionContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: Spacing.XSmall,
   },
   buttonContainer: {
     display: 'flex',
-    flexDirection: 'column',
-    gap: Spacing.Medium,
+    flexDirection: 'row',
+    padding: getScreenHeight(2),
+    backgroundColor: ColorPalette.White,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  headerContainer: {
+    paddingVertical: getScreenHeight(2),
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  orderNumberText: {
+    color: ColorPalette.GREY_TEXT_500,
+  },
+  dateTimeText: {
+    color: ColorPalette.GREY_TEXT_300,
   },
 });

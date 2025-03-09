@@ -75,6 +75,11 @@ const AddProduct = () => {
     goBack();
   };
 
+  const handleStepPress = stepId => {
+    // Navigate to the selected step
+    setCurrentStep(stepId);
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -106,7 +111,11 @@ const AddProduct = () => {
         }
       />
 
-      <ProgressStepper steps={STEPS} currentStep={currentStep} />
+      <ProgressStepper
+        steps={STEPS}
+        currentStep={currentStep}
+        onStepPress={handleStepPress}
+      />
 
       <View style={[styles.mainContainer, {paddingBottom: getScreenHeight(9)}]}>
         <ScrollView

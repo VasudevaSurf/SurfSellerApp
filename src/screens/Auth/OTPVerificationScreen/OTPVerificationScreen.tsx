@@ -67,11 +67,12 @@ const OTPVerificationScreen = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={[globalStyles.secondaryContainer, styles.container]}>
-      <TouchableOpacity onPress={goBack} style={styles.bannerContainer}>
+      <TouchableOpacity style={styles.bannerContainer}>
         <ArrowLeftIcon
           size={20}
           color={ColorPalette.GREY_TEXT_400}
           strokeWidth={2}
+          onPress={goBack}
         />
       </TouchableOpacity>
       <View>
@@ -90,7 +91,7 @@ const OTPVerificationScreen = ({route, navigation}) => {
               />
               <Typography
                 text={phoneNumber}
-                variant={TypographyVariant.PSMALL_MEDIUM}
+                variant={TypographyVariant.LMEDIUM_BOLD}
                 customTextStyles={styles.subCaptionTwo}
               />
             </View>
@@ -123,10 +124,9 @@ const OTPVerificationScreen = ({route, navigation}) => {
             <TextButton
               text={resendText}
               onPress={handleResendOtp}
-              variant={TypographyVariant.PSMALL_MEDIUM}
+              variant={TypographyVariant.PSMALL_REGULAR}
               customTextStyles={{
                 ...styles.linkText,
-                fontFamily: Fonts.POPPINS_REGULAR,
                 color: ColorPalette.PURPLE_300,
               }}
               underline
@@ -140,6 +140,7 @@ const OTPVerificationScreen = ({route, navigation}) => {
             variant={ButtonVariant.PRIMARY}
             state={buttonState}
             size={ButtonSize.MEDIUM}
+            withShadow
           />
         </View>
       </View>

@@ -1,7 +1,9 @@
 import React, {useState} from 'react';
 import {Image, TouchableOpacity, View} from 'react-native';
 import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
+import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import {ColorPalette} from '../../../config/colorPalette';
+import {getScreenHeight} from '../../../helpers/screenSize';
 import {Badge} from '../../UserComponents/Badges/Badge';
 import {BadgeType, BadgeVariant} from '../../UserComponents/Badges/Badge.types';
 import {Typography} from '../../UserComponents/Typography/Typography';
@@ -37,6 +39,11 @@ const getStatusColors = (
         borderColor: ColorPalette.RED_100,
         textColor: ColorPalette.PURPLE_ROSE_300,
       };
+    case 'Pending':
+      return {
+        borderColor: '#FFC107', // Yellow color for pending
+        textColor: '#FFC107',
+      };
     default:
       return {
         borderColor: ColorPalette.RED_100,
@@ -56,6 +63,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
   orderDate,
   orderTime,
   orderStatus,
+  orderQuantity,
   onStatusChange,
   onCardPress,
   style,
@@ -79,10 +87,33 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
           orderDate,
           orderTime,
           orderStatus,
+          orderQuantity,
         })
       }
       activeOpacity={0.7}>
-      <View style={styles.topContainer}>
+      {/* Header with order number and date */}
+      <View style={styles.headerContainer}>
+        <View style={{gap: getScreenHeight(0.5)}}>
+          <Typography
+            text={`Order #${orderNumber}`}
+            variant={TypographyVariant.H5_BOLD}
+            customTextStyles={styles.orderNumberText}
+          />
+          <Typography
+            text={`${orderDate} • ${orderTime}`}
+            variant={TypographyVariant.LMEDIUM_REGULAR}
+            customTextStyles={styles.dateTimeText}
+          />
+        </View>
+        <ArrowRightIcon
+          size={24}
+          color={ColorPalette.GREY_TEXT_400}
+          style={undefined}
+        />
+      </View>
+
+      {/* Product info section */}
+      <View style={styles.productContainer}>
         <View style={styles.imageContainer}>
           <Image
             source={{uri: orderImage}}
@@ -90,18 +121,36 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
             resizeMode="cover"
           />
         </View>
-        <View style={styles.contentContainer}>
+        <View style={styles.productDetailsContainer}>
           <Typography
             text={orderName}
-            variant={TypographyVariant.LMEDIUM_BOLD}
+            variant={TypographyVariant.PSMALL_MEDIUM}
             customTextStyles={styles.orderName}
             numberOfLines={2}
           />
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: getScreenHeight(1),
+              alignItems: 'center',
+            }}>
+            <Typography
+              text={`Quantity: `}
+              variant={TypographyVariant.PMEDIUM_REGULAR}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+            />
+            <Typography
+              text={`${orderQuantity || 1}`}
+              variant={TypographyVariant.LMEDIUM_BOLD}
+              customTextStyles={styles.quantityText}
+            />
+          </View>
+
           <View style={styles.priceContainer}>
             <Typography
-              text="Total :"
+              text="Total:"
               variant={TypographyVariant.PMEDIUM_REGULAR}
-              customTextStyles={styles.totalText}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
             <Typography
               text={`€${orderPrice}`}
@@ -112,67 +161,28 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
         </View>
       </View>
 
-      <View style={styles.infoContainer}>
-        <View style={styles.orderEmailContaienr}>
-          <View style={styles.infoRow}>
-            <Typography
-              text={`Order #${orderNumber}`}
-              variant={TypographyVariant.LMEDIUM_MEDIUM}
-              customTextStyles={styles.value}
-            />
-            <Typography
-              text={orderEmail}
-              variant={TypographyVariant.LSMALL_REGULAR}
-              customTextStyles={styles.valueAbove}
-            />
-          </View>
-          <View style={styles.infoRowTwo}>
-            <Typography
-              text="Phone"
-              variant={TypographyVariant.LMEDIUM_MEDIUM}
-              customTextStyles={styles.value}
-            />
-            <Typography
-              text={orderPhone?.toString()}
-              variant={TypographyVariant.LSMALL_REGULAR}
-              customTextStyles={styles.valueAbove}
-            />
-          </View>
-        </View>
-
-        <View style={styles.dateStatusContainer}>
-          <View style={styles.dateContainer}>
-            <Typography
-              text="Date and Time"
-              variant={TypographyVariant.LMEDIUM_MEDIUM}
-              customTextStyles={styles.value}
-            />
-            {orderPhone && (
-              <Typography
-                text={`${orderDate}, ${orderTime}`}
-                variant={TypographyVariant.LSMALL_REGULAR}
-                customTextStyles={styles.valueAbove}
-              />
-            )}
-          </View>
-          <View style={styles.infoRow}>
-            <Badge
-              text={orderStatus}
-              type={getStatusBadgeType(orderStatus)}
-              variant={BadgeVariant.OUTLINE}
-              rightIcon={ArrowDownIcon}
-              onPress={e => {
-                e.stopPropagation();
-                setIsModalVisible(true);
-              }}
-              customBorderColor={statusColors.borderColor}
-              textVariant={TypographyVariant.LMEDIUM_BOLD}
-              customContainerStyle={styles.containerStyle}
-              customTextColor={statusColors.textColor}
-              iconSize={24}
-            />
-          </View>
-        </View>
+      {/* Status section */}
+      <View style={styles.statusSection}>
+        <Typography
+          text="Order status:"
+          variant={TypographyVariant.PSMALL_MEDIUM}
+          customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+        />
+        <Badge
+          text={orderStatus}
+          type={getStatusBadgeType(orderStatus)}
+          variant={BadgeVariant.OUTLINE}
+          rightIcon={ArrowDownIcon}
+          onPress={e => {
+            e.stopPropagation();
+            setIsModalVisible(true);
+          }}
+          customBorderColor={statusColors.borderColor}
+          textVariant={TypographyVariant.LMEDIUM_BOLD}
+          customContainerStyle={styles.statusBadge}
+          customTextColor={statusColors.textColor}
+          iconSize={20}
+        />
         <StatusModal
           isVisible={isModalVisible}
           onClose={() => setIsModalVisible(false)}

@@ -1,13 +1,12 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../config/colorPalette';
 import {
-  getScreenWidth,
   getScreenHeight,
+  getScreenWidth,
 } from '../../../../../helpers/screenSize';
-import {BorderRadius} from '../../../../../config/globalStyles';
 
 interface Step {
   id: number;
@@ -17,12 +16,20 @@ interface Step {
 interface ProgressStepperProps {
   steps: Step[];
   currentStep: number;
+  onStepPress?: (stepId: number) => void;
 }
 
 const ProgressStepper: React.FC<ProgressStepperProps> = ({
   steps,
   currentStep,
+  onStepPress,
 }) => {
+  const handleStepPress = (stepId: number) => {
+    if (onStepPress) {
+      onStepPress(stepId);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.connectorContainer}>
@@ -49,28 +56,35 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
         const isActive = isPassed || isCurrent;
 
         return (
-          <View key={step.id} style={styles.stepContainer}>
-            <View
-              style={[
-                styles.circle,
-                isPassed
-                  ? styles.passedCircle
-                  : isActive
-                  ? styles.activeCircle
-                  : styles.inactiveCircle,
-              ]}>
-              <Typography
-                variant={TypographyVariant.LMEDIUM_BOLD}
-                text={String(step.id).padStart(2, '0')}
-                customTextStyles={[
-                  styles.stepNumber,
+          <TouchableOpacity
+            key={step.id}
+            style={styles.stepContainer}
+            onPress={() => handleStepPress(step.id)}
+            activeOpacity={0.7}>
+            <View style={styles.circleWrapper}>
+              {isCurrent && <View style={styles.haloEffect} />}
+              <View
+                style={[
+                  styles.circle,
                   isPassed
-                    ? styles.passedStepNumber
+                    ? styles.passedCircle
                     : isActive
-                    ? styles.activeStepNumber
-                    : styles.inactiveStepNumber,
-                ]}
-              />
+                    ? styles.activeCircle
+                    : styles.inactiveCircle,
+                ]}>
+                <Typography
+                  variant={TypographyVariant.LMEDIUM_BOLD}
+                  text={String(step.id).padStart(2, '0')}
+                  customTextStyles={[
+                    styles.stepNumber,
+                    isPassed
+                      ? styles.passedStepNumber
+                      : isActive
+                      ? styles.activeStepNumber
+                      : styles.inactiveStepNumber,
+                  ]}
+                />
+              </View>
             </View>
 
             <Typography
@@ -83,7 +97,7 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
               numberOfLines={1}
               ellipsizeMode="tail"
             />
-          </View>
+          </TouchableOpacity>
         );
       })}
     </View>
@@ -103,7 +117,7 @@ const styles = StyleSheet.create({
   connectorContainer: {
     position: 'absolute',
     flexDirection: 'row',
-    top: getScreenHeight(3.5),
+    top: getScreenHeight(4.5),
     left: 0,
     right: 0,
     zIndex: 1,
@@ -129,17 +143,32 @@ const styles = StyleSheet.create({
     display: 'flex',
     gap: getScreenWidth(2),
   },
+  circleWrapper: {
+    position: 'relative',
+    width: getScreenWidth(13),
+    height: getScreenWidth(13),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: getScreenHeight(0.5),
+  },
+  haloEffect: {
+    position: 'absolute',
+    width: getScreenWidth(11),
+    height: getScreenWidth(11),
+    borderRadius: getScreenWidth(6.5),
+    backgroundColor: 'rgba(58, 90, 254, 0.12)',
+  },
   circle: {
     width: getScreenWidth(8),
     height: getScreenWidth(8),
     borderRadius: getScreenWidth(4),
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: getScreenHeight(0.5),
+    zIndex: 2,
   },
   activeCircle: {
     backgroundColor: ColorPalette.White,
-    borderWidth: 1.5,
+    borderWidth: 3,
     borderColor: ColorPalette.PURPLE_300,
   },
   passedCircle: {
@@ -148,8 +177,8 @@ const styles = StyleSheet.create({
     borderColor: ColorPalette.PURPLE_300,
   },
   inactiveCircle: {
-    backgroundColor: ColorPalette.White,
-    borderWidth: 1.5,
+    backgroundColor: ColorPalette.SearchBack,
+    borderWidth: 3,
     borderColor: ColorPalette.ConnectLine,
   },
   activeStepNumber: {
@@ -159,7 +188,7 @@ const styles = StyleSheet.create({
     color: ColorPalette.White,
   },
   inactiveStepNumber: {
-    color: ColorPalette.ConnectLine,
+    color: ColorPalette.GREY_TEXT_200,
   },
   stepLabel: {
     textAlign: 'center',

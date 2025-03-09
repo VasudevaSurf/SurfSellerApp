@@ -67,6 +67,11 @@ export type ProductNavigator = {
   CategoryScreen: undefined;
 };
 
+export type HomeNavigator = {
+  Home: undefined;
+  NewOrders: undefined;
+};
+
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}

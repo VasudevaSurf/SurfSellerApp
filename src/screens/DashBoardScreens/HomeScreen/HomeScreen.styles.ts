@@ -1,13 +1,14 @@
 import {StyleSheet} from 'react-native';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {ColorPalette} from '../../../config/colorPalette';
+import {Spacing} from '../../../config/globalStyles';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     flexDirection: 'column',
-    paddingHorizontal: getScreenWidth(4),
     paddingVertical: getScreenHeight(2),
+    paddingHorizontal: getScreenHeight(2),
   },
   scrollContent: {
     gap: getScreenHeight(2),
@@ -25,14 +26,12 @@ export const styles = StyleSheet.create({
     gap: getScreenHeight(0.5),
   },
   textOne: {
-    fontSize: getScreenWidth(4), // Responsive font size
     lineHeight: getScreenHeight(2.5), // Add line height for text wrapping
     color: ColorPalette.GREY_TEXT_500,
     flexShrink: 1, // Allow text to shrink
   },
   textTwo: {
     color: ColorPalette.GREY_TEXT_300,
-    fontSize: getScreenWidth(2.8), // Responsive font size
     lineHeight: getScreenHeight(1.8), // Add line height for text wrapping
     flexShrink: 1, // Allow text to shrink
   },
@@ -55,7 +54,7 @@ export const styles = StyleSheet.create({
     width: '100%', // Ensure full width
   },
   menuContainer: {
-    padding: getScreenHeight(1.5),
+    paddingVertical: getScreenHeight(2),
     width: '100%', // Ensure full width
   },
   leftIconBackgroundColor: {
@@ -68,6 +67,9 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: getScreenHeight(2),
     width: '100%', // Ensure full width
+    padding: getScreenHeight(2),
+    backgroundColor: ColorPalette.PURPLE_100,
+    borderRadius: getScreenWidth(3),
   },
   containerOne: {
     flexDirection: 'row',
@@ -84,11 +86,19 @@ export const styles = StyleSheet.create({
   totalSales: {
     flex: 1, // Changed from flex: 2 to flex: 1 for better proportional scaling
     backgroundColor: ColorPalette.White,
-    paddingVertical: getScreenHeight(2),
-    paddingHorizontal: getScreenWidth(3), // Reduced padding
-    borderRadius: getScreenWidth(2),
+    paddingVertical: getScreenHeight(2.9),
+    paddingHorizontal: getScreenWidth(4), // Reduced padding
+    borderRadius: getScreenWidth(4),
     flexDirection: 'column',
     gap: getScreenHeight(1.5), // Reduced gap
+    shadowColor: '#cfc3c3',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 4.59,
+    elevation: 5,
   },
   salesOne: {
     alignItems: 'center',
@@ -134,11 +144,9 @@ export const styles = StyleSheet.create({
   },
   countText: {
     color: ColorPalette.RiseText,
-    fontSize: getScreenWidth(3.5), // Responsive font size
   },
   countValue: {
     color: ColorPalette.GREY_TEXT_500,
-    fontSize: getScreenWidth(4.2), // Responsive font size
     flexShrink: 1, // Allow content to shrink
   },
   countCaptionContainer: {
@@ -147,30 +155,44 @@ export const styles = StyleSheet.create({
   },
   countCaption: {
     color: ColorPalette.GREY_TEXT_300,
-    fontSize: getScreenWidth(3.2), // Responsive font size
   },
   countCaptionOne: {
     color: ColorPalette.PURPLE_300,
-    fontSize: getScreenWidth(3.2), // Responsive font size
   },
   activeProduct: {
     flex: 1,
     flexDirection: 'row',
     padding: getScreenHeight(1.5), // Reduced padding
     backgroundColor: ColorPalette.White,
-    borderRadius: getScreenWidth(2),
+    borderRadius: getScreenWidth(4),
     gap: getScreenWidth(3), // Reduced gap
     alignItems: 'center',
     justifyContent: 'space-between',
+    shadowColor: '#cfc3c3',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 4.59,
+    elevation: 5,
   },
   stockContainer: {
     flexDirection: 'column',
     gap: getScreenHeight(1),
     padding: getScreenHeight(1.5), // Reduced padding
     backgroundColor: ColorPalette.White,
-    borderRadius: getScreenWidth(2),
+    borderRadius: getScreenWidth(4),
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
+    shadowColor: '#cfc3c3',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 4.59,
+    elevation: 5,
   },
   salesOverview: {
     borderRadius: getScreenWidth(3),
@@ -196,8 +218,8 @@ export const styles = StyleSheet.create({
     padding: getScreenHeight(0.5),
     flexDirection: 'row',
     gap: getScreenWidth(1),
-    backgroundColor: ColorPalette.ButtonBackHome,
-    borderRadius: getScreenWidth(2),
+    backgroundColor: ColorPalette.SearchBack,
+    borderRadius: Spacing.Medium,
   },
   salesGraph: {
     width: '100%', // Use percentage instead of fixed width
@@ -227,7 +249,6 @@ export const styles = StyleSheet.create({
   },
   viewAllText: {
     color: ColorPalette.PURPLE_200,
-    fontSize: getScreenWidth(3.2), // Responsive font size
   },
   recentAllOrders: {
     flexDirection: 'column',
@@ -256,5 +277,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: getScreenHeight(2),
     flex: 0.5, // Allocate less space compared to containerAnotherOne
+  },
+  buttonStyles: {
+    borderRadius: Spacing.XLarge,
   },
 });

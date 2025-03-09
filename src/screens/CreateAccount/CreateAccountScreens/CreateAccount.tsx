@@ -17,6 +17,7 @@ import {globalStyles} from '../../../config/globalStyles';
 import {STATIC_TEXT} from '../../../config/staticText';
 import {navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './CreateAccount.styles';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 const {surfTitle} = STATIC_TEXT.screens.onboarding;
 
@@ -75,57 +76,53 @@ const CreateAccount = () => {
     />
   );
 
-  const renderPhoneInput = () => (
-    <View style={styles.contentWrapper}>
-      <View style={styles.subCaptionContainer}>
+  const renderHeading = () => (
+    <View style={styles.subCaptionContainer}>
+      <Typography
+        text="Create your seller account"
+        variant={TypographyVariant.H5_BOLD}
+        customTextStyles={styles.heading}
+      />
+      <View>
         <Typography
-          text="Create your seller account"
-          variant={TypographyVariant.H5_BOLD}
-          customTextStyles={styles.heading}
-        />
-        <View>
-          <Typography
-            text="Please provide below details to help us with your"
-            variant={TypographyVariant.PXSMALL_REGULAR}
-            customTextStyles={styles.subheading}
-          />
-          <Typography
-            text="onboarding."
-            variant={TypographyVariant.PXSMALL_REGULAR}
-            customTextStyles={styles.subheading}
-          />
-        </View>
-      </View>
-      <View style={styles.inputContainer}>
-        <AnimatedTextInput
-          label="Seller Name"
-          value={sellerName}
-          onChangeText={setSellerName}
-          keyboardType="default"
-          customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-          customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-        />
-        <AnimatedTextInput
-          label="Business Name"
-          value={businessName}
-          onChangeText={setBusinessName}
-          keyboardType="default"
-          customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-          customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-        />
-        <AnimatedTextInput
-          label="Whatsapp Number"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          keyboardType="phone-pad"
-          showCountrySection
-          countryCode={countryCode}
-          countryFlag={MALTA_FLAG_URL}
-          onCountryPress={handleCountryPress}
-          customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-          customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+          text="Please provide below details to help us with your onboarding"
+          variant={TypographyVariant.PXSMALL_REGULAR}
+          customTextStyles={styles.subheading}
         />
       </View>
+    </View>
+  );
+
+  const renderPhoneInput = () => (
+    <View style={styles.inputContainer}>
+      <AnimatedTextInput
+        label="Seller Name"
+        value={sellerName}
+        onChangeText={setSellerName}
+        keyboardType="default"
+        customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+        customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+      />
+      <AnimatedTextInput
+        label="Business Name"
+        value={businessName}
+        onChangeText={setBusinessName}
+        keyboardType="default"
+        customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+        customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+      />
+      <AnimatedTextInput
+        label="Whatsapp Number"
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        keyboardType="phone-pad"
+        showCountrySection
+        countryCode={countryCode}
+        countryFlag={MALTA_FLAG_URL}
+        onCountryPress={handleCountryPress}
+        customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+        customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+      />
     </View>
   );
 
@@ -152,7 +149,7 @@ const CreateAccount = () => {
         customTextStyles={styles.caption}
       />
       <TextButton
-        text="Privacy Policy"
+        text="Privacy Policy."
         onPress={handlePrivacyPress}
         variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={{
@@ -173,35 +170,43 @@ const CreateAccount = () => {
           variant={ButtonVariant.PRIMARY}
           state={buttonState}
           size={ButtonSize.MEDIUM}
-        />
-      </View>
-      <View style={styles.termsContainerTwo}>
-        <Typography
-          text="Already have an account? "
-          variant={TypographyVariant.LMEDIUM_REGULAR}
-          customTextStyles={styles.captionTwo}
-        />
-        <TextButton
-          text="Login"
-          onPress={handleCreateAccount}
-          variant={TypographyVariant.PMEDIUM_SEMIBOLD}
-          underline
-          customTextStyles={{
-            color: ColorPalette.PURPLE_300,
-            fontFamily: Fonts.POPPINS_BOLD,
-          }}
+          withShadow
         />
       </View>
     </>
+  );
+
+  const renderLogin = () => (
+    <View style={styles.termsContainerTwo}>
+      <Typography
+        text="Already have an account? "
+        variant={TypographyVariant.LMEDIUM_REGULAR}
+        customTextStyles={styles.captionTwo}
+      />
+      <TextButton
+        text="Login"
+        onPress={handleCreateAccount}
+        variant={TypographyVariant.PMEDIUM_SEMIBOLD}
+        underline
+        customTextStyles={{
+          color: ColorPalette.PURPLE_300,
+          fontFamily: Fonts.POPPINS_BOLD,
+        }}
+      />
+    </View>
   );
 
   return (
     <SafeAreaView style={[globalStyles.secondaryContainer, styles.container]}>
       {renderBanner()}
       <View style={styles.containerTwo}>
-        {renderPhoneInput()}
-        {renderTerms()}
+        {renderHeading()}
+        <View style={{gap: getScreenWidth(4)}}>
+          {renderPhoneInput()}
+          {renderTerms()}
+        </View>
         {renderActionButtons()}
+        {renderLogin()}
       </View>
     </SafeAreaView>
   );

@@ -1,11 +1,7 @@
 import {StyleSheet} from 'react-native';
-import {BorderRadius, Spacing} from '../../../config/globalStyles';
 import {ColorPalette} from '../../../config/colorPalette';
-import {
-  convertDipToPixels,
-  getScreenHeight,
-  getScreenWidth,
-} from '../../../helpers/screenSize';
+import {BorderRadius, Spacing} from '../../../config/globalStyles';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
@@ -15,11 +11,11 @@ export const styles = StyleSheet.create({
   bannerContainer: {
     padding: Spacing.Large,
     paddingTop: Spacing.Medium,
-    marginBottom: Spacing.XXLarge,
+    marginBottom: Spacing.XLarge,
   },
   mainTwoContainer: {
     gap: getScreenWidth(3), // Using getScreenWidth instead of getFigmaDimension(12)
-    marginTop: Spacing.XXLarge,
+    marginTop: Spacing.Large,
   },
   mainContainerTwo: {
     paddingHorizontal: Spacing.Large,
@@ -39,6 +35,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: getScreenWidth(1), // Using getScreenWidth instead of getFigmaDimension(4)
     alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // Typography Styles
@@ -66,7 +63,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   otpBox: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderRadius: BorderRadius.Medium,
     borderColor: ColorPalette.GREY_100, // Default unfocused state
     backgroundColor: ColorPalette.White,
@@ -74,12 +71,19 @@ export const styles = StyleSheet.create({
     width: getScreenWidth(20), // Using getScreenWidth instead of convertDipToPixels(83)
   },
   otpBoxFocused: {
-    borderColor: ColorPalette.GREY_TEXT_400, // Focused state
+    borderColor: ColorPalette.GREY_TEXT_400, // Grey border when focused
     borderWidth: 2,
+    // iOS shadow - purple glow
+    shadowColor: 'rgba(237, 219, 251, 0.80)',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    // Android shadow
+    elevation: 6,
   },
   otpBoxFilled: {
     borderColor: ColorPalette.GREY_TEXT_400, // Filled but not focused state
-    borderWidth: 1,
+    borderWidth: 1.5,
     backgroundColor: ColorPalette.White,
   },
 

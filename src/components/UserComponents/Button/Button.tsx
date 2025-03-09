@@ -1,5 +1,5 @@
 import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View, Platform} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {ColorPalette} from '../../../config/colorPalette';
 import {Typography} from '../Typography/Typography';
@@ -31,7 +31,8 @@ export const Button: React.FC<ButtonProps> = ({
   useGradient = false,
   customStyles,
   customTextStyles,
-  bgColor, // Add this prop to accept custom background color
+  bgColor,
+  withShadow = false, // Add this prop to enable shadow
 }) => {
   const buttonHeight = getButtonHeight(size);
   const currentState = disabled ? ButtonState.DISABLED : state;
@@ -40,6 +41,21 @@ export const Button: React.FC<ButtonProps> = ({
 
   // Determine if custom background color should be used
   const useCustomBgColor = bgColor && type === ButtonType.PRIMARY && !disabled;
+
+  // Shadow styles for iOS and Android
+  const shadowStyle = withShadow
+    ? Platform.select({
+        ios: {
+          shadowColor: 'rgba(16, 24, 40, 0.08)',
+          shadowOffset: {width: 0, height: 6},
+          shadowOpacity: 1,
+          shadowRadius: buttonHeight / 5,
+        },
+        android: {
+          elevation: 10,
+        },
+      })
+    : {};
 
   const containerStyle = [
     styles.container,
@@ -57,6 +73,7 @@ export const Button: React.FC<ButtonProps> = ({
           ? ColorPalette.PURPLE_300
           : ColorPalette.PURPLE_ROSE_300,
     },
+    withShadow && shadowStyle,
     customStyles,
   ];
 

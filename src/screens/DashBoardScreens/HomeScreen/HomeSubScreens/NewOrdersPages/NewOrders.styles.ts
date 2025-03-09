@@ -1,14 +1,11 @@
 import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import {ColorPalette} from '../../../../../config/colorPalette';
+import {
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
-  searchContainer: {
-    padding: getScreenWidth(4),
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: ColorPalette.White,
-  },
   mainContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -18,10 +15,6 @@ export const styles = StyleSheet.create({
   },
   scrollContent: {
     gap: getScreenWidth(4),
-  },
-  slidingBarsContainer: {
-    padding: getScreenWidth(4),
-    backgroundColor: ColorPalette.White,
   },
   textStyle: {
     color: ColorPalette.GREY_TEXT_500,

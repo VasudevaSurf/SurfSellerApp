@@ -17,12 +17,12 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     <View style={[styles.container, customContainerStyle]} testID={testID}>
       <SearchIcon
         size={20}
-        color={ColorPalette.SearchI}
+        color={ColorPalette.GREY_300}
         style={styles.searchIcon}
       />
       <TextInput
         placeholder={placeholder}
-        placeholderTextColor={ColorPalette.searchIcon}
+        placeholderTextColor={ColorPalette.GREY_300}
         value={value}
         onChangeText={onChangeText}
         style={[styles.input, customInputStyle]}

@@ -4,16 +4,19 @@ import {ColorPalette} from '../../../config/colorPalette';
 
 export const styles = StyleSheet.create({
   searchContainer: {
+    display: 'flex',
+    flexDirection: 'row',
     padding: getScreenWidth(4),
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between', // Changed from 'center' to 'space-between'
     backgroundColor: ColorPalette.White,
+    gap: getScreenWidth(2.5), // Added gap between search box and button
   },
   mainContainer: {
     display: 'flex',
     flexDirection: 'column',
-    paddingHorizontal: getScreenWidth(4),
     paddingVertical: getScreenHeight(1),
+    paddingHorizontal: getScreenWidth(4),
     marginTop: getScreenHeight(2),
   },
   scrollContent: {

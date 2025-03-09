@@ -9,13 +9,15 @@ import {ColorPalette} from '../../../config/colorPalette';
 export const styles = StyleSheet.create({
   container: {
     height: getScreenHeight(6),
-    backgroundColor: ColorPalette.SearchBack,
+    backgroundColor: ColorPalette.White,
     borderRadius: getScreenWidth(2),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: getScreenWidth(3),
     paddingVertical: getScreenHeight(1),
+    borderWidth: 1,
+    borderColor: ColorPalette.GREY_100,
   },
   input: {
     flex: 1,
