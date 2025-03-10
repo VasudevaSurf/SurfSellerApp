@@ -118,25 +118,24 @@ export const styles = StyleSheet.create({
     width: 'auto',
   },
   tabButton: {
-    paddingVertical: getScreenHeight(1.5),
-    paddingHorizontal: getScreenWidth(12),
+    paddingVertical: getScreenHeight(1),
+    paddingHorizontal: getScreenWidth(13),
     borderRadius: BorderRadius.XSmall,
     backgroundColor: 'transparent',
   },
   activeTabButton: {
-    backgroundColor: '#000000',
+    backgroundColor: ColorPalette.ProgressLine,
   },
 
   // Tab Content
   divider: {
-    height: getScreenHeight(0.2),
+    height: getScreenHeight(2),
     backgroundColor: ColorPalette.SearchBack,
     marginTop: getScreenHeight(1),
   },
   tabContent: {
     padding: getScreenWidth(2.5),
     backgroundColor: ColorPalette.White,
-    paddingVertical: getScreenHeight(2),
   },
   sectionTitle: {
     color: ColorPalette.GREY_TEXT_500,

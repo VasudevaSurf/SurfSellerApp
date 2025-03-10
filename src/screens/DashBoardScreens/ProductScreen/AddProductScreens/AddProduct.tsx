@@ -142,6 +142,7 @@ const AddProduct = () => {
           variant={ButtonVariant.PRIMARY}
           state={ButtonState.DEFAULT}
           size={ButtonSize.MEDIUM}
+          withShadow
         />
       </View>
     </SafeAreaView>

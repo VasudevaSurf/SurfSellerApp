@@ -50,14 +50,16 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   customFocusedBorderColor,
   customErrorBorderColor,
   customBorderWidth = 1,
-  customFocusedBorderWidth = 2, // New default value
-  customErrorBorderWidth = 2, // New default value
+  customFocusedBorderWidth = 2,
+  customErrorBorderWidth = 2,
   disabled = false,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [countrySectionWidth, setCountrySectionWidth] = useState(0);
   const inputRef = useRef<RNTextInput>(null);
+
+  // Initialize animation values based on whether we already have a value
   const animatedLabelPosition = useRef(
     new Animated.Value(value ? 1 : 0),
   ).current;
@@ -77,6 +79,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     customErrorBorderWidth,
   );
 
+  // Handle focus events with smoother animations
   const handleFocus = () => {
     if (!disabled) {
       setIsFocused(true);
@@ -98,20 +101,28 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     setCountrySectionWidth(width);
   };
 
+  // Smoother animation with proper easing
   const animateLabel = (toValue: number) => {
     Animated.parallel([
       Animated.timing(animatedLabelPosition, {
         toValue,
-        duration: 200,
+        duration: 150, // Slightly faster animation
         useNativeDriver: false,
       }),
       Animated.timing(animatedLabelSize, {
         toValue,
-        duration: 200,
+        duration: 150,
         useNativeDriver: false,
       }),
     ]).start();
   };
+
+  useEffect(() => {
+    // Handle initial state based on value
+    if (value && animatedLabelPosition._value === 0) {
+      animateLabel(1);
+    }
+  }, []);
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -136,6 +147,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     return customLabelColorUnfocused || ColorPalette.GREY_TEXT_400;
   };
 
+  // Refined label positioning to prevent jumping
   const labelStyle = {
     ...styles.label,
     transform: [
@@ -274,6 +286,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     }
     return null;
   };
+
   const getInputContainerStyle = () => {
     const hasLeftSection =
       showCountrySection || (leftIcons && leftIcons.length > 0) || leftText;
@@ -318,7 +331,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
             autoCapitalize={autoCapitalize}
             secureTextEntry={secureTextEntry}
             keyboardType={keyboardType}
-            placeholder={placeholder}
+            placeholder={isFocused || value ? placeholder : ''}
             editable={!disabled}
           />
         </View>

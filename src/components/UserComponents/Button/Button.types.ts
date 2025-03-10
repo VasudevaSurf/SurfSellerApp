@@ -24,6 +24,8 @@ export enum ButtonState {
   PRESSED = 'pressed',
   FOCUSED = 'focused',
   DISABLED = 'disabled',
+  AI = 'ai',
+  FILEUPLOAD = 'fileupload',
 }
 
 export interface ButtonProps {

@@ -50,6 +50,15 @@ export const getBackgroundColor = (
               start: {x: 0, y: 0},
               end: {x: 1, y: 1},
             };
+          case ButtonState.AI:
+            return {
+              isGradient: true,
+              colors: ['#FC00FF', '#00B6DE'],
+              start: {x: 0, y: 0},
+              end: {x: 1, y: 1},
+            };
+          case ButtonState.FILEUPLOAD:
+            return ColorPalette.ProgressLine;
           case ButtonState.HOVERED:
             return ColorPalette.PURPLE_100;
           case ButtonState.PRESSED:

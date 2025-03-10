@@ -138,6 +138,7 @@ export const AddModal: React.FC<AddModalProps> = ({
                 IconComponent={button.IconComponent}
                 iconPosition={button.iconPosition}
                 useGradient={button.useGradient}
+                withShadow
               />
             ))}
           </View>

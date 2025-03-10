@@ -21,6 +21,7 @@ import {
   ErrorValues,
   FieldValues,
 } from './EditFieldScreen.types';
+import ArrowLeft from '../../../assets/icons/ArrowLeft';
 
 type ValidationFunction = (value: string) => string | true;
 
@@ -316,9 +317,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
         name={headerTitle || `Update your ${fieldType}`}
         variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
-        }
+        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
         rightIcons={null}
       />
       <View style={styles.mainContainer}>

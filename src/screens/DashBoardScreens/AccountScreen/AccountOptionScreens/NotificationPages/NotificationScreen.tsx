@@ -14,6 +14,7 @@ import {
 import {BorderRadius} from '../../../../../config/globalStyles';
 import {goBack} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './NotificationScreen.styles';
+import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 
 const NotificationScreen: React.FC = () => {
   const [autoAcceptOrders, setAutoAcceptOrders] = useState('yes');
@@ -35,9 +36,7 @@ const NotificationScreen: React.FC = () => {
         name="Notifications"
         variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
-        }
+        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
         rightIcons={null}
       />
       <View style={styles.mainContainer}>
@@ -55,29 +54,34 @@ const NotificationScreen: React.FC = () => {
                 variant={TypographyVariant.H6_BOLD}
                 customTextStyles={styles.primaryText}
               />
+
+              <ToggleButtons
+                leftButtonText="Yes"
+                rightButtonText="No"
+                leftButtonValue="yes"
+                rightButtonValue="no"
+                initialActiveButton={autoAcceptOrders}
+                onSelectionChange={handleAutoAcceptChange}
+                inactiveBackgroundColor="transparent"
+                activeBackgroundColor={ColorPalette.toggleColor}
+                inactiveTextColor={ColorPalette.GREY_TEXT_500}
+                activeTextColor={ColorPalette.White}
+                containerStyle={styles.toggleContainer}
+                buttonStyle={styles.toggleButton}
+                textStyle={styles.toggleButtonText}
+                typographyVariant={TypographyVariant.LSMALL_MEDIUM}
+              />
+            </View>
+            <View
+              style={{
+                width: getScreenWidth(50),
+              }}>
               <Typography
                 text="(Mark orders as Accepted automatically for the desired payment modes)"
                 variant={TypographyVariant.LXSMALL_REGULAR}
                 customTextStyles={styles.secondaryText}
               />
             </View>
-
-            <ToggleButtons
-              leftButtonText="Yes"
-              rightButtonText="No"
-              leftButtonValue="yes"
-              rightButtonValue="no"
-              initialActiveButton={autoAcceptOrders}
-              onSelectionChange={handleAutoAcceptChange}
-              inactiveBackgroundColor="transparent"
-              activeBackgroundColor={ColorPalette.toggleColor}
-              inactiveTextColor={ColorPalette.GREY_TEXT_500}
-              activeTextColor={ColorPalette.White}
-              containerStyle={styles.toggleContainer}
-              buttonStyle={styles.toggleButton}
-              textStyle={styles.toggleButtonText}
-              typographyVariant={TypographyVariant.LSMALL_MEDIUM}
-            />
           </View>
 
           <View style={styles.sectionItem}>
@@ -87,45 +91,44 @@ const NotificationScreen: React.FC = () => {
                 variant={TypographyVariant.H6_BOLD}
                 customTextStyles={styles.primaryText}
               />
-              <Typography
-                text="(Send order notifications to the WhatsApp directly)"
-                variant={TypographyVariant.LXSMALL_REGULAR}
-                customTextStyles={styles.secondaryText}
+              <ToggleSwitch
+                isOn={whatsappNotifications}
+                onToggle={handleWhatsappToggle}
+                onColor={ColorPalette.Success}
+                offColor={ColorPalette.Gray}
+                size="small"
+                thumbOnStyle={{
+                  backgroundColor: ColorPalette.White,
+                  elevation: 0,
+                  shadowOpacity: 0,
+                  shadowColor: 'transparent',
+                  shadowOffset: {height: 0, width: 0},
+                  shadowRadius: 0,
+                }}
+                thumbOffStyle={{
+                  backgroundColor: ColorPalette.White,
+                  elevation: 0,
+                  shadowOpacity: 0,
+                  shadowColor: 'transparent',
+                  shadowOffset: {height: 0, width: 0},
+                  shadowRadius: 0,
+                }}
+                trackOnStyle={{
+                  width: getScreenWidth(10),
+                  height: getScreenHeight(3),
+                  borderRadius: BorderRadius.Medium,
+                }}
+                trackOffStyle={{
+                  width: getScreenWidth(10),
+                  height: getScreenHeight(3),
+                  borderRadius: BorderRadius.Medium,
+                }}
               />
             </View>
-
-            <ToggleSwitch
-              isOn={whatsappNotifications}
-              onToggle={handleWhatsappToggle}
-              onColor={ColorPalette.Success}
-              offColor={ColorPalette.Gray}
-              size="small"
-              thumbOnStyle={{
-                backgroundColor: ColorPalette.White,
-                elevation: 0,
-                shadowOpacity: 0,
-                shadowColor: 'transparent',
-                shadowOffset: {height: 0, width: 0},
-                shadowRadius: 0,
-              }}
-              thumbOffStyle={{
-                backgroundColor: ColorPalette.White,
-                elevation: 0,
-                shadowOpacity: 0,
-                shadowColor: 'transparent',
-                shadowOffset: {height: 0, width: 0},
-                shadowRadius: 0,
-              }}
-              trackOnStyle={{
-                width: getScreenWidth(10),
-                height: getScreenHeight(3),
-                borderRadius: BorderRadius.Medium,
-              }}
-              trackOffStyle={{
-                width: getScreenWidth(10),
-                height: getScreenHeight(3),
-                borderRadius: BorderRadius.Medium,
-              }}
+            <Typography
+              text="(Send order notifications to the WhatsApp directly)"
+              variant={TypographyVariant.LXSMALL_REGULAR}
+              customTextStyles={styles.secondaryText}
             />
           </View>
         </ScrollView>

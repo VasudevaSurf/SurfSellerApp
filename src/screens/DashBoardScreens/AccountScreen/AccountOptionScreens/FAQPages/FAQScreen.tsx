@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {SafeAreaView, ScrollView, TouchableOpacity, View} from 'react-native';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
 import ArrowRightIcon from '../../../../../assets/icons/ArrowRightIcon';
@@ -12,6 +12,8 @@ import {ColorPalette} from '../../../../../config/colorPalette';
 import {getScreenHeight} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './FAQScreen.styles';
+import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
+import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
 
 const FAQScreen = () => {
   const [searchText, setSearchText] = useState('');
@@ -58,16 +60,27 @@ const FAQScreen = () => {
     navigate('Dashboard', {screen: 'Account', params: {screen: 'ChatScreen'}});
   };
 
+  const headerIcons = useMemo(
+    () => [
+      {
+        icon: QuestionMarkIcon,
+        onPress: () => console.log('Question mark pressed'),
+        size: 24,
+        color: ColorPalette.Black,
+        strokeWidth: 2,
+      },
+    ],
+    [],
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name="How can we help?"
         variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
-        }
-        rightIcons={null}
+        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+        rightIcons={headerIcons}
       />
       <View style={styles.searchContainer}>
         <SearchBox

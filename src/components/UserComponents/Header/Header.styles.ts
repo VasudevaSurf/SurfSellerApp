@@ -41,7 +41,7 @@ export const headerStyles = StyleSheet.create({
   },
   leftIconContainer: {
     paddingVertical: Spacing.XXSmall,
-    paddingHorizontal: Spacing.XSmall,
+    paddingHorizontal: Spacing.XXSmall,
   },
   badgeWrapper: {
     alignSelf: 'flex-start',

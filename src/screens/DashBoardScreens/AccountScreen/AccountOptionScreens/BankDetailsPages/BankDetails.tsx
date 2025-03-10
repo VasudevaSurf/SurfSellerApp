@@ -9,6 +9,7 @@ import {ColorPalette} from '../../../../../config/colorPalette';
 import {getScreenHeight} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './BankDetails.styles';
+import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 
 const BankDetails = () => {
   const route = useRoute();
@@ -99,9 +100,7 @@ const BankDetails = () => {
         name="Bank Details"
         variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
-        }
+        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
         rightIcons={null}
       />
       <ScrollView
@@ -118,7 +117,7 @@ const BankDetails = () => {
             onChangeText={setAccountName}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditAccountName}
             customBorderColor={ColorPalette.GREY_TEXT_400}
@@ -131,7 +130,7 @@ const BankDetails = () => {
             onChangeText={setAccountNumber}
             keyboardType="numeric"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditAccountNumber}
             customBorderColor={ColorPalette.GREY_TEXT_400}
@@ -144,7 +143,7 @@ const BankDetails = () => {
             onChangeText={setBicCode}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditBicCode}
             customBorderColor={ColorPalette.GREY_TEXT_400}

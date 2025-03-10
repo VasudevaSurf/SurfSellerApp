@@ -66,7 +66,7 @@ export const styles = StyleSheet.create({
     paddingVertical: Spacing.XSmall,
     paddingHorizontal: Spacing.XLarge,
     borderWidth: 1,
-    borderColor: ColorPalette.toggleBorder,
+    borderColor: ColorPalette.GREY_TEXT_100,
   },
   toggleButtonText: {
     textAlign: 'center',

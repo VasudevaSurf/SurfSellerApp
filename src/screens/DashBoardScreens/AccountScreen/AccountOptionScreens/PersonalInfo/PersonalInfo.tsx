@@ -9,6 +9,7 @@ import {ColorPalette} from '../../../../../config/colorPalette';
 import {getScreenHeight} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './PerosanlInfo.styles';
+import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 
 const INITIAL_COUNTRY_CODE = '+356';
 const MALTA_FLAG_URL =
@@ -72,14 +73,14 @@ const PersonalInfo = () => {
           fieldType: 'email',
           initialValue: email,
           headerTitle: 'Update your email',
-          label: 'Email address',
+          label: 'Email ID',
           description:
             'Please update your email ID to receive important updates and notifications.',
           keyboardType: 'email-address',
           validationType: 'email',
           onSubmitActionType: 'updateEmail',
           captionText: 'Email verified',
-          iconImage: require('../../../../../assets/images/success.png'),
+          iconImage: require('../../../../../assets/images/elements.png'),
           size: 24,
         },
       },
@@ -105,7 +106,7 @@ const PersonalInfo = () => {
           validationType: 'phone',
           onSubmitActionType: 'updatePhone',
           captionText: 'WhatsApp number verified',
-          iconImage: require('../../../../../assets/images/success.png'),
+          iconImage: require('../../../../../assets/images/elements.png'),
           size: 24,
         },
       },
@@ -118,9 +119,7 @@ const PersonalInfo = () => {
         name="Personal Info"
         variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
-        }
+        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
         rightIcons={null}
       />
       <ScrollView
@@ -137,7 +136,7 @@ const PersonalInfo = () => {
             onChangeText={setFullName}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditName}
             customBorderColor={ColorPalette.GREY_TEXT_400}
@@ -150,7 +149,7 @@ const PersonalInfo = () => {
             onChangeText={setEmail}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditEmail}
             customBorderColor={ColorPalette.GREY_TEXT_400}
@@ -163,7 +162,7 @@ const PersonalInfo = () => {
             onChangeText={setPhoneNumber}
             keyboardType="phone-pad"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             showCountrySection
             countryCode={countryCode}
             countryFlag={MALTA_FLAG_URL}

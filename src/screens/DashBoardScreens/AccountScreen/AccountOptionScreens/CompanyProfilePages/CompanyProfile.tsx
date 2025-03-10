@@ -27,6 +27,7 @@ import {getScreenHeight} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './CompanyProfile.styles';
 import {containerStyles} from './ImageContainer.styles';
+import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 
 const MALTA_FLAG_URL =
   'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
@@ -208,9 +209,7 @@ const CompanyProfile = () => {
         name="Company Profile"
         variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
-        }
+        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
         rightIcons={null}
       />
       <ScrollView
@@ -234,7 +233,7 @@ const CompanyProfile = () => {
                   <TouchableOpacity
                     style={containerStyles.editButton}
                     onPress={handleUpload}>
-                    <PencilIcon size={12} color="#000000" />
+                    <PencilIcon size={12} color={ColorPalette.ProgressLine} />
                   </TouchableOpacity>
                 </View>
                 <Typography
@@ -261,7 +260,7 @@ const CompanyProfile = () => {
                   <TouchableOpacity
                     style={containerStyles.editButton}
                     onPress={handleUpload}>
-                    <PencilIcon size={12} color="#000000" />
+                    <PencilIcon size={12} color={ColorPalette.ProgressLine} />
                   </TouchableOpacity>
                 </View>
 
@@ -279,7 +278,7 @@ const CompanyProfile = () => {
             onChangeText={setBusinessName}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditBusinessName}
             customBorderColor={ColorPalette.GREY_TEXT_400}
@@ -292,7 +291,7 @@ const CompanyProfile = () => {
             onChangeText={setVATNumber}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditVATNumber}
             customBorderColor={ColorPalette.GREY_TEXT_400}
@@ -305,7 +304,7 @@ const CompanyProfile = () => {
             onChangeText={setStreetName}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditStreet}
             customBorderColor={ColorPalette.GREY_TEXT_400}
@@ -318,7 +317,7 @@ const CompanyProfile = () => {
             onChangeText={setCityName}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditCity}
             customBorderColor={ColorPalette.GREY_TEXT_400}
@@ -331,7 +330,7 @@ const CompanyProfile = () => {
             onChangeText={setPostalCode}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditPostalCode}
             customBorderColor={ColorPalette.GREY_TEXT_400}
@@ -344,7 +343,7 @@ const CompanyProfile = () => {
             onChangeText={setCountry}
             keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-            customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             showCountrySection
             countryFlag={MALTA_FLAG_URL}
             onCountryPress={() => {}}

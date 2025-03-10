@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import CheckIcon from '../../../../../../assets/icons/CheckIcon';
-import InfoIcon from '../../../../../../assets/icons/InfoIcon';
+import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import ToggleButtons from '../../../../../../components/MainComponents/ToggleButtons/ToggleButtons';
 import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
 import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
@@ -26,9 +26,9 @@ const InventoryStep = () => {
             text="Inventory"
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
-          <InfoIcon
+          <InfoIconPay
             size={16}
-            color={ColorPalette.IconColor}
+            color={ColorPalette.GREY_TEXT_400}
             style={undefined}
           />
         </View>

@@ -1,9 +1,7 @@
 import React, {useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import ArrowDownIcon from '../../../../../../assets/icons/ArrowDownIcon';
+import {View} from 'react-native';
 import InfoIcon from '../../../../../../assets/icons/InfoIcon';
-import {StatusModal} from '../../../../../../components/MainComponents/StatusModal/StatusModal';
-import {Option} from '../../../../../../components/MainComponents/StatusModal/StatusModal.types';
+import Dropdown from '../../../../../../components/MainComponents/DropdownModal/Dropdown';
 import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
 import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
@@ -11,60 +9,59 @@ import {ColorPalette} from '../../../../../../config/colorPalette';
 import {getScreenWidth} from '../../../../../../helpers/screenSize';
 import {styles} from './FeaturesStep.styles';
 
-const BRAND_OPTIONS: Option[] = [
-  {value: 'Kinnie', label: 'Kinnie', isSelected: false},
-  {value: 'Twistees', label: 'Twistees', isSelected: false},
-  {value: 'Mdina Glass', label: 'Mdina Glass', isSelected: false},
-  {value: 'Melita Limited', label: 'Melita Limited', isSelected: false},
-  {value: 'Charles & Ron', label: 'Charles & Ron', isSelected: false},
-  {
-    value: 'Simonds Farsons Cisk',
-    label: 'Simonds Farsons Cisk',
-    isSelected: false,
-  },
-  {value: 'Gaia & Nina', label: 'Gaia & Nina', isSelected: false},
-  {value: 'Mvintage', label: 'Mvintage', isSelected: false},
+const BRAND_OPTIONS = [
+  {value: 'Kinnie', label: 'Kinnie'},
+  {value: 'Twistees', label: 'Twistees'},
+  {value: 'Mdina Glass', label: 'Mdina Glass'},
+  {value: 'Melita Limited', label: 'Melita Limited'},
+  {value: 'Charles & Ron', label: 'Charles & Ron'},
+  {value: 'Simonds Farsons Cisk', label: 'Simonds Farsons Cisk'},
+  {value: 'Gaia & Nina', label: 'Gaia & Nina'},
+  {value: 'Mvintage', label: 'Mvintage'},
   {
     value: 'Corinthia Hotels International',
     label: 'Corinthia Hotels International',
-    isSelected: false,
   },
+  {value: 'Kandy Kids', label: 'Kandy Kids'},
+  {value: 'Kullhadd', label: 'Kullhadd'},
+  {value: 'KRS Releasing', label: 'KRS Releasing'},
+  {value: "Kellogg's", label: "Kellogg's"},
 ];
 
-const COLOR_OPTIONS: Option[] = [
-  {value: 'Chartreuse', label: 'Chartreuse', isSelected: false},
-  {value: 'Amber', label: 'Amber', isSelected: false},
-  {value: 'Periwinkle', label: 'Periwinkle', isSelected: false},
-  {value: 'TurquoiseBlue', label: 'Turquoise', isSelected: false},
-  {value: 'Lavender', label: 'Lavender', isSelected: false},
-  {value: 'Coral', label: 'Coral', isSelected: false},
-  {value: 'Indigo', label: 'Indigo', isSelected: false},
-  {value: 'Celeste', label: 'Celeste', isSelected: false},
-  {value: 'Ochre', label: 'Ochre', isSelected: false},
+const COLOR_OPTIONS = [
+  {value: 'Chartreuse', label: 'Chartreuse'},
+  {value: 'Amber', label: 'Amber'},
+  {value: 'Periwinkle', label: 'Periwinkle'},
+  {value: 'TurquoiseBlue', label: 'Turquoise'},
+  {value: 'Lavender', label: 'Lavender'},
+  {value: 'Coral', label: 'Coral'},
+  {value: 'Indigo', label: 'Indigo'},
+  {value: 'Celeste', label: 'Celeste'},
+  {value: 'Ochre', label: 'Ochre'},
 ];
 
-const SIZE_OPTIONS: Option[] = [
-  {value: 'XXS', label: 'XXSmall', isSelected: false},
-  {value: 'XS', label: 'XSmall', isSelected: false},
-  {value: 'S', label: 'Small', isSelected: false},
-  {value: 'L', label: 'Large', isSelected: false},
-  {value: 'M', label: 'Medium', isSelected: false},
-  {value: 'XL', label: 'XLarge', isSelected: false},
-  {value: 'XXL', label: 'XXLarge', isSelected: false},
-  {value: 'XXXL', label: 'XXXLarge', isSelected: false},
-  {value: '4XL', label: '4XLLarge', isSelected: false},
+const SIZE_OPTIONS = [
+  {value: 'XXS', label: 'XXSmall'},
+  {value: 'XS', label: 'XSmall'},
+  {value: 'S', label: 'Small'},
+  {value: 'L', label: 'Large'},
+  {value: 'M', label: 'Medium'},
+  {value: 'XL', label: 'XLarge'},
+  {value: 'XXL', label: 'XXLarge'},
+  {value: 'XXXL', label: 'XXXLarge'},
+  {value: '4XL', label: '4XLLarge'},
 ];
 
-const COUNTRY_OPTIONS: Option[] = [
-  {value: 'Malta', label: 'Malta', isSelected: false},
-  {value: 'United Kingdom', label: 'United Kingdom', isSelected: false},
-  {value: 'Italy', label: 'Italy', isSelected: false},
-  {value: 'Germany', label: 'Germany', isSelected: false},
-  {value: 'Spain', label: 'Spain', isSelected: false},
-  {value: 'Saudi Arabia', label: 'Saudi Arabia', isSelected: false},
-  {value: 'France', label: 'France', isSelected: false},
-  {value: 'India', label: 'India', isSelected: false},
-  {value: 'Russia', label: 'Russia', isSelected: false},
+const COUNTRY_OPTIONS = [
+  {value: 'Malta', label: 'Malta'},
+  {value: 'United Kingdom', label: 'United Kingdom'},
+  {value: 'Italy', label: 'Italy'},
+  {value: 'Germany', label: 'Germany'},
+  {value: 'Spain', label: 'Spain'},
+  {value: 'Saudi Arabia', label: 'Saudi Arabia'},
+  {value: 'France', label: 'France'},
+  {value: 'India', label: 'India'},
+  {value: 'Russia', label: 'Russia'},
 ];
 
 const FeaturesStep = () => {
@@ -73,16 +70,24 @@ const FeaturesStep = () => {
 
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
-  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedSize, setSelectedSize] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
 
-  const [isBrandModalVisible, setIsBrandModalVisible] = useState(false);
-  const [isColorModalVisible, setIsColorModalVisible] = useState(false);
-  const [isSizeModalVisible, setIsSizeModalVisible] = useState(false);
-  const [isCountryModalVisible, setIsCountryModalVisible] = useState(false);
+  // State to manage which dropdown is currently active
+  const [activeDropdown, setActiveDropdown] = useState(null);
+
+  // Handler for dropdown toggle
+  const handleDropdownToggle = (dropdownName, isOpen) => {
+    if (isOpen) {
+      setActiveDropdown(dropdownName);
+    } else if (activeDropdown === dropdownName) {
+      setActiveDropdown(null);
+    }
+  };
 
   return (
     <View style={styles.container}>
+      {/* Features Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Typography
@@ -98,71 +103,68 @@ const FeaturesStep = () => {
         </View>
 
         <View style={{gap: getScreenWidth(4)}}>
+          {/* First row of dropdowns */}
           <View style={styles.inputContainer}>
-            <TouchableOpacity
-              style={[styles.inputContainer, styles.selectContainer]}
-              onPress={() => setIsBrandModalVisible(true)}>
-              <Typography
-                variant={TypographyVariant.PSMALL_REGULAR}
-                text={selectedBrand || 'Select brand'}
-                customTextStyles={{
-                  color: selectedBrand
-                    ? ColorPalette.GREY_TEXT_500
-                    : ColorPalette.GREY_TEXT_00,
-                }}
+            {/* Brand Dropdown */}
+            <View style={{flex: 1, zIndex: activeDropdown === 'brand' ? 3 : 1}}>
+              <Dropdown
+                options={BRAND_OPTIONS}
+                selectedValue={selectedBrand}
+                onSelect={value => setSelectedBrand(value)}
+                placeholder="Select brand"
+                showSearch={true}
+                searchPlaceholder="Search brands"
+                selectionType="radio"
+                onDropdownToggle={isOpen =>
+                  handleDropdownToggle('brand', isOpen)
+                }
               />
-              <ArrowDownIcon
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_400}
-              />
-            </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity
-              style={[styles.inputContainer, styles.selectContainer]}
-              onPress={() => setIsColorModalVisible(true)}>
-              <Typography
-                variant={TypographyVariant.PSMALL_REGULAR}
-                text={selectedColor || 'Select color'}
-                customTextStyles={{
-                  color: selectedColor
-                    ? ColorPalette.GREY_TEXT_500
-                    : ColorPalette.GREY_TEXT_00,
-                }}
+            {/* Color Dropdown */}
+            <View style={{flex: 1, zIndex: activeDropdown === 'color' ? 3 : 1}}>
+              <Dropdown
+                options={COLOR_OPTIONS}
+                selectedValue={selectedColor}
+                onSelect={value => setSelectedColor(value)}
+                placeholder="Select color"
+                showSearch={true}
+                searchPlaceholder="Search colors"
+                selectionType="radio"
+                onDropdownToggle={isOpen =>
+                  handleDropdownToggle('color', isOpen)
+                }
               />
-              <ArrowDownIcon
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_400}
-              />
-            </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity
-              style={[styles.inputContainer, styles.selectContainer]}
-              onPress={() => setIsSizeModalVisible(true)}>
-              <Typography
-                variant={TypographyVariant.PSMALL_REGULAR}
-                text={selectedSize || 'Select size'}
-                customTextStyles={{
-                  color: selectedSize
-                    ? ColorPalette.GREY_TEXT_500
-                    : ColorPalette.GREY_TEXT_00,
-                }}
+            {/* Size Dropdown - multi-select */}
+            <View style={{flex: 1, zIndex: activeDropdown === 'size' ? 3 : 1}}>
+              <Dropdown
+                options={SIZE_OPTIONS}
+                selectedValue={selectedSize}
+                onSelect={values => setSelectedSize(values)}
+                placeholder="Select size"
+                showSearch={true}
+                searchPlaceholder="Search sizes"
+                selectionType="checkbox"
+                onDropdownToggle={isOpen =>
+                  handleDropdownToggle('size', isOpen)
+                }
               />
-              <ArrowDownIcon
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_400}
-              />
-            </TouchableOpacity>
+            </View>
           </View>
 
+          {/* Weight input */}
           <AnimatedTextInput
             label="Enter weight(Kgs : 0.000)"
             value={weighBy}
             onChangeText={setWeighBy}
-            keyboardType="default"
+            keyboardType="numeric"
           />
         </View>
       </View>
 
+      {/* Manufacturing Details Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Typography
@@ -178,100 +180,36 @@ const FeaturesStep = () => {
         </View>
 
         <View style={styles.inputContainerOne}>
+          {/* Manufacturer input */}
           <AnimatedTextInput
             label="Enter manufactured by"
             value={manufacturedBy}
             onChangeText={setManufacturedBy}
             keyboardType="default"
           />
-          <TouchableOpacity
-            style={[
-              styles.inputContainer,
-              styles.selectContainer,
-              {marginHorizontal: getScreenWidth(4)},
-            ]}
-            onPress={() => setIsCountryModalVisible(true)}>
-            <Typography
-              variant={TypographyVariant.PSMALL_REGULAR}
-              text={selectedCountry || 'Select country of origin'}
-              customTextStyles={{
-                color: selectedCountry
-                  ? ColorPalette.GREY_TEXT_500
-                  : ColorPalette.GREY_TEXT_00,
-              }}
+
+          {/* Country dropdown */}
+          <View
+            style={{
+              flex: 1,
+              marginHorizontal: getScreenWidth(4),
+              zIndex: activeDropdown === 'country' ? 3 : 1,
+            }}>
+            <Dropdown
+              options={COUNTRY_OPTIONS}
+              selectedValue={selectedCountry}
+              onSelect={value => setSelectedCountry(value)}
+              placeholder="Select country of origin"
+              showSearch={true}
+              searchPlaceholder="Search countries"
+              selectionType="radio"
+              onDropdownToggle={isOpen =>
+                handleDropdownToggle('country', isOpen)
+              }
             />
-            <ArrowDownIcon
-              style={undefined}
-              color={ColorPalette.GREY_TEXT_400}
-            />
-          </TouchableOpacity>
+          </View>
         </View>
       </View>
-
-      <StatusModal
-        isVisible={isBrandModalVisible}
-        onClose={() => setIsBrandModalVisible(false)}
-        onSubmit={value => {
-          setSelectedBrand(value);
-          setIsBrandModalVisible(false);
-        }}
-        initialStatus={selectedBrand}
-        options={BRAND_OPTIONS}
-        title="Select Brand"
-        showSearch={true}
-        searchPlaceholder="Search brands"
-        selectionType="radio"
-      />
-
-      <StatusModal
-        isVisible={isColorModalVisible}
-        onClose={() => setIsColorModalVisible(false)}
-        onSubmit={value => {
-          setSelectedColor(value);
-          setIsColorModalVisible(false);
-        }}
-        initialStatus={selectedColor}
-        options={COLOR_OPTIONS}
-        title="Select Color"
-        showSearch={true}
-        searchPlaceholder="Search colors"
-        selectionType="radio"
-      />
-
-      <StatusModal
-        isVisible={isSizeModalVisible}
-        onClose={() => setIsSizeModalVisible(false)}
-        onSubmit={value => {
-          setSelectedSize(value);
-          setIsSizeModalVisible(false);
-        }}
-        initialStatus={selectedSize}
-        options={SIZE_OPTIONS}
-        title="Select Size"
-        showSearch={true}
-        searchPlaceholder="Search sizes"
-        selectionType="checkbox"
-        checkboxProps={{
-          size: 24,
-          backgroundColor: '#9101CF',
-          checkColor: 'white',
-        }}
-      />
-
-      <StatusModal
-        isVisible={isCountryModalVisible}
-        onClose={() => setIsCountryModalVisible(false)}
-        onSubmit={value => {
-          setSelectedCountry(value);
-          setIsCountryModalVisible(false);
-        }}
-        initialStatus={selectedCountry}
-        options={COUNTRY_OPTIONS}
-        title="Select Country of Origin"
-        showSearch={true}
-        searchPlaceholder="Search countries"
-        selectionType="radio"
-      />
     </View>
   );
 };

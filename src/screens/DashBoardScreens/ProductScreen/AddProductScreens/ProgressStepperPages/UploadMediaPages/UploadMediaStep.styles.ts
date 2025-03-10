@@ -44,13 +44,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: getScreenWidth(4),
   },
-  buttonMain: {
-    shadowColor: 'rgba(16, 24, 40, 0.08)',
-    shadowOffset: {width: 0, height: 6},
-    shadowOpacity: 1,
-    shadowRadius: 15,
-    elevation: 6,
-  },
   tipsContainer: {
     paddingVertical: getScreenHeight(1.5),
     paddingHorizontal: getScreenWidth(4),

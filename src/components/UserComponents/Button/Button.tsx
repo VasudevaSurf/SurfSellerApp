@@ -43,19 +43,20 @@ export const Button: React.FC<ButtonProps> = ({
   const useCustomBgColor = bgColor && type === ButtonType.PRIMARY && !disabled;
 
   // Shadow styles for iOS and Android
-  const shadowStyle = withShadow
-    ? Platform.select({
-        ios: {
-          shadowColor: 'rgba(16, 24, 40, 0.08)',
-          shadowOffset: {width: 0, height: 6},
-          shadowOpacity: 1,
-          shadowRadius: buttonHeight / 5,
-        },
-        android: {
-          elevation: 10,
-        },
-      })
-    : {};
+  const shadowStyle =
+    withShadow && type !== ButtonType.OUTLINED
+      ? Platform.select({
+          ios: {
+            shadowColor: 'rgba(16, 24, 40, 0.08)',
+            shadowOffset: {width: 0, height: 6},
+            shadowOpacity: 1,
+            shadowRadius: buttonHeight / 5,
+          },
+          android: {
+            elevation: 10,
+          },
+        })
+      : {};
 
   const containerStyle = [
     styles.container,

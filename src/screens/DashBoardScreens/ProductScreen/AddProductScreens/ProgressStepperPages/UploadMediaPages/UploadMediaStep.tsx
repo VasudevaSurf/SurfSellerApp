@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Alert, Image, TouchableOpacity, View} from 'react-native';
-import InfoIcon from '../../../../../../assets/icons/InfoIcon';
+import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import CircleOutlineClose from '../../../../../../assets/icons/NewProductIcons/CircleOutlineClose';
 import CloudManIcon from '../../../../../../assets/icons/NewProductIcons/CloudManIcon';
 import CrossArrowsIcon from '../../../../../../assets/icons/NewProductIcons/CrossArrowsIcon';
@@ -144,9 +144,9 @@ const UploadMediaStep = () => {
             text="Product Images"
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
-          <InfoIcon
+          <InfoIconPay
             size={16}
-            color={ColorPalette.IconColor}
+            color={ColorPalette.GREY_TEXT_400}
             style={undefined}
           />
         </View>
@@ -157,11 +157,11 @@ const UploadMediaStep = () => {
             <Button
               text="Browse Files"
               variant={ButtonVariant.PRIMARY}
-              state={ButtonState.DEFAULT}
+              state={ButtonState.FILEUPLOAD}
               size={ButtonSize.SMALL}
               type={ButtonType.PRIMARY}
               onPress={handleBrowseFiles}
-              customStyles={styles.buttonMain}
+              withShadow
             />
           </View>
           <Typography

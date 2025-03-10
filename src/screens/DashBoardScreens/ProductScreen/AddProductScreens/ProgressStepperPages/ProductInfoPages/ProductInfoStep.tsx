@@ -3,6 +3,7 @@ import {TextInput, TouchableOpacity, View} from 'react-native';
 import ArrowDownIcon from '../../../../../../assets/icons/ArrowDownIcon';
 import ArrowRightIcon from '../../../../../../assets/icons/ArrowRightIcon';
 import InfoIcon from '../../../../../../assets/icons/InfoIcon';
+import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import AlignTextCenterIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextCenterIcon';
 import AlignTextLeftIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextLeftIcon';
 import AlignTextRightIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextRightIcon';
@@ -24,8 +25,8 @@ import {Typography} from '../../../../../../components/UserComponents/Typography
 import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../../config/colorPalette';
 import {getScreenWidth} from '../../../../../../helpers/screenSize';
-import {styles} from './ProductInfoStep.styles';
 import {navigate} from '../../../../../../navigation/utils/navigationRef';
+import {styles} from './ProductInfoStep.styles';
 
 interface ProductInfoStepProps {
   formData: {
@@ -117,9 +118,9 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
             text="Product information"
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
-          <InfoIcon
+          <InfoIconPay
             size={16}
-            color={ColorPalette.IconColor}
+            color={ColorPalette.GREY_TEXT_400}
             style={undefined}
           />
         </View>
@@ -171,9 +172,9 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               text="Product description"
               customTextStyles={styles.sectionTitle}
             />
-            <InfoIcon
+            <InfoIconPay
               size={16}
-              color={ColorPalette.IconColor}
+              color={ColorPalette.GREY_TEXT_400}
               style={undefined}
             />
           </View>
@@ -182,9 +183,10 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
             text="Generate"
             variant={ButtonVariant.PRIMARY}
             type={ButtonType.PRIMARY}
-            state={ButtonState.DEFAULT}
+            state={ButtonState.AI}
             size={ButtonSize.SMALL}
             onPress={() => {}}
+            withShadow
           />
         </View>
 

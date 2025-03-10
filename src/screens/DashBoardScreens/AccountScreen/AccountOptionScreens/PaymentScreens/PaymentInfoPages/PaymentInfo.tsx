@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -32,6 +32,8 @@ import {
   navigate,
 } from '../../../../../../navigation/utils/navigationRef';
 import {styles} from './PaymentInfo.styles';
+import ArrowLeft from '../../../../../../assets/icons/ArrowLeft';
+import QuestionMarkIcon from '../../../../../../assets/icons/QuestionMarkIcon';
 
 const initialLayout = {width: Dimensions.get('window').width};
 
@@ -107,7 +109,7 @@ const PaymentInfo = () => {
               variant={TypographyVariant.PMEDIUM_MEDIUM}
               customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
             />
-            <InfoIconPay style={undefined} />
+            <InfoIconPay style={undefined} color={ColorPalette.GREY_TEXT_400} />
           </View>
 
           <Typography
@@ -145,7 +147,7 @@ const PaymentInfo = () => {
           <View style={styles.tabContent}>
             <Typography
               text={`${title} History`}
-              variant={TypographyVariant.LMEDIUM_BOLD}
+              variant={TypographyVariant.H6_BOLD}
               customTextStyles={styles.sectionTitle}
             />
 
@@ -244,16 +246,27 @@ const PaymentInfo = () => {
     },
   ];
 
+  const headerIcons = useMemo(
+    () => [
+      {
+        icon: QuestionMarkIcon,
+        onPress: () => console.log('Question mark pressed'),
+        size: 24,
+        color: ColorPalette.Black,
+        strokeWidth: 2,
+      },
+    ],
+    [],
+  );
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <Header
         name="Payments"
         variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
-        }
-        rightIcons={null}
+        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+        rightIcons={headerIcons}
       />
       <ScrollView
         style={styles.mainContainer}
@@ -276,10 +289,10 @@ const PaymentInfo = () => {
                 <Typography
                   text="Connected"
                   variant={TypographyVariant.PXSMALL_REGULAR}
-                  customTextStyles={{color: ColorPalette.ConnectColor}}
+                  customTextStyles={{color: ColorPalette.ProgressLine}}
                 />
                 <Image
-                  source={require('../../../../../../assets/images/success.png')}
+                  source={require('../../../../../../assets/images/elements.png')}
                   style={styles.statusIcon}
                 />
               </View>
