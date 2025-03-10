@@ -5,21 +5,34 @@ import {
   FlatList,
   Modal,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
 import CheckIcon from '../../../assets/icons/CheckIcon';
-import SearchIcon from '../../../assets/icons/SearchIcon';
 import {ColorPalette} from '../../../config/colorPalette';
 import {BorderRadius} from '../../../config/globalStyles';
 import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
+import {SearchBox} from '../../UserComponents/SearchBox/SearchBox';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
+
+// Color mapping for the color indicators
+const COLOR_MAP = {
+  Chartreuse: '#7FFF00',
+  Amber: '#FFBF00',
+  Periwinkle: '#CCCCFF',
+  TurquoiseBlue: '#40E0D0',
+  Turquoise: '#40E0D0',
+  Lavender: '#E6E6FA',
+  Coral: '#FF7F50',
+  Indigo: '#4B0082',
+  Celeste: '#B2FFFF',
+  Ochre: '#CC7722',
+};
 
 const Dropdown = ({
   options = [],
@@ -34,6 +47,7 @@ const Dropdown = ({
   disabled = false,
   zIndex = 1,
   containerStyle = {},
+  showColorIndicator = false, // New prop to control color indicator display
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -45,7 +59,6 @@ const Dropdown = ({
     height: 0,
   });
   const triggerRef = useRef(null);
-  const searchInputRef = useRef(null);
 
   // Update filtered options when search text or options change
   useEffect(() => {
@@ -111,15 +124,6 @@ const Dropdown = ({
     setIsOpen(false);
   };
 
-  // Focus search input when dropdown opens
-  useEffect(() => {
-    if (isOpen && showSearch && searchInputRef.current) {
-      setTimeout(() => {
-        searchInputRef.current.focus();
-      }, 100);
-    }
-  }, [isOpen, showSearch]);
-
   // Get display text for selected value(s)
   const getSelectedLabel = () => {
     // Handle checkbox selection case
@@ -157,12 +161,29 @@ const Dropdown = ({
     return placeholder;
   };
 
+  // Get color for selected value (for trigger display)
+  const getSelectedColor = () => {
+    if (!showColorIndicator || !selectedValue) return null;
+
+    if (selectionType === 'radio') {
+      const selectedOption = options.find(
+        option => option.value === selectedValue,
+      );
+      return selectedOption ? COLOR_MAP[selectedOption.value] : null;
+    }
+
+    return null; // No color indicator for multi-select
+  };
+
   // Render option item for FlatList
   const renderItem = ({item}) => {
     const isSelected =
       selectionType === 'radio'
         ? item.value === selectedValue
         : Array.isArray(selectedValue) && selectedValue.includes(item.value);
+
+    // Determine if this item should show color indicator
+    const showThisColorIndicator = showColorIndicator && COLOR_MAP[item.value];
 
     return (
       <TouchableOpacity
@@ -196,6 +217,16 @@ const Dropdown = ({
           customTextStyles={styles.optionText}
           variant={TypographyVariant.PMEDIUM_REGULAR}
         />
+
+        {/* Color indicator circle - only shown for color dropdown */}
+        {showThisColorIndicator && (
+          <View
+            style={[
+              styles.colorIndicator,
+              {backgroundColor: COLOR_MAP[item.value]},
+            ]}
+          />
+        )}
       </TouchableOpacity>
     );
   };
@@ -279,10 +310,25 @@ const Dropdown = ({
           text={getSelectedLabel()}
           variant={TypographyVariant.PSMALL_REGULAR}
         />
-        <ArrowDownIcon
-          style={{transform: [{rotate: isOpen ? '180deg' : '0deg'}]}}
-          color={disabled ? ColorPalette.GREY_200 : ColorPalette.GREY_TEXT_100}
-        />
+
+        <View style={styles.triggerRightContent}>
+          {/* Show color indicator in trigger if selected and showColorIndicator is true */}
+          {showColorIndicator && getSelectedColor() && (
+            <View
+              style={[
+                styles.triggerColorIndicator,
+                {backgroundColor: getSelectedColor()},
+              ]}
+            />
+          )}
+
+          <ArrowDownIcon
+            style={{transform: [{rotate: isOpen ? '180deg' : '0deg'}]}}
+            color={
+              disabled ? ColorPalette.GREY_200 : ColorPalette.GREY_TEXT_100
+            }
+          />
+        </View>
       </TouchableOpacity>
 
       <Modal
@@ -295,24 +341,16 @@ const Dropdown = ({
             <TouchableWithoutFeedback onPress={e => e.stopPropagation()}>
               <Animated.View
                 style={[styles.dropdownContent, calculatePosition()]}>
-                {/* Search input with icon */}
+                {/* Using SearchBox component instead of custom search implementation */}
                 {showSearch && (
                   <View style={styles.searchContainer}>
-                    <View style={styles.searchInputWrapper}>
-                      <SearchIcon
-                        size={18}
-                        color={ColorPalette.GREY_TEXT_100}
-                        style={styles.searchIcon}
-                      />
-                      <TextInput
-                        ref={searchInputRef}
-                        value={searchText}
-                        onChangeText={setSearchText}
-                        placeholder={searchPlaceholder}
-                        style={styles.searchInput}
-                        clearButtonMode="while-editing"
-                      />
-                    </View>
+                    <SearchBox
+                      placeholder={searchPlaceholder}
+                      value={searchText}
+                      onChangeText={setSearchText}
+                      testID="dropdown-search"
+                      customContainerStyle={styles.searchBoxContainer}
+                    />
                   </View>
                 )}
 
@@ -361,6 +399,7 @@ const styles = StyleSheet.create({
     borderColor: ColorPalette.GREY_100,
     borderRadius: BorderRadius.XSmall,
     backgroundColor: ColorPalette.White,
+    paddingVertical: getScreenHeight(2),
   },
   dropdownTriggerActive: {
     borderColor: ColorPalette.GREY_TEXT_400,
@@ -377,6 +416,18 @@ const styles = StyleSheet.create({
   },
   triggerTextDisabled: {
     color: ColorPalette.GREY_200,
+  },
+  triggerRightContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  triggerColorIndicator: {
+    width: getScreenWidth(5),
+    height: getScreenWidth(5),
+    borderRadius: BorderRadius.Full,
+    marginRight: getScreenWidth(2),
+    borderWidth: 1,
+    borderColor: ColorPalette.GREY_100,
   },
   modalOverlay: {
     flex: 1,
@@ -398,20 +449,8 @@ const styles = StyleSheet.create({
   searchContainer: {
     marginBottom: getScreenHeight(0.8),
   },
-  searchInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  searchBoxContainer: {
     backgroundColor: ColorPalette.SearchBack,
-    borderRadius: BorderRadius.XSmall,
-    paddingHorizontal: getScreenWidth(2.5),
-  },
-  searchIcon: {
-    marginRight: getScreenWidth(2),
-  },
-  searchInput: {
-    flex: 1,
-    padding: getScreenHeight(1),
-    color: ColorPalette.GREY_TEXT_500,
   },
   optionsList: {
     paddingBottom: getScreenHeight(0.4),
@@ -456,6 +495,15 @@ const styles = StyleSheet.create({
   },
   optionText: {
     color: ColorPalette.GREY_TEXT_500,
+    flex: 1,
+  },
+  colorIndicator: {
+    width: getScreenWidth(4),
+    height: getScreenWidth(4),
+    borderRadius: BorderRadius.Full,
+    marginLeft: getScreenWidth(2),
+    borderWidth: 1,
+    borderColor: ColorPalette.GREY_100,
   },
   noResults: {
     padding: getScreenHeight(2),

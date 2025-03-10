@@ -121,7 +121,7 @@ const FeaturesStep = () => {
               />
             </View>
 
-            {/* Color Dropdown */}
+            {/* Color Dropdown with color indicators */}
             <View style={{flex: 1, zIndex: activeDropdown === 'color' ? 3 : 1}}>
               <Dropdown
                 options={COLOR_OPTIONS}
@@ -131,6 +131,7 @@ const FeaturesStep = () => {
                 showSearch={true}
                 searchPlaceholder="Search colors"
                 selectionType="radio"
+                showColorIndicator={true} // Enable color indicators
                 onDropdownToggle={isOpen =>
                   handleDropdownToggle('color', isOpen)
                 }
