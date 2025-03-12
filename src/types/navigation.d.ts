@@ -4,6 +4,7 @@ export type CreateStackParamList = {
     phoneNumber: string;
   };
   CreateSuccess: undefined;
+  EmailSignIn: undefined;
 };
 
 export type AuthStackParamList = {

@@ -1,6 +1,7 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {Image, ScrollView, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useDispatch} from 'react-redux';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import CircularEuroIcon from '../../../assets/icons/CircularEuroIcon';
 import LanguageIcon from '../../../assets/icons/LanguageIcon';
@@ -19,12 +20,32 @@ import {Typography} from '../../../components/UserComponents/Typography/Typograp
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight} from '../../../helpers/screenSize';
-import {navigate} from '../../../navigation/utils/navigationRef';
+import {navigateToAuth} from '../../../navigation/utils/navigationRef';
+import {logoutUser} from '../../../redux/slices/authSlice';
 import {styles} from './AccountScreen.styles';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const dispatch = useDispatch();
+
+  // Handle logout functionality
+  const handleLogout = useCallback(async () => {
+    try {
+      // Dispatch logout action from redux
+      await dispatch(logoutUser());
+
+      // Hide the modal
+      setShowLogoutModal(false);
+
+      // Navigate to Auth screen
+      navigateToAuth();
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Close the modal even if there's an error
+      setShowLogoutModal(false);
+    }
+  }, [dispatch]);
 
   // Memoize header icons configuration
   const headerIcons = useMemo(
@@ -47,12 +68,12 @@ const AccountScreen = () => {
     [],
   );
 
-  // Memoize modal buttons
+  // Memoize modal buttons with updated logout functionality
   const logoutButtons = useMemo(
     () => [
       {
         text: 'LOGOUT',
-        onPress: () => setShowLogoutModal(false),
+        onPress: handleLogout,
         variant: ButtonVariant.PRIMARY,
         type: ButtonType.PRIMARY,
         state: ButtonState.DEFAULT,
@@ -71,7 +92,7 @@ const AccountScreen = () => {
         customTextStyles: styles.customText,
       },
     ],
-    [],
+    [handleLogout],
   );
 
   const deleteButtons = useMemo(

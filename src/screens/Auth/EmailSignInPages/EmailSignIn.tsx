@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {SafeAreaView, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {SafeAreaView, View, Alert} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
 import {Button} from '../../../components/UserComponents/Button/Button';
 import {
@@ -12,45 +13,42 @@ import AnimatedTextInput from '../../../components/UserComponents/TextInput/Text
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
+import {Fonts} from '../../../config/fonts';
 import {globalStyles} from '../../../config/globalStyles';
 import {STATIC_TEXT} from '../../../config/staticText';
-import {navigate} from '../../../navigation/utils/navigationRef';
-import {styles} from './PhoneNumberScreen.styles';
+import {getScreenWidth} from '../../../helpers/screenSize';
+import {styles} from './EmailSignIn.styles';
+import {loginUser, clearError} from '../../../redux/slices/authSlice';
+import type {AppDispatch, RootState} from '../../../redux/store';
 
 const {surfTitle} = STATIC_TEXT.screens.onboarding;
-const {
-  loginText,
-  whatsapp,
-  termsText,
-  termsText2,
-  and,
-  privacyPolicy,
-  getOtp,
-  dontAccount,
-  createOne,
-} = STATIC_TEXT.screens.phoneNumberScreen;
 
-const INITIAL_COUNTRY_CODE = '+356';
-const MALTA_FLAG_URL =
-  'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
+const EmailSignIn = ({navigation}) => {
+  // Redux
+  const dispatch = useDispatch<AppDispatch>();
+  const {isLoading, error} = useSelector((state: RootState) => state.auth);
 
-const PhoneNumberScreen = () => {
   // State
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [countryCode, setCountryCode] = useState(INITIAL_COUNTRY_CODE);
+  const [emailId, setEmailId] = useState('');
+  const [password, setPassword] = useState('');
   const [buttonState, setButtonState] = useState(ButtonState.DISABLED);
 
+  // Update button state based on form inputs
   useEffect(() => {
-    if (phoneNumber.trim() !== '') {
+    if (emailId.trim() && password.trim()) {
       setButtonState(ButtonState.DEFAULT);
     } else {
       setButtonState(ButtonState.DISABLED);
     }
-  }, [phoneNumber]);
+  }, [emailId, password]);
 
-  const handleCountryPress = () => {
-    console.log('Open country picker');
-  };
+  // Show error alert if login failed
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Login Failed', error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   const handleTermsPress = () => {
     console.log('Navigate to Terms of Use');
@@ -61,20 +59,27 @@ const PhoneNumberScreen = () => {
   };
 
   const handleCreateAccount = () => {
-    console.log('Navigate to Learn More');
+    navigation.navigate('PhoneNumber');
   };
 
-  const handleEmailSignIn = () => {
-    navigate('EmailSignIn');
-  };
+  const handleSignIn = async () => {
+    if (buttonState === ButtonState.DISABLED) return;
 
-  const handleGetOtp = () => {
-    if (phoneNumber) {
-      navigate('OTPVerification', {
-        phoneNumber: `${countryCode}${phoneNumber}`,
-        flow: 'login',
-      });
+    setButtonState(ButtonState.LOADING);
+
+    // Dispatch login action
+    const resultAction = await dispatch(
+      loginUser({
+        email: emailId,
+        password: password,
+      }),
+    );
+
+    if (loginUser.fulfilled.match(resultAction)) {
+      navigation.navigate('Dashboard');
     }
+
+    setButtonState(ButtonState.DEFAULT);
   };
 
   const renderBanner = () => (
@@ -86,23 +91,33 @@ const PhoneNumberScreen = () => {
     />
   );
 
-  const renderPhoneInput = () => (
-    <View style={styles.contentWrapper}>
+  const renderHeading = () => (
+    <View style={styles.subCaptionContainer}>
       <Typography
-        text={loginText}
-        variant={TypographyVariant.H6_BOLD}
+        text="Login to your seller account"
+        variant={TypographyVariant.H5_BOLD}
         customTextStyles={styles.heading}
       />
+    </View>
+  );
+
+  const renderEmailInput = () => (
+    <View style={styles.inputContainer}>
       <AnimatedTextInput
-        label={whatsapp}
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
-        keyboardType="phone-pad"
-        showCountrySection
-        countryCode={countryCode}
-        countryFlag={MALTA_FLAG_URL}
-        onCountryPress={handleCountryPress}
-        autoFocus
+        label="Email ID"
+        value={emailId}
+        onChangeText={setEmailId}
+        keyboardType="email-address"
+        customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+        customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+      />
+      <AnimatedTextInput
+        label="Password"
+        value={password}
+        onChangeText={setPassword}
+        type="password"
+        customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+        customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
       />
     </View>
   );
@@ -110,29 +125,33 @@ const PhoneNumberScreen = () => {
   const renderTerms = () => (
     <View style={styles.termsContainer}>
       <Typography
-        text={termsText}
+        text="By continuing you agree to the Surf's "
         variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={styles.caption}
       />
       <TextButton
-        text={termsText2}
+        text="Terms of Use"
         onPress={handleTermsPress}
         variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={{
           ...styles.linkText,
+          fontFamily: Fonts.POPPINS_REGULAR,
+          color: ColorPalette.PURPLE_300,
         }}
       />
       <Typography
-        text={and}
+        text=" and "
         variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={styles.caption}
       />
       <TextButton
-        text={privacyPolicy}
+        text="Privacy Policy."
         onPress={handlePrivacyPress}
         variant={TypographyVariant.LXSMALL_REGULAR}
         customTextStyles={{
           ...styles.linkText,
+          fontFamily: Fonts.POPPINS_REGULAR,
+          color: ColorPalette.PURPLE_300,
         }}
       />
     </View>
@@ -142,47 +161,32 @@ const PhoneNumberScreen = () => {
     <>
       <View style={styles.mainContainerTwo}>
         <Button
-          text={getOtp}
-          onPress={handleGetOtp}
+          text="Sign In"
+          onPress={handleSignIn}
           variant={ButtonVariant.PRIMARY}
           state={buttonState}
           size={ButtonSize.MEDIUM}
           withShadow
         />
       </View>
-      <View style={styles.termsContainerTwo}>
-        <Typography
-          text={dontAccount}
-          variant={TypographyVariant.LMEDIUM_REGULAR}
-          customTextStyles={styles.captionTwo}
-        />
-        <TextButton
-          text={createOne}
-          onPress={handleCreateAccount}
-          variant={TypographyVariant.LMEDIUM_BOLD}
-          underline
-          customTextStyles={{
-            color: ColorPalette.PURPLE_300,
-          }}
-        />
-      </View>
     </>
   );
 
-  const EmailButton = () => (
+  const renderSignup = () => (
     <View style={styles.termsContainerTwo}>
       <Typography
-        text="Want to login with"
+        text="Don't have an account? "
         variant={TypographyVariant.LMEDIUM_REGULAR}
         customTextStyles={styles.captionTwo}
       />
       <TextButton
-        text="EmaiL"
-        onPress={handleEmailSignIn}
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        text="Create Account"
+        onPress={handleCreateAccount}
+        variant={TypographyVariant.PMEDIUM_SEMIBOLD}
         underline
         customTextStyles={{
           color: ColorPalette.PURPLE_300,
+          fontFamily: Fonts.POPPINS_BOLD,
         }}
       />
     </View>
@@ -191,16 +195,17 @@ const PhoneNumberScreen = () => {
   return (
     <SafeAreaView style={[globalStyles.secondaryContainer, styles.container]}>
       {renderBanner()}
-      <View>
-        <View style={styles.twoContainer}>
-          {renderPhoneInput()}
+      <View style={styles.containerTwo}>
+        {renderHeading()}
+        <View style={{gap: getScreenWidth(4)}}>
+          {renderEmailInput()}
           {renderTerms()}
         </View>
         {renderActionButtons()}
+        {renderSignup()}
       </View>
-      <View style={styles.emailButton}>{EmailButton()}</View>
     </SafeAreaView>
   );
 };
 
-export default PhoneNumberScreen;
+export default EmailSignIn;

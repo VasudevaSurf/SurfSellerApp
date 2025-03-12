@@ -1,10 +1,9 @@
 import {StyleSheet} from 'react-native';
-import {Spacing, BorderRadius} from '../../../config/globalStyles';
+import {Spacing} from '../../../config/globalStyles';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
-  // Layout Containers
   container: {
     flex: 1,
     backgroundColor: ColorPalette.White,
@@ -12,20 +11,17 @@ export const styles = StyleSheet.create({
   bannerContainer: {
     padding: Spacing.Large,
     paddingTop: Spacing.Medium,
-    marginBottom: Spacing.Large,
+    marginBottom: Spacing.XLarge,
   },
   mainContainerTwo: {
     paddingHorizontal: Spacing.Large,
-    paddingVertical: getScreenHeight(3),
   },
-  contentWrapper: {
-    gap: getScreenHeight(3),
+  containerTwo: {
+    gap: getScreenWidth(6),
   },
-  twoContainer: {
-    gap: getScreenHeight(2),
+  inputContainer: {
+    gap: getScreenWidth(4),
   },
-
-  // Terms Containers
   termsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -37,41 +33,28 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: getScreenHeight(0.5),
+    gap: getScreenWidth(1),
   },
-
-  // Typography
+  subCaptionContainer: {
+    gap: getScreenWidth(1),
+  },
   heading: {
     paddingLeft: Spacing.Large,
     color: ColorPalette.GREY_TEXT_500,
   },
-  caption: {
+  subheading: {
+    paddingLeft: Spacing.Large,
     color: ColorPalette.GREY_TEXT_300,
+  },
+  caption: {
+    color: ColorPalette.AgreeTerms,
     textAlign: 'center',
   },
   captionTwo: {
     color: ColorPalette.GREY_TEXT_500,
     textAlign: 'center',
   },
-
-  // Links
   linkText: {
-    color: ColorPalette.PURPLE_300,
-  },
-
-  // Navigation
-  backButton: {
-    padding: getScreenHeight(2),
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    zIndex: 1,
-  },
-
-  emailButton: {
-    position: 'absolute',
-    bottom: Spacing.Large,
-    width: '100%',
-    paddingHorizontal: Spacing.Large,
+    color: ColorPalette.ButtonPrimary,
   },
 });

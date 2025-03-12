@@ -18,6 +18,32 @@ import {createStyles} from './TextInput.styles';
 import {TextInputProps} from './TextInput.types';
 import {validateInput} from './TextInput.utils';
 
+// Add these imports at the top of your file
+// You can replace these with your actual eye icons
+const EyeOpenIcon = () => (
+  <View
+    style={{
+      width: 24,
+      height: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}>
+    <Typography variant={TypographyVariant.PSMALL_REGULAR} text="👁️" />
+  </View>
+);
+
+const EyeCloseIcon = () => (
+  <View
+    style={{
+      width: 24,
+      height: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}>
+    <Typography variant={TypographyVariant.PSMALL_REGULAR} text="👁️‍🗨️" />
+  </View>
+);
+
 const AnimatedTextInput: React.FC<TextInputProps> = ({
   label,
   value,
@@ -57,6 +83,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [countrySectionWidth, setCountrySectionWidth] = useState(0);
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const inputRef = useRef<RNTextInput>(null);
 
   // Initialize animation values based on whether we already have a value
@@ -115,6 +142,10 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
         useNativeDriver: false,
       }),
     ]).start();
+  };
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
   };
 
   useEffect(() => {
@@ -251,8 +282,31 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     return null;
   };
 
+  // Create a combined array of rightIcons that includes the password toggle if needed
+  const allRightIcons = React.useMemo(() => {
+    if (type === 'password') {
+      // Check if password toggle already exists in the rightIcons array
+      const hasPasswordToggleIcon = rightIcons.some(
+        icon => icon.id === 'password-toggle',
+      );
+
+      if (!hasPasswordToggleIcon) {
+        // Create a new array with the password toggle icon added
+        return [
+          ...rightIcons,
+          {
+            id: 'password-toggle',
+            icon: passwordVisible ? <EyeOpenIcon /> : <EyeCloseIcon />,
+            onPress: togglePasswordVisibility,
+          },
+        ];
+      }
+    }
+    return rightIcons;
+  }, [type, passwordVisible, rightIcons]);
+
   const renderRightSection = () => {
-    if (rightIcons?.length > 0 || rightText) {
+    if (allRightIcons?.length > 0 || rightText) {
       return (
         <View style={styles.rightSection}>
           {rightText && (
@@ -264,7 +318,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
               />
             </TouchableOpacity>
           )}
-          {rightIcons.map((iconConfig, index) => (
+          {allRightIcons.map((iconConfig, index) => (
             <TouchableOpacity
               key={index}
               style={styles.iconContainer}
@@ -296,6 +350,10 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
       backgroundColor: disabled ? ColorPalette.GREY_50 : undefined,
     };
   };
+
+  // Determine if we need to use secureTextEntry based on the type and visibility state
+  const isSecureTextEntry =
+    type === 'password' ? !passwordVisible : secureTextEntry;
 
   return (
     <Pressable
@@ -329,7 +387,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
             onFocus={handleFocus}
             onBlur={handleBlur}
             autoCapitalize={autoCapitalize}
-            secureTextEntry={secureTextEntry}
+            secureTextEntry={isSecureTextEntry}
             keyboardType={keyboardType}
             placeholder={isFocused || value ? placeholder : ''}
             editable={!disabled}

@@ -1,6 +1,7 @@
 import {TextStyle, ViewStyle} from 'react-native';
 
-interface IconConfig {
+export interface IconConfig {
+  id?: string; // Add this new property
   icon: React.ReactNode | string;
   onPress?: () => void;
 }
@@ -20,12 +21,17 @@ export interface TextInputProps {
   customLabelColorUnfocused?: string;
   error?: string;
   secureTextEntry?: boolean;
-  keyboardType?: 'default' | 'number-pad' | 'email-address' | 'phone-pad';
+  keyboardType?:
+    | 'default'
+    | 'number-pad'
+    | 'email-address'
+    | 'phone-pad'
+    | 'password';
   showCountrySection?: boolean;
   countryCode?: string;
   countryFlag?: string;
   onCountryPress?: () => void;
-  type?: 'email' | 'phone' | 'default';
+  type?: 'email' | 'phone' | 'password' | 'default';
   height?: number;
   width?: number | string;
   leftIcons?: IconConfig[]; // Changed to array of IconConfig
