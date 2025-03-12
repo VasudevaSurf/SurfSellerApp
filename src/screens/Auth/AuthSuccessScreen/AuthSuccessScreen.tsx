@@ -1,15 +1,16 @@
 import React, {useEffect} from 'react';
 import {Animated, SafeAreaView, View} from 'react-native';
+import {useDispatch} from 'react-redux';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {globalStyles} from '../../../config/globalStyles';
 import {STATIC_TEXT} from '../../../config/staticText';
-import {navigateToMain} from '../../../navigation/utils/navigationRef';
 import {styles} from './AuthSuccessScreen.styles';
 
 const successTitle = STATIC_TEXT.screens.authSuccess.successTitle;
 
 const AuthSuccessScreen = () => {
+  const dispatch = useDispatch();
   const scaleValue = new Animated.Value(0);
   const opacityValue = new Animated.Value(0);
 
@@ -27,12 +28,15 @@ const AuthSuccessScreen = () => {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      // Navigate to Dashboard after animation completes
+      // Complete the animation and then update login status
+      // before navigating
       setTimeout(() => {
-        navigateToMain();
+        // Now update the login status in redux
+        dispatch({type: 'auth/completeLogin'});
+        // Wait a bit more before navigating
       }, 500);
     });
-  }, []);
+  }, [dispatch]);
 
   const animatedStyle = {
     transform: [{scale: scaleValue}],

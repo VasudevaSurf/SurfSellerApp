@@ -33,14 +33,16 @@ const EmailSignIn = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [buttonState, setButtonState] = useState(ButtonState.DISABLED);
 
-  // Update button state based on form inputs
+  // Update button state based on form inputs and loading state
   useEffect(() => {
-    if (emailId.trim() && password.trim()) {
+    if (isLoading) {
+      setButtonState(ButtonState.LOADING);
+    } else if (emailId.trim() && password.trim()) {
       setButtonState(ButtonState.DEFAULT);
     } else {
       setButtonState(ButtonState.DISABLED);
     }
-  }, [emailId, password]);
+  }, [emailId, password, isLoading]);
 
   // Show error alert if login failed
   useEffect(() => {
@@ -63,9 +65,13 @@ const EmailSignIn = ({navigation}) => {
   };
 
   const handleSignIn = async () => {
-    if (buttonState === ButtonState.DISABLED) return;
+    if (
+      buttonState === ButtonState.DISABLED ||
+      buttonState === ButtonState.LOADING
+    )
+      return;
 
-    setButtonState(ButtonState.LOADING);
+    // We'll let the isLoading state from Redux control the button state through the useEffect
 
     // Dispatch login action
     const resultAction = await dispatch(
@@ -76,10 +82,9 @@ const EmailSignIn = ({navigation}) => {
     );
 
     if (loginUser.fulfilled.match(resultAction)) {
-      navigation.navigate('Dashboard');
+      // Navigate to AuthSuccess but don't update isLoggedIn yet
+      navigation.navigate('AuthSuccess');
     }
-
-    setButtonState(ButtonState.DEFAULT);
   };
 
   const renderBanner = () => (
@@ -107,9 +112,10 @@ const EmailSignIn = ({navigation}) => {
         label="Email ID"
         value={emailId}
         onChangeText={setEmailId}
-        keyboardType="email-address"
+        type="email"
         customLabelColorFocused={ColorPalette.GREY_TEXT_400}
         customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+        editable={!isLoading}
       />
       <AnimatedTextInput
         label="Password"
@@ -118,6 +124,7 @@ const EmailSignIn = ({navigation}) => {
         type="password"
         customLabelColorFocused={ColorPalette.GREY_TEXT_400}
         customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+        editable={!isLoading}
       />
     </View>
   );
@@ -138,6 +145,7 @@ const EmailSignIn = ({navigation}) => {
           fontFamily: Fonts.POPPINS_REGULAR,
           color: ColorPalette.PURPLE_300,
         }}
+        disabled={isLoading}
       />
       <Typography
         text=" and "
@@ -153,6 +161,7 @@ const EmailSignIn = ({navigation}) => {
           fontFamily: Fonts.POPPINS_REGULAR,
           color: ColorPalette.PURPLE_300,
         }}
+        disabled={isLoading}
       />
     </View>
   );
@@ -161,7 +170,7 @@ const EmailSignIn = ({navigation}) => {
     <>
       <View style={styles.mainContainerTwo}>
         <Button
-          text="Sign In"
+          text={isLoading ? 'Signing In...' : 'Sign In'}
           onPress={handleSignIn}
           variant={ButtonVariant.PRIMARY}
           state={buttonState}
@@ -188,6 +197,7 @@ const EmailSignIn = ({navigation}) => {
           color: ColorPalette.PURPLE_300,
           fontFamily: Fonts.POPPINS_BOLD,
         }}
+        disabled={isLoading}
       />
     </View>
   );

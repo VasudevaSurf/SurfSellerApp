@@ -20,7 +20,10 @@ import {Typography} from '../../../components/UserComponents/Typography/Typograp
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight} from '../../../helpers/screenSize';
-import {navigateToAuth} from '../../../navigation/utils/navigationRef';
+import {
+  navigate,
+  navigateToAuth,
+} from '../../../navigation/utils/navigationRef';
 import {logoutUser} from '../../../redux/slices/authSlice';
 import {styles} from './AccountScreen.styles';
 
