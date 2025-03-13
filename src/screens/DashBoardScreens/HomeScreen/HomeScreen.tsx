@@ -54,7 +54,9 @@ const HomeScreen = () => {
           <PackageIcon style={undefined} color={ColorPalette.PURPLE_200} />
         ),
         rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {},
+        onPress: () => {
+          handleNewOrderPress();
+        },
         leftIconBackgroundColor: 'rgba(145, 1, 207, 0.10)',
       },
       {
@@ -63,7 +65,9 @@ const HomeScreen = () => {
           <PackageIcon style={undefined} color={ColorPalette.Green_200} />
         ),
         rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {},
+        onPress: () => {
+          handleNewOrderPress();
+        },
         leftIconBackgroundColor: 'rgba(31, 193, 107, 0.10)',
       },
     ],

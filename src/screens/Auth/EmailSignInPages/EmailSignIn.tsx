@@ -36,7 +36,7 @@ const EmailSignIn = ({navigation}) => {
   // Update button state based on form inputs and loading state
   useEffect(() => {
     if (isLoading) {
-      setButtonState(ButtonState.LOADING);
+      setButtonState(ButtonState.FOCUSED);
     } else if (emailId.trim() && password.trim()) {
       setButtonState(ButtonState.DEFAULT);
     } else {
@@ -67,7 +67,7 @@ const EmailSignIn = ({navigation}) => {
   const handleSignIn = async () => {
     if (
       buttonState === ButtonState.DISABLED ||
-      buttonState === ButtonState.LOADING
+      buttonState === ButtonState.FOCUSED
     )
       return;
 
@@ -184,12 +184,12 @@ const EmailSignIn = ({navigation}) => {
   const renderSignup = () => (
     <View style={styles.termsContainerTwo}>
       <Typography
-        text="Don't have an account? "
+        text="Want to Sign in Phone? "
         variant={TypographyVariant.LMEDIUM_REGULAR}
         customTextStyles={styles.captionTwo}
       />
       <TextButton
-        text="Create Account"
+        text="SignIn"
         onPress={handleCreateAccount}
         variant={TypographyVariant.PMEDIUM_SEMIBOLD}
         underline
