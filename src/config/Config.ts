@@ -1,6 +1,0 @@
-// src/config/Config.ts
-export default {
-  API_BASE_URL: 'https://surf.mt/2.0/api',
-  API_AUTH_HEADER:
-    'Basic YWRtaW5Ac3VyZi5tdDpOOW9aMnlXMzc3cEg1VTExNTFiY3YyZlYyNDYySTk1NA==',
-};
