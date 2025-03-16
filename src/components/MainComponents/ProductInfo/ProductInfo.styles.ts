@@ -5,14 +5,18 @@ import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // Note: padding is moved to contentContainer
+    backgroundColor: 'transparent', // Let the CustomSquircle handle the background
+  },
+  contentContainer: {
+    flex: 1,
     flexDirection: 'row',
     padding: getScreenWidth(4),
-    backgroundColor: ColorPalette.White,
     gap: getScreenHeight(1.5),
-    borderRadius: getScreenWidth(3),
   },
   imageContainer: {
     width: getScreenWidth(26),
+    height: '100%',
     borderRadius: getScreenWidth(2),
     overflow: 'hidden',
   },

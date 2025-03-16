@@ -11,15 +11,12 @@ export const slidingBarStyles = StyleSheet.create({
     gap: getScreenWidth(4),
   },
   option: {
-    borderRadius: getScreenWidth(2),
+    // borderRadius removed as it's handled by CustomSquircle
     paddingVertical: getScreenHeight(1.25),
     paddingHorizontal: getScreenWidth(4),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: ColorPalette.ButtonBackHome,
-  },
-  selectedOption: {
-    backgroundColor: ColorPalette.MainHeading,
+    // backgroundColor is now handled directly in the component
   },
   optionText: {
     color: ColorPalette.Black,

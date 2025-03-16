@@ -11,6 +11,7 @@ import {TypographyVariant} from '../../UserComponents/Typography/Typography.type
 import {StatusModal} from '../StatusModal/StatusModal';
 import {styles} from './OrderInfo.styles';
 import {OrderInfoProps, OrderStatus} from './OrderInfo.types';
+import {CustomSquircle} from '../CustomSquircleMain/CustomSquircle';
 
 const getStatusBadgeType = (status: OrderStatus): BadgeType => {
   switch (status) {
@@ -72,125 +73,132 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
   const statusColors = getStatusColors(orderStatus);
 
   return (
-    <TouchableOpacity
+    <CustomSquircle
       style={[styles.container, style]}
-      onPress={() =>
-        onCardPress &&
-        onCardPress({
-          orderId,
-          orderImage,
-          orderName,
-          orderPrice,
-          orderNumber,
-          orderEmail,
-          orderPhone,
-          orderDate,
-          orderTime,
-          orderStatus,
-          orderQuantity,
-        })
-      }
-      activeOpacity={0.7}>
-      {/* Header with order number and date */}
-      <View style={styles.headerContainer}>
-        <View style={{gap: getScreenHeight(0.5)}}>
-          <Typography
-            text={`Order #${orderNumber}`}
-            variant={TypographyVariant.H5_BOLD}
-            customTextStyles={styles.orderNumberText}
-          />
-          <Typography
-            text={`${orderDate} • ${orderTime}`}
-            variant={TypographyVariant.LMEDIUM_REGULAR}
-            customTextStyles={styles.dateTimeText}
+      fillColor={ColorPalette.White}>
+      <TouchableOpacity
+        style={{flex: 1}}
+        onPress={() =>
+          onCardPress &&
+          onCardPress({
+            orderId,
+            orderImage,
+            orderName,
+            orderPrice,
+            orderNumber,
+            orderEmail,
+            orderPhone,
+            orderDate,
+            orderTime,
+            orderStatus,
+            orderQuantity,
+          })
+        }
+        activeOpacity={0.7}>
+        {/* Header with order number and date */}
+        <View style={styles.headerContainer}>
+          <View style={{gap: getScreenHeight(0.5)}}>
+            <Typography
+              text={`Order #${orderNumber}`}
+              variant={TypographyVariant.H5_BOLD}
+              customTextStyles={styles.orderNumberText}
+            />
+            <Typography
+              text={`${orderDate} • ${orderTime}`}
+              variant={TypographyVariant.LMEDIUM_REGULAR}
+              customTextStyles={styles.dateTimeText}
+            />
+          </View>
+          <ArrowRightIcon
+            size={24}
+            color={ColorPalette.GREY_TEXT_400}
+            style={undefined}
           />
         </View>
-        <ArrowRightIcon
-          size={24}
-          color={ColorPalette.GREY_TEXT_400}
-          style={undefined}
-        />
-      </View>
 
-      {/* Product info section */}
-      <View style={styles.productContainer}>
-        <View style={styles.imageContainer}>
-          <Image
-            source={{uri: orderImage}}
-            style={styles.orderImage}
-            resizeMode="cover"
-          />
+        {/* Product info section */}
+        <View style={styles.productContainer}>
+          <CustomSquircle
+            style={styles.imageContainer}
+            cornerRadius={8}
+            fillColor={ColorPalette.GREY_50}>
+            <Image
+              source={{uri: orderImage}}
+              style={styles.orderImage}
+              resizeMode="cover"
+            />
+          </CustomSquircle>
+          <View style={styles.productDetailsContainer}>
+            <Typography
+              text={orderName}
+              variant={TypographyVariant.PSMALL_MEDIUM}
+              customTextStyles={styles.orderName}
+              numberOfLines={2}
+            />
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: getScreenHeight(1),
+                alignItems: 'center',
+              }}>
+              <Typography
+                text={`Quantity: `}
+                variant={TypographyVariant.PMEDIUM_REGULAR}
+                customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+              />
+              <Typography
+                text={`${orderQuantity || 1}`}
+                variant={TypographyVariant.LMEDIUM_BOLD}
+                customTextStyles={styles.quantityText}
+              />
+            </View>
+
+            <View style={styles.priceContainer}>
+              <Typography
+                text="Total:"
+                variant={TypographyVariant.PMEDIUM_REGULAR}
+                customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+              />
+              <Typography
+                text={`€${orderPrice}`}
+                variant={TypographyVariant.LMEDIUM_BOLD}
+                customTextStyles={styles.priceText}
+              />
+            </View>
+          </View>
         </View>
-        <View style={styles.productDetailsContainer}>
+
+        {/* Status section */}
+        <View style={styles.statusSection}>
           <Typography
-            text={orderName}
+            text="Order status:"
             variant={TypographyVariant.PSMALL_MEDIUM}
-            customTextStyles={styles.orderName}
-            numberOfLines={2}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
           />
-          <View
-            style={{
-              flexDirection: 'row',
-              gap: getScreenHeight(1),
-              alignItems: 'center',
-            }}>
-            <Typography
-              text={`Quantity: `}
-              variant={TypographyVariant.PMEDIUM_REGULAR}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
-            />
-            <Typography
-              text={`${orderQuantity || 1}`}
-              variant={TypographyVariant.LMEDIUM_BOLD}
-              customTextStyles={styles.quantityText}
-            />
-          </View>
-
-          <View style={styles.priceContainer}>
-            <Typography
-              text="Total:"
-              variant={TypographyVariant.PMEDIUM_REGULAR}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
-            />
-            <Typography
-              text={`€${orderPrice}`}
-              variant={TypographyVariant.LMEDIUM_BOLD}
-              customTextStyles={styles.priceText}
-            />
-          </View>
+          <Badge
+            text={orderStatus}
+            type={getStatusBadgeType(orderStatus)}
+            variant={BadgeVariant.OUTLINE}
+            rightIcon={ArrowDownIcon}
+            onPress={e => {
+              e.stopPropagation();
+              setIsModalVisible(true);
+            }}
+            customBorderColor={statusColors.borderColor}
+            textVariant={TypographyVariant.LMEDIUM_BOLD}
+            customContainerStyle={styles.statusBadge}
+            customTextColor={statusColors.textColor}
+            iconSize={20}
+          />
+          <StatusModal
+            isVisible={isModalVisible}
+            onClose={() => setIsModalVisible(false)}
+            onSubmit={onStatusChange}
+            initialStatus={orderStatus}
+            showSearch={false}
+          />
         </View>
-      </View>
-
-      {/* Status section */}
-      <View style={styles.statusSection}>
-        <Typography
-          text="Order status:"
-          variant={TypographyVariant.PSMALL_MEDIUM}
-          customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
-        />
-        <Badge
-          text={orderStatus}
-          type={getStatusBadgeType(orderStatus)}
-          variant={BadgeVariant.OUTLINE}
-          rightIcon={ArrowDownIcon}
-          onPress={e => {
-            e.stopPropagation();
-            setIsModalVisible(true);
-          }}
-          customBorderColor={statusColors.borderColor}
-          textVariant={TypographyVariant.LMEDIUM_BOLD}
-          customContainerStyle={styles.statusBadge}
-          customTextColor={statusColors.textColor}
-          iconSize={20}
-        />
-        <StatusModal
-          isVisible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          onSubmit={onStatusChange}
-          initialStatus={orderStatus}
-          showSearch={false}
-        />
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </CustomSquircle>
   );
 };

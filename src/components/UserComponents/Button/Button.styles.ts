@@ -135,11 +135,13 @@ export const createButtonStyles = (buttonHeight: number) =>
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: buttonHeight / 2,
+      overflow: 'hidden', // Important for squircle to be contained within the button
     },
     content: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      zIndex: 1, // Ensure content is above the squircle background
     },
     icon: {
       marginRight: 8,
@@ -152,5 +154,10 @@ export const createButtonStyles = (buttonHeight: number) =>
     },
     gradient: {
       ...StyleSheet.absoluteFillObject,
+    },
+    // Add squircle-specific styles
+    squircleContainer: {
+      ...StyleSheet.absoluteFillObject,
+      zIndex: 0,
     },
   });

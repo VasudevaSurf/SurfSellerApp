@@ -23,6 +23,8 @@ import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {styles} from './HomeScreen.styles';
 import {navigate} from '../../../navigation/utils/navigationRef';
+// Import the CustomSquircle component
+import {CustomSquircle} from '../../../components/MainComponents/CustomSquircleMain/CustomSquircle';
 
 const HomeScreen = () => {
   const handleNewOrderPress = params => {
@@ -122,7 +124,12 @@ const HomeScreen = () => {
           {paddingBottom: getScreenHeight(4)},
         ]}
         showsVerticalScrollIndicator={false}>
-        <View style={styles.verifyContainer}>
+        {/* Verify Container */}
+        <CustomSquircle
+          style={styles.verifyContainer}
+          fillColor={ColorPalette.White}
+          cornerRadius={16}
+          cornerSmoothing={1.0}>
           <View style={styles.textVerifyContainer}>
             <Typography
               variant={TypographyVariant.H6_BOLD}
@@ -139,9 +146,21 @@ const HomeScreen = () => {
               adjustsFontSizeToFit
             />
           </View>
-          <View style={styles.verifyStepsContainer}></View>
-        </View>
-        <View style={styles.OrderContainer}>
+          <CustomSquircle
+            style={styles.verifyStepsContainer}
+            fillColor={ColorPalette.PRIMARY_WHITE_SELLER}
+            cornerRadius={16}
+            cornerSmoothing={1.0}>
+            {/* Verify Steps Content */}
+          </CustomSquircle>
+        </CustomSquircle>
+
+        {/* Order Container */}
+        <CustomSquircle
+          style={styles.OrderContainer}
+          fillColor={ColorPalette.White}
+          cornerRadius={16}
+          cornerSmoothing={1.0}>
           {menuItems.map((item, index) => (
             <MenuItem
               key={index}
@@ -167,14 +186,28 @@ const HomeScreen = () => {
               isLastItem={index === menuItems.length - 1}
             />
           ))}
-        </View>
-        <View style={styles.statsContainer}>
+        </CustomSquircle>
+
+        {/* Stats Container */}
+        <CustomSquircle
+          style={styles.statsContainer}
+          fillColor={ColorPalette.PURPLE_100}
+          cornerRadius={16}
+          cornerSmoothing={1.0}>
           <View style={styles.containerOne}>
-            <View style={styles.totalSales}>
+            <CustomSquircle
+              style={styles.totalSales}
+              fillColor={ColorPalette.White}
+              cornerRadius={16}
+              cornerSmoothing={1.0}>
               <View style={styles.salesOne}>
-                <View style={styles.iconBackSale}>
+                <CustomSquircle
+                  style={styles.iconBackSale}
+                  fillColor={'rgba(31, 193, 107, 0.10)'}
+                  cornerRadius={16}
+                  cornerSmoothing={1.0}>
                   <TotalSalesIcon style={undefined} />
-                </View>
+                </CustomSquircle>
                 <View style={styles.countBlock}>
                   <Typography
                     variant={TypographyVariant.PXSMALL_REGULAR}
@@ -200,12 +233,21 @@ const HomeScreen = () => {
                   numberOfLines={1}
                 />
               </View>
-            </View>
-            <View style={styles.totalSales}>
+            </CustomSquircle>
+
+            <CustomSquircle
+              style={styles.totalSales}
+              fillColor={ColorPalette.White}
+              cornerRadius={16}
+              cornerSmoothing={1.0}>
               <View style={styles.salesOne}>
-                <View style={styles.iconBackOne}>
+                <CustomSquircle
+                  style={styles.iconBackOne}
+                  fillColor={'rgba(145, 1, 207, 0.10)'}
+                  cornerRadius={16}
+                  cornerSmoothing={1.0}>
                   <PackageIcon style={undefined} />
-                </View>
+                </CustomSquircle>
                 <View style={styles.countBlock}>
                   <Typography
                     variant={TypographyVariant.PXSMALL_REGULAR}
@@ -231,15 +273,24 @@ const HomeScreen = () => {
                   numberOfLines={1}
                 />
               </View>
-            </View>
+            </CustomSquircle>
           </View>
+
           <View style={styles.containerAnother}>
             <View style={styles.containerAnotherOne}>
-              <View style={styles.activeProduct}>
+              <CustomSquircle
+                style={styles.activeProduct}
+                fillColor={ColorPalette.White}
+                cornerRadius={16}
+                cornerSmoothing={1.0}>
                 <View style={styles.twoContainer}>
-                  <View style={styles.iconBackOne}>
+                  <CustomSquircle
+                    style={styles.iconBackOne}
+                    fillColor={'rgba(145, 1, 207, 0.10)'}
+                    cornerRadius={16}
+                    cornerSmoothing={1.0}>
                     <BrainIcon style={undefined} />
-                  </View>
+                  </CustomSquircle>
                   <View style={styles.salesTwo}>
                     <Typography
                       variant={TypographyVariant.H4_BOLD}
@@ -265,12 +316,21 @@ const HomeScreen = () => {
                   />
                   <TrendIcon size={18} style={undefined} />
                 </View>
-              </View>
-              <View style={styles.activeProduct}>
+              </CustomSquircle>
+
+              <CustomSquircle
+                style={styles.activeProduct}
+                fillColor={ColorPalette.White}
+                cornerRadius={16}
+                cornerSmoothing={1.0}>
                 <View style={styles.twoContainer}>
-                  <View style={styles.iconBack}>
+                  <CustomSquircle
+                    style={styles.iconBack}
+                    fillColor={'rgba(31, 193, 107, 0.10)'}
+                    cornerRadius={16}
+                    cornerSmoothing={1.0}>
                     <CurrencyIcon style={undefined} />
-                  </View>
+                  </CustomSquircle>
                   <View style={styles.salesTwo}>
                     <Typography
                       variant={TypographyVariant.H4_BOLD}
@@ -297,13 +357,22 @@ const HomeScreen = () => {
                   />
                   <TrendIcon size={18} style={undefined} />
                 </View>
-              </View>
+              </CustomSquircle>
             </View>
+
             <View style={styles.containerProportional}>
-              <View style={styles.stockContainer}>
-                <View style={styles.iconBackTwo}>
+              <CustomSquircle
+                style={styles.stockContainer}
+                fillColor={ColorPalette.White}
+                cornerRadius={16}
+                cornerSmoothing={1.0}>
+                <CustomSquircle
+                  style={styles.iconBackTwo}
+                  fillColor={'rgba(208, 4, 22, 0.10)'}
+                  cornerRadius={16}
+                  cornerSmoothing={1.0}>
                   <DownloadIcon style={undefined} />
-                </View>
+                </CustomSquircle>
                 <View style={styles.salesTwo}>
                   <Typography
                     variant={TypographyVariant.LSMALL_BOLD}
@@ -318,11 +387,20 @@ const HomeScreen = () => {
                     numberOfLines={1}
                   />
                 </View>
-              </View>
-              <View style={styles.stockContainer}>
-                <View style={styles.iconBackThree}>
+              </CustomSquircle>
+
+              <CustomSquircle
+                style={styles.stockContainer}
+                fillColor={ColorPalette.White}
+                cornerRadius={16}
+                cornerSmoothing={1.0}>
+                <CustomSquircle
+                  style={styles.iconBackThree}
+                  fillColor={'rgba(223, 180, 0, 0.10)'}
+                  cornerRadius={16}
+                  cornerSmoothing={1.0}>
                   <BookmarkNoteIcon style={undefined} />
-                </View>
+                </CustomSquircle>
                 <View style={styles.salesTwo}>
                   <Typography
                     variant={TypographyVariant.LSMALL_BOLD}
@@ -338,11 +416,17 @@ const HomeScreen = () => {
                     numberOfLines={1}
                   />
                 </View>
-              </View>
+              </CustomSquircle>
             </View>
           </View>
-        </View>
-        <View style={styles.salesOverview}>
+        </CustomSquircle>
+
+        {/* Sales Overview */}
+        <CustomSquircle
+          style={styles.salesOverview}
+          fillColor={ColorPalette.White}
+          cornerRadius={16}
+          cornerSmoothing={1.0}>
           <View style={styles.salesHeading}>
             <View style={styles.LeftHeading}>
               <Typography
@@ -366,13 +450,23 @@ const HomeScreen = () => {
                 />
               </View>
             </View>
-            <View style={styles.rightHeadingButtons}>
+            <CustomSquircle
+              style={styles.rightHeadingButtons}
+              fillColor={ColorPalette.SearchBack}
+              cornerRadius={16}
+              cornerSmoothing={1.0}>
               <ToggleButtons buttonStyle={styles.buttonStyles} />
-            </View>
+            </CustomSquircle>
           </View>
           <View style={styles.salesGraph}></View>
-        </View>
-        <View style={styles.recentOrdersContainer}>
+        </CustomSquircle>
+
+        {/* Recent Orders */}
+        <CustomSquircle
+          style={styles.recentOrdersContainer}
+          fillColor={ColorPalette.White}
+          cornerRadius={16}
+          cornerSmoothing={1.0}>
           <View style={styles.recentOrderTitle}>
             <Typography
               variant={TypographyVariant.H6_BOLD}
@@ -454,7 +548,7 @@ const HomeScreen = () => {
               />
             ))}
           </View>
-        </View>
+        </CustomSquircle>
       </ScrollView>
     </SafeAreaView>
   );

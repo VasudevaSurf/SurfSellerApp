@@ -14,144 +14,128 @@ export const styles = StyleSheet.create({
     gap: getScreenHeight(2),
   },
   verifyContainer: {
+    flex: 1,
     flexDirection: 'column',
     paddingHorizontal: getScreenWidth(3),
     paddingVertical: getScreenHeight(2.5),
     gap: getScreenHeight(2.5),
-    backgroundColor: ColorPalette.White,
-    borderRadius: getScreenWidth(3),
+    overflow: 'hidden',
   },
   textVerifyContainer: {
     flexDirection: 'column',
     gap: getScreenHeight(0.5),
   },
   textOne: {
-    lineHeight: getScreenHeight(2.5), // Add line height for text wrapping
+    lineHeight: getScreenHeight(2.5),
     color: ColorPalette.GREY_TEXT_500,
-    flexShrink: 1, // Allow text to shrink
+    flexShrink: 1,
   },
   textTwo: {
     color: ColorPalette.GREY_TEXT_300,
-    lineHeight: getScreenHeight(1.8), // Add line height for text wrapping
-    flexShrink: 1, // Allow text to shrink
+    lineHeight: getScreenHeight(1.8),
+    flexShrink: 1,
   },
   verifyStepsContainer: {
+    flex: 1,
     flexDirection: 'column',
     paddingHorizontal: getScreenWidth(2),
     paddingVertical: getScreenHeight(1.5),
-    backgroundColor: ColorPalette.PRIMARY_WHITE_SELLER,
-    borderRadius: getScreenWidth(3),
-    minHeight: getScreenHeight(30), // Use min-height instead of fixed height
-    maxHeight: getScreenHeight(40), // Add max-height constraint
+    minHeight: getScreenHeight(30),
+    maxHeight: getScreenHeight(40),
+    overflow: 'hidden',
   },
   OrderContainer: {
-    borderRadius: getScreenWidth(3),
-    backgroundColor: ColorPalette.White,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     paddingVertical: getScreenHeight(1),
-    width: '100%', // Ensure full width
+    width: '100%',
   },
   menuContainer: {
     paddingVertical: getScreenHeight(2),
-    width: '100%', // Ensure full width
+    width: '100%',
   },
   leftIconBackgroundColor: {
     alignItems: 'center',
     justifyContent: 'center',
     padding: getScreenHeight(1),
-    borderRadius: getScreenWidth(2),
+    overflow: 'hidden',
   },
   statsContainer: {
+    flex: 1,
     flexDirection: 'column',
     gap: getScreenHeight(2),
-    width: '100%', // Ensure full width
+    width: '100%',
     padding: getScreenHeight(2),
-    backgroundColor: ColorPalette.PURPLE_100,
-    borderRadius: getScreenWidth(3),
+    overflow: 'hidden',
   },
   containerOne: {
     flexDirection: 'row',
     gap: getScreenWidth(4),
-    width: '100%', // Ensure full width
+    width: '100%',
   },
   containerTwo: {
     flexDirection: 'row',
     gap: getScreenWidth(4),
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: '100%', // Ensure full width
+    width: '100%',
   },
   totalSales: {
-    flex: 1, // Changed from flex: 2 to flex: 1 for better proportional scaling
-    backgroundColor: ColorPalette.White,
+    flex: 1,
     paddingVertical: getScreenHeight(2.9),
-    paddingHorizontal: getScreenWidth(4), // Reduced padding
-    borderRadius: getScreenWidth(4),
+    paddingHorizontal: getScreenWidth(4),
     flexDirection: 'column',
-    gap: getScreenHeight(1.5), // Reduced gap
-    shadowColor: '#cfc3c3',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 4.59,
-    elevation: 5,
+    gap: getScreenHeight(1.5),
+    overflow: 'hidden',
   },
   salesOne: {
     alignItems: 'center',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    gap: getScreenWidth(2), // Reduced gap
+    gap: getScreenWidth(2),
   },
   salesTwo: {
     flexDirection: 'column',
-    flexShrink: 1, // Allow content to shrink
+    flexShrink: 1,
   },
   iconBack: {
-    borderRadius: getScreenWidth(2),
     padding: getScreenHeight(1),
-    backgroundColor: 'rgba(31, 193, 107, 0.10)',
+    overflow: 'hidden',
   },
   iconBackSale: {
-    borderRadius: getScreenWidth(2),
     padding: getScreenHeight(1),
-    backgroundColor: 'rgba(31, 193, 107, 0.10)',
+    overflow: 'hidden',
   },
   iconBackOne: {
-    borderRadius: getScreenWidth(2),
     padding: getScreenHeight(1),
-    backgroundColor: 'rgba(145, 1, 207, 0.10)',
+    overflow: 'hidden',
   },
   iconBackTwo: {
-    borderRadius: getScreenWidth(1),
     padding: getScreenHeight(0.5),
-    backgroundColor: 'rgba(208, 4, 22, 0.10)',
+    overflow: 'hidden',
   },
   iconBackThree: {
-    borderRadius: getScreenWidth(1),
     padding: getScreenHeight(0.5),
-    backgroundColor: 'rgba(223, 180, 0, 0.10)',
+    overflow: 'hidden',
   },
   countBlock: {
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     gap: getScreenWidth(1),
-    flexShrink: 1, // Allow content to shrink
+    flexShrink: 1,
   },
   countText: {
     color: ColorPalette.RiseText,
   },
   countValue: {
     color: ColorPalette.GREY_TEXT_500,
-    flexShrink: 1, // Allow content to shrink
+    flexShrink: 1,
   },
   countCaptionContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap', // Allow text to wrap
+    flexWrap: 'wrap',
   },
   countCaption: {
     color: ColorPalette.GREY_TEXT_300,
@@ -162,55 +146,36 @@ export const styles = StyleSheet.create({
   activeProduct: {
     flex: 1,
     flexDirection: 'row',
-    padding: getScreenHeight(1.5), // Reduced padding
-    backgroundColor: ColorPalette.White,
-    borderRadius: getScreenWidth(4),
-    gap: getScreenWidth(3), // Reduced gap
+    padding: getScreenHeight(1.5),
+    gap: getScreenWidth(3),
     alignItems: 'center',
     justifyContent: 'space-between',
-    shadowColor: '#cfc3c3',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 4.59,
-    elevation: 5,
+    overflow: 'hidden',
   },
   stockContainer: {
     flexDirection: 'column',
     gap: getScreenHeight(1),
-    padding: getScreenHeight(1.5), // Reduced padding
-    backgroundColor: ColorPalette.White,
-    borderRadius: getScreenWidth(4),
+    padding: getScreenHeight(1.5),
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    shadowColor: '#cfc3c3',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 4.59,
-    elevation: 5,
+    overflow: 'hidden',
   },
   salesOverview: {
-    borderRadius: getScreenWidth(3),
-    backgroundColor: ColorPalette.White,
     paddingVertical: getScreenHeight(2),
     paddingHorizontal: getScreenWidth(3),
     flexDirection: 'column',
     gap: getScreenHeight(3),
-    width: '100%', // Ensure full width
+    width: '100%',
+    overflow: 'hidden',
   },
   salesHeading: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%', // Ensure full width
+    width: '100%',
   },
   LeftHeading: {
     flexDirection: 'column',
-    flex: 1, // Allow it to take available space
+    flex: 1,
   },
   rightHeadingButtons: {
     alignItems: 'center',
@@ -218,34 +183,32 @@ export const styles = StyleSheet.create({
     padding: getScreenHeight(0.5),
     flexDirection: 'row',
     gap: getScreenWidth(1),
-    backgroundColor: ColorPalette.SearchBack,
-    borderRadius: Spacing.Medium,
+    overflow: 'hidden',
   },
   salesGraph: {
-    width: '100%', // Use percentage instead of fixed width
-    height: getScreenHeight(30), // Adjusted height
-    minHeight: getScreenHeight(20), // Add min-height
+    width: '100%',
+    height: getScreenHeight(30),
+    minHeight: getScreenHeight(20),
   },
   recentOrdersContainer: {
     flexDirection: 'column',
     paddingVertical: getScreenHeight(2.5),
     paddingHorizontal: getScreenWidth(3),
     gap: getScreenHeight(2.5),
-    backgroundColor: ColorPalette.White,
-    borderRadius: getScreenWidth(3),
-    width: '100%', // Ensure full width
+    width: '100%',
+    overflow: 'hidden',
   },
   recentOrderTitle: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: '100%', // Ensure full width
+    width: '100%',
   },
   viewAll: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: getScreenWidth(1), // Add gap between text and icon
+    gap: getScreenWidth(1),
   },
   viewAllText: {
     color: ColorPalette.PURPLE_200,
@@ -258,15 +221,15 @@ export const styles = StyleSheet.create({
   },
   twoContainer: {
     flexDirection: 'row',
-    gap: getScreenWidth(3), // Reduced gap
+    gap: getScreenWidth(3),
     alignItems: 'center',
-    justifyContent: 'flex-start', // Changed to flex-start for better alignment
-    flexShrink: 1, // Allow content to shrink
+    justifyContent: 'flex-start',
+    flexShrink: 1,
   },
   containerAnother: {
     flexDirection: 'row',
     gap: getScreenWidth(4),
-    width: '100%', // Ensure full width
+    width: '100%',
   },
   containerAnotherOne: {
     flex: 1,
@@ -276,7 +239,7 @@ export const styles = StyleSheet.create({
   containerProportional: {
     flexDirection: 'column',
     gap: getScreenHeight(2),
-    flex: 0.5, // Allocate less space compared to containerAnotherOne
+    flex: 0.5,
   },
   buttonStyles: {
     borderRadius: Spacing.XLarge,

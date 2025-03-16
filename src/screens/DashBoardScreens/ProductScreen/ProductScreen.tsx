@@ -19,12 +19,12 @@ import {
 } from '../../../components/UserComponents/Button';
 import {Header} from '../../../components/UserComponents/Header/Header';
 import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './ProductScreen.styles';
+import {CustomSquircle} from '../../../components/MainComponents/CustomSquircleMain/CustomSquircle';
 
 const ProductScreen = () => {
   const [searchText, setSearchText] = useState('');
@@ -249,11 +249,18 @@ const ProductScreen = () => {
           buttons={buttons}
         />
       </ScrollView>
-      <TouchableOpacity
+      <CustomSquircle
         style={styles.floatingButton}
-        onPress={() => setShowAddModal(true)}>
-        <PlusIcon size={24} color={ColorPalette.White} style={undefined} />
-      </TouchableOpacity>
+        fillColor={ColorPalette.PURPLE_300}
+        cornerRadius={16}
+        cornerSmoothing={1.0} // 1.0 is 100% corner smoothing
+      >
+        <TouchableOpacity
+          style={styles.floatingButtonInner}
+          onPress={() => setShowAddModal(true)}>
+          <PlusIcon size={24} color={ColorPalette.White} style={undefined} />
+        </TouchableOpacity>
+      </CustomSquircle>
     </SafeAreaView>
   );
 };

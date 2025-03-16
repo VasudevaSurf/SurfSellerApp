@@ -1,5 +1,5 @@
 import React from 'react';
-import {TouchableOpacity, View, Platform} from 'react-native';
+import {TouchableOpacity, View, Platform, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {ColorPalette} from '../../../config/colorPalette';
 import {Typography} from '../Typography/Typography';
@@ -17,6 +17,7 @@ import {
   ButtonType,
   ButtonVariant,
 } from './Button.types';
+import {CustomSquircle} from '../../MainComponents/CustomSquircleMain/CustomSquircle';
 
 export const Button: React.FC<ButtonProps> = ({
   text,
@@ -32,7 +33,7 @@ export const Button: React.FC<ButtonProps> = ({
   customStyles,
   customTextStyles,
   bgColor,
-  withShadow = false, // Add this prop to enable shadow
+  withShadow = false,
 }) => {
   const buttonHeight = getButtonHeight(size);
   const currentState = disabled ? ButtonState.DISABLED : state;
@@ -61,22 +62,18 @@ export const Button: React.FC<ButtonProps> = ({
   const containerStyle = [
     styles.container,
     {
-      backgroundColor: useCustomBgColor
-        ? bgColor
-        : typeof backgroundColor === 'object'
-        ? 'transparent'
-        : backgroundColor,
+      backgroundColor: 'transparent', // Make container transparent since squircle handles background
       opacity: currentState === ButtonState.DISABLED ? 0.5 : 1,
-    },
-    type === ButtonType.OUTLINED && {
-      borderColor:
-        variant === ButtonVariant.PRIMARY
-          ? ColorPalette.PURPLE_300
-          : ColorPalette.PURPLE_ROSE_300,
     },
     withShadow && shadowStyle,
     customStyles,
   ];
+
+  const fillColor = useCustomBgColor
+    ? bgColor
+    : typeof backgroundColor === 'object'
+    ? 'transparent'
+    : backgroundColor;
 
   const renderContent = () => (
     <View style={styles.content}>
@@ -107,7 +104,7 @@ export const Button: React.FC<ButtonProps> = ({
       (typeof backgroundColor === 'object' && backgroundColor.isGradient)) &&
     type === ButtonType.PRIMARY &&
     !disabled &&
-    !useCustomBgColor; // Don't use gradient if custom background color is provided
+    !useCustomBgColor;
 
   if (shouldUseGradient) {
     const gradientConfig =
@@ -127,12 +124,18 @@ export const Button: React.FC<ButtonProps> = ({
         onPress={onPress}
         disabled={disabled}
         style={containerStyle}>
-        <LinearGradient
-          colors={gradientConfig.colors}
-          start={gradientConfig.start}
-          end={gradientConfig.end}
-          style={[styles.gradient, {borderRadius: buttonHeight / 5}]}
-        />
+        <CustomSquircle
+          style={styles.gradient}
+          fillColor="transparent"
+          cornerRadius={buttonHeight / 5}
+          cornerSmoothing={1.0}>
+          <LinearGradient
+            colors={gradientConfig.colors}
+            start={gradientConfig.start}
+            end={gradientConfig.end}
+            style={styles.gradient}
+          />
+        </CustomSquircle>
         {renderContent()}
       </TouchableOpacity>
     );
@@ -143,6 +146,12 @@ export const Button: React.FC<ButtonProps> = ({
       onPress={onPress}
       disabled={disabled}
       style={containerStyle}>
+      <CustomSquircle
+        style={StyleSheet.absoluteFillObject}
+        fillColor={type === ButtonType.OUTLINED ? 'transparent' : fillColor}
+        cornerRadius={buttonHeight / 5}
+        cornerSmoothing={1.0}
+      />
       {renderContent()}
     </TouchableOpacity>
   );

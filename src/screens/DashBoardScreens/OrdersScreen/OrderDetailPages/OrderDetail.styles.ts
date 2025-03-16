@@ -14,7 +14,8 @@ export const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     gap: Spacing.Medium,
-    paddingBottom: getScreenHeight(8), // Add padding to ensure content doesn't get hidden behind the button
+    paddingBottom: getScreenHeight(8),
+    paddingHorizontal: getScreenWidth(4), // Add padding to ensure content doesn't get hidden behind the button
   },
   productCard: {
     backgroundColor: ColorPalette.White,
@@ -22,7 +23,14 @@ export const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     gap: Spacing.Medium,
-    borderRadius: BorderRadius.XSmall,
+    paddingBottom: Spacing.Medium,
+    // Border radius removed as it will be handled by CustomSquircle
+  },
+  productCardContent: {
+    paddingHorizontal: Spacing.Medium,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: Spacing.Medium,
     paddingBottom: Spacing.Medium,
   },
   productRow: {
@@ -84,22 +92,24 @@ export const styles = StyleSheet.create({
     paddingVertical: Spacing.Medium,
     paddingHorizontal: Spacing.Medium,
   },
+  accordionWrapper: {
+    overflow: 'hidden',
+    marginBottom: Spacing.XSmall,
+  },
   accordionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: ColorPalette.White,
     paddingVertical: getScreenHeight(2.5),
     paddingHorizontal: getScreenHeight(2),
+    // Remove backgroundColor as it's handled by CustomSquircle
   },
   accordionContent: {
-    backgroundColor: ColorPalette.White,
     paddingVertical: Spacing.Small,
     paddingHorizontal: Spacing.Medium,
     paddingBottom: Spacing.Medium,
     marginTop: -Spacing.XSmall,
-    borderBottomLeftRadius: BorderRadius.XSmall,
-    borderBottomRightRadius: BorderRadius.XSmall,
+    // Remove backgroundColor and borderRadius as they're handled by CustomSquircle
   },
   accordionContainer: {
     display: 'flex',
