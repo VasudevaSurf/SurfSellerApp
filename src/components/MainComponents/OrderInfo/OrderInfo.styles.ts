@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
   imageContainer: {
     width: getScreenWidth(24),
     height: getScreenWidth(24),
-    // No need for borderRadius here, handled by CustomSquircle
+    borderRadius: Spacing.XSmall,
     overflow: 'hidden',
   },
   orderImage: {
