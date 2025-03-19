@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexWrap: 'wrap', // Added for better text wrapping
-    paddingHorizontal: Spacing.Medium, // Added for better spacing
+    paddingHorizontal: getScreenWidth(4), // Added for better spacing
   },
   termsContainerTwo: {
     flexDirection: 'row',
@@ -72,6 +72,6 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     bottom: Spacing.Large,
     width: '100%',
-    paddingHorizontal: Spacing.Large,
+    paddingHorizontal: getScreenWidth(5),
   },
 });

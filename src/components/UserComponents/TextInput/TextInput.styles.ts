@@ -98,7 +98,6 @@ export const createStyles = (
       color: ColorPalette.RED_100,
       fontSize: 12,
       marginTop: Spacing.XXSmall,
-      marginLeft: Spacing.Small,
     },
     rightSection: {
       flexDirection: 'row',
