@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, View} from 'react-native';
+import {SafeAreaView, View, ScrollView} from 'react-native';
 import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
 import {Button} from '../../../components/UserComponents/Button/Button';
 import {
@@ -190,14 +190,19 @@ const PhoneNumberScreen = () => {
 
   return (
     <SafeAreaView style={[globalStyles.secondaryContainer, styles.container]}>
-      {renderBanner()}
-      <View>
-        <View style={styles.twoContainer}>
-          {renderPhoneInput()}
-          {renderTerms()}
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}>
+        {renderBanner()}
+        <View style={styles.mainContent}>
+          <View style={styles.twoContainer}>
+            {renderPhoneInput()}
+            {renderTerms()}
+          </View>
+          {renderActionButtons()}
         </View>
-        {renderActionButtons()}
-      </View>
+      </ScrollView>
       <View style={styles.emailButton}>{EmailButton()}</View>
     </SafeAreaView>
   );

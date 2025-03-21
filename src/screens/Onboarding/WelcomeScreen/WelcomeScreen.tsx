@@ -156,70 +156,76 @@ const WelcomeScreen = () => {
 
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.contentContainer}>
-        {/* Carousel */}
-        <View style={styles.scrollViewWrapper}>
-          <ScrollView
-            ref={scrollViewRef}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            onScrollBeginDrag={stopAutoScroll}
-            onScrollEndDrag={startAutoScroll}>
-            {content.map((item, index) => (
-              <View key={index} style={[styles.slide, {width: screenWidth}]}>
-                <Image
-                  source={item.image}
-                  style={styles.image}
-                  resizeMode="contain"
-                />
-                <View style={styles.textContainer}>
-                  <Typography
-                    variant={TypographyVariant.H4_BOLD}
-                    text={item.title}
-                    customTextStyles={styles.title}
+      {/* Adding main ScrollView wrapper here */}
+      <ScrollView
+        contentContainerStyle={styles.scrollContentContainer}
+        showsVerticalScrollIndicator={false}
+        bounces={false}>
+        <View style={styles.contentContainer}>
+          {/* Carousel */}
+          <View style={styles.scrollViewWrapper}>
+            <ScrollView
+              ref={scrollViewRef}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+              onScrollBeginDrag={stopAutoScroll}
+              onScrollEndDrag={startAutoScroll}>
+              {content.map((item, index) => (
+                <View key={index} style={[styles.slide, {width: screenWidth}]}>
+                  <Image
+                    source={item.image}
+                    style={styles.image}
+                    resizeMode="contain"
                   />
-                  <Typography
-                    variant={TypographyVariant.PSMALL_REGULAR}
-                    text={item.subtitle}
-                    customTextStyles={styles.subtitle}
-                  />
+                  <View style={styles.textContainer}>
+                    <Typography
+                      variant={TypographyVariant.H4_BOLD}
+                      text={item.title}
+                      customTextStyles={styles.title}
+                    />
+                    <Typography
+                      variant={TypographyVariant.PSMALL_REGULAR}
+                      text={item.subtitle}
+                      customTextStyles={styles.subtitle}
+                    />
+                  </View>
                 </View>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
+              ))}
+            </ScrollView>
+          </View>
 
-        {/* Pagination indicator */}
-        <View style={styles.paginationGap}>
-          <AnimatedPaginationIndicator
-            scrollX={scrollX}
-            contentLength={content.length}
-            width={screenWidth}
-          />
-        </View>
+          {/* Pagination indicator */}
+          <View style={styles.paginationGap}>
+            <AnimatedPaginationIndicator
+              scrollX={scrollX}
+              contentLength={content.length}
+              width={screenWidth}
+            />
+          </View>
 
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
-          <Button
-            text={createAccount}
-            onPress={handleCreateNewAccount}
-            variant={ButtonVariant.PRIMARY}
-            state={ButtonState.DEFAULT}
-            size={ButtonSize.MEDIUM}
-          />
-          <Button
-            text={login}
-            onPress={handleLogin}
-            variant={ButtonVariant.PRIMARY}
-            state={ButtonState.DEFAULT}
-            type={ButtonType.OUTLINED}
-            customStyles={styles.buttonContainerStyle}
-          />
+          {/* Buttons */}
+          <View style={styles.buttonContainer}>
+            <Button
+              text={createAccount}
+              onPress={handleCreateNewAccount}
+              variant={ButtonVariant.PRIMARY}
+              state={ButtonState.DEFAULT}
+              size={ButtonSize.MEDIUM}
+            />
+            <Button
+              text={login}
+              onPress={handleLogin}
+              variant={ButtonVariant.PRIMARY}
+              state={ButtonState.DEFAULT}
+              type={ButtonType.OUTLINED}
+              customStyles={styles.buttonContainerStyle}
+            />
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };

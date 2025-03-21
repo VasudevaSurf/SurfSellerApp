@@ -6,10 +6,17 @@ import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ColorPalette.White,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    paddingHorizontal: Spacing.Medium,
+  },
+  contentContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing.Medium,
-    backgroundColor: ColorPalette.White,
+    paddingVertical: Spacing.Medium,
   },
   successImage: {
     height: getScreenHeight(208 / 8), // Converting pixel values to percentage

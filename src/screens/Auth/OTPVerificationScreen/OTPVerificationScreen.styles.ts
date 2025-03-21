@@ -8,6 +8,9 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ColorPalette.White,
   },
+  scrollContentContainer: {
+    flexGrow: 1,
+  },
   bannerContainer: {
     padding: Spacing.Large,
     paddingTop: Spacing.Medium,

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, View} from 'react-native';
+import {SafeAreaView, View, ScrollView} from 'react-native';
 import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
 import {Button} from '../../../components/UserComponents/Button/Button';
 import {
@@ -132,6 +132,7 @@ const VATVerification = () => {
         variant={ButtonVariant.PRIMARY}
         state={buttonState}
         size={ButtonSize.MEDIUM}
+        withShadow
       />
     </View>
   );
@@ -139,11 +140,16 @@ const VATVerification = () => {
   return (
     <SafeAreaView style={[globalStyles.secondaryContainer, styles.container]}>
       {renderBanner()}
-      <View style={styles.containerTwo}>
-        {renderVATInput()}
-        {renderTerms()}
-        {renderActionButtons()}
-      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollViewContent}
+        bounces={false}>
+        <View style={styles.containerTwo}>
+          {renderVATInput()}
+          {renderTerms()}
+          {renderActionButtons()}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

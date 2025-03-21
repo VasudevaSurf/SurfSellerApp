@@ -87,7 +87,8 @@ export const styles = StyleSheet.create({
   },
   withdrawButton: {
     width: getScreenWidth(26),
-    height: getScreenHeight(5),
+    height: getScreenHeight(4),
+    borderRadius: BorderRadius.Full,
     paddingHorizontal: getScreenWidth(2.5),
   },
   withdrawButtonText: {

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {SafeAreaView, View, Alert} from 'react-native';
+import {SafeAreaView, View, Alert, ScrollView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
 import {Button} from '../../../components/UserComponents/Button/Button';
@@ -204,16 +204,22 @@ const EmailSignIn = ({navigation}) => {
 
   return (
     <SafeAreaView style={[globalStyles.secondaryContainer, styles.container]}>
-      {renderBanner()}
-      <View style={styles.containerTwo}>
-        {renderHeading()}
-        <View style={{gap: getScreenWidth(4)}}>
-          {renderEmailInput()}
-          {renderTerms()}
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        keyboardShouldPersistTaps="handled">
+        {renderBanner()}
+        <View style={styles.containerTwo}>
+          {renderHeading()}
+          <View style={{gap: getScreenWidth(4)}}>
+            {renderEmailInput()}
+            {renderTerms()}
+          </View>
+          {renderActionButtons()}
+          {renderSignup()}
         </View>
-        {renderActionButtons()}
-        {renderSignup()}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

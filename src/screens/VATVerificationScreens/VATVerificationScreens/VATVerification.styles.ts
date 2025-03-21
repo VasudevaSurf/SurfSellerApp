@@ -8,6 +8,9 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ColorPalette.White,
   },
+  scrollViewContent: {
+    flexGrow: 1,
+  },
   bannerContainer: {
     padding: Spacing.Large,
     paddingTop: Spacing.Medium,
@@ -15,6 +18,7 @@ export const styles = StyleSheet.create({
   },
   mainContainerTwo: {
     paddingHorizontal: Spacing.Large,
+    marginBottom: Spacing.Large,
   },
   contentWrapper: {
     gap: Spacing.XLarge,

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, TouchableOpacity, View} from 'react-native';
+import {SafeAreaView, TouchableOpacity, View, ScrollView} from 'react-native';
 import ArrowLeftIcon from '../../../assets/icons/ArrowLeft';
 import FlowBite from '../../../assets/icons/FlowBite';
 import {Button} from '../../../components/UserComponents/Button/Button';
@@ -75,75 +75,80 @@ const OTPVerificationScreen = ({route, navigation}) => {
           onPress={goBack}
         />
       </TouchableOpacity>
-      <View>
-        <View style={styles.contentWrapper}>
-          <Typography
-            text={promptTitle}
-            variant={TypographyVariant.H5_BOLD}
-            customTextStyles={styles.heading}
-          />
-          <View style={styles.containerTwo}>
-            <View style={styles.subContainer}>
-              <Typography
-                text={otpSent}
-                variant={TypographyVariant.PSMALL_REGULAR}
-                customTextStyles={styles.subCaption}
-              />
-              <Typography
-                text={phoneNumber}
-                variant={TypographyVariant.LMEDIUM_BOLD}
-                customTextStyles={styles.subCaptionTwo}
+      <ScrollView
+        contentContainerStyle={styles.scrollContentContainer}
+        showsVerticalScrollIndicator={false}
+        bounces={false}>
+        <View>
+          <View style={styles.contentWrapper}>
+            <Typography
+              text={promptTitle}
+              variant={TypographyVariant.H5_BOLD}
+              customTextStyles={styles.heading}
+            />
+            <View style={styles.containerTwo}>
+              <View style={styles.subContainer}>
+                <Typography
+                  text={otpSent}
+                  variant={TypographyVariant.PSMALL_REGULAR}
+                  customTextStyles={styles.subCaption}
+                />
+                <Typography
+                  text={phoneNumber}
+                  variant={TypographyVariant.LMEDIUM_BOLD}
+                  customTextStyles={styles.subCaptionTwo}
+                />
+              </View>
+              <TouchableOpacity style={styles.iconContainer}>
+                <FlowBite
+                  size={20}
+                  color={ColorPalette.GREY_TEXT_400}
+                  strokeWidth={2}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.mainTwoContainer}>
+            <View style={styles.otpContainer}>
+              <OtpInput
+                numberOfDigits={OTP_LENGTH}
+                onTextChange={handleOtpChange}
+                onFilled={handleOtpComplete}
+                autoFocus
+                focusColor={ColorPalette.GREY_TEXT_400}
+                theme={{
+                  containerStyle: styles.otpInputContainer,
+                  pinCodeContainerStyle: styles.otpBox,
+                  focusedPinCodeContainerStyle: styles.otpBoxFocused,
+                  filledPinCodeContainerStyle: styles.otpBoxFilled,
+                }}
               />
             </View>
-            <TouchableOpacity style={styles.iconContainer}>
-              <FlowBite
-                size={20}
-                color={ColorPalette.GREY_TEXT_400}
-                strokeWidth={2}
+            <View style={styles.termsContainer}>
+              <TextButton
+                text={resendText}
+                onPress={handleResendOtp}
+                variant={TypographyVariant.PSMALL_REGULAR}
+                customTextStyles={{
+                  ...styles.linkText,
+                  color: ColorPalette.PURPLE_300,
+                }}
+                underline
               />
-            </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View style={styles.mainTwoContainer}>
-          <View style={styles.otpContainer}>
-            <OtpInput
-              numberOfDigits={OTP_LENGTH}
-              onTextChange={handleOtpChange}
-              onFilled={handleOtpComplete}
-              autoFocus
-              focusColor={ColorPalette.GREY_TEXT_400}
-              theme={{
-                containerStyle: styles.otpInputContainer,
-                pinCodeContainerStyle: styles.otpBox,
-                focusedPinCodeContainerStyle: styles.otpBoxFocused,
-                filledPinCodeContainerStyle: styles.otpBoxFilled,
-              }}
-            />
-          </View>
-          <View style={styles.termsContainer}>
-            <TextButton
-              text={resendText}
-              onPress={handleResendOtp}
-              variant={TypographyVariant.PSMALL_REGULAR}
-              customTextStyles={{
-                ...styles.linkText,
-                color: ColorPalette.PURPLE_300,
-              }}
-              underline
+          <View style={styles.mainContainerTwo}>
+            <Button
+              text={verifyText}
+              onPress={handleNavigate}
+              variant={ButtonVariant.PRIMARY}
+              state={buttonState}
+              size={ButtonSize.MEDIUM}
+              withShadow
             />
           </View>
         </View>
-        <View style={styles.mainContainerTwo}>
-          <Button
-            text={verifyText}
-            onPress={handleNavigate}
-            variant={ButtonVariant.PRIMARY}
-            state={buttonState}
-            size={ButtonSize.MEDIUM}
-            withShadow
-          />
-        </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

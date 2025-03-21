@@ -15,7 +15,6 @@ import {TypographyVariant} from '../../UserComponents/Typography/Typography.type
 import {AddModal, ButtonConfig} from '../AddModal/AddModal';
 import {styles} from './ProductInfo.styles';
 import {ProductInfoProps} from './ProductInfo.types';
-import {CustomSquircle} from '../CustomSquircleMain/CustomSquircle';
 
 export const ProductInfo: React.FC<ProductInfoProps> = ({
   orderImage,
@@ -69,118 +68,109 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   ];
 
   return (
-    <CustomSquircle
-      style={[styles.container, style]}
-      cornerRadius={24}
-      cornerSmoothing={1.0}
-      fillColor={ColorPalette.White}>
-      <View style={styles.contentContainer}>
-        <CustomSquircle
-          style={styles.imageContainer}
-          cornerRadius={16}
-          cornerSmoothing={1.0}>
-          <Image
-            source={{uri: orderImage}}
-            style={styles.productImage}
-            resizeMode="cover"
-          />
-        </CustomSquircle>
+    <View style={[styles.container, style]}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={{uri: orderImage}}
+          style={styles.productImage}
+          resizeMode="cover"
+        />
+      </View>
 
-        <View style={styles.infoContainer}>
-          <View style={styles.infoContainerOne}>
-            <View style={styles.productNameWrapper}>
-              <Typography
-                variant={TypographyVariant.LMEDIUM_MEDIUM}
-                text={productName}
-                customTextStyles={styles.productNameText}
-                numberOfLines={2}
-              />
-            </View>
-            <View style={styles.iconContainer}>
-              <MoreVerticalIcon
-                onPress={() => setShowModal(true)}
-                style={undefined}
-              />
-            </View>
+      <View style={styles.infoContainer}>
+        <View style={styles.infoContainerOne}>
+          <View style={styles.productNameWrapper}>
+            <Typography
+              variant={TypographyVariant.LMEDIUM_MEDIUM}
+              text={productName}
+              customTextStyles={styles.productNameText}
+              numberOfLines={2}
+            />
           </View>
-
-          <View style={styles.infoContainerTwo}>
-            <View style={styles.sellerContainer}>
-              <Typography
-                variant={TypographyVariant.LSMALL_REGULAR}
-                text="Seller Price :"
-                customTextStyles={styles.labelText}
-              />
-              <Typography
-                variant={TypographyVariant.H5_BOLD}
-                text={sellerPrice}
-                customTextStyles={styles.valueText}
-              />
-            </View>
-            <View style={styles.platFormContainer}>
-              <Typography
-                variant={TypographyVariant.LSMALL_REGULAR}
-                text="Platform fee :"
-                customTextStyles={styles.labelText}
-              />
-              <Typography
-                variant={TypographyVariant.H5_BOLD}
-                text={platformFee}
-                customTextStyles={styles.valueText}
-              />
-            </View>
+          <View style={styles.iconContainer}>
+            <MoreVerticalIcon
+              onPress={() => setShowModal(true)}
+              style={undefined}
+            />
           </View>
+        </View>
 
-          <View style={styles.infoContainerThree}>
-            <View style={styles.stockContainer}>
-              <Typography
-                variant={TypographyVariant.LSMALL_REGULAR}
-                text="Stock :"
-                customTextStyles={styles.labelText}
-              />
-              <Typography
-                variant={TypographyVariant.LSMALL_MEDIUM}
-                text={stock}
-                customTextStyles={styles.valueText}
-              />
-            </View>
-            <View style={styles.toggleContainer}>
-              <ToggleSwitch
-                isOn={active}
-                onColor={ColorPalette.Success}
-                offColor={ColorPalette.Gray}
-                label={active ? 'Active' : 'Hidden'}
-                labelStyle={styles.toggleLabel}
-                size="small"
-                onToggle={isOn => onActiveChange?.(isOn)}
-                thumbOnStyle={{
-                  backgroundColor: ColorPalette.White,
-                  elevation: 0,
-                  shadowOpacity: 0,
-                  shadowColor: 'transparent',
-                  shadowOffset: {height: 0, width: 0},
-                  shadowRadius: 0,
-                }}
-                thumbOffStyle={{
-                  backgroundColor: ColorPalette.White,
-                  elevation: 0,
-                  shadowOpacity: 0,
-                  shadowColor: 'transparent',
-                  shadowOffset: {height: 0, width: 0},
-                  shadowRadius: 0,
-                }}
-                trackOnStyle={{
-                  width: getFigmaDimension(40),
-                  height: getFigmaDimension(24),
-                  borderRadius: getFigmaDimension(12),
-                }}
-                trackOffStyle={{
-                  width: getFigmaDimension(40),
-                  height: getFigmaDimension(24),
-                  borderRadius: getFigmaDimension(12),
-                }}
-              />
-            </View>
+        <View style={styles.infoContainerTwo}>
+          <View style={styles.sellerContainer}>
+            <Typography
+              variant={TypographyVariant.LSMALL_REGULAR}
+              text="Seller Price :"
+              customTextStyles={styles.labelText}
+            />
+            <Typography
+              variant={TypographyVariant.H5_BOLD}
+              text={sellerPrice}
+              customTextStyles={styles.valueText}
+            />
+          </View>
+          <View style={styles.platFormContainer}>
+            <Typography
+              variant={TypographyVariant.LSMALL_REGULAR}
+              text="Platform fee :"
+              customTextStyles={styles.labelText}
+            />
+            <Typography
+              variant={TypographyVariant.H5_BOLD}
+              text={platformFee}
+              customTextStyles={styles.valueText}
+            />
+          </View>
+        </View>
+
+        <View style={styles.infoContainerThree}>
+          <View style={styles.stockContainer}>
+            <Typography
+              variant={TypographyVariant.LSMALL_REGULAR}
+              text="Stock :"
+              customTextStyles={styles.labelText}
+            />
+            <Typography
+              variant={TypographyVariant.LSMALL_MEDIUM}
+              text={stock}
+              customTextStyles={styles.valueText}
+            />
+          </View>
+          <View style={styles.toggleContainer}>
+            <ToggleSwitch
+              isOn={active}
+              onColor={ColorPalette.Success}
+              offColor={ColorPalette.Gray}
+              label={active ? 'Active' : 'Hidden'}
+              labelStyle={styles.toggleLabel}
+              size="small"
+              onToggle={isOn => onActiveChange?.(isOn)}
+              thumbOnStyle={{
+                backgroundColor: ColorPalette.White,
+                elevation: 0,
+                shadowOpacity: 0,
+                shadowColor: 'transparent',
+                shadowOffset: {height: 0, width: 0},
+                shadowRadius: 0,
+              }}
+              thumbOffStyle={{
+                backgroundColor: ColorPalette.White,
+                elevation: 0,
+                shadowOpacity: 0,
+                shadowColor: 'transparent',
+                shadowOffset: {height: 0, width: 0},
+                shadowRadius: 0,
+              }}
+              trackOnStyle={{
+                width: getFigmaDimension(40),
+                height: getFigmaDimension(24),
+                borderRadius: getFigmaDimension(12),
+              }}
+              trackOffStyle={{
+                width: getFigmaDimension(40),
+                height: getFigmaDimension(24),
+                borderRadius: getFigmaDimension(12),
+              }}
+            />
           </View>
         </View>
 
@@ -190,6 +180,6 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           buttons={buttonsTwo}
         />
       </View>
-    </CustomSquircle>
+    </View>
   );
 };

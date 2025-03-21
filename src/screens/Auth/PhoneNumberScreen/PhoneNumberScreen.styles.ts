@@ -9,6 +9,13 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ColorPalette.White,
   },
+  scrollViewContent: {
+    flexGrow: 1,
+  },
+  mainContent: {
+    flex: 1,
+    paddingBottom: getScreenHeight(8), // Add padding at bottom to avoid overlay with email button
+  },
   bannerContainer: {
     padding: Spacing.Large,
     paddingTop: Spacing.Medium,

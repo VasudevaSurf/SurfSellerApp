@@ -6,10 +6,13 @@ import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ColorPalette.White,
+  },
+  scrollContent: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: Spacing.Medium,
-    backgroundColor: ColorPalette.White,
   },
   successImage: {
     height: getScreenHeight(26),

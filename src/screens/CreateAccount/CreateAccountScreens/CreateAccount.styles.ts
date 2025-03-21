@@ -8,13 +8,16 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ColorPalette.White,
   },
+  scrollContainer: {
+    flexGrow: 1, // Only adding this property, keeping all other spacing intact
+  },
   bannerContainer: {
-    padding: Spacing.Large,
-    paddingTop: Spacing.Medium,
-    marginBottom: Spacing.XLarge,
+    padding: getScreenWidth(5),
+    paddingTop: getScreenHeight(2),
+    marginBottom: getScreenHeight(3),
   },
   mainContainerTwo: {
-    paddingHorizontal: Spacing.Large,
+    paddingHorizontal: getScreenWidth(5),
   },
   containerTwo: {
     gap: getScreenWidth(6),
@@ -27,7 +30,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexWrap: 'wrap', // Added for better text wrapping
-    paddingHorizontal: Spacing.Medium, // Added for better spacing
+    paddingHorizontal: getScreenWidth(4), // Added for better spacing
   },
   termsContainerTwo: {
     flexDirection: 'row',

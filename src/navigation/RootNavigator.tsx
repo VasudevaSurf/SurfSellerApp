@@ -36,12 +36,12 @@ export const RootNavigator = () => {
         <>
           <Stack.Screen name="Onboarding" component={OnboardingNavigator} />
           <Stack.Screen name="Auth" component={AuthNavigator} />
+          <Stack.Screen name="Create" component={CreateNavigator} />
+          <Stack.Screen name="VAT" component={VATNavigator} />
         </>
       ) : (
         <>
           <Stack.Screen name="Dashboard" component={DashboardNavigator} />
-          <Stack.Screen name="Create" component={CreateNavigator} />
-          <Stack.Screen name="VAT" component={VATNavigator} />
         </>
       )}
     </Stack.Navigator>

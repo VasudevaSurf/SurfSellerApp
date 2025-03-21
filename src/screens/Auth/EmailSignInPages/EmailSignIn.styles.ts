@@ -8,6 +8,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ColorPalette.White,
   },
+  scrollViewContent: {
+    flexGrow: 1,
+    paddingBottom: Spacing.Large,
+  },
   bannerContainer: {
     padding: Spacing.Large,
     paddingTop: Spacing.Medium,
@@ -18,6 +22,7 @@ export const styles = StyleSheet.create({
   },
   containerTwo: {
     gap: getScreenWidth(6),
+    paddingBottom: Spacing.Medium,
   },
   inputContainer: {
     gap: getScreenWidth(4),

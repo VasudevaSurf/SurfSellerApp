@@ -20,7 +20,6 @@ import {OrderDetailProps} from './OrderDetail.types';
 import {Badge} from '../../../../components/UserComponents/Badges/Badge';
 import ArrowDownIcon from '../../../../assets/icons/ArrowDownIcon';
 import {StatusModal} from '../../../../components/MainComponents/StatusModal/StatusModal';
-import {CustomSquircle} from '../../../../components/MainComponents/CustomSquircleMain/CustomSquircle';
 
 const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -161,114 +160,105 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
             {paddingTop: getScreenHeight(2)},
           ]}
           showsVerticalScrollIndicator={false}>
-          <CustomSquircle
-            cornerRadius={16}
-            cornerSmoothing={1.0}
-            fillColor={ColorPalette.White}>
-            <View style={styles.productCardContent}>
-              <View style={styles.headerContainer}>
-                <View style={{gap: getScreenHeight(0.5)}}>
-                  <Typography
-                    text={`Order #${orderData.orderNumber}`}
-                    variant={TypographyVariant.H5_BOLD}
-                    customTextStyles={styles.orderNumberText}
-                  />
-                  <Typography
-                    text={`${orderData.orderDate} • ${orderData.orderTime}`}
-                    variant={TypographyVariant.LMEDIUM_REGULAR}
-                    customTextStyles={styles.dateTimeText}
-                  />
-                </View>
+          <View style={styles.productCard}>
+            <View style={styles.headerContainer}>
+              <View style={{gap: getScreenHeight(0.5)}}>
+                <Typography
+                  text={`Order #${orderData.orderNumber}`}
+                  variant={TypographyVariant.H5_BOLD}
+                  customTextStyles={styles.orderNumberText}
+                />
+                <Typography
+                  text={`${orderData.orderDate} • ${orderData.orderTime}`}
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
+                  customTextStyles={styles.dateTimeText}
+                />
               </View>
-              <View style={styles.productRow}>
-                <View style={styles.imageContainer}>
-                  <Image
-                    source={{uri: orderData.orderImage}}
-                    style={styles.productImage}
-                    resizeMode="cover"
-                  />
-                </View>
-                <View style={styles.productInfo}>
-                  <Typography
-                    text={orderData.orderName}
-                    variant={TypographyVariant.PSMALL_MEDIUM}
-                    customTextStyles={{
-                      color: ColorPalette.GREY_TEXT_500,
-                      flexWrap: 'wrap',
-                      width: '100%',
-                    }}
-                    numberOfLines={0} // Force text to break regardless of width
-                  />
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      gap: getScreenWidth(1),
-                      width: '100%',
-                    }}>
-                    <Typography
-                      text="Inventory: "
-                      variant={TypographyVariant.PSMALL_REGULAR}
-                      customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
-                    />
-                    <Typography
-                      text={inventory.toString()}
-                      variant={TypographyVariant.LSMALL_BOLD}
-                      customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
-                    />
-                  </View>
-                </View>
+            </View>
+            <View style={styles.productRow}>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{uri: orderData.orderImage}}
+                  style={styles.productImage}
+                  resizeMode="cover"
+                />
               </View>
-
-              <View style={styles.dataContainer}>
-                <View style={styles.totalRow}>
+              <View style={styles.productInfo}>
+                <Typography
+                  text={orderData.orderName}
+                  variant={TypographyVariant.PSMALL_MEDIUM}
+                  customTextStyles={{
+                    color: ColorPalette.GREY_TEXT_500,
+                    flexWrap: 'wrap',
+                    width: '100%',
+                  }}
+                  numberOfLines={0} // Force text to break regardless of width
+                />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: getScreenWidth(1),
+                    width: '100%',
+                  }}>
                   <Typography
-                    text="Sub Total:"
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                    customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
-                  />
-                  <Typography
-                    text={subTotal}
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
+                    text="Inventory: "
+                    variant={TypographyVariant.PSMALL_REGULAR}
                     customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
                   />
-                </View>
-
-                <View style={styles.totalRow}>
                   <Typography
-                    text="Shipping Cost:"
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                    customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
-                  />
-                  <Typography
-                    text={shippingCost}
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                    customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
-                  />
-                </View>
-
-                <View style={styles.totalRow}>
-                  <Typography
-                    text="Total:"
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                    customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
-                  />
-                  <Typography
-                    text={totalPrice}
-                    variant={TypographyVariant.H6_BOLD}
-                    customTextStyles={{color: ColorPalette.Black}}
+                    text={inventory.toString()}
+                    variant={TypographyVariant.LSMALL_BOLD}
+                    customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
                   />
                 </View>
               </View>
             </View>
-          </CustomSquircle>
 
-          <CustomSquircle
-            style={styles.downContainer}
-            cornerRadius={16}
-            cornerSmoothing={1}
-            fillColor={ColorPalette.White}>
+            <View style={styles.dataContainer}>
+              <View style={styles.totalRow}>
+                <Typography
+                  text="Sub Total:"
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+                />
+                <Typography
+                  text={subTotal}
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+                />
+              </View>
+
+              <View style={styles.totalRow}>
+                <Typography
+                  text="Shipping Cost:"
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+                />
+                <Typography
+                  text={shippingCost}
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+                />
+              </View>
+
+              <View style={styles.totalRow}>
+                <Typography
+                  text="Total:"
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+                />
+                <Typography
+                  text={totalPrice}
+                  variant={TypographyVariant.H6_BOLD}
+                  customTextStyles={{color: ColorPalette.Black}}
+                />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.downContainer}>
             <Accordion
               sections={SECTIONS}
               activeSections={activeSections}
@@ -279,7 +269,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
               underlayColor="transparent"
               containerStyle={styles.accordionContainer}
             />
-          </CustomSquircle>
+          </View>
 
           <View style={styles.buttonContainer}>
             <Typography

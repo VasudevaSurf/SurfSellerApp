@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Animated, SafeAreaView, View} from 'react-native';
+import {Animated, SafeAreaView, View, ScrollView} from 'react-native';
 import {Button} from '../../../components/UserComponents/Button/Button';
 import {
   ButtonSize,
@@ -41,32 +41,38 @@ const VATSuccess = () => {
 
   return (
     <SafeAreaView style={[globalStyles.secondaryContainer, styles.container]}>
-      <Animated.Image
-        source={require('../../../assets/images/success.png')}
-        style={[styles.successImage, animatedStyle]}
-        resizeMode="contain"
-      />
-      <View style={styles.textContainer}>
-        <Typography
-          variant={TypographyVariant.H6_BOLD}
-          text={yourSet}
-          customTextStyles={styles.title}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}>
+        <Animated.Image
+          source={require('../../../assets/images/success.png')}
+          style={[styles.successImage, animatedStyle]}
+          resizeMode="contain"
         />
-        <Typography
-          variant={TypographyVariant.LMEDIUM_REGULAR}
-          text={yourVerified}
-          customTextStyles={styles.subtitle}
-        />
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button
-          text={goDashboard}
-          onPress={() => {}}
-          variant={ButtonVariant.PRIMARY}
-          state={ButtonState.DEFAULT}
-          size={ButtonSize.MEDIUM}
-        />
-      </View>
+        <View style={styles.textContainer}>
+          <Typography
+            variant={TypographyVariant.H6_BOLD}
+            text={yourSet}
+            customTextStyles={styles.title}
+          />
+          <Typography
+            variant={TypographyVariant.LMEDIUM_REGULAR}
+            text={yourVerified}
+            customTextStyles={styles.subtitle}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button
+            text={goDashboard}
+            onPress={() => {}}
+            variant={ButtonVariant.PRIMARY}
+            state={ButtonState.DEFAULT}
+            size={ButtonSize.MEDIUM}
+            withShadow
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

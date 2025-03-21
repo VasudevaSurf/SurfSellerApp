@@ -44,13 +44,12 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
+    backgroundColor: ColorPalette.PURPLE_300,
     width: 48,
     height: 48,
-  },
-  floatingButtonInner: {
-    width: '100%',
-    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: getScreenWidth(3),
+    padding: getScreenWidth(3),
   },
 });

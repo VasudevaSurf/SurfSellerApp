@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Animated, SafeAreaView, View} from 'react-native';
+import {Animated, SafeAreaView, View, ScrollView} from 'react-native';
 import {useDispatch} from 'react-redux';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
@@ -45,18 +45,23 @@ const AuthSuccessScreen = () => {
 
   return (
     <SafeAreaView style={[globalStyles.secondaryContainer, styles.container]}>
-      <Animated.Image
-        source={require('../../../assets/images/success.png')}
-        style={[styles.successImage, animatedStyle]}
-        resizeMode="contain"
-      />
-      <View style={styles.textContainer}>
-        <Typography
-          variant={TypographyVariant.H6_BOLD}
-          text={successTitle}
-          customTextStyles={styles.title}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}>
+        <Animated.Image
+          source={require('../../../assets/images/success.png')}
+          style={[styles.successImage, animatedStyle]}
+          resizeMode="contain"
         />
-      </View>
+        <View style={styles.textContainer}>
+          <Typography
+            variant={TypographyVariant.H6_BOLD}
+            text={successTitle}
+            customTextStyles={styles.title}
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

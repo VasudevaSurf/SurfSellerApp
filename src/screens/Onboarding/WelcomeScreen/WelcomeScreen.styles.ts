@@ -8,6 +8,9 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ColorPalette.White,
   },
+  scrollContentContainer: {
+    flexGrow: 1, // This ensures the ScrollView content can grow to fill the screen
+  },
   contentContainer: {
     flex: 1,
     justifyContent: 'space-between',
