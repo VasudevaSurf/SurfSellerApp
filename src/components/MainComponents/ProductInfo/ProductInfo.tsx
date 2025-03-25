@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Image, View} from 'react-native';
+import {Image, ImageSourcePropType, View} from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
 import MoreVerticalIcon from '../../../assets/icons/MoreVerticalIcon';
 import {ColorPalette} from '../../../config/colorPalette';
@@ -16,6 +16,8 @@ import {AddModal, ButtonConfig} from '../AddModal/AddModal';
 import {styles} from './ProductInfo.styles';
 import {ProductInfoProps} from './ProductInfo.types';
 
+const DefaultProduct = require('../../../assets/images/defaultProduct.png');
+
 export const ProductInfo: React.FC<ProductInfoProps> = ({
   orderImage,
   productName,
@@ -29,6 +31,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   onMoreOptions,
 }) => {
   const [showModal, setShowModal] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState(false);
 
   const handleUploadCsv = () => {
     console.log('Upload CSV pressed');
@@ -67,13 +70,26 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
     },
   ];
 
+  const getImageSource = (): ImageSourcePropType => {
+    if (!orderImage || orderImage.trim() === '' || imageLoadError) {
+      return DefaultProduct;
+    }
+    return {uri: orderImage};
+  };
+
+  const handleImageError = () => {
+    console.log('Image load error, falling back to default');
+    setImageLoadError(true);
+  };
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.imageContainer}>
         <Image
-          source={{uri: orderImage}}
+          source={getImageSource()}
           style={styles.productImage}
           resizeMode="cover"
+          onError={handleImageError}
         />
       </View>
 
