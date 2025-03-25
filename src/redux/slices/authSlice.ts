@@ -26,9 +26,9 @@ export const loginUser = createAsyncThunk(
   ) => {
     try {
       const response = await loginApi(email, password);
+      console.log('Login Response:', JSON.stringify(response, null, 2));
 
       if (response.result) {
-        // Store user data in AsyncStorage
         await AsyncStorage.setItem(
           'userData',
           JSON.stringify(response.vendor_data),

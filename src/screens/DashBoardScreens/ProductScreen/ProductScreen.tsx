@@ -1,6 +1,12 @@
-import React, {useState} from 'react';
-import {ScrollView, TouchableOpacity, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  ScrollView,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useDispatch, useSelector} from 'react-redux';
 import BellIcon from '../../../assets/icons/BellIcon';
 import InfoIcon from '../../../assets/icons/InfoIcon';
 import PlusIcon from '../../../assets/icons/PlusIcon';
@@ -25,10 +31,29 @@ import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './ProductScreen.styles';
+import {RootState, AppDispatch} from '../../../redux/store';
+import {fetchProducts} from '../../../redux/slices/productsSlice';
 
 const ProductScreen = () => {
-  const [searchText, setSearchText] = useState('');
+  const dispatch = useDispatch<AppDispatch>();
+  const [searchText] = useState();
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const userId = useSelector(
+    (state: RootState) => state.auth.userData?.user_id,
+  );
+
+  console.log('User ID for Products:', userId);
+
+  const {products, loading, error, totalItems} = useSelector(
+    (state: RootState) => state.products,
+  );
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchProducts({userId}));
+    }
+  }, [dispatch, userId]);
 
   const handleAddManually = () => {
     setShowAddModal(false);
@@ -64,70 +89,6 @@ const ProductScreen = () => {
     },
   ];
 
-  const [products, setProducts] = useState([
-    {
-      id: '1',
-      orderImage: 'https://picsum.photos/200',
-      productName: 'Nike Air Max 270 React Premium Men’s Running...',
-      sellerPrice: '€495.00',
-      platformFee: '€5.00',
-      stock: '11',
-      active: true,
-    },
-    {
-      id: '2',
-      orderImage: 'https://picsum.photos/199',
-      productName: 'Nike Air Max 270 React Premium Men’s Running...',
-      sellerPrice: '€299.99',
-      platformFee: '€4.50',
-      stock: '8',
-      active: true,
-    },
-    {
-      id: '3',
-      orderImage: 'https://picsum.photos/202',
-      productName: 'Nike Air Max 270 React Premium Men’s Running...',
-      sellerPrice: '€149.99',
-      platformFee: '€3.00',
-      stock: '15',
-      active: false,
-    },
-    {
-      id: '4',
-      orderImage: 'https://picsum.photos/203',
-      productName: 'Moonstone Pendant',
-      sellerPrice: '€199.99',
-      platformFee: '€3.50',
-      stock: '5',
-      active: true,
-    },
-    {
-      id: '5',
-      orderImage: 'https://picsum.photos/204',
-      productName: 'Starlight Bracelet Collection',
-      sellerPrice: '€259.99',
-      platformFee: '€4.00',
-      stock: '7',
-      active: false,
-    },
-  ]);
-
-  const searchBarHeight = getScreenHeight(6);
-
-  const filterSections = [
-    {
-      id: 'status',
-      title: 'Status',
-      options: [
-        {id: 'active', label: 'Active', isSelected: false},
-        {id: 'inStock', label: 'In stock', isSelected: false},
-        {id: 'lowStock', label: 'Low stock', isSelected: false},
-        {id: 'outOfStock', label: 'Out of stock', isSelected: false},
-        {id: 'hidden', label: 'Hidden', isSelected: false},
-      ],
-    },
-  ];
-
   const filterOptions = [
     {id: 'all', label: 'All'},
     {id: 'inStock', label: 'In Stock'},
@@ -142,13 +103,7 @@ const ProductScreen = () => {
 
   const [selectedFilter, setSelectedFilter] = useState(filterOptions[0]);
 
-  const handleActiveChange = (productId: string, isActive: boolean) => {
-    setProducts(prevProducts =>
-      prevProducts.map(product =>
-        product.id === productId ? {...product, active: isActive} : product,
-      ),
-    );
-  };
+  const searchBarHeight = getScreenHeight(6);
 
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
@@ -171,20 +126,13 @@ const ProductScreen = () => {
             color: ColorPalette.IconColor,
             strokeWidth: 2,
           },
-          // {
-          //   icon: AlignCenterIcon,
-          //   onPress: () => setShowModal(true),
-          //   size: 24,
-          //   color: ColorPalette.Black,
-          //   strokeWidth: 2,
-          // },
         ]}
       />
 
       <View style={styles.searchContainer}>
         <SearchBox
           value={searchText}
-          onChangeText={setSearchText}
+          onChangeText={() => {}} // Placeholder for future implementation
           placeholder="Search products..."
           customContainerStyle={{
             flex: 1,
@@ -216,39 +164,55 @@ const ProductScreen = () => {
         />
       </View>
 
-      <ScrollView
-        style={styles.mainContainer}
-        contentContainerStyle={[
-          styles.scrollContent,
-          {paddingBottom: getScreenHeight(4)},
-        ]}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.ProductContainer}>
-          {products.map(product => (
-            <ProductInfo
-              key={product.id}
-              orderImage={product.orderImage}
-              productName={product.productName}
-              sellerPrice={product.sellerPrice}
-              platformFee={product.platformFee}
-              stock={product.stock}
-              active={product.active}
-              onActiveChange={isActive =>
-                handleActiveChange(product.id, isActive)
-              }
-              onShare={() => console.log(`Share ${product.productName}`)}
-              onMoreOptions={() =>
-                console.log(`More options for ${product.productName}`)
-              }
-            />
-          ))}
+      {loading ? (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size="large" color={ColorPalette.Primary} />
         </View>
-        <AddModal
-          isVisible={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          buttons={buttons}
-        />
-      </ScrollView>
+      ) : error ? (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Typography
+            text={error}
+            variant={TypographyVariant.LMEDIUM_REGULAR}
+            customTextStyles={{color: ColorPalette.RED_100}}
+          />
+        </View>
+      ) : (
+        <ScrollView
+          style={styles.mainContainer}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {paddingBottom: getScreenHeight(4)},
+          ]}
+          showsVerticalScrollIndicator={false}>
+          <View style={styles.ProductContainer}>
+            {products.map(product => (
+              <ProductInfo
+                key={product.product_id}
+                orderImage={product.image_url}
+                productName={product.product}
+                sellerPrice={product.format_price}
+                platformFee="€0.00"
+                stock={product.amount.toString()}
+                active={product.status === 'A'}
+                onActiveChange={() =>
+                  console.log('Active change not implemented')
+                }
+                onShare={() => console.log(`Share ${product.product}`)}
+                onMoreOptions={() =>
+                  console.log(`More options for ${product.product}`)
+                }
+              />
+            ))}
+          </View>
+        </ScrollView>
+      )}
+
+      <AddModal
+        isVisible={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        buttons={buttons}
+      />
+
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={() => setShowAddModal(true)}>

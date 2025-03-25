@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
     marginLeft: getScreenWidth(3),
     color: ColorPalette.Black,
     fontFamily: 'Poppins-Regular',
-    fontSize: getFigmaDimension(13),
+    fontSize: getFigmaDimension(14),
     padding: 0,
   },
   searchIcon: {

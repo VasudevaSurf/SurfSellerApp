@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {Image, ScrollView, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import CircularEuroIcon from '../../../assets/icons/CircularEuroIcon';
 import LanguageIcon from '../../../assets/icons/LanguageIcon';
@@ -26,31 +26,32 @@ import {
 } from '../../../navigation/utils/navigationRef';
 import {logoutUser} from '../../../redux/slices/authSlice';
 import {styles} from './AccountScreen.styles';
+import {RootState} from '../../../redux/store';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dispatch = useDispatch();
+  const userData = useSelector((state: RootState) => state.auth.userData);
+
+  const fullName = userData
+    ? `${userData.firstname || ''} ${userData.lastname || ''}`.trim()
+    : 'User Profile';
 
   // Handle logout functionality
   const handleLogout = useCallback(async () => {
     try {
-      // Dispatch logout action from redux
       await dispatch(logoutUser());
 
-      // Hide the modal
       setShowLogoutModal(false);
 
-      // Navigate to Auth screen
       navigateToAuth();
     } catch (error) {
       console.error('Logout failed:', error);
-      // Close the modal even if there's an error
       setShowLogoutModal(false);
     }
   }, [dispatch]);
 
-  // Memoize header icons configuration
   const headerIcons = useMemo(
     () => [
       {
@@ -242,7 +243,7 @@ const AccountScreen = () => {
         </View>
         <View style={styles.dataContainer}>
           <Typography
-            text="Annie`s Flower Shop"
+            text={fullName}
             variant={TypographyVariant.H6_BOLD}
             customTextStyles={styles.profileName}
           />

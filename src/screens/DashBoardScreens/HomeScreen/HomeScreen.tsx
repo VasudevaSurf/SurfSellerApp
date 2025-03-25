@@ -23,8 +23,12 @@ import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {styles} from './HomeScreen.styles';
 import {navigate} from '../../../navigation/utils/navigationRef';
+import {RootState} from '../../../redux/store';
+import {useSelector} from 'react-redux';
 
 const HomeScreen = () => {
+  const userData = useSelector((state: RootState) => state.auth.userData);
+
   const handleNewOrderPress = params => {
     navigate('Dashboard', {
       screen: 'Home',
@@ -85,7 +89,7 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
-        name="Hello, Aditya! 👋"
+        name={`Hello, ${userData?.firstname || 'User'}! 👋`}
         image={{
           source: require('../../../assets/images/placeholder-profile.png'),
         }}
