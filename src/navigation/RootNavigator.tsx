@@ -42,6 +42,7 @@ export const RootNavigator = () => {
       ) : (
         <>
           <Stack.Screen name="Dashboard" component={DashboardNavigator} />
+          <Stack.Screen name="Auth" component={AuthNavigator} />
         </>
       )}
     </Stack.Navigator>
