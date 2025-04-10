@@ -6,10 +6,11 @@ import {TypographyVariant} from '../../../components/UserComponents/Typography/T
 import {globalStyles} from '../../../config/globalStyles';
 import {STATIC_TEXT} from '../../../config/staticText';
 import {styles} from './AuthSuccessScreen.styles';
+import {CommonActions} from '@react-navigation/native';
 
 const successTitle = STATIC_TEXT.screens.authSuccess.successTitle;
 
-const AuthSuccessScreen = () => {
+const AuthSuccessScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const scaleValue = new Animated.Value(0);
   const opacityValue = new Animated.Value(0);
@@ -29,14 +30,22 @@ const AuthSuccessScreen = () => {
       }),
     ]).start(() => {
       // Complete the animation and then update login status
-      // before navigating
       setTimeout(() => {
-        // Now update the login status in redux
+        // Update the login status in redux
         dispatch({type: 'auth/completeLogin'});
-        // Wait a bit more before navigating
+
+        // Navigate to Dashboard using reset to clear history
+        setTimeout(() => {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: 'Dashboard'}],
+            }),
+          );
+        }, 500);
       }, 500);
     });
-  }, [dispatch]);
+  }, [dispatch, navigation]);
 
   const animatedStyle = {
     transform: [{scale: scaleValue}],
