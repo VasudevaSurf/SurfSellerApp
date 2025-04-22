@@ -32,7 +32,8 @@ export const Button: React.FC<ButtonProps> = ({
   customStyles,
   customTextStyles,
   bgColor,
-  withShadow = false, // Add this prop to enable shadow
+  withShadow = false,
+  textVariant, // New prop
 }) => {
   const buttonHeight = getButtonHeight(size);
   const currentState = disabled ? ButtonState.DISABLED : state;
@@ -73,6 +74,7 @@ export const Button: React.FC<ButtonProps> = ({
         variant === ButtonVariant.PRIMARY
           ? ColorPalette.PURPLE_300
           : ColorPalette.PURPLE_ROSE_300,
+      borderWidth: 1, // Ensure border width is set for outlined buttons
     },
     withShadow && shadowStyle,
     customStyles,
@@ -86,7 +88,7 @@ export const Button: React.FC<ButtonProps> = ({
         </View>
       )}
       <Typography
-        variant={getTypographyVariant(size)}
+        variant={textVariant || getTypographyVariant(size)} // Use custom variant if provided
         text={text}
         customTextStyles={[
           {color: getTextColor(variant, type, currentState)},

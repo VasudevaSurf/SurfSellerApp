@@ -108,23 +108,32 @@ export const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    backgroundColor: 'transparent', // Making container transparent
   },
   tabBar: {
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     elevation: 0,
     shadowOpacity: 0,
   },
   tab: {
     width: 'auto',
   },
+  tabButtonWrapper: {
+    flexDirection: 'row',
+    backgroundColor: ColorPalette.SearchBack,
+    borderRadius: BorderRadius.Small,
+    alignSelf: 'center', // Center the wrapper
+    padding: getScreenHeight(0.5),
+    gap: getScreenWidth(3), // Gap between tab buttons
+  },
   tabButton: {
     paddingVertical: getScreenHeight(1),
-    paddingHorizontal: getScreenWidth(13),
+    paddingHorizontal: getScreenWidth(10),
     borderRadius: BorderRadius.XSmall,
     backgroundColor: 'transparent',
   },
   activeTabButton: {
-    backgroundColor: ColorPalette.ProgressLine,
+    backgroundColor: ColorPalette.ProgressLine, // Purple color for active tab
   },
 
   // Tab Content

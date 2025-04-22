@@ -245,7 +245,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: getScreenWidth(1), // Add gap between text and icon
+    gap: getScreenWidth(2), // Add gap between text and icon
   },
   viewAllText: {
     color: ColorPalette.PURPLE_200,

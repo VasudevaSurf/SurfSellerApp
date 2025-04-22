@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
     marginRight: getScreenWidth(3.2),
   },
   productNameText: {
-    color: ColorPalette.GREY_TEXT_500,
+    color: ColorPalette.GREY_TEXT_300,
     flexShrink: 1,
   },
   iconContainer: {
@@ -74,7 +74,7 @@ export const styles = StyleSheet.create({
     color: ColorPalette.GREY_TEXT_500,
   },
   toggleLabel: {
-    color: ColorPalette.GREY_TEXT_500,
+    color: ColorPalette.GREY_TEXT_100,
     fontWeight: '500',
   },
 });

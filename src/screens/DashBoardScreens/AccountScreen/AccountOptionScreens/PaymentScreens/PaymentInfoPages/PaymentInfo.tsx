@@ -191,24 +191,14 @@ const PaymentInfo = () => {
 
   const renderTabBar = props => (
     <View style={styles.tabBarContainer}>
-      <TabBar
-        {...props}
-        indicatorStyle={{backgroundColor: 'transparent'}}
-        style={styles.tabBar}
-        tabStyle={styles.tab}
-        renderTabBarItem={({route}) => {
-          const isFocused =
-            props.navigationState.index ===
-            props.navigationState.routes.findIndex(r => r.key === route.key);
+      <View style={styles.tabButtonWrapper}>
+        {props.navigationState.routes.map((route, i) => {
+          const isFocused = props.navigationState.index === i;
 
           return (
             <TouchableOpacity
-              onPress={() => {
-                const routeIndex = props.navigationState.routes.findIndex(
-                  r => r.key === route.key,
-                );
-                setIndex(routeIndex);
-              }}
+              key={i}
+              onPress={() => setIndex(i)}
               style={[styles.tabButton, isFocused && styles.activeTabButton]}>
               <Typography
                 text={route.title}
@@ -221,8 +211,8 @@ const PaymentInfo = () => {
               />
             </TouchableOpacity>
           );
-        }}
-      />
+        })}
+      </View>
     </View>
   );
 

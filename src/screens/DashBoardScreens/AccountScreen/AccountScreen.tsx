@@ -244,7 +244,7 @@ const AccountScreen = () => {
         <View style={styles.dataContainer}>
           <Typography
             text={fullName}
-            variant={TypographyVariant.H6_BOLD}
+            variant={TypographyVariant.H6_SEMIBOLD}
             customTextStyles={styles.profileName}
           />
           <Typography
@@ -268,7 +268,7 @@ const AccountScreen = () => {
           </View>
           <View style={styles.salesTwo}>
             <Typography
-              variant={TypographyVariant.H5_BOLD}
+              variant={TypographyVariant.H5_SEMIBOLD}
               text="€47,125.34"
               customTextStyles={styles.countValue}
             />
@@ -285,7 +285,7 @@ const AccountScreen = () => {
           </View>
           <View style={styles.salesTwo}>
             <Typography
-              variant={TypographyVariant.H5_BOLD}
+              variant={TypographyVariant.H5_SEMIBOLD}
               text="1529"
               customTextStyles={styles.countValue}
             />

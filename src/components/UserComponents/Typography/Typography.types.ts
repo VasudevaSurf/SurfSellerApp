@@ -33,6 +33,7 @@ export enum TypographyVariant {
   H6_SEMIBOLD = 'h6_Semibold',
   H6_BOLD = 'h6_Bold',
   H6_EXTRABOLD = 'h6_ExtraBold',
+  H6_SMALL_SEMIBOLD = 'h6_small_semibold',
 
   //Paragraph
   PMEDIUM_REGULAR = 'pmedium_regular',
@@ -60,6 +61,7 @@ export enum TypographyVariant {
   LMEDIUM_SEMIBOLD = 'lmedium_semibold',
   LMEDIUM_BOLD = 'lmedium_bold',
   LMEDIUM_EXTRABOLD = 'lmedium-extrabold',
+  LMEDIUM_EXTRASEMIBOLD = 'lmedium-extrasemibold',
 
   LSMALL_REGULAR = 'lsmall_regular',
   LSMALL_MEDIUM = 'lsmall_medium',

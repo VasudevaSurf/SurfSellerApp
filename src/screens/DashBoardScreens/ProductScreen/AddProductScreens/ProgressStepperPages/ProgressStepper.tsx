@@ -73,7 +73,7 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
                     : styles.inactiveCircle,
                 ]}>
                 <Typography
-                  variant={TypographyVariant.LMEDIUM_BOLD}
+                  variant={TypographyVariant.LSMALL_REGULAR}
                   text={String(step.id).padStart(2, '0')}
                   customTextStyles={[
                     styles.stepNumber,

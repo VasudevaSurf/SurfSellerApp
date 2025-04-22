@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
   },
   bottomBorder: {
     borderBottomWidth: 0.5,
-    borderBottomColor: ColorPalette.GREY_200,
+    borderBottomColor: ColorPalette.SearchBack,
   },
   content: {
     flexDirection: 'row',

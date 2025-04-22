@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: Spacing.Medium,
     paddingBottom: Spacing.Medium,
-    // Border radius removed as it will be handled by CustomSquircle
+    borderRadius: Spacing.Small,
   },
   productCardContent: {
     paddingHorizontal: Spacing.Medium,
@@ -85,6 +85,9 @@ export const styles = StyleSheet.create({
   downContainer: {
     display: 'flex',
     flexDirection: 'column',
+    backgroundColor: ColorPalette.White,
+    borderRadius: Spacing.Small,
+    overflow: 'hidden',
   },
   sectionContainer: {
     backgroundColor: ColorPalette.White,

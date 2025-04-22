@@ -84,20 +84,29 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     },
   ];
 
-  // Render header for accordion
-  const _renderHeader = (section, _, isActive) => {
+  const _renderHeader = (section, index, isActive) => {
     return (
-      <View style={styles.accordionHeader}>
-        <Typography
-          text={section.title}
-          variant={TypographyVariant.LMEDIUM_BOLD}
-        />
-        <ChevronDownIcon
-          style={{
-            transform: [{rotate: isActive ? '180deg' : '0deg'}],
-          }}
-          size={24}
-        />
+      <View>
+        {index > 0 && (
+          <View
+            style={{
+              height: 1,
+              backgroundColor: ColorPalette.GREY_200,
+            }}
+          />
+        )}
+        <View style={styles.accordionHeader}>
+          <Typography
+            text={section.title}
+            variant={TypographyVariant.LMEDIUM_BOLD}
+          />
+          <ChevronDownIcon
+            style={{
+              transform: [{rotate: isActive ? '180deg' : '0deg'}],
+            }}
+            size={24}
+          />
+        </View>
       </View>
     );
   };

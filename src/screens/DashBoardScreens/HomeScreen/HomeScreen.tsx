@@ -25,6 +25,7 @@ import {styles} from './HomeScreen.styles';
 import {navigate} from '../../../navigation/utils/navigationRef';
 import {RootState} from '../../../redux/store';
 import {useSelector} from 'react-redux';
+import ArrowRightStyle from '../../../assets/icons/ArrowRightStyle';
 
 const HomeScreen = () => {
   const userData = useSelector((state: RootState) => state.auth.userData);
@@ -93,7 +94,7 @@ const HomeScreen = () => {
         image={{
           source: require('../../../assets/images/placeholder-profile.png'),
         }}
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_SMALL_SEMIBOLD}
         textColor={ColorPalette.GREY_TEXT_500}
         rightIcons={[
           {
@@ -101,21 +102,21 @@ const HomeScreen = () => {
             onPress: () => console.log('Search pressed'),
             size: 20,
             color: ColorPalette.GREY_TEXT_400,
-            strokeWidth: 2,
+            strokeWidth: 1.5,
           },
           {
             icon: BellIcon,
             onPress: () => console.log('Bell pressed'),
             size: 20,
             color: ColorPalette.GREY_TEXT_400,
-            strokeWidth: 2,
+            strokeWidth: 1.5,
           },
           {
             icon: QuestionMarkIcon,
             onPress: () => console.log('Help pressed'),
             size: 24,
             color: ColorPalette.GREY_TEXT_400,
-            strokeWidth: 2,
+            strokeWidth: 1.5,
           },
         ]}
       />
@@ -130,14 +131,14 @@ const HomeScreen = () => {
           <View style={styles.textVerifyContainer}>
             <Typography
               variant={TypographyVariant.H6_BOLD}
-              text="Complete these steps to start selling"
+              text="Get Started with Selling"
               customTextStyles={styles.textOne}
               numberOfLines={2}
               adjustsFontSizeToFit
             />
             <Typography
-              variant={TypographyVariant.LXSMALL_REGULAR}
-              text="Complete the following tasks to activate your seller account"
+              variant={TypographyVariant.LSMALL_REGULAR}
+              text="Complete these steps to activate your seller account."
               customTextStyles={styles.textTwo}
               numberOfLines={2}
               adjustsFontSizeToFit
@@ -350,20 +351,20 @@ const HomeScreen = () => {
           <View style={styles.salesHeading}>
             <View style={styles.LeftHeading}>
               <Typography
-                variant={TypographyVariant.H5_BOLD}
+                variant={TypographyVariant.H5_SEMIBOLD}
                 text="Sales Overview"
                 customTextStyles={styles.countValue}
                 numberOfLines={1}
               />
               <View style={styles.countCaptionContainer}>
                 <Typography
-                  variant={TypographyVariant.LSMALL_SEMIBOLD}
+                  variant={TypographyVariant.LSMALL_REGULAR}
                   text="Total sales this week - "
                   customTextStyles={styles.countCaption}
                   numberOfLines={1}
                 />
                 <Typography
-                  variant={TypographyVariant.LSMALL_BOLD}
+                  variant={TypographyVariant.LSMALL_SEMIBOLD}
                   text="25,000€"
                   customTextStyles={styles.countCaptionOne}
                   numberOfLines={1}
@@ -379,21 +380,23 @@ const HomeScreen = () => {
         <View style={styles.recentOrdersContainer}>
           <View style={styles.recentOrderTitle}>
             <Typography
-              variant={TypographyVariant.H6_BOLD}
+              variant={TypographyVariant.H6_SEMIBOLD}
               text="Recent Orders"
               customTextStyles={styles.countValue}
               numberOfLines={1}
             />
             <View style={styles.viewAll}>
               <Typography
-                variant={TypographyVariant.LSMALL_REGULAR}
+                variant={TypographyVariant.PSMALL_MEDIUM}
                 text="View All"
                 customTextStyles={styles.viewAllText}
                 numberOfLines={1}
               />
-              <ArrowRightIcon
+              <ArrowRightStyle
                 style={undefined}
                 color={ColorPalette.PURPLE_200}
+                size={13}
+                onPress={undefined}
               />
             </View>
           </View>

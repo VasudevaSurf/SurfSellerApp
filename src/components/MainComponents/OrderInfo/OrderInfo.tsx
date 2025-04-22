@@ -96,7 +96,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
         <View style={{gap: getScreenHeight(0.5)}}>
           <Typography
             text={`Order #${orderNumber}`}
-            variant={TypographyVariant.H5_BOLD}
+            variant={TypographyVariant.H5_SEMIBOLD}
             customTextStyles={styles.orderNumberText}
           />
           <Typography
@@ -178,10 +178,10 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
             setIsModalVisible(true);
           }}
           customBorderColor={statusColors.borderColor}
-          textVariant={TypographyVariant.LMEDIUM_BOLD}
+          textVariant={TypographyVariant.LMEDIUM_MEDIUM}
           customContainerStyle={styles.statusBadge}
           customTextColor={statusColors.textColor}
-          iconSize={20}
+          iconSize={16}
         />
         <StatusModal
           isVisible={isModalVisible}

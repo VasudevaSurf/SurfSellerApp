@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
+import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import LockIcon from '../../../../../assets/icons/LockIcon';
 import PencilIcon from '../../../../../assets/icons/PencilIcon';
 import {AddModal} from '../../../../../components/MainComponents/AddModal/AddModal';
@@ -27,7 +27,6 @@ import {getScreenHeight} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './CompanyProfile.styles';
 import {containerStyles} from './ImageContainer.styles';
-import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 
 const MALTA_FLAG_URL =
   'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
@@ -233,7 +232,7 @@ const CompanyProfile = () => {
                   <TouchableOpacity
                     style={containerStyles.editButton}
                     onPress={handleUpload}>
-                    <PencilIcon size={12} color={ColorPalette.ProgressLine} />
+                    <PencilIcon size={18} color={ColorPalette.GREY_TEXT_400} />
                   </TouchableOpacity>
                 </View>
                 <Typography
@@ -260,7 +259,7 @@ const CompanyProfile = () => {
                   <TouchableOpacity
                     style={containerStyles.editButton}
                     onPress={handleUpload}>
-                    <PencilIcon size={12} color={ColorPalette.ProgressLine} />
+                    <PencilIcon size={18} color={ColorPalette.GREY_TEXT_400} />
                   </TouchableOpacity>
                 </View>
 

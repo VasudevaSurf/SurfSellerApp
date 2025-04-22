@@ -48,6 +48,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       variant: ButtonVariant.PRIMARY,
       state: ButtonState.DEFAULT,
       size: ButtonSize.MEDIUM,
+      textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
     },
     {
       text: 'Delete',
@@ -58,6 +59,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       size: ButtonSize.MEDIUM,
       customStyles: {borderWidth: 1, borderColor: ColorPalette.GREY_TEXT_400},
       customTextStyles: {color: ColorPalette.GREY_TEXT_400},
+      textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
     },
     {
       text: 'Cancel',
@@ -67,6 +69,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       type: ButtonType.OUTLINED,
       size: ButtonSize.MEDIUM,
       customStyles: {borderWidth: 1},
+      textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
     },
   ];
 
@@ -81,6 +84,11 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
     console.log('Image load error, falling back to default');
     setImageLoadError(true);
   };
+
+  // Calculate dimensions for the toggle switch
+  const trackWidth = getFigmaDimension(40);
+  const trackHeight = getFigmaDimension(24);
+  const thumbDiameter = getFigmaDimension(18);
 
   return (
     <View style={[styles.container, style]}>
@@ -119,7 +127,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               customTextStyles={styles.labelText}
             />
             <Typography
-              variant={TypographyVariant.H5_BOLD}
+              variant={TypographyVariant.H5_SEMIBOLD}
               text={sellerPrice}
               customTextStyles={styles.valueText}
             />
@@ -131,7 +139,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               customTextStyles={styles.labelText}
             />
             <Typography
-              variant={TypographyVariant.H5_BOLD}
+              variant={TypographyVariant.H5_SEMIBOLD}
               text={platformFee}
               customTextStyles={styles.valueText}
             />
@@ -167,6 +175,10 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 shadowColor: 'transparent',
                 shadowOffset: {height: 0, width: 0},
                 shadowRadius: 0,
+                width: thumbDiameter,
+                height: thumbDiameter,
+                borderRadius: thumbDiameter / 2,
+                margin: (trackHeight - thumbDiameter) / 2,
               }}
               thumbOffStyle={{
                 backgroundColor: ColorPalette.White,
@@ -175,16 +187,26 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 shadowColor: 'transparent',
                 shadowOffset: {height: 0, width: 0},
                 shadowRadius: 0,
+                width: thumbDiameter,
+                height: thumbDiameter,
+                borderRadius: thumbDiameter / 2,
+                margin: (trackHeight - thumbDiameter) / 2,
               }}
               trackOnStyle={{
-                width: getFigmaDimension(40),
-                height: getFigmaDimension(24),
-                borderRadius: getFigmaDimension(12),
+                width: trackWidth,
+                height: trackHeight,
+                borderRadius: trackHeight / 2,
+                padding: 0,
               }}
               trackOffStyle={{
-                width: getFigmaDimension(40),
-                height: getFigmaDimension(24),
-                borderRadius: getFigmaDimension(12),
+                width: trackWidth,
+                height: trackHeight,
+                borderRadius: trackHeight / 2,
+                padding: 0,
+              }}
+              containerStyle={{
+                padding: 0,
+                margin: 0,
               }}
             />
           </View>

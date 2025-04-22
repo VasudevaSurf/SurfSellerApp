@@ -137,6 +137,12 @@ export const textBaseStyles = StyleSheet.create({
     fontStyle: 'normal',
     fontFamily: Fonts.POPPINS_SEMIBOLD,
   },
+  [TypographyVariant.H6_SMALL_SEMIBOLD]: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontStyle: 'normal',
+    fontFamily: Fonts.POPPINS_SEMIBOLD,
+  },
   [TypographyVariant.H6_BOLD]: {
     fontSize: 18,
     lineHeight: 24,
@@ -261,6 +267,11 @@ export const textBaseStyles = StyleSheet.create({
     fontSize: 16,
     fontStyle: 'normal',
     fontFamily: Fonts.POPPINS_BOLD,
+  },
+  [TypographyVariant.LMEDIUM_EXTRASEMIBOLD]: {
+    fontSize: 16,
+    fontStyle: 'normal',
+    fontFamily: Fonts.POPPINS_SEMIBOLD,
   },
   [TypographyVariant.LSMALL_REGULAR]: {
     fontSize: 12,

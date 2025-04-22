@@ -42,10 +42,12 @@ const WithdrawScreen = () => {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name="Payments"
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
-        rightIcons={headerIcons}
+        leftIcon={
+          <ArrowLeftIcon style={undefined} size={16} onPress={goBack} />
+        }
+        // rightIcons={headerIcons}
       />
       <View style={styles.mainContainer}>
         <ScrollView
@@ -97,6 +99,7 @@ const WithdrawScreen = () => {
             disabled
             size={ButtonSize.MEDIUM}
             onPress={() => {}}
+            textVariant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
           />
           <Button
             text="Cancel"
@@ -110,6 +113,7 @@ const WithdrawScreen = () => {
               borderColor: ColorPalette.PURPLE_300,
             }}
             customTextStyles={{color: ColorPalette.PURPLE_300}}
+            textVariant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
           />
         </View>
       </View>

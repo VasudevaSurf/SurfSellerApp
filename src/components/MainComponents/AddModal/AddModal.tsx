@@ -33,6 +33,7 @@ export interface ButtonConfig {
   IconComponent?: React.ReactNode;
   iconPosition?: 'left' | 'right';
   useGradient?: boolean;
+  textVariant?: TypographyVariant;
 }
 
 export interface AddModalProps {
@@ -139,6 +140,7 @@ export const AddModal: React.FC<AddModalProps> = ({
                 iconPosition={button.iconPosition}
                 useGradient={button.useGradient}
                 withShadow
+                textVariant={button.textVariant}
               />
             ))}
           </View>

@@ -19,6 +19,7 @@ import InventoryStep from './ProgressStepperPages/InventoryStepPages/InventorySt
 import ProductInfoStep from './ProgressStepperPages/ProductInfoPages/ProductInfoStep';
 import ProgressStepper from './ProgressStepperPages/ProgressStepper';
 import UploadMediaStep from './ProgressStepperPages/UploadMediaPages/UploadMediaStep';
+import ArrowLeft from '../../../../assets/icons/ArrowLeft';
 
 const STEPS = [
   {id: 1, label: 'Product Info'},
@@ -104,10 +105,15 @@ const AddProduct = () => {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name="Add Product"
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_SMALL_SEMIBOLD}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={handleBack} />
+          <ArrowLeft
+            style={undefined}
+            size={15}
+            onPress={handleBack}
+            color={ColorPalette.GREY_TEXT_400}
+          />
         }
       />
 

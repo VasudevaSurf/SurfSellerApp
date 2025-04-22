@@ -9,11 +9,19 @@ import {SearchBox} from '../../../../../components/UserComponents/SearchBox/Sear
 import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../config/colorPalette';
-import {getScreenHeight} from '../../../../../helpers/screenSize';
+import {
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import {styles} from './FAQScreen.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
+import {
+  BadgeType,
+  BadgeVariant,
+} from '../../../../../components/UserComponents/Badges/Badge.types';
+import {Spacing} from '../../../../../config/globalStyles';
 
 const FAQScreen = () => {
   const [searchText, setSearchText] = useState('');
@@ -24,7 +32,10 @@ const FAQScreen = () => {
       title: 'Product Listing & Requirements',
       items: [
         {id: 1, label: 'How do I list a new product on the app?'},
-        {id: 2, label: 'What are the image requirements for product listings?'},
+        {
+          id: 2,
+          label: 'What are the image requirements for product listings?',
+        },
         {id: 3, label: 'Can I edit my product details after listing?'},
         {id: 4, label: 'What should I include in the product description?'},
       ],
@@ -34,7 +45,10 @@ const FAQScreen = () => {
       title: 'Pricing & Payments',
       items: [
         {id: 1, label: 'How should I price my product?'},
-        {id: 2, label: 'Does the app charge any listing fees or commissions?'},
+        {
+          id: 2,
+          label: 'Does the app charge any listing fees or commissions?',
+        },
         {id: 3, label: 'How do I receive payments from buyers?'},
         {id: 4, label: 'How often will I receive my payments?'},
         {
@@ -49,7 +63,10 @@ const FAQScreen = () => {
       title: 'Shipping & Delivery',
       items: [
         {id: 1, label: 'Who handles the shipping—me or the platform?'},
-        {id: 2, label: 'Does the app charge any listing fees or commissions?'},
+        {
+          id: 2,
+          label: 'Does the app charge any listing fees or commissions?',
+        },
         {id: 3, label: 'How do I receive payments from buyers?'},
         {id: 4, label: 'How often will I receive my payments?'},
       ],
@@ -57,7 +74,10 @@ const FAQScreen = () => {
   ];
 
   const handleChat = () => {
-    navigate('Dashboard', {screen: 'Account', params: {screen: 'ChatScreen'}});
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {screen: 'ChatScreen'},
+    });
   };
 
   const headerIcons = useMemo(
@@ -80,7 +100,25 @@ const FAQScreen = () => {
         variant={TypographyVariant.LMEDIUM_BOLD}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
-        rightIcons={headerIcons}
+        rightIcons={[
+          {
+            isBadge: true,
+            text: 'Chat with us',
+            badgeType: BadgeType.PRIMARY,
+            badgeVariant: BadgeVariant.FILLED,
+            onPress: () => {},
+            customContainerStyle: {
+              borderColor: ColorPalette.ProgressLine,
+              borderRadius: Spacing.XSmall,
+              paddingVertical: getScreenHeight(1.5),
+              paddingHorizontal: getScreenWidth(2),
+            },
+            textVariant: TypographyVariant.LMEDIUM_MEDIUM,
+            customTextColor: ColorPalette.PRIMARY_500,
+            leftIcon: MessageIcon,
+            iconSize: 16,
+          },
+        ]}
       />
       <View style={styles.searchContainer}>
         <SearchBox
@@ -92,10 +130,7 @@ const FAQScreen = () => {
       <View style={styles.mainContainer}>
         <ScrollView
           style={styles.scrollViewContainer}
-          contentContainerStyle={[
-            styles.scrollContent,
-            {paddingTop: getScreenHeight(2)},
-          ]}
+          contentContainerStyle={[styles.scrollContent]}
           showsVerticalScrollIndicator={false}>
           {faqCategories.map(category => (
             <View key={category.id} style={styles.categoryContainer}>

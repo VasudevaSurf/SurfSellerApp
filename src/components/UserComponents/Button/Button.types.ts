@@ -1,4 +1,5 @@
 import {StyleProp, TextStyle, ViewStyle} from 'react-native';
+import {TypographyVariant} from '../Typography/Typography.types';
 
 export enum ButtonSize {
   LARGE = 'large',
@@ -42,5 +43,6 @@ export interface ButtonProps {
   customStyles?: StyleProp<ViewStyle>;
   customTextStyles?: StyleProp<TextStyle>;
   bgColor?: string;
-  withShadow?: boolean; // New prop to enable shadow
+  withShadow?: boolean;
+  textVariant?: TypographyVariant;
 }

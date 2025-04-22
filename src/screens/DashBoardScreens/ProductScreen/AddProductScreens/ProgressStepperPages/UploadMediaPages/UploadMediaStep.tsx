@@ -140,14 +140,15 @@ const UploadMediaStep = () => {
       <View style={styles.mainHeader}>
         <View style={styles.headerContainer}>
           <Typography
-            variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+            variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
             text="Product Images"
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <InfoIconPay
-            size={16}
+            size={19}
             color={ColorPalette.GREY_TEXT_400}
             style={undefined}
+            strokeWidth={1.5}
           />
         </View>
 

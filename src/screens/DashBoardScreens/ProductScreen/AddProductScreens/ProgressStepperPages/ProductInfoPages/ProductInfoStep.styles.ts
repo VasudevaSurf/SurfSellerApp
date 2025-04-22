@@ -81,9 +81,13 @@ export const styles = StyleSheet.create({
   toolbarIcons: {
     display: 'flex',
     flexDirection: 'row',
-    gap: getScreenWidth(2),
+    gap: getScreenWidth(1),
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  toolbarIconsScrollView: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   containerStyle: {
     backgroundColor: ColorPalette.SearchBack,
@@ -123,5 +127,11 @@ export const styles = StyleSheet.create({
   activeFormatButton: {
     borderRadius: getScreenWidth(1),
     padding: getScreenWidth(0.5),
+  },
+  formatButton: {
+    height: getScreenWidth(7),
+    width: getScreenWidth(7),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {TextInput, TouchableOpacity, View} from 'react-native';
 import ArrowDownIcon from '../../../../../../assets/icons/ArrowDownIcon';
 import ArrowRightIcon from '../../../../../../assets/icons/ArrowRightIcon';
-import InfoIcon from '../../../../../../assets/icons/InfoIcon';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import AlignTextCenterIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextCenterIcon';
 import AlignTextLeftIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextLeftIcon';
@@ -187,6 +186,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
             size={ButtonSize.SMALL}
             onPress={() => {}}
             withShadow
+            textVariant={TypographyVariant.LMEDIUM_MEDIUM}
           />
         </View>
 
@@ -209,13 +209,12 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               onPress={() => toggleTextFormat('bold')}
               style={[textFormat.bold && styles.activeFormatButton]}>
               <Typography
-                variant={TypographyVariant.LMEDIUM_BOLD}
+                variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
                 text="B"
                 customTextStyles={{
                   color: textFormat.bold
                     ? ColorPalette.Primary
                     : ColorPalette.GREY_TEXT_400,
-                  fontSize: 18,
                 }}
               />
             </TouchableOpacity>

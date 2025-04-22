@@ -8,6 +8,7 @@ import {Typography} from '../../../../../components/UserComponents/Typography/Ty
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../config/colorPalette';
 import {
+  getFigmaDimension,
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
@@ -19,6 +20,9 @@ import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 const NotificationScreen: React.FC = () => {
   const [autoAcceptOrders, setAutoAcceptOrders] = useState('yes');
   const [whatsappNotifications, setWhatsappNotifications] = useState(true);
+  const trackWidth = getFigmaDimension(40);
+  const trackHeight = getFigmaDimension(24);
+  const thumbDiameter = getFigmaDimension(18);
 
   const handleAutoAcceptChange = (value: string) => {
     setAutoAcceptOrders(value);
@@ -51,7 +55,7 @@ const NotificationScreen: React.FC = () => {
             <View style={styles.textContainer}>
               <Typography
                 text="Auto accept orders"
-                variant={TypographyVariant.H6_BOLD}
+                variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
                 customTextStyles={styles.primaryText}
               />
 
@@ -88,7 +92,7 @@ const NotificationScreen: React.FC = () => {
             <View style={styles.textContainer}>
               <Typography
                 text="WhatsApp notifications"
-                variant={TypographyVariant.H6_BOLD}
+                variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
                 customTextStyles={styles.primaryText}
               />
               <ToggleSwitch
@@ -104,6 +108,10 @@ const NotificationScreen: React.FC = () => {
                   shadowColor: 'transparent',
                   shadowOffset: {height: 0, width: 0},
                   shadowRadius: 0,
+                  width: thumbDiameter,
+                  height: thumbDiameter,
+                  borderRadius: thumbDiameter / 2,
+                  margin: (trackHeight - thumbDiameter) / 2,
                 }}
                 thumbOffStyle={{
                   backgroundColor: ColorPalette.White,
@@ -112,16 +120,22 @@ const NotificationScreen: React.FC = () => {
                   shadowColor: 'transparent',
                   shadowOffset: {height: 0, width: 0},
                   shadowRadius: 0,
+                  width: thumbDiameter,
+                  height: thumbDiameter,
+                  borderRadius: thumbDiameter / 2,
+                  margin: (trackHeight - thumbDiameter) / 2,
                 }}
                 trackOnStyle={{
-                  width: getScreenWidth(10),
-                  height: getScreenHeight(3),
-                  borderRadius: BorderRadius.Medium,
+                  width: trackWidth,
+                  height: trackHeight,
+                  borderRadius: trackHeight / 2,
+                  padding: 0,
                 }}
                 trackOffStyle={{
-                  width: getScreenWidth(10),
-                  height: getScreenHeight(3),
-                  borderRadius: BorderRadius.Medium,
+                  width: trackWidth,
+                  height: trackHeight,
+                  borderRadius: trackHeight / 2,
+                  padding: 0,
                 }}
               />
             </View>

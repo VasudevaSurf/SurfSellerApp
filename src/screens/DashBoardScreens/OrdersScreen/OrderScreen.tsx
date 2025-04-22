@@ -82,11 +82,11 @@ const OrderScreen = () => {
 
   const filterOptions = [
     {id: 'all', label: 'All'},
+    {id: 'active', label: 'Active'},
     {id: 'inStock', label: 'In Stock'},
+    {id: 'hidden', label: 'Hidden'},
     {id: 'lowStock', label: 'Low in Stock'},
     {id: 'outOfStock', label: 'Out of Stock'},
-    {id: 'hidden', label: 'Hidden'},
-    {id: 'active', label: 'Active'},
     {id: 'pending', label: 'Pending'},
     {id: 'discontinued', label: 'Discontinued'},
     {id: 'draft', label: 'Draft'},
@@ -122,16 +122,16 @@ const OrderScreen = () => {
           {
             icon: BellIcon,
             onPress: () => console.log('Bell icon pressed'),
-            size: 24,
-            color: ColorPalette.GREY_TEXT_400,
-            strokeWidth: 2,
+            size: 20,
+            color: ColorPalette.IconColor,
+            strokeWidth: 1.5,
           },
           {
             icon: QuestionMarkIcon,
-            onPress: () => {},
+            onPress: () => console.log('Info icon pressed'),
             size: 24,
-            color: ColorPalette.GREY_TEXT_400,
-            strokeWidth: 2,
+            color: ColorPalette.IconColor,
+            strokeWidth: 1.5,
           },
         ]}
       />

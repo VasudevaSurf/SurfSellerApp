@@ -1,18 +1,12 @@
 import React from 'react';
 import {Image, View} from 'react-native';
 import {ColorPalette} from '../../../config/colorPalette';
+import {getFigmaDimension} from '../../../helpers/screenSize';
+import {Badge} from '../../UserComponents/Badges/Badge';
 import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
 import {styles} from './RecentOrder.styles';
 import {RecentOrderProps} from './RecentOrder.types';
-import {Badge} from '../../UserComponents/Badges/Badge';
-import DotIcon from '../../../assets/icons/DotIcon';
-import {
-  getScreenWidth,
-  getScreenHeight,
-  getFigmaDimension,
-} from '../../../helpers/screenSize';
-import {Spacing, BorderRadius} from '../../../config/globalStyles';
 
 export const RecentOrder: React.FC<RecentOrderProps> = ({
   orderImage,
@@ -62,14 +56,14 @@ export const RecentOrder: React.FC<RecentOrderProps> = ({
               paddingHorizontal: getFigmaDimension(8),
               paddingVertical: getFigmaDimension(6),
             }}
-            textVariant={TypographyVariant.LMEDIUM_MEDIUM}
+            textVariant={TypographyVariant.LSMALL_MEDIUM}
             customTextColor={statusStyle.text}
           />
         </View>
 
         <View style={styles.textSection}>
           <Typography
-            variant={TypographyVariant.LMEDIUM_BOLD}
+            variant={TypographyVariant.LMEDIUM_SEMIBOLD}
             text={`Order #${orderId}`}
             customTextStyles={styles.orderIdText}
           />
@@ -91,19 +85,19 @@ export const RecentOrder: React.FC<RecentOrderProps> = ({
 
         <View style={styles.priceSection}>
           <Typography
-            variant={TypographyVariant.H6_BOLD}
+            variant={TypographyVariant.H6_SEMIBOLD}
             text={`€${orderAmount.toFixed(2)}`}
             customTextStyles={styles.amountText}
           />
 
           <View style={styles.infoRow}>
             <Typography
-              variant={TypographyVariant.LSMALL_SEMIBOLD}
+              variant={TypographyVariant.LSMALL_REGULAR}
               text={`${orderDate}  •`}
               customTextStyles={styles.dateText}
             />
             <Typography
-              variant={TypographyVariant.LSMALL_SEMIBOLD}
+              variant={TypographyVariant.LSMALL_REGULAR}
               text={customerName}
               customTextStyles={styles.customerText}
             />

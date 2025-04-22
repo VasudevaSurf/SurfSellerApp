@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingVertical: getScreenHeight(1),
     paddingHorizontal: getScreenWidth(4),
-    marginTop: getScreenHeight(2),
+    marginTop: getScreenHeight(1.5),
   },
   scrollContent: {
     gap: getScreenWidth(4),
