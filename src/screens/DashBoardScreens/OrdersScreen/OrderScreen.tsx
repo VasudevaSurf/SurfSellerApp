@@ -74,7 +74,24 @@ const OrderScreen = () => {
     totalItems,
   } = useSelector((state: RootState) => state.orders);
 
+  // Debugging: Log userId
+  useEffect(() => {
+    console.log('OrderScreen - userId:', userId);
+  }, [userId]);
+
   const [searchText, setSearchText] = useState('');
+
+  // Log orders received
+  useEffect(() => {
+    console.log('OrderScreen - Orders received:', orders?.length || 0);
+    if (orders && orders.length > 0) {
+      console.log('OrderScreen - First order ID:', orders[0].order_id);
+      console.log(
+        'OrderScreen - First order details:',
+        JSON.stringify(orders[0], null, 2),
+      );
+    }
+  }, [orders]);
 
   const formattedOrders =
     orders?.map(order => {
@@ -134,6 +151,12 @@ const OrderScreen = () => {
   useEffect(() => {
     if (userId) {
       const apiStatus = getApiStatusFromFilter(statusFilter);
+      console.log(
+        'OrderScreen - Fetching orders with userId:',
+        userId,
+        'status:',
+        apiStatus,
+      );
       dispatch(fetchOrders({userId, status: apiStatus}) as any);
     }
   }, [dispatch, userId]);
@@ -145,9 +168,15 @@ const OrderScreen = () => {
   const handleSearch = () => {
     if (userId) {
       if (searchText.trim()) {
+        console.log('OrderScreen - Searching orders with term:', searchText);
         dispatch(searchOrders({userId, searchTerm: searchText}) as any);
       } else {
-        dispatch(fetchOrders({userId, status: statusFilter}) as any);
+        const apiStatus = getApiStatusFromFilter(statusFilter);
+        console.log(
+          'OrderScreen - Clearing search, fetching with status:',
+          apiStatus,
+        );
+        dispatch(fetchOrders({userId, status: apiStatus}) as any);
       }
     }
   };
@@ -156,20 +185,27 @@ const OrderScreen = () => {
     console.log(`Order ${orderId} status changed to ${newStatus}`);
 
     if (userId) {
-      dispatch(fetchOrders({userId, status: statusFilter}) as any);
+      const apiStatus = getApiStatusFromFilter(statusFilter);
+      dispatch(fetchOrders({userId, status: apiStatus}) as any);
     }
   };
 
   const handleFilterSelect = (filter: {id: string; label: string}) => {
+    console.log('OrderScreen - Filter selected:', filter.id);
     dispatch(setStatusFilter(filter.id));
     const apiStatus = getApiStatusFromFilter(filter.id);
 
     if (userId) {
+      console.log('OrderScreen - Fetching with new filter, status:', apiStatus);
       dispatch(fetchOrders({userId, status: apiStatus}) as any);
     }
   };
 
   const handleCardPress = (params: any) => {
+    console.log(
+      'OrderScreen - Card pressed with params:',
+      JSON.stringify(params, null, 2),
+    );
     navigate('Dashboard', {
       screen: 'Orders',
       params: {
@@ -257,7 +293,20 @@ const OrderScreen = () => {
                   onStatusChange={status =>
                     handleStatusChange(order.id, status)
                   }
-                  onCardPress={handleCardPress}
+                  onCardPress={() =>
+                    handleCardPress({
+                      orderId: order.id,
+                      orderImage: order.orderImage,
+                      orderName: order.orderName,
+                      orderPrice: order.orderPrice,
+                      orderNumber: order.orderNumber,
+                      orderEmail: order.orderEmail,
+                      orderPhone: order.orderPhone,
+                      orderDate: order.orderDate,
+                      orderTime: order.orderTime,
+                      orderStatus: order.orderStatus,
+                    })
+                  }
                 />
               ))
             ) : (

@@ -1,5 +1,11 @@
-import React, {useState} from 'react';
-import {Image, SafeAreaView, ScrollView, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import ChevronDownIcon from '../../../../assets/icons/ArrowDownIcon';
 import ArrowLeft from '../../../../assets/icons/ArrowLeft';
@@ -20,36 +26,200 @@ import {OrderDetailProps} from './OrderDetail.types';
 import {Badge} from '../../../../components/UserComponents/Badges/Badge';
 import ArrowDownIcon from '../../../../assets/icons/ArrowDownIcon';
 import {StatusModal} from '../../../../components/MainComponents/StatusModal/StatusModal';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../../../redux/store';
+import {
+  fetchOrderDetails,
+  updateOrderStatus,
+} from '../../../../redux/slices/orderDetailsSlice';
 
 const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
+  const dispatch = useDispatch();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState('Completed');
-  const orderData = route?.params || {
-    orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
-    orderImage: 'https://picsum.photos/202',
-    orderPrice: '495.00',
-    orderNumber: 172,
-    orderDate: '10 Jul 2024',
-    orderStatus: 'Completed',
-    orderTime: '10:30 AM',
+  const {orderDetails, loading, error} = useSelector(
+    (state: RootState) => state.orderDetails,
+  );
+
+  const userId = useSelector(
+    (state: RootState) => state.auth.userData?.user_id,
+  );
+
+  // Get data from route params
+  const params = route?.params || {};
+  const orderId = params.orderId;
+
+  // Local state for UI while data is loading
+  const [currentStatus, setCurrentStatus] = useState(
+    params.orderStatus || 'Pending',
+  );
+  const [inventory, setInventory] = useState(1);
+  const [customerInfo, setCustomerInfo] = useState({
+    name: params.orderName || '',
+    email: params.orderEmail || '',
+    phone: params.orderPhone || '',
+  });
+  const [productName, setProductName] = useState(params.orderName || 'Product');
+  const [productImage, setProductImage] = useState(
+    params.orderImage || 'https://picsum.photos/202',
+  );
+  const [subTotal, setSubTotal] = useState(params.orderPrice || '€0.00');
+  const [shippingCost, setShippingCost] = useState('€0.00');
+  const [totalPrice, setTotalPrice] = useState(params.orderPrice || '€0.00');
+  const [orderData, setOrderData] = useState({
+    orderNumber: params.orderNumber || orderId,
+    orderDate: params.orderDate || new Date().toLocaleDateString(),
+    orderTime: params.orderTime || new Date().toLocaleTimeString(),
+    orderImage: params.orderImage || 'https://picsum.photos/202',
+    orderName: params.orderName || 'Product',
+    orderStatus: params.orderStatus || 'Pending',
+  });
+
+  // Log for debugging
+  useEffect(() => {
+    console.log(
+      'OrderDetail - Mounted with params:',
+      JSON.stringify(params, null, 2),
+    );
+    console.log('OrderDetail - User ID:', userId);
+    console.log('OrderDetail - Order ID:', orderId);
+  }, [params, userId, orderId]);
+
+  // Format price consistently
+  const formatPrice = (price: any): string => {
+    if (!price) return '€0.00';
+
+    // If it's already a string with Euro symbol
+    if (typeof price === 'string' && price.startsWith('€')) {
+      return price;
+    }
+
+    // If it's a number or a string number
+    return `€${price}`;
+  };
+
+  useEffect(() => {
+    // Only fetch if we have both userID and orderID
+    if (userId && orderId) {
+      dispatch(fetchOrderDetails({userId, orderId}) as any);
+    }
+  }, [dispatch, userId, orderId]);
+
+  // Update local state when orderDetails changes
+  useEffect(() => {
+    if (orderDetails) {
+      // Get the first product information if available
+      let firstProduct = null;
+      if (orderDetails.products && orderDetails.products.length > 0) {
+        firstProduct = orderDetails.products[0];
+        setProductName(firstProduct.product || params.orderName || 'Product');
+        setProductImage(
+          firstProduct.image_url ||
+            params.orderImage ||
+            'https://picsum.photos/202',
+        );
+        setInventory(firstProduct.amount || 1);
+      }
+
+      // Important - use the date/time that came from the route params if available
+      // This ensures consistency with the OrderScreen
+      const orderDate =
+        params.orderDate ||
+        orderDetails.formattedDate ||
+        orderDetails.timestamp;
+      const orderTime = params.orderTime || orderDetails.formattedTime;
+
+      // Set order data with preference for the route params (for consistency)
+      setOrderData({
+        orderNumber:
+          orderDetails.order_number || orderDetails.order_id || orderId,
+        orderDate: orderDate,
+        orderTime: orderTime,
+        orderImage: productImage,
+        orderName: productName,
+        orderStatus:
+          mapStatusToDisplay(orderDetails.status) ||
+          params.orderStatus ||
+          'Pending',
+      });
+
+      // Set customer information
+      setCustomerInfo({
+        name:
+          `${orderDetails.firstname || ''} ${
+            orderDetails.lastname || ''
+          }`.trim() ||
+          orderDetails.customer?.name ||
+          params.orderName ||
+          '',
+        email:
+          orderDetails.email ||
+          orderDetails.customer?.email ||
+          params.orderEmail ||
+          '',
+        phone:
+          orderDetails.phone ||
+          orderDetails.customer?.phone ||
+          params.orderPhone ||
+          '',
+      });
+
+      // Set pricing information, ensuring consistent format
+      setTotalPrice(formatPrice(orderDetails.total));
+      setSubTotal(formatPrice(orderDetails.subtotal || orderDetails.total));
+      setShippingCost(formatPrice(orderDetails.shipping_cost || '0.00'));
+
+      // Set current status using the same mapping as OrderScreen
+      setCurrentStatus(
+        mapStatusToDisplay(
+          orderDetails.status || params.orderStatus || 'Pending',
+        ),
+      );
+    }
+  }, [orderDetails, params]);
+
+  const mapStatusToDisplay = (apiStatus: string): string => {
+    // Use the same mapping as in OrderScreen for consistency
+    const statusMap: {[key: string]: string} = {
+      O: 'Pending',
+      P: 'Processing',
+      C: 'Completed',
+      F: 'Failed',
+      I: 'Cancelled',
+      D: 'Declined',
+      B: 'Shipping',
+      Y: 'Processing',
+      A: 'Processing',
+    };
+
+    return statusMap[apiStatus] || apiStatus || 'Processing';
   };
 
   const [activeSections, setActiveSections] = useState([]);
 
-  // Calculated values for the example
-  const subTotal = '€1,996.00';
-  const shippingCost = '€2.50';
-  const totalPrice = '€1,998.50';
-  const inventory = 11;
-
-  // Define accordion sections data
+  // Define accordion sections data using real customer data
   const SECTIONS = [
     {
       title: 'Customer Information',
       content: (
         <View style={styles.accordionContent}>
           <Typography
-            text="This is customer information section"
+            text={`Name: ${customerInfo.name || 'N/A'}`}
+            variant={TypographyVariant.PMEDIUM_REGULAR}
+            customTextStyles={{
+              color: ColorPalette.GREY_TEXT_300,
+              marginBottom: 8,
+            }}
+          />
+          <Typography
+            text={`Email: ${customerInfo.email || 'N/A'}`}
+            variant={TypographyVariant.PMEDIUM_REGULAR}
+            customTextStyles={{
+              color: ColorPalette.GREY_TEXT_300,
+              marginBottom: 8,
+            }}
+          />
+          <Typography
+            text={`Phone: ${customerInfo.phone || 'N/A'}`}
             variant={TypographyVariant.PMEDIUM_REGULAR}
             customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
           />
@@ -60,9 +230,8 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
       title: 'Billing Address',
       content: (
         <View style={styles.accordionContent}>
-          {/* Billing address content would go here */}
           <Typography
-            text="This is billing address section"
+            text="Address information not available in current API response"
             variant={TypographyVariant.PMEDIUM_REGULAR}
             customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
           />
@@ -73,9 +242,8 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
       title: 'Payment Information',
       content: (
         <View style={styles.accordionContent}>
-          {/* Payment information content would go here */}
           <Typography
-            text="This is payment information section"
+            text="Payment information not available in current API response"
             variant={TypographyVariant.PMEDIUM_REGULAR}
             customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
           />
@@ -131,7 +299,77 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
   const handleStatusChange = newStatus => {
     setCurrentStatus(newStatus);
     console.log('Status changed to:', newStatus);
+
+    // Update the status in Redux
+    if (orderDetails) {
+      // Convert display status back to API status code
+      const apiStatusCode =
+        Object.keys(statusMap).find(key => statusMap[key] === newStatus) || 'P'; // Default to Processing if not found
+
+      dispatch(updateOrderStatus(apiStatusCode));
+
+      // Here you would add an API call to update the status in the backend
+    }
   };
+
+  // Status mapping for conversion between display and API values
+  const statusMap = {
+    O: 'Pending',
+    P: 'Processing',
+    C: 'Completed',
+    F: 'Failed',
+    I: 'Cancelled',
+    D: 'Declined',
+    B: 'Shipping',
+    Y: 'Processing',
+    A: 'Processing',
+  };
+
+  // Show loading spinner while initial data fetching completes
+  if (loading && !orderData) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <Header
+          name="Order summary"
+          variant={TypographyVariant.LMEDIUM_BOLD}
+          textColor={ColorPalette.AgreeTerms}
+          leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+        />
+        <View
+          style={[
+            styles.mainContainer,
+            {justifyContent: 'center', alignItems: 'center'},
+          ]}>
+          <ActivityIndicator size="large" color={ColorPalette.PRIMARY_500} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Only show error screen if there is no data at all to display
+  if (error && !orderData) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <Header
+          name="Order summary"
+          variant={TypographyVariant.LMEDIUM_BOLD}
+          textColor={ColorPalette.AgreeTerms}
+          leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+        />
+        <View
+          style={[
+            styles.mainContainer,
+            {justifyContent: 'center', alignItems: 'center', padding: 20},
+          ]}>
+          <Typography
+            text={error || 'Could not load order details'}
+            variant={TypographyVariant.PMEDIUM_REGULAR}
+            customTextStyles={{color: ColorPalette.ERROR}}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -161,6 +399,24 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         ]}
       />
 
+      {/* Show warning for API errors while still displaying data */}
+      {error && (
+        <View
+          style={{
+            backgroundColor: '#FFECB3',
+            padding: 12,
+            marginHorizontal: 16,
+            marginTop: 8,
+            borderRadius: 8,
+          }}>
+          <Typography
+            text={`Note: Using limited data. ${error}`}
+            variant={TypographyVariant.PSMALL_MEDIUM}
+            customTextStyles={{color: '#856404'}}
+          />
+        </View>
+      )}
+
       <View style={styles.mainContainer}>
         <ScrollView
           style={styles.mainContainer}
@@ -187,14 +443,14 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
             <View style={styles.productRow}>
               <View style={styles.imageContainer}>
                 <Image
-                  source={{uri: orderData.orderImage}}
+                  source={{uri: productImage}}
                   style={styles.productImage}
                   resizeMode="cover"
                 />
               </View>
               <View style={styles.productInfo}>
                 <Typography
-                  text={orderData.orderName}
+                  text={productName}
                   variant={TypographyVariant.PSMALL_MEDIUM}
                   customTextStyles={{
                     color: ColorPalette.GREY_TEXT_500,
@@ -212,7 +468,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
                     width: '100%',
                   }}>
                   <Typography
-                    text="Inventory: "
+                    text="Quantity: "
                     variant={TypographyVariant.PSMALL_REGULAR}
                     customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
                   />
@@ -294,7 +550,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
               customContainerStyle={{
                 paddingVertical: getScreenHeight(1.5),
                 paddingHorizontal: getScreenHeight(2),
-                backgroundColor: ColorPalette.Green_200,
+                backgroundColor: getStatusColor(currentStatus),
               }}
               textVariant={TypographyVariant.LMEDIUM_MEDIUM}
               rightIcon={ArrowDownIcon}
@@ -311,6 +567,30 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
       </View>
     </SafeAreaView>
   );
+};
+
+// Helper function to determine status color based on status
+const getStatusColor = (status: string): string => {
+  const statusColorMap: {[key: string]: string} = {
+    O: '#ff9522', // Pending
+    P: '#97cf4d', // Processing
+    C: '#97cf4d', // Completed
+    F: '#ff5215', // Failed
+    I: '#c2c2c2', // Cancelled
+    D: '#ff5215', // Declined
+    B: '#28abf6', // Shipping
+    Y: '#cc4125', // Awaiting call
+    A: '#dcdcdc', // Fraud checking
+    Pending: '#ff9522',
+    Processing: '#97cf4d',
+    Completed: '#97cf4d',
+    Failed: '#ff5215',
+    Cancelled: '#c2c2c2',
+    Declined: '#ff5215',
+    Shipping: '#28abf6',
+  };
+
+  return statusColorMap[status] || ColorPalette.Green_200;
 };
 
 export default OrderDetail;

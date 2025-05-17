@@ -176,7 +176,50 @@ export const fetchOrderDetailsApi = async (userId: string, orderId: string) => {
         for_order_data: true,
       },
     });
-    return response.data as OrderDetailsResponse;
+
+    if (response.data && response.data.order_info) {
+      const orderInfo = response.data.order_info;
+
+      const products = orderInfo.products
+        ? orderInfo.products.map((product: any) => ({
+            product_id: product.product_id,
+            product: product.product,
+            amount: parseInt(product.amount || '1'),
+            price: product.price_format || `€${product.price}`,
+            image_url: product.image_url || '',
+          }))
+        : [];
+
+      const orderData = {
+        order_id: orderInfo.order_id,
+        order_number: orderInfo.order_id,
+        timestamp: orderInfo.timestamp || orderInfo.updated_at,
+        status: orderInfo.status,
+        total: orderInfo.total ? `€${orderInfo.total}` : '€0.00',
+        firstname: orderInfo.firstname,
+        lastname: orderInfo.lastname,
+        email: orderInfo.email,
+        phone: orderInfo.phone,
+        customer: {
+          email: orderInfo.email,
+          phone: orderInfo.phone,
+          name: `${orderInfo.firstname || ''} ${
+            orderInfo.lastname || ''
+          }`.trim(),
+        },
+        products: products,
+        shipping_cost: orderInfo.shipping_cost || '0.00',
+        subtotal: orderInfo.subtotal || orderInfo.total || '0.00',
+      };
+
+      return {
+        order_data: orderData,
+        result: response.data.result,
+        message: response.data.message,
+      } as OrderDetailsResponse;
+    }
+
+    throw new Error('Response missing order_info property');
   } catch (error) {
     console.error('Fetch Order Details API error:', error);
     throw error;
