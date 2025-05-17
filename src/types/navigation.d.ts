@@ -66,6 +66,7 @@ export type ProductNavigator = {
   ProductsPage: undefined;
   AddProduct: undefined;
   CategoryScreen: undefined;
+  ProductDetails: { productId: string };
 };
 
 export type HomeNavigator = {

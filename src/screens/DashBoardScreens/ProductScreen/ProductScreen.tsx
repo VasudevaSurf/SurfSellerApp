@@ -34,63 +34,10 @@ import {fetchProducts} from '../../../redux/slices/productsSlice';
 import {AppDispatch, RootState} from '../../../redux/store';
 import {styles} from './ProductScreen.styles';
 
-// Demo product data for testing
-const demoProducts = [
-  {
-    product_id: 'demo1',
-    product: 'Premium Leather Wallet',
-    format_price: '€129.99',
-    image_url: 'https://example.com/wallet.jpg',
-    amount: 45,
-    status: 'A',
-  },
-  {
-    product_id: 'demo2',
-    product: 'Stainless Steel Water Bottle - Eco-Friendly & BPA Free',
-    format_price: '€24.95',
-    image_url: 'https://example.com/bottle.jpg',
-    amount: 230,
-    status: '',
-  },
-  {
-    product_id: 'demo3',
-    product: 'Wireless Noise-Cancelling Headphones',
-    format_price: '€199.99',
-    image_url: 'https://example.com/headphones.jpg',
-    amount: 15,
-    status: 'A',
-  },
-  {
-    product_id: 'demo4',
-    product: 'Organic Cotton T-Shirt',
-    format_price: '€29.95',
-    image_url: '',
-    amount: 0,
-    status: 'H',
-  },
-  {
-    product_id: 'demo5',
-    product: 'Handmade Ceramic Mug Set',
-    format_price: '€39.99',
-    image_url: 'https://example.com/mugs.jpg',
-    amount: 8,
-    status: 'A',
-  },
-  {
-    product_id: 'demo6',
-    product: 'Smart Watch with Health Tracking',
-    format_price: '€249.99',
-    image_url: 'https://example.com/smartwatch.jpg',
-    amount: 2,
-    status: 'A',
-  },
-];
-
 const ProductScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchText] = useState();
   const [showAddModal, setShowAddModal] = useState(false);
-  const [useTestData, setUseTestData] = useState(false);
 
   const userId = useSelector(
     (state: RootState) => state.auth.userData?.user_id,
@@ -105,19 +52,23 @@ const ProductScreen = () => {
     totalItems,
   } = useSelector((state: RootState) => state.products);
 
-  // Combined products array (API data or demo data)
-  const displayProducts =
-    useTestData || !products || products.length === 0 ? demoProducts : products;
+  // Log all product IDs in the console
+  useEffect(() => {
+    if (products && products.length > 0) {
+      console.log(
+        'Product IDs available:',
+        products.map(product => product.product_id),
+      );
+    } else {
+      console.log('No product IDs available');
+    }
+  }, [products]);
 
   useEffect(() => {
     if (userId) {
-      dispatch(fetchProducts({userId})).catch(() => {
-        console.log('Failed to fetch products, using demo data');
-        setUseTestData(true);
+      dispatch(fetchProducts({userId})).catch(err => {
+        console.log('Failed to fetch products:', err);
       });
-    } else {
-      // If no userId available, use demo data
-      setUseTestData(true);
     }
   }, [dispatch, userId]);
 
@@ -156,7 +107,7 @@ const ProductScreen = () => {
   ];
 
   const filterOptions = [
-    {id: 'all', label: `All ${displayProducts.length}`},
+    {id: 'all', label: `All ${products.length}`},
     {id: 'active', label: 'Active'},
     {id: 'lowStock', label: 'Low in Stock'},
     {id: 'hidden', label: 'Hidden'},
@@ -241,26 +192,17 @@ const ProductScreen = () => {
         />
       </View>
 
-      {loading && !useTestData ? (
+      {loading ? (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <ActivityIndicator size="large" color={ColorPalette.Primary} />
         </View>
-      ) : error && !useTestData ? (
+      ) : error ? (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Typography
             text={error}
             variant={TypographyVariant.LMEDIUM_REGULAR}
             customTextStyles={{color: ColorPalette.RED_100}}
           />
-          <TouchableOpacity
-            style={{marginTop: 16, padding: 8}}
-            onPress={() => setUseTestData(true)}>
-            <Typography
-              text="Use demo data instead"
-              variant={TypographyVariant.LMEDIUM_REGULAR}
-              customTextStyles={{color: ColorPalette.Primary}}
-            />
-          </TouchableOpacity>
         </View>
       ) : (
         <ScrollView
@@ -271,10 +213,11 @@ const ProductScreen = () => {
           ]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.ProductContainer}>
-            {displayProducts && displayProducts.length > 0 ? (
-              displayProducts.map(product => (
+            {products && products.length > 0 ? (
+              products.map(product => (
                 <ProductInfo
                   key={product.product_id}
+                  productId={product.product_id} // Make sure this is correctly passed
                   orderImage={product.image_url}
                   productName={product.product}
                   sellerPrice={product.format_price}

@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {ScrollView, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {ScrollView, View, ActivityIndicator} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BellIcon from '../../../assets/icons/BellIcon';
 import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
@@ -14,95 +14,162 @@ import {getScreenHeight} from '../../../helpers/screenSize';
 import {navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './OrderScreen.styles';
 import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../../redux/store';
+import {
+  fetchOrders,
+  searchOrders,
+  setStatusFilter,
+  setSearchTerm,
+} from '../../../redux/slices/ordersSlice';
 
-const OrderScreen = () => {
-  const [searchText, setSearchText] = useState('');
-  const [orders, setOrders] = useState([
-    {
-      id: '1',
-      orderImage: 'https://picsum.photos/202',
-      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
-      orderPrice: '499.00',
-      orderNumber: 172,
-      orderEmail: 'revanthyadav@surf.mt',
-      orderPhone: 9970344320,
-      orderDate: '10/15/2024',
-      orderTime: '21:59',
-      orderStatus: 'Cancelled' as OrderStatus,
-    },
-    {
-      id: '2',
-      orderImage: 'https://picsum.photos/202',
-      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
-      orderPrice: '499.00',
-      orderNumber: 172,
-      orderEmail: 'revanthyadav@surf.mt',
-      orderPhone: 9970344320,
-      orderDate: '10/15/2024',
-      orderTime: '21:59',
-      orderStatus: 'Cancelled' as OrderStatus,
-    },
-    {
-      id: '3',
-      orderImage: 'https://picsum.photos/202',
-      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
-      orderPrice: '10.00',
-      orderNumber: 172,
-      orderEmail: 'revanthyadav@surf.mt',
-      orderPhone: 9970344320,
-      orderDate: '10/15/2024',
-      orderTime: '21:59',
-      orderStatus: 'Cancelled' as OrderStatus,
-    },
-    {
-      id: '4',
-      orderImage: 'https://picsum.photos/202',
-      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
-      orderPrice: '499.00',
-      orderNumber: 172,
-      orderEmail: 'revanthyadav@surf.mt',
-      orderPhone: 9970344320,
-      orderDate: '10/15/2024',
-      orderTime: '21:59',
-      orderStatus: 'Cancelled' as OrderStatus,
-    },
-    {
-      id: '5',
-      orderImage: 'https://picsum.photos/202',
-      orderName: 'Lunar Whisper | 75ml | Velvet Bloom Collection',
-      orderPrice: '499.00',
-      orderNumber: 172,
-      orderEmail: 'revanthyadav@surf.mt',
-      orderPhone: 9970344320,
-      orderDate: '10/15/2024',
-      orderTime: '21:59',
-      orderStatus: 'Cancelled' as OrderStatus,
-    },
-  ]);
-
-  const filterOptions = [
-    {id: 'all', label: 'All'},
-    {id: 'active', label: 'Active'},
-    {id: 'inStock', label: 'In Stock'},
-    {id: 'hidden', label: 'Hidden'},
-    {id: 'lowStock', label: 'Low in Stock'},
-    {id: 'outOfStock', label: 'Out of Stock'},
-    {id: 'pending', label: 'Pending'},
-    {id: 'discontinued', label: 'Discontinued'},
-    {id: 'draft', label: 'Draft'},
-  ];
-
-  const [selectedFilter, setSelectedFilter] = useState(filterOptions[0]);
-
-  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    setOrders(prevOrders =>
-      prevOrders.map(order =>
-        order.id === orderId ? {...order, orderStatus: newStatus} : order,
-      ),
-    );
+const convertOrderStatus = (apiStatus: string): OrderStatus => {
+  const statusMap: {[key: string]: OrderStatus} = {
+    O: 'Pending',
+    P: 'Processing',
+    C: 'Completed',
+    F: 'Failed',
+    I: 'Cancelled',
+    D: 'Declined',
+    B: 'Shipping', // Backordered mapped to Shipping
+    Y: 'Processing', // Awaiting call mapped to Processing
+    A: 'Processing', // Fraud checking mapped to Processing
   };
 
-  const handleCardPress = params => {
+  return statusMap[apiStatus] || 'Processing';
+};
+
+const getApiStatusFromFilter = (filterId: string): string | null => {
+  if (filterId === 'all') return null;
+
+  const filterToApiMap: {[key: string]: string} = {
+    pending: 'O',
+    processing: 'P',
+    completed: 'C',
+    failed: 'F',
+    cancelled: 'I',
+    shipping: 'B',
+  };
+
+  if (['O', 'P', 'C', 'F', 'I', 'D', 'B', 'Y', 'A'].includes(filterId)) {
+    return filterId;
+  }
+
+  return filterToApiMap[filterId] || null;
+};
+
+const OrderScreen = () => {
+  const dispatch = useDispatch();
+  const userId = useSelector(
+    (state: RootState) => state.auth.userData?.user_id,
+  );
+  const {
+    orders,
+    orderStatuses,
+    loading,
+    error,
+    statusFilter,
+    searchTerm,
+    currentPage,
+    totalItems,
+  } = useSelector((state: RootState) => state.orders);
+
+  const [searchText, setSearchText] = useState('');
+
+  const formattedOrders =
+    orders?.map(order => {
+      return {
+        id: order.order_id || '',
+        orderImage: 'https://picsum.photos/202',
+        orderName:
+          `${order.firstname || ''} ${order.lastname || ''}`.trim() ||
+          `Customer Order`,
+        orderPrice: order.total || '€0.00',
+        orderNumber: parseInt(order.order_id || '0'),
+        orderEmail: order.email || '',
+        orderPhone: order.phone || '',
+        orderDate: order.timestamp
+          ? new Date(parseInt(order.timestamp) * 1000).toLocaleDateString()
+          : '',
+        orderTime: order.timestamp
+          ? new Date(parseInt(order.timestamp) * 1000).toLocaleTimeString()
+          : '',
+        orderStatus: convertOrderStatus(order.status || ''),
+      };
+    }) || [];
+
+  const defaultFilters = [
+    {id: 'all', label: 'All'},
+    {id: 'processing', label: 'Processing'},
+    {id: 'completed', label: 'Completed'},
+    {id: 'cancelled', label: 'Cancelled'},
+    {id: 'pending', label: 'Pending'},
+    {id: 'failed', label: 'Failed'},
+    {id: 'shipping', label: 'Shipping'},
+  ];
+
+  const apiStatusMap = {
+    O: 'pending',
+    P: 'processing',
+    C: 'completed',
+    F: 'failed',
+    I: 'cancelled',
+    B: 'shipping',
+  };
+
+  const additionalFilters =
+    orderStatuses
+      ?.filter(status => !Object.keys(apiStatusMap).includes(status.status))
+      .map(status => ({
+        id: status.status,
+        label: status.description,
+      })) || [];
+
+  const filterOptions = [...defaultFilters, ...additionalFilters];
+
+  const selectedFilter =
+    filterOptions.find(option => option.id === statusFilter) ||
+    filterOptions[0];
+
+  useEffect(() => {
+    if (userId) {
+      const apiStatus = getApiStatusFromFilter(statusFilter);
+      dispatch(fetchOrders({userId, status: apiStatus}) as any);
+    }
+  }, [dispatch, userId]);
+
+  const handleSearchTextChange = (text: string) => {
+    setSearchText(text);
+  };
+
+  const handleSearch = () => {
+    if (userId) {
+      if (searchText.trim()) {
+        dispatch(searchOrders({userId, searchTerm: searchText}) as any);
+      } else {
+        dispatch(fetchOrders({userId, status: statusFilter}) as any);
+      }
+    }
+  };
+
+  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
+    console.log(`Order ${orderId} status changed to ${newStatus}`);
+
+    if (userId) {
+      dispatch(fetchOrders({userId, status: statusFilter}) as any);
+    }
+  };
+
+  const handleFilterSelect = (filter: {id: string; label: string}) => {
+    dispatch(setStatusFilter(filter.id));
+    const apiStatus = getApiStatusFromFilter(filter.id);
+
+    if (userId) {
+      dispatch(fetchOrders({userId, status: apiStatus}) as any);
+    }
+  };
+
+  const handleCardPress = (params: any) => {
     navigate('Dashboard', {
       screen: 'Orders',
       params: {
@@ -139,44 +206,72 @@ const OrderScreen = () => {
       <View style={styles.searchContainer}>
         <SearchBox
           value={searchText}
-          onChangeText={setSearchText}
-          placeholder="Search Products"
+          onChangeText={handleSearchTextChange}
+          placeholder="Search Orders"
+          onSubmitEditing={handleSearch}
         />
       </View>
       <View style={styles.slidingBarsContainer}>
         <SlidingBar
           options={filterOptions}
           selectedOption={selectedFilter}
-          onOptionSelect={setSelectedFilter}
+          onOptionSelect={handleFilterSelect}
         />
       </View>
-      <ScrollView
-        style={styles.mainContainer}
-        contentContainerStyle={[
-          styles.scrollContent,
-          {paddingBottom: getScreenHeight(4)},
-        ]}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.productContainer}>
-          {orders.map(order => (
-            <OrderInfo
-              key={order.id}
-              orderId={order.id}
-              orderImage={order.orderImage}
-              orderName={order.orderName}
-              orderPrice={order.orderPrice}
-              orderNumber={order.orderNumber}
-              orderEmail={order.orderEmail}
-              orderPhone={order.orderPhone}
-              orderDate={order.orderDate}
-              orderTime={order.orderTime}
-              orderStatus={order.orderStatus}
-              onStatusChange={status => handleStatusChange(order.id, status)}
-              onCardPress={handleCardPress}
-            />
-          ))}
+
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={ColorPalette.PRIMARY} />
         </View>
-      </ScrollView>
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <Typography
+            text={`Error: ${error}`}
+            variant={TypographyVariant.MEDIUM}
+            color={ColorPalette.ERROR}
+          />
+        </View>
+      ) : (
+        <ScrollView
+          style={styles.mainContainer}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {paddingBottom: getScreenHeight(4)},
+          ]}
+          showsVerticalScrollIndicator={false}>
+          <View style={styles.productContainer}>
+            {formattedOrders.length > 0 ? (
+              formattedOrders.map(order => (
+                <OrderInfo
+                  key={order.id}
+                  orderId={order.id}
+                  orderImage={order.orderImage}
+                  orderName={order.orderName}
+                  orderPrice={order.orderPrice}
+                  orderNumber={order.orderNumber}
+                  orderEmail={order.orderEmail}
+                  orderPhone={order.orderPhone}
+                  orderDate={order.orderDate}
+                  orderTime={order.orderTime}
+                  orderStatus={order.orderStatus}
+                  onStatusChange={status =>
+                    handleStatusChange(order.id, status)
+                  }
+                  onCardPress={handleCardPress}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Typography
+                  text="No orders found"
+                  variant={TypographyVariant.MEDIUM}
+                  color={ColorPalette.GREY_TEXT_400}
+                />
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

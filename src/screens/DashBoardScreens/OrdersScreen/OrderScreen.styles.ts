@@ -31,4 +31,21 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: getScreenWidth(4),
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: getScreenWidth(4),
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: getScreenHeight(20),
+  },
 });

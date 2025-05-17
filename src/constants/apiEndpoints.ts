@@ -1,8 +1,13 @@
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/NtSeLoginApi',
+    LOGIN: '/api.php?_d=NtSeLoginApi',
   },
   PRODUCTS: {
-    LIST: '/NtSeProductsApi',
+    LIST: '/api.php?_d=NtSeProductsApi',
+    DETAIL: '/api.php?_d=NtSeProductsApi',
+  },
+  ORDERS: {
+    LIST: '/api.php?_d=NtSeOrdersApi',
+    DETAIL: '/api.php?_d=NtSeOrdersApi',
   },
 };

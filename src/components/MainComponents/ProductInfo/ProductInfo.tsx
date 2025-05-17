@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Image, ImageSourcePropType, View} from 'react-native';
+import {Image, ImageSourcePropType, TouchableOpacity, View} from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
 import MoreVerticalIcon from '../../../assets/icons/MoreVerticalIcon';
 import {ColorPalette} from '../../../config/colorPalette';
@@ -15,10 +15,12 @@ import {TypographyVariant} from '../../UserComponents/Typography/Typography.type
 import {AddModal, ButtonConfig} from '../AddModal/AddModal';
 import {styles} from './ProductInfo.styles';
 import {ProductInfoProps} from './ProductInfo.types';
+import {navigate} from '../../../navigation/utils/navigationRef';
 
 const DefaultProduct = require('../../../assets/images/defaultProduct.png');
 
 export const ProductInfo: React.FC<ProductInfoProps> = ({
+  productId,
   orderImage,
   productName,
   sellerPrice,
@@ -32,6 +34,16 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
+
+  const handlePress = () => {
+    navigate('Dashboard', {
+      screen: 'Product',
+      params: {
+        screen: 'ProductDetails',
+        params: {productId},
+      },
+    });
+  };
 
   const handleUploadCsv = () => {
     console.log('Upload CSV pressed');
@@ -91,7 +103,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   const thumbDiameter = getFigmaDimension(18);
 
   return (
-    <View style={[styles.container, style]}>
+    <TouchableOpacity onPress={handlePress} style={[styles.container, style]}>
       <View style={styles.imageContainer}>
         <Image
           source={getImageSource()}
@@ -218,6 +230,6 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           buttons={buttonsTwo}
         />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
