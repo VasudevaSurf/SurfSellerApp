@@ -1,5 +1,6 @@
 import React, {useCallback, useState} from 'react';
 import {Image, SafeAreaView, ScrollView, View} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import ArrowLeftIcon from '../../../assets/icons/ArrowLeftIcon';
 import CloseCircleIcon from '../../../assets/icons/CloseCircleIcon';
 import {
@@ -15,6 +16,7 @@ import {TypographyVariant} from '../../../components/UserComponents/Typography/T
 import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {goBack, navigate} from '../../../navigation/utils/navigationRef';
+import {updateProfile} from '../../../redux/slices/profileSlice';
 import {styles} from './EditFieldScreen.styles';
 import {
   EditFieldParams,
@@ -22,6 +24,7 @@ import {
   FieldValues,
 } from './EditFieldScreen.types';
 import ArrowLeft from '../../../assets/icons/ArrowLeft';
+import {RootState, AppDispatch} from '../../../redux/store';
 
 type ValidationFunction = (value: string) => string | true;
 
@@ -32,31 +35,77 @@ interface UpdatedEditFieldScreenProps {
   navigation: any;
 }
 
-const submitFormAction = (actionType: string, values: any) => {
-  switch (actionType) {
-    case 'updateName':
-    case 'updateBusinessName':
-    case 'updateVATNumber':
-    case 'updateStreetName':
-    case 'updateCityName':
-    case 'updatePostalCode':
-    case 'updateCountry':
-    case 'updateEmail':
-    case 'updatePhone':
-    case 'updateAccountName':
-    case 'updateAccountNumber':
-    case 'updateBicCode':
-      break;
-    default:
-      console.warn(`Unhandled action type: ${actionType}`);
+const submitFormAction = async (
+  actionType: string,
+  values: any,
+  dispatch: AppDispatch,
+  userId: string,
+) => {
+  try {
+    switch (actionType) {
+      case 'updateName':
+        // For name updates, values contains firstName and lastName
+        await dispatch(
+          updateProfile({
+            userId,
+            profileData: {
+              firstname: values.firstName,
+              lastname: values.lastName,
+            },
+          }),
+        ).unwrap();
+        break;
+      case 'updateEmail':
+        await dispatch(
+          updateProfile({
+            userId,
+            profileData: {
+              email: values,
+            },
+          }),
+        ).unwrap();
+        break;
+      case 'updatePhone':
+        await dispatch(
+          updateProfile({
+            userId,
+            profileData: {
+              phone: values,
+            },
+          }),
+        ).unwrap();
+        break;
+      case 'updateBusinessName':
+      case 'updateVATNumber':
+      case 'updateStreetName':
+      case 'updateCityName':
+      case 'updatePostalCode':
+      case 'updateCountry':
+      case 'updateAccountName':
+      case 'updateAccountNumber':
+      case 'updateBicCode':
+        // These are not profile updates, handle them as before
+        break;
+      default:
+        console.warn(`Unhandled action type: ${actionType}`);
+    }
+    return true;
+  } catch (error) {
+    console.error('Profile update failed:', error);
+    throw error;
   }
-  return true;
 };
 
 const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
   route,
   navigation,
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const userData = useSelector((state: RootState) => state.auth.userData);
+  const {updating, updateError} = useSelector(
+    (state: RootState) => state.profile,
+  );
+
   const {
     fieldType,
     initialValue = '',
@@ -187,7 +236,6 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     if (originScreen === 'CompanyProfile') {
       navigation.navigate('CompanyProfile', updatedData);
     } else if (originScreen === 'BankDetails') {
-      // Add this condition
       navigation.navigate('BankDetails', updatedData);
     } else if (fieldType === 'email') {
       navigation.navigate('Dashboard', {
@@ -202,105 +250,131 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     }
   };
 
-  const handleSubmit = (): void => {
-    if (multipleFields) {
-      let hasErrors = false;
-      const newErrors: ErrorValues = {};
+  const handleSubmit = async (): Promise<void> => {
+    if (!userData?.user_id) {
+      setError('User not found. Please login again.');
+      return;
+    }
 
-      fields.forEach(field => {
-        const validationFn = getValidationForType(field.validationType);
-        const validationResult = validationFn(fieldValues[field.key]);
+    try {
+      if (multipleFields) {
+        let hasErrors = false;
+        const newErrors: ErrorValues = {};
 
-        if (validationResult !== true) {
-          newErrors[field.key] = validationResult;
-          hasErrors = true;
+        fields.forEach(field => {
+          const validationFn = getValidationForType(field.validationType);
+          const validationResult = validationFn(fieldValues[field.key]);
+
+          if (validationResult !== true) {
+            newErrors[field.key] = validationResult;
+            hasErrors = true;
+          }
+        });
+
+        if (hasErrors) {
+          setErrors(newErrors);
+          return;
         }
-      });
 
-      if (hasErrors) {
-        setErrors(newErrors);
-        return;
-      }
+        await submitFormAction(
+          onSubmitActionType,
+          fieldValues,
+          dispatch,
+          userData.user_id,
+        );
 
-      submitFormAction(onSubmitActionType, fieldValues);
-
-      if (originScreen === 'CompanyProfile') {
-        // For CompanyProfile, we may still need name combinations in some cases
-        if (fieldValues.firstName && fieldValues.lastName) {
+        if (originScreen === 'CompanyProfile') {
+          // For CompanyProfile, we may still need name combinations in some cases
+          if (fieldValues.firstName && fieldValues.lastName) {
+            const fullName = `${fieldValues.firstName} ${fieldValues.lastName}`;
+            navigateBack({updatedName: fullName});
+          } else {
+            navigateBack(fieldValues);
+          }
+        } else {
+          // Default PersonalInfo handling
           const fullName = `${fieldValues.firstName} ${fieldValues.lastName}`;
           navigateBack({updatedName: fullName});
+        }
+      } else {
+        const validationFn = getValidationForType(validationType || fieldType);
+        const validationResult = validationFn(fieldValue);
+
+        if (validationResult !== true) {
+          setError(validationResult);
+          return;
+        }
+
+        await submitFormAction(
+          onSubmitActionType,
+          fieldValue,
+          dispatch,
+          userData.user_id,
+        );
+
+        if (fieldType === 'phone') {
+          navigate('Auth', {
+            screen: 'OTPVerification',
+            params: {
+              phoneNumber: `${countryCode} ${fieldValue}`,
+              flow: 'update',
+              returnData: {updatedPhone: fieldValue},
+              returnScreen: originScreen,
+              returnStack: 'Account',
+            },
+          });
         } else {
-          navigateBack(fieldValues);
+          let updatedData = {};
+          switch (fieldType) {
+            case 'email':
+              updatedData = {updatedEmail: fieldValue};
+              break;
+            case 'businessName':
+              updatedData = {updatedName: fieldValue};
+              break;
+            case 'vatNumber':
+              updatedData = {updatedVat: fieldValue};
+              break;
+            case 'streetName':
+              updatedData = {updatedStreet: fieldValue};
+              break;
+            case 'cityName':
+              updatedData = {updatedCity: fieldValue};
+              break;
+            case 'postalCode':
+              updatedData = {updatedPostal: fieldValue};
+              break;
+            case 'country':
+              updatedData = {updatedCountry: fieldValue};
+              break;
+            case 'accountName':
+              updatedData = {updatedAccountName: fieldValue};
+              break;
+            case 'accountNumber':
+              updatedData = {updatedAccountNumber: fieldValue};
+              break;
+            case 'bicCode':
+              updatedData = {updatedBicCode: fieldValue};
+              break;
+            default:
+              updatedData = {updatedName: fieldValue};
+          }
+          navigateBack(updatedData);
         }
-      } else {
-        // Default PersonalInfo handling
-        const fullName = `${fieldValues.firstName} ${fieldValues.lastName}`;
-        navigateBack({updatedName: fullName});
       }
-    } else {
-      const validationFn = getValidationForType(validationType || fieldType);
-      const validationResult = validationFn(fieldValue);
-
-      if (validationResult !== true) {
-        setError(validationResult);
-        return;
-      }
-
-      submitFormAction(onSubmitActionType, fieldValue);
-
-      if (fieldType === 'phone') {
-        navigate('Auth', {
-          screen: 'OTPVerification',
-          params: {
-            phoneNumber: `${countryCode} ${fieldValue}`,
-            flow: 'update',
-            returnData: {updatedPhone: fieldValue},
-            returnScreen: originScreen,
-            returnStack: 'Account',
-          },
-        });
+    } catch (error: any) {
+      console.error('Submit failed:', error);
+      if (multipleFields) {
+        setErrors({general: error.message || 'Update failed'});
       } else {
-        let updatedData = {};
-        switch (fieldType) {
-          case 'businessName':
-            updatedData = {updatedName: fieldValue};
-            break;
-          case 'vatNumber':
-            updatedData = {updatedVat: fieldValue};
-            break;
-          case 'streetName':
-            updatedData = {updatedStreet: fieldValue};
-            break;
-          case 'cityName':
-            updatedData = {updatedCity: fieldValue};
-            break;
-          case 'postalCode':
-            updatedData = {updatedPostal: fieldValue};
-            break;
-          case 'country':
-            updatedData = {updatedCountry: fieldValue};
-            break;
-          case 'email':
-            updatedData = {updatedEmail: fieldValue};
-            break;
-          case 'accountName':
-            updatedData = {updatedAccountName: fieldValue};
-            break;
-          case 'accountNumber':
-            updatedData = {updatedAccountNumber: fieldValue};
-            break;
-          case 'bicCode':
-            updatedData = {updatedBicCode: fieldValue};
-            break;
-          default:
-            updatedData = {updatedName: fieldValue};
-        }
-        navigateBack(updatedData);
+        setError(error.message || 'Update failed');
       }
     }
   };
 
   const isSubmitDisabled = (): boolean => {
+    if (updating) return true;
+
     if (multipleFields) {
       return fields.some(
         field =>
@@ -310,6 +384,9 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     }
     return fieldValue.trim() === '';
   };
+
+  // Show update error from Redux if it exists
+  const displayError = updateError || error;
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -368,6 +445,15 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                       ]}
                     />
                   ))}
+                  {errors.general && (
+                    <View style={{paddingHorizontal: getScreenWidth(4)}}>
+                      <Typography
+                        variant={TypographyVariant.PSMALL_REGULAR}
+                        text={errors.general}
+                        customTextStyles={{color: ColorPalette.RED}}
+                      />
+                    </View>
+                  )}
                 </View>
               ) : (
                 <AnimatedTextInput
@@ -378,12 +464,12 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                   customLabelColorFocused={ColorPalette.GREY_TEXT_400}
                   customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
                   customBorderColor={
-                    error ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
+                    displayError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
                   }
                   customBorderWidth={1}
                   customFocusedBorderWidth={2}
                   customErrorBorderWidth={2}
-                  error={error}
+                  error={displayError}
                   showCountrySection={showCountrySection}
                   countryCode={countryCode}
                   countryFlag={countryFlag}
@@ -423,6 +509,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
             }
             size={ButtonSize.MEDIUM}
             onPress={handleSubmit}
+            loading={updating}
           />
         </View>
       </View>

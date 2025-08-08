@@ -375,12 +375,16 @@ export const loginApi = async (email: string, password: string) => {
 
 export const fetchProfileApi = async (userId: string) => {
   try {
+    console.log('Fetching profile for userId:', userId);
+
     const response = await apiClient.get(`/api.php`, {
       params: {
         _d: 'NtSeProfilesApi',
         user_id: userId,
       },
     });
+
+    console.log('Profile API response:', response.data);
     return response.data as ProfileResponse;
   } catch (error) {
     console.error('Fetch Profile API error:', error);
@@ -393,15 +397,43 @@ export const updateProfileApi = async (
   profileData: Partial<UserProfile>,
 ) => {
   try {
-    const response = await apiClient.post(`/api.php`, {
+    console.log(
+      'Updating profile for userId:',
+      userId,
+      'with data:',
+      profileData,
+    );
+
+    // Transform the profile data to match API expectations
+    const requestData = {
       _d: 'NtSeProfilesApi',
       user_id: userId,
       user_data: profileData,
-    });
+    };
+
+    console.log('Sending update request:', requestData);
+
+    const response = await apiClient.post(`/api.php`, requestData);
+
+    console.log('Update Profile API response:', response.data);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Update Profile API error:', error);
-    throw error;
+
+    // Handle different error scenarios
+    if (error.response?.status === 400) {
+      throw new Error('Invalid profile data provided');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to update this profile');
+    } else if (error.response?.status === 404) {
+      throw new Error('Profile not found');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error occurred while updating profile');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to update profile',
+      );
+    }
   }
 };
 

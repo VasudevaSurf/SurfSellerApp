@@ -1,6 +1,7 @@
 import {useFocusEffect, useRoute} from '@react-navigation/native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
 import {Header} from '../../../../../components/UserComponents/Header/Header';
 import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
@@ -8,8 +9,10 @@ import {TypographyVariant} from '../../../../../components/UserComponents/Typogr
 import {ColorPalette} from '../../../../../config/colorPalette';
 import {getScreenHeight} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
+import {fetchProfile} from '../../../../../redux/slices/profileSlice';
 import {styles} from './PerosanlInfo.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
+import {RootState, AppDispatch} from '../../../../../redux/store';
 
 const INITIAL_COUNTRY_CODE = '+356';
 const MALTA_FLAG_URL =
@@ -17,10 +20,38 @@ const MALTA_FLAG_URL =
 
 const PersonalInfo = () => {
   const route = useRoute();
-  const [fullName, setFullName] = useState('Annie Flora');
-  const [email, setEmail] = useState('anniesshop@gmail.com');
-  const [phoneNumber, setPhoneNumber] = useState('9864 1234');
+  const dispatch = useDispatch<AppDispatch>();
+  const userData = useSelector((state: RootState) => state.auth.userData);
+  const {profileData, loading, error} = useSelector(
+    (state: RootState) => state.profile,
+  );
+
+  // State for form fields
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [countryCode, setCountryCode] = useState(INITIAL_COUNTRY_CODE);
+
+  // Fetch profile data when component mounts
+  useEffect(() => {
+    if (userData?.user_id) {
+      dispatch(fetchProfile(userData.user_id));
+    }
+  }, [dispatch, userData?.user_id]);
+
+  // Update state when profile data changes
+  useEffect(() => {
+    if (profileData) {
+      // Construct full name from profile data
+      const firstName = profileData.firstname || '';
+      const lastName = profileData.lastname || '';
+      const constructedFullName = `${firstName} ${lastName}`.trim();
+
+      setFullName(constructedFullName || 'Annie Flora');
+      setEmail(profileData.email || 'anniesshop@gmail.com');
+      setPhoneNumber(profileData.phone || '9864 1234');
+    }
+  }, [profileData]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -34,12 +65,16 @@ const PersonalInfo = () => {
   );
 
   const handleEditName = () => {
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
     navigate('EditField', {
       fieldType: 'name',
       multipleFields: true,
       initialValues: {
-        firstName: fullName.split(' ')[0] || '',
-        lastName: fullName.split(' ').slice(1).join(' ') || '',
+        firstName,
+        lastName,
       },
       headerTitle: 'Update your name',
       description:

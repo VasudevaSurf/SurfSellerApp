@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Image, ScrollView, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useDispatch, useSelector} from 'react-redux';
@@ -25,26 +25,42 @@ import {
   navigateToAuth,
 } from '../../../navigation/utils/navigationRef';
 import {logoutUser} from '../../../redux/slices/authSlice';
+import {fetchProfile} from '../../../redux/slices/profileSlice';
 import {styles} from './AccountScreen.styles';
-import {RootState} from '../../../redux/store';
+import {RootState, AppDispatch} from '../../../redux/store';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
+  const {profileData, loading, error} = useSelector(
+    (state: RootState) => state.profile,
+  );
 
-  const fullName = userData
-    ? `${userData.firstname || ''} ${userData.lastname || ''}`.trim()
-    : 'User Profile';
+  // Fetch profile data when component mounts
+  useEffect(() => {
+    if (userData?.user_id) {
+      dispatch(fetchProfile(userData.user_id));
+    }
+  }, [dispatch, userData?.user_id]);
+
+  // Get display name from profile data or fallback to auth data
+  const fullName = useMemo(() => {
+    if (profileData?.firstname && profileData?.lastname) {
+      return `${profileData.firstname} ${profileData.lastname}`.trim();
+    }
+    if (userData?.firstname && userData?.lastname) {
+      return `${userData.firstname} ${userData.lastname}`.trim();
+    }
+    return 'User Profile';
+  }, [profileData, userData]);
 
   // Handle logout functionality
   const handleLogout = useCallback(async () => {
     try {
       await dispatch(logoutUser());
-
       setShowLogoutModal(false);
-
       navigateToAuth();
     } catch (error) {
       console.error('Logout failed:', error);
@@ -130,7 +146,6 @@ const AccountScreen = () => {
     () => [
       {
         label: 'Personal Info',
-        // leftIcon: <ProfileIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -141,7 +156,6 @@ const AccountScreen = () => {
       },
       {
         label: 'Company Profile',
-        // leftIcon: <CompanyProfile style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -152,7 +166,6 @@ const AccountScreen = () => {
       },
       {
         label: 'Bank Details',
-        // leftIcon: <BankIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -163,7 +176,6 @@ const AccountScreen = () => {
       },
       {
         label: 'Payments',
-        // leftIcon: <PaymentIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -174,13 +186,11 @@ const AccountScreen = () => {
       },
       {
         label: 'Strip Account',
-        // leftIcon: <StripIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {},
       },
       {
         label: 'Notifications',
-        // leftIcon: <NotificationIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -191,13 +201,11 @@ const AccountScreen = () => {
       },
       {
         label: 'Terms and Conditions',
-        // leftIcon: <TermsIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {},
       },
       {
         label: `FAQ'S`,
-        // leftIcon: <TermsIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {
           navigate('Dashboard', {
@@ -208,19 +216,16 @@ const AccountScreen = () => {
       },
       {
         label: 'Privacy Policy',
-        // leftIcon: <PolicyIcon style={undefined} />,
         rightIcon: <ArrowRightIcon style={undefined} />,
         onPress: () => {},
       },
       {
         label: 'Logout',
-        // leftIcon: <LogOutIcon style={undefined} />,
         rightIcon: null,
         onPress: () => setShowLogoutModal(true),
       },
       {
         label: 'Delete Account',
-        // leftIcon: <DeleteIcon style={undefined} />,
         rightIcon: null,
         onPress: () => setShowDeleteModal(true),
       },
@@ -255,7 +260,7 @@ const AccountScreen = () => {
         </View>
       </View>
     ),
-    [],
+    [fullName],
   );
 
   // Memoize the sales section
