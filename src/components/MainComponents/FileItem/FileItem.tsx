@@ -26,11 +26,30 @@ const FileItem: React.FC<FileItemProps> = ({
   testID,
   customStyles,
 }) => {
+  // Check if the thumbnailSource is a URI object or a number
+  const isUriSource =
+    thumbnailSource &&
+    typeof thumbnailSource === 'object' &&
+    thumbnailSource.uri;
+  const isNumberSource = typeof thumbnailSource === 'number';
+
   return (
     <View style={[styles.container, customStyles]} testID={testID}>
       <View style={styles.fileInfo}>
         <View style={styles.thumbnailContainer}>
-          {typeof thumbnailSource === 'number' ? (
+          {isNumberSource ? (
+            <>
+              <Image source={thumbnailSource} style={styles.thumbnail} />
+              {onDelete && (
+                <TouchableOpacity
+                  style={styles.deleteIconOverlay}
+                  onPress={onDelete}
+                  activeOpacity={0.7}>
+                  <TrashIcon size={16} />
+                </TouchableOpacity>
+              )}
+            </>
+          ) : isUriSource ? (
             <>
               <Image source={thumbnailSource} style={styles.thumbnail} />
               {onDelete && (

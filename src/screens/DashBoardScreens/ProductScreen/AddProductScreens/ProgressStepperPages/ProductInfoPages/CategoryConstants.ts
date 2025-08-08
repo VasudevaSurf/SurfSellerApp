@@ -1,6 +1,4 @@
 import React from 'react';
-import {View} from 'react-native';
-import {ColorPalette} from '../../../../../../config/colorPalette';
 
 export interface SubCategory {
   id: string;
@@ -14,7 +12,8 @@ export interface Category {
   subcategories?: SubCategory[];
 }
 
-export const CATEGORIES: Category[] = [
+// Keep fallback categories for when API is loading or fails
+export const FALLBACK_CATEGORIES: Category[] = [
   {
     id: 'men',
     name: 'Men',
@@ -84,4 +83,6 @@ export const UI_TEXT = {
   SELECT_SUBCATEGORY: 'Select subcategory',
   NO_CATEGORIES: 'No categories found',
   NO_SUBCATEGORIES: 'No subcategories found',
+  LOADING_CATEGORIES: 'Loading categories...',
+  ERROR_LOADING_CATEGORIES: 'Failed to load categories',
 };

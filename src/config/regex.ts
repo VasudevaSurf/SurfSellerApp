@@ -41,3 +41,10 @@ export const formatWithCommas = (value: string) => {
   return isNegative ? '-' + result : result;
 };
 export const quoteContentExtractionRegex = /\*quotes\*(.*?)\*quotes\*/g;
+
+export const cleanUrl = (url: string): string => {
+  if (!url) return '';
+
+  // Remove 'dev.' from the URL if it exists
+  return url.replace(/https:\/\/dev\./, 'https://');
+};

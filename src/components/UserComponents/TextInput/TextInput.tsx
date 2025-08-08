@@ -86,11 +86,16 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   const [passwordVisible, setPasswordVisible] = useState(false);
   const inputRef = useRef<RNTextInput>(null);
 
+  // Check if we have a value to determine initial animation state
+  const hasValue = value && value.length > 0;
+
   // Initialize animation values based on whether we already have a value
   const animatedLabelPosition = useRef(
-    new Animated.Value(value ? 1 : 0),
+    new Animated.Value(hasValue ? 1 : 0),
   ).current;
-  const animatedLabelSize = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const animatedLabelSize = useRef(
+    new Animated.Value(hasValue ? 1 : 0),
+  ).current;
 
   const styles = createStyles(
     isFocused,
@@ -148,12 +153,23 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     setPasswordVisible(!passwordVisible);
   };
 
+  // Fix the useEffect to properly handle value changes
   useEffect(() => {
-    // Handle initial state based on value
-    if (value && animatedLabelPosition._value === 0) {
+    const currentHasValue = value && value.length > 0;
+
+    // Only animate if the state actually changes
+    if (currentHasValue && animatedLabelPosition._value === 0) {
+      // Value exists but label is down - animate up
       animateLabel(1);
+    } else if (
+      !currentHasValue &&
+      !isFocused &&
+      animatedLabelPosition._value === 1
+    ) {
+      // No value and not focused but label is up - animate down
+      animateLabel(0);
     }
-  }, []);
+  }, [value, isFocused]); // Keep both dependencies but with proper logic
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {

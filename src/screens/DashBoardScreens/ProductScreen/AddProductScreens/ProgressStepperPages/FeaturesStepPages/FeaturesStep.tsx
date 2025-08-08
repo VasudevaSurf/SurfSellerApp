@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View} from 'react-native';
 import InfoIcon from '../../../../../../assets/icons/InfoIcon';
 import Dropdown from '../../../../../../components/MainComponents/DropdownModal/Dropdown';
@@ -64,7 +64,17 @@ const COUNTRY_OPTIONS = [
   {value: 'Russia', label: 'Russia'},
 ];
 
-const FeaturesStep = () => {
+interface FeaturesStepProps {
+  formData: any;
+  updateFormData: (data: any) => void;
+  editMode?: boolean;
+}
+
+const FeaturesStep: React.FC<FeaturesStepProps> = ({
+  formData,
+  updateFormData,
+  editMode = false,
+}) => {
   const [manufacturedBy, setManufacturedBy] = useState('');
   const [weighBy, setWeighBy] = useState('');
 
@@ -75,6 +85,49 @@ const FeaturesStep = () => {
 
   // State to manage which dropdown is currently active
   const [activeDropdown, setActiveDropdown] = useState(null);
+
+  // Pre-fill data if in edit mode
+  useEffect(() => {
+    if (editMode && formData) {
+      setManufacturedBy(formData.manufacturer || '');
+      setWeighBy(formData.weight || '');
+      setSelectedBrand(formData.brand || '');
+      setSelectedColor(formData.color || '');
+      setSelectedSize(formData.size ? [formData.size] : []);
+      setSelectedCountry(formData.countryOfOrigin || '');
+    }
+  }, [editMode, formData]);
+
+  // Update form data when values change
+  const handleManufacturerChange = (text: string) => {
+    setManufacturedBy(text);
+    updateFormData({manufacturer: text});
+  };
+
+  const handleWeightChange = (text: string) => {
+    setWeighBy(text);
+    updateFormData({weight: text});
+  };
+
+  const handleBrandChange = (value: string) => {
+    setSelectedBrand(value);
+    updateFormData({brand: value});
+  };
+
+  const handleColorChange = (value: string) => {
+    setSelectedColor(value);
+    updateFormData({color: value});
+  };
+
+  const handleSizeChange = (values: string[]) => {
+    setSelectedSize(values);
+    updateFormData({size: values.length > 0 ? values[0] : ''});
+  };
+
+  const handleCountryChange = (value: string) => {
+    setSelectedCountry(value);
+    updateFormData({countryOfOrigin: value});
+  };
 
   // Handler for dropdown toggle
   const handleDropdownToggle = (dropdownName, isOpen) => {
@@ -110,7 +163,7 @@ const FeaturesStep = () => {
               <Dropdown
                 options={BRAND_OPTIONS}
                 selectedValue={selectedBrand}
-                onSelect={value => setSelectedBrand(value)}
+                onSelect={handleBrandChange}
                 placeholder="Select brand"
                 showSearch={true}
                 searchPlaceholder="Search brands"
@@ -126,7 +179,7 @@ const FeaturesStep = () => {
               <Dropdown
                 options={COLOR_OPTIONS}
                 selectedValue={selectedColor}
-                onSelect={value => setSelectedColor(value)}
+                onSelect={handleColorChange}
                 placeholder="Select color"
                 showSearch={true}
                 searchPlaceholder="Search colors"
@@ -143,7 +196,7 @@ const FeaturesStep = () => {
               <Dropdown
                 options={SIZE_OPTIONS}
                 selectedValue={selectedSize}
-                onSelect={values => setSelectedSize(values)}
+                onSelect={handleSizeChange}
                 placeholder="Select size"
                 showSearch={true}
                 searchPlaceholder="Search sizes"
@@ -159,7 +212,7 @@ const FeaturesStep = () => {
           <AnimatedTextInput
             label="Enter weight(Kgs : 0.000)"
             value={weighBy}
-            onChangeText={setWeighBy}
+            onChangeText={handleWeightChange}
             keyboardType="numeric"
           />
         </View>
@@ -185,7 +238,7 @@ const FeaturesStep = () => {
           <AnimatedTextInput
             label="Enter manufactured by"
             value={manufacturedBy}
-            onChangeText={setManufacturedBy}
+            onChangeText={handleManufacturerChange}
             keyboardType="default"
           />
 
@@ -199,7 +252,7 @@ const FeaturesStep = () => {
             <Dropdown
               options={COUNTRY_OPTIONS}
               selectedValue={selectedCountry}
-              onSelect={value => setSelectedCountry(value)}
+              onSelect={handleCountryChange}
               placeholder="Select country of origin"
               showSearch={true}
               searchPlaceholder="Search countries"

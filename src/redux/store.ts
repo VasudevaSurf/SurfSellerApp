@@ -4,6 +4,9 @@ import productsReducer from './slices/productsSlice';
 import productDetailsReducer from './slices/productDetailsSlice';
 import ordersReducer from './slices/ordersSlice';
 import orderDetailsReducer from './slices/orderDetailsSlice';
+import profileReducer from './slices/profileSlice.ts'
+import initializerReducer from './slices/initializerSlice.ts'
+import categoriesReducer from './slices/categoriesSlice.ts';
 
 const store = configureStore({
   reducer: {
@@ -12,6 +15,9 @@ const store = configureStore({
     productDetails: productDetailsReducer,
     orders: ordersReducer,
     orderDetails: orderDetailsReducer,
+    profile: profileReducer,
+    initializer: initializerReducer,
+    categories: categoriesReducer,
   },
 });
 

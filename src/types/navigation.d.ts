@@ -55,6 +55,8 @@ export type AccountSettingsStackParamList = {
   NotificationScreen: undefined;
   FAQScreen: undefined;
   ChatScreen: undefined;
+  TermsAndConditions: undefined;
+  PrivacyPolicy: undefined;
 };
 
 export type OrderNavigator = {
@@ -66,7 +68,7 @@ export type ProductNavigator = {
   ProductsPage: undefined;
   AddProduct: undefined;
   CategoryScreen: undefined;
-  ProductDetails: { productId: string };
+  ProductDetails: {productId: string};
 };
 
 export type HomeNavigator = {

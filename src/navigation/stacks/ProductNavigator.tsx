@@ -4,7 +4,6 @@ import AddProduct from '../../screens/DashBoardScreens/ProductScreen/AddProductS
 import ProductScreen from '../../screens/DashBoardScreens/ProductScreen/ProductScreen';
 import {AccountSettingsStackParamList} from '../../types/navigation';
 import CategorySelectionScreen from '../../screens/DashBoardScreens/ProductScreen/AddProductScreens/ProgressStepperPages/ProductInfoPages/CategorySelectionScreen';
-import ProductDetailsScreen from '../../screens/DashBoardScreens/ProductScreen/ProductDetailScreens/ProductDetailsScreen';
 
 const Stack = createStackNavigator<AccountSettingsStackParamList>();
 
@@ -21,7 +20,6 @@ export const ProductNavigator = () => {
         options={{headerShown: false}}
       />
       <Stack.Screen name="CategoryScreen" component={CategorySelectionScreen} />
-      <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
     </Stack.Navigator>
   );
 };

@@ -102,3 +102,4 @@ export const getScreenParams = <T extends keyof RootStackParamList>(
   }
   return undefined;
 };
+

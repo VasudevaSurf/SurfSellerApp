@@ -1,7 +1,10 @@
-import React, {useState} from 'react';
+// Updated ProductInfoStep.tsx to handle category path
+
+import React, {useState, useEffect} from 'react';
 import {TextInput, TouchableOpacity, View} from 'react-native';
 import ArrowDownIcon from '../../../../../../assets/icons/ArrowDownIcon';
 import ArrowRightIcon from '../../../../../../assets/icons/ArrowRightIcon';
+import InfoIcon from '../../../../../../assets/icons/InfoIcon';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import AlignTextCenterIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextCenterIcon';
 import AlignTextLeftIcon from '../../../../../../assets/icons/NewProductIcons/AlignTextLeftIcon';
@@ -26,6 +29,7 @@ import {ColorPalette} from '../../../../../../config/colorPalette';
 import {getScreenWidth} from '../../../../../../helpers/screenSize';
 import {navigate} from '../../../../../../navigation/utils/navigationRef';
 import {styles} from './ProductInfoStep.styles';
+import {Spacing} from '../../../../../../config/globalStyles';
 
 interface ProductInfoStepProps {
   formData: {
@@ -34,14 +38,29 @@ interface ProductInfoStepProps {
     category: string;
     subcategory?: string;
     description: string;
+    categoryPath?: string[]; // Add category path support
+    productId?: string; // Make productId optional
   };
   updateFormData: (data: any) => void;
+  editMode?: boolean;
 }
 
 const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
-  formData,
+  formData = {}, // Provide default empty object
   updateFormData,
+  editMode = false,
 }) => {
+  // Safely access formData properties with defaults
+  const safeFormData = {
+    productName: formData?.productName || '',
+    price: formData?.price || '',
+    category: formData?.category || '',
+    subcategory: formData?.subcategory || '',
+    description: formData?.description || '',
+    categoryPath: formData?.categoryPath || [],
+    productId: formData?.productId || '',
+    ...formData, // Spread any additional properties
+  };
   const [isFocused, setIsFocused] = useState(false);
   const [textAlignment, setTextAlignment] = useState<
     'left' | 'center' | 'right'
@@ -73,39 +92,89 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
     }));
   };
 
-  // Fix navigation to CategorySelection
+  // Updated navigation to category selection
   const navigateToCategorySelection = () => {
     navigate('Dashboard', {
       screen: 'Product',
       params: {
         screen: 'CategoryScreen',
         params: {
-          // Add nested params properly
           onSelectCategory: handleCategorySelection,
-          initialCategory: formData.category,
-          initialSubcategory: formData.subcategory,
+          // Don't pass initialCategory to allow fresh start from root
+          // This allows users to change to completely different categories
+          productId: safeFormData.productId, // Use safe form data
         },
       },
     });
   };
 
-  const handleCategorySelection = (category: string, subcategory?: string) => {
-    const categoryData = subcategory
-      ? {category, subcategory}
-      : {category, subcategory: undefined};
+  // Updated category selection handler to support category path
+  const handleCategorySelection = (categoryPath: string[]) => {
+    console.log('Category path selected:', categoryPath);
+
+    if (categoryPath.length === 0) return;
+
+    // Store the full category path and also maintain backwards compatibility
+    const categoryData = {
+      categoryPath: categoryPath,
+      category: categoryPath[0], // Root category for backwards compatibility
+      subcategory:
+        categoryPath.length > 1
+          ? categoryPath[categoryPath.length - 1]
+          : undefined,
+      // Store the full path as a formatted string for display
+      categoryDisplay: categoryPath.join(' > '),
+    };
 
     updateFormData(categoryData);
   };
 
-  // Format the category display text
+  // Updated category display text with full path support
   const getCategoryDisplayText = () => {
-    if (!formData.category) {
+    // Check if we have a category path (new format)
+    if (safeFormData.categoryPath && safeFormData.categoryPath.length > 0) {
+      return safeFormData.categoryPath.join(' > ');
+    }
+
+    // Fallback to old format for backwards compatibility
+    if (!safeFormData.category) {
       return 'Select category*';
     }
 
-    return formData.subcategory
-      ? `${formData.category} - ${formData.subcategory}`
-      : formData.category;
+    return safeFormData.subcategory
+      ? `${safeFormData.category} - ${safeFormData.subcategory}`
+      : safeFormData.category;
+  };
+
+  // Get placeholder text for category selection
+  const getCategoryPlaceholderText = () => {
+    return 'Select category*';
+  };
+
+  // Check if category is selected
+  const isCategorySelected = () => {
+    return (
+      (safeFormData.categoryPath && safeFormData.categoryPath.length > 0) ||
+      safeFormData.category
+    );
+  };
+
+  const getHeaderText = () => {
+    return editMode ? 'Update Product Information' : 'Product information';
+  };
+
+  const getDescriptionHeaderText = () => {
+    return editMode ? 'Update Product Description' : 'Product description';
+  };
+
+  // Helper to get category info for debugging
+  const getCategoryDebugInfo = () => {
+    if (safeFormData.categoryPath) {
+      return `Path: [${safeFormData.categoryPath.join(', ')}]`;
+    }
+    return `Legacy: ${safeFormData.category}${
+      safeFormData.subcategory ? ` - ${safeFormData.subcategory}` : ''
+    }`;
   };
 
   return (
@@ -114,7 +183,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
         <View style={styles.sectionHeader}>
           <Typography
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            text="Product information"
+            text={getHeaderText()}
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <InfoIconPay
@@ -127,13 +196,13 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
         <View style={styles.inputContainer}>
           <AnimatedTextInput
             label="Enter product name*"
-            value={formData.productName}
+            value={safeFormData.productName}
             onChangeText={text => updateFormData({productName: text})}
             keyboardType="default"
           />
           <AnimatedTextInput
             label="Enter price*"
-            value={formData.price || ''}
+            value={safeFormData.price}
             onChangeText={text => updateFormData({price: text})}
             keyboardType="phone-pad"
             countryCode="€"
@@ -149,7 +218,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
                 variant={TypographyVariant.PSMALL_REGULAR}
                 text={getCategoryDisplayText()}
                 customTextStyles={{
-                  color: formData.category
+                  color: isCategorySelected()
                     ? ColorPalette.GREY_TEXT_500
                     : ColorPalette.GREY_TEXT_300,
                 }}
@@ -160,6 +229,20 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               />
             </TouchableOpacity>
           </View>
+
+          {/* Debug info - remove in production */}
+          {__DEV__ && isCategorySelected() && (
+            <View style={{paddingHorizontal: getScreenWidth(4), marginTop: 8}}>
+              <Typography
+                variant={TypographyVariant.LXSMALL_REGULAR}
+                text={getCategoryDebugInfo()}
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  fontSize: 10,
+                }}
+              />
+            </View>
+          )}
         </View>
       </View>
 
@@ -168,7 +251,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
           <View style={styles.descContainer}>
             <Typography
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              text="Product description"
+              text={getDescriptionHeaderText()}
               customTextStyles={styles.sectionTitle}
             />
             <InfoIconPay
@@ -178,16 +261,18 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
             />
           </View>
 
-          <Button
-            text="Generate"
-            variant={ButtonVariant.PRIMARY}
-            type={ButtonType.PRIMARY}
-            state={ButtonState.AI}
-            size={ButtonSize.SMALL}
-            onPress={() => {}}
-            withShadow
-            textVariant={TypographyVariant.LMEDIUM_MEDIUM}
-          />
+          {!editMode && (
+            <Button
+              text="Generate"
+              variant={ButtonVariant.PRIMARY}
+              type={ButtonType.PRIMARY}
+              state={ButtonState.AI}
+              size={ButtonSize.SMALL}
+              onPress={() => {}}
+              withShadow
+              textVariant={TypographyVariant.LMEDIUM_MEDIUM}
+            />
+          )}
         </View>
 
         <View style={styles.toolbar}>
@@ -307,12 +392,16 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               textFormat.italic && styles.italicText,
               textFormat.underline && styles.underlineText,
             ]}
-            placeholder="Sonic Wave Powerful sound, deep bass, 12H playtime, Bluetooth. Perfect for any space!"
+            placeholder={
+              editMode
+                ? 'Update your product description...'
+                : 'Sonic Wave Powerful sound, deep bass, 12H playtime, Bluetooth. Perfect for any space!'
+            }
             placeholderTextColor={ColorPalette.PlaceholderText}
             multiline={true}
             numberOfLines={6}
             textAlignVertical="top"
-            value={formData.description}
+            value={safeFormData.description}
             onChangeText={text => updateFormData({description: text})}
             onFocus={handleTextAreaFocus}
             onBlur={handleTextAreaBlur}

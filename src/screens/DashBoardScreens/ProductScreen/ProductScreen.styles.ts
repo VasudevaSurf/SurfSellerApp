@@ -1,3 +1,5 @@
+// src/screens/DashBoardScreens/ProductScreen/ProductScreen.styles.ts
+
 import {StyleSheet} from 'react-native';
 import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
 import {ColorPalette} from '../../../config/colorPalette';
@@ -8,9 +10,9 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: getScreenWidth(4),
     alignItems: 'center',
-    justifyContent: 'space-between', // Changed from 'center' to 'space-between'
+    justifyContent: 'space-between',
     backgroundColor: ColorPalette.White,
-    gap: getScreenWidth(2.5), // Added gap between search box and button
+    gap: getScreenWidth(2.5),
   },
   mainContainer: {
     display: 'flex',
@@ -25,6 +27,8 @@ export const styles = StyleSheet.create({
   slidingBarsContainer: {
     padding: getScreenWidth(4),
     backgroundColor: ColorPalette.White,
+    borderBottomWidth: 1,
+    borderBottomColor: ColorPalette.GREY_100,
   },
   textStyle: {
     color: ColorPalette.TotalText,
@@ -51,5 +55,45 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: getScreenWidth(3),
     padding: getScreenWidth(3),
+    shadowColor: ColorPalette.PURPLE_300,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: getScreenWidth(5),
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: getScreenWidth(5),
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: getScreenWidth(5),
+    minHeight: getScreenHeight(30),
+  },
+  emptyStateText: {
+    color: ColorPalette.GREY_TEXT_300,
+    textAlign: 'center',
+    marginBottom: getScreenHeight(2),
+  },
+  retryButton: {
+    marginTop: getScreenHeight(2),
+  },
+  filterCount: {
+    fontSize: 12,
+    color: ColorPalette.GREY_TEXT_100,
+    marginLeft: getScreenWidth(1),
   },
 });
