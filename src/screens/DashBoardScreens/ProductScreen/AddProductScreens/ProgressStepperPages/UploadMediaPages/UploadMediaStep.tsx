@@ -18,6 +18,24 @@ import {TypographyVariant} from '../../../../../../components/UserComponents/Typ
 import {ColorPalette} from '../../../../../../config/colorPalette';
 import {getFigmaDimension} from '../../../../../../helpers/screenSize';
 import {styles} from './UploadMediaStep.styles';
+import {
+  pickImagesFromGallery,
+  takePhotoWithCamera,
+  formatFileSize,
+  validateImage,
+  PickedImage,
+} from '../../../../../../utils/imagePicker';
+
+interface FileData {
+  id: string;
+  name: string;
+  size: string;
+  date: string;
+  thumbnailSource: any;
+  isExisting?: boolean;
+  originalUrl?: string;
+  uri?: string; // For newly picked images
+}
 
 interface UploadMediaStepProps {
   formData: any;
@@ -31,80 +49,54 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   editMode = false,
 }) => {
   const [uploadStatus, setUploadStatus] = useState('initial');
-  const [uploadProgress, setUploadProgress] = useState(30);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const [files, setFiles] = useState([
-    {
-      id: '1',
-      name: 'cool-shoes.jpg',
-      size: '240 KB',
-      date: 'Aug 24 2025',
-      thumbnailSource: require('../../../../../../assets/images/sample.png'),
-    },
-    {
-      id: '2',
-      name: 'product-design.pdf',
-      size: '1.2 MB',
-      date: 'Aug 20 2025',
-      thumbnailSource: require('../../../../../../assets/images/sample.png'),
-    },
-    {
-      id: '3',
-      name: 'product-design.pdf',
-      size: '1.2 MB',
-      date: 'Aug 20 2025',
-      thumbnailSource: require('../../../../../../assets/images/sample.png'),
-    },
-    {
-      id: '4',
-      name: 'product-design.pdf',
-      size: '1.2 MB',
-      date: 'Aug 20 2025',
-      thumbnailSource: require('../../../../../../assets/images/sample.png'),
-    },
-  ]);
+  const [files, setFiles] = useState<FileData[]>([]);
 
   // Pre-fill images if in edit mode
   useEffect(() => {
     if (editMode && formData.images && formData.images.length > 0) {
-      const preFilledFiles = formData.images.map((imageUrl, index) => {
-        // Extract filename from URL or create a descriptive name
-        const urlParts = imageUrl.split('/');
-        const fullFilename =
-          urlParts[urlParts.length - 1] || `product-image-${index + 1}.jpg`;
+      const preFilledFiles = formData.images.map(
+        (imageUrl: string, index: number) => {
+          // Extract filename from URL or create a descriptive name
+          const urlParts = imageUrl.split('/');
+          const fullFilename =
+            urlParts[urlParts.length - 1] || `product-image-${index + 1}.jpg`;
 
-        // Remove query parameters if any
-        const filename = fullFilename.split('?')[0];
+          // Remove query parameters if any
+          const filename = fullFilename.split('?')[0];
 
-        // Get file extension from URL or default to jpg
-        const fileExtension = filename.includes('.')
-          ? filename.split('.').pop()?.toLowerCase()
-          : 'jpg';
+          // Get file extension from URL or default to jpg
+          const fileExtension = filename.includes('.')
+            ? filename.split('.').pop()?.toLowerCase()
+            : 'jpg';
 
-        // Estimate file size based on image dimensions (this is approximate)
-        const estimatedSize =
-          fileExtension === 'jpg' || fileExtension === 'jpeg'
-            ? '180 KB'
-            : fileExtension === 'png'
-            ? '250 KB'
-            : '200 KB';
+          // Estimate file size based on image dimensions (this is approximate)
+          const estimatedSize =
+            fileExtension === 'jpg' || fileExtension === 'jpeg'
+              ? '180 KB'
+              : fileExtension === 'png'
+              ? '250 KB'
+              : '200 KB';
 
-        return {
-          id: `prefilled-${index}`,
-          name: filename,
-          size: estimatedSize,
-          date: 'Uploaded',
-          thumbnailSource: {uri: imageUrl}, // Use actual image URL
-          isExisting: true,
-          originalUrl: imageUrl, // Keep reference to original URL
-        };
-      });
+          return {
+            id: `prefilled-${index}`,
+            name: filename,
+            size: estimatedSize,
+            date: 'Uploaded',
+            thumbnailSource: {uri: imageUrl}, // Use actual image URL
+            isExisting: true,
+            originalUrl: imageUrl, // Keep reference to original URL
+          };
+        },
+      );
 
       setFiles(preFilledFiles);
       setUploadStatus('completed');
     }
-  }, [editMode]); // Remove formData.images from dependencies
+  }, [editMode, formData.images]);
 
   const handleDelete = (fileId: string) => {
     Alert.alert('Delete File', 'Are you sure you want to delete this file?', [
@@ -120,8 +112,8 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
           // Update form data
           const imageUrls = updatedFiles
-            .filter(file => file.thumbnailSource?.uri)
-            .map(file => file.thumbnailSource.uri);
+            .filter(file => file.uri || file.originalUrl)
+            .map(file => file.uri || file.originalUrl);
           updateFormData({images: imageUrls});
 
           // If no files left, reset to initial state
@@ -145,50 +137,118 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
     setIsAddModalVisible(true);
   };
 
-  const handleUploadStart = (source: string) => {
+  const handleUploadStart = async (source: string) => {
     setIsAddModalVisible(false);
+    setIsUploading(true);
 
-    setUploadStatus('uploading');
+    try {
+      let result;
 
-    console.log(`Upload started from: ${source}`);
+      switch (source) {
+        case 'gallery':
+          result = await pickImagesFromGallery({
+            multiple: true,
+            quality: 0.8,
+            maxWidth: 1024,
+            maxHeight: 1024,
+          });
+          break;
 
-    let progress = 0;
-    const progressInterval = setInterval(() => {
-      progress += 10;
-      setUploadProgress(progress);
+        case 'camera':
+          result = await takePhotoWithCamera({
+            quality: 0.8,
+            maxWidth: 1024,
+            maxHeight: 1024,
+          });
+          break;
 
-      if (progress >= 100) {
-        clearInterval(progressInterval);
-        setUploadStatus('completed');
+        case 'drive':
+          // TODO: Implement drive integration if needed
+          Alert.alert(
+            'Coming Soon',
+            'Drive integration will be available soon.',
+          );
+          setIsUploading(false);
+          return;
 
-        // Simulate adding new files
-        const newFiles = [
-          {
-            id: `new-${Date.now()}-1`,
-            name: 'new-product-1.jpg',
-            size: '180 KB',
-            date: new Date().toLocaleDateString(),
-            thumbnailSource: require('../../../../../../assets/images/sample.png'),
-          },
-          {
-            id: `new-${Date.now()}-2`,
-            name: 'new-product-2.jpg',
-            size: '220 KB',
-            date: new Date().toLocaleDateString(),
-            thumbnailSource: require('../../../../../../assets/images/sample.png'),
-          },
-        ];
-
-        const updatedFiles = [...files, ...newFiles];
-        setFiles(updatedFiles);
-
-        // Update form data with new images
-        const imageUrls = updatedFiles
-          .filter(file => file.thumbnailSource?.uri)
-          .map(file => file.thumbnailSource.uri);
-        updateFormData({images: imageUrls});
+        default:
+          setIsUploading(false);
+          return;
       }
-    }, 500);
+
+      if (!result.success) {
+        Alert.alert('Error', result.error || 'Failed to select images');
+        setIsUploading(false);
+        return;
+      }
+
+      if (result.images && result.images.length > 0) {
+        // Validate images
+        const validImages = [];
+        for (const image of result.images) {
+          const validation = validateImage(image);
+          if (validation.valid) {
+            validImages.push(image);
+          } else {
+            Alert.alert(
+              'Invalid Image',
+              validation.error || 'Invalid image selected',
+            );
+          }
+        }
+
+        if (validImages.length > 0) {
+          // Simulate upload progress
+          setUploadStatus('uploading');
+          setUploadProgress(0);
+
+          const progressInterval = setInterval(() => {
+            setUploadProgress(prev => {
+              const newProgress = prev + 20;
+              if (newProgress >= 100) {
+                clearInterval(progressInterval);
+
+                // Add new images to files
+                const newFiles: FileData[] = validImages.map(
+                  (image, index) => ({
+                    id: `new-${Date.now()}-${index}`,
+                    name: image.fileName,
+                    size: formatFileSize(image.fileSize),
+                    date: new Date().toLocaleDateString(),
+                    thumbnailSource: {uri: image.uri},
+                    uri: image.uri,
+                  }),
+                );
+
+                const updatedFiles = [...files, ...newFiles];
+                setFiles(updatedFiles);
+
+                // Update form data with image URIs
+                const imageUrls = updatedFiles
+                  .filter(file => file.uri || file.originalUrl)
+                  .map(file => file.uri || file.originalUrl);
+                updateFormData({images: imageUrls});
+
+                setUploadStatus('completed');
+                setIsUploading(false);
+
+                return 100;
+              }
+              return newProgress;
+            });
+          }, 300);
+        } else {
+          setIsUploading(false);
+        }
+      } else {
+        Alert.alert('No Images', 'No images were selected.');
+        setIsUploading(false);
+      }
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      Alert.alert('Upload Error', error.message || 'Failed to upload images');
+      setIsUploading(false);
+    }
   };
 
   const handleCancelUpload = () => {
@@ -204,15 +264,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       state: ButtonState.DEFAULT,
       type: ButtonType.PRIMARY,
       size: ButtonSize.MEDIUM,
-    },
-    {
-      text: 'Select from Drive',
-      onPress: () => handleUploadStart('drive'),
-      variant: ButtonVariant.PRIMARY,
-      state: ButtonState.DEFAULT,
-      type: ButtonType.OUTLINED,
-      size: ButtonSize.MEDIUM,
-      customStyles: styles.customButton,
+      disabled: isUploading,
     },
     {
       text: 'Take a Photo',
@@ -221,7 +273,18 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       state: ButtonState.DEFAULT,
       type: ButtonType.OUTLINED,
       size: ButtonSize.MEDIUM,
+      customStyles: styles.customButton,
+      disabled: isUploading,
+    },
+    {
+      text: 'Select from Drive',
+      onPress: () => handleUploadStart('drive'),
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      type: ButtonType.OUTLINED,
+      size: ButtonSize.MEDIUM,
       customTextStyles: styles.customText,
+      disabled: isUploading,
     },
   ];
 
@@ -268,18 +331,19 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 type={ButtonType.PRIMARY}
                 onPress={handleBrowseFiles}
                 withShadow
+                disabled={isUploading}
               />
             </View>
             <Typography
               variant={TypographyVariant.LMEDIUM_REGULAR}
-              text="PNG, JPG, GIF up to 1024MB"
+              text="PNG, JPG, GIF up to 10MB"
               customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
           </View>
         )}
 
         {/* Show add more button if files exist */}
-        {uploadStatus === 'completed' && files.length > 0 && (
+        {uploadStatus === 'completed' && files.length > 0 && !isUploading && (
           <View style={{alignItems: 'center', marginTop: 16}}>
             <Button
               text="Add More Images"
@@ -311,17 +375,19 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           <View style={styles.mainProgress}>
             <View style={styles.progressHeader}>
               <Typography
-                text="Uploading 4 files"
+                text={`Uploading ${files.length + 1} file${
+                  files.length > 0 ? 's' : ''
+                }`}
                 variant={TypographyVariant.LMEDIUM_EXTRABOLD}
                 customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
               />
               <CrossArrowsIcon style={undefined} size={18} />
             </View>
             <View style={styles.imageShowing}>
-              {[1, 2, 3, 4, 5].map((_, index) => (
+              {files.slice(0, 5).map((file, index) => (
                 <Image
                   key={index}
-                  source={require('../../../../../../assets/images/sample.png')}
+                  source={file.thumbnailSource}
                   style={styles.sampleImage}
                 />
               ))}
@@ -331,7 +397,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             style={[styles.progressLine, {width: `${uploadProgress}%`}]}></View>
           <View style={styles.progressPercent}>
             <Typography
-              text={`525KB • ${uploadProgress}% uploading`}
+              text={`${uploadProgress}% uploading`}
               variant={TypographyVariant.LMEDIUM_REGULAR}
               customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />

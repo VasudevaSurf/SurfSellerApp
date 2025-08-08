@@ -207,6 +207,103 @@ export interface StatusUpdateResponse {
   message: string;
 }
 
+// NEW: Product Creation/Update interfaces
+export interface CreateProductRequest {
+  image_pair_positon?: string[];
+  lang_code: string;
+  product_data: {
+    amount: string;
+    avail_since?: string;
+    category_ids: number[];
+    details_layout?: string;
+    discussion_type?: string;
+    exceptions_type?: string;
+    full_description: string;
+    list_price?: string;
+    list_qty_count?: string;
+    max_qty?: string;
+    min_qty?: string;
+    options_type?: string;
+    out_of_stock_actions?: string;
+    popularity?: string;
+    price: string;
+    product: string;
+    product_code: string;
+    promo_text?: string;
+    qty_step?: string;
+    sales_amount?: string;
+    search_words?: string;
+    short_description?: string;
+    status: string;
+    tax_ids?: number[];
+    timestamp?: string;
+    tracking?: string;
+    usergroup_ids?: number[];
+    zero_price_action?: string;
+  };
+  user_id: string;
+  product_id?: number; // Optional for create, required for update
+}
+
+export interface CreateProductResponse {
+  result: boolean;
+  message: string;
+  product_id?: number;
+  product_data?: any;
+}
+
+export interface CategoryData {
+  id: string;
+  name: string;
+  subcategories?: CategoryData[];
+}
+
+export interface CategoriesResponse {
+  categories: CategoryData[];
+  result: boolean;
+  message: string;
+}
+
+// Helper function to find category ID by path
+const findCategoryIdByPath = (
+  categories: CategoryData[],
+  categoryPath: string[],
+): number[] => {
+  const categoryIds: number[] = [];
+
+  const findRecursive = (
+    cats: CategoryData[],
+    path: string[],
+    depth: number = 0,
+  ): boolean => {
+    if (depth >= path.length) return false;
+
+    const targetName = path[depth];
+    const category = cats.find(
+      cat => cat.name.toLowerCase() === targetName.toLowerCase(),
+    );
+
+    if (category) {
+      categoryIds.push(parseInt(category.id));
+
+      // If this is the last item in path, we're done
+      if (depth === path.length - 1) {
+        return true;
+      }
+
+      // Otherwise, search in subcategories
+      if (category.subcategories) {
+        return findRecursive(category.subcategories, path, depth + 1);
+      }
+    }
+
+    return false;
+  };
+
+  findRecursive(categories, categoryPath);
+  return categoryIds;
+};
+
 export const fetchInitializerApi = async () => {
   try {
     const response = await apiClient.get(`/api.php`, {
@@ -667,18 +764,6 @@ export const updateMultipleProductsStatusApi = async (
   }
 };
 
-export interface CategoryData {
-  id: string;
-  name: string;
-  subcategories?: CategoryData[];
-}
-
-export interface CategoriesResponse {
-  categories: CategoryData[];
-  result: boolean;
-  message: string;
-}
-
 // Add this function to your apiService.ts
 export const fetchCategoriesApi = async (
   userId: string,
@@ -802,6 +887,159 @@ export const deleteMultipleProductsApi = async (
   productIds: string[],
 ): Promise<DeleteProductResponse> => {
   return deleteProductApi(userId, productIds);
+};
+
+// NEW: Create new product
+export const createProductApi = async (
+  productData: CreateProductRequest,
+): Promise<CreateProductResponse> => {
+  try {
+    console.log('Creating product with data:', productData);
+
+    const response = await axios({
+      method: 'POST',
+      url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: productData,
+    });
+
+    console.log('Create product response:', response.data);
+    return response.data as CreateProductResponse;
+  } catch (error: any) {
+    console.error('Create Product API error:', error);
+
+    if (error.response?.status === 400) {
+      throw new Error('Invalid product data provided');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to create products');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error occurred while creating product');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to create product',
+      );
+    }
+  }
+};
+
+// NEW: Update existing product
+export const updateProductApi = async (
+  productData: CreateProductRequest,
+): Promise<CreateProductResponse> => {
+  try {
+    if (!productData.product_id) {
+      throw new Error('Product ID is required for update');
+    }
+
+    console.log('Updating product with data:', productData);
+
+    const response = await axios({
+      method: 'POST',
+      url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: productData,
+    });
+
+    console.log('Update product response:', response.data);
+    return response.data as CreateProductResponse;
+  } catch (error: any) {
+    console.error('Update Product API error:', error);
+
+    if (error.response?.status === 404) {
+      throw new Error('Product not found');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to update this product');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error occurred while updating product');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to update product',
+      );
+    }
+  }
+};
+
+// Helper function to transform form data to API format
+export const transformFormDataToApiFormat = (
+  formData: any,
+  userId: string,
+  editMode: boolean = false,
+  availableCategories: CategoryData[] = [],
+): CreateProductRequest => {
+  // Extract category IDs from categoryPath
+  let categoryIds: number[] = [309]; // Default fallback
+
+  if (
+    formData.categoryPath &&
+    formData.categoryPath.length > 0 &&
+    availableCategories.length > 0
+  ) {
+    // Find actual category IDs from the path
+    const foundIds = findCategoryIdByPath(
+      availableCategories,
+      formData.categoryPath,
+    );
+    if (foundIds.length > 0) {
+      categoryIds = foundIds;
+    }
+  }
+
+  const apiData: CreateProductRequest = {
+    lang_code: 'en',
+    product_data: {
+      amount: formData.quantity || '0',
+      avail_since: '',
+      category_ids: categoryIds,
+      details_layout: 'default',
+      discussion_type: 'B',
+      exceptions_type: 'F',
+      full_description: formData.description || '',
+      list_price: '0.00',
+      list_qty_count: '',
+      max_qty: formData.maxQuantity || '',
+      min_qty: formData.minQuantity || '',
+      options_type: 'P',
+      out_of_stock_actions: 'N',
+      popularity: '',
+      price: parseFloat(formData.price || '0').toFixed(8), // API expects 8 decimal places
+      product: formData.productName || '',
+      product_code: formData.productCode || '',
+      promo_text: '',
+      qty_step: '',
+      sales_amount: '',
+      search_words: '',
+      short_description: '',
+      status: 'A', // Active by default
+      tax_ids: formData.taxType === 'VAT' ? [1] : [], // Assuming VAT has ID 1
+      timestamp: Math.floor(Date.now() / 1000).toString(),
+      tracking: formData.trackInventory ? 'B' : 'N',
+      usergroup_ids: [],
+      zero_price_action: 'P',
+    },
+    user_id: userId,
+  };
+
+  // Add image positions if available
+  if (formData.images && formData.images.length > 0) {
+    // For now, we'll use placeholder image positions
+    // In a real implementation, you'd upload images first and get their paths
+    apiData.image_pair_positon = formData.images.map(
+      (_, index) => `product_${Date.now()}/image_${index}.jpg`,
+    );
+  }
+
+  // Add product_id for updates
+  if (editMode && formData.productId) {
+    apiData.product_id = parseInt(formData.productId);
+  }
+
+  return apiData;
 };
 
 export default apiClient;

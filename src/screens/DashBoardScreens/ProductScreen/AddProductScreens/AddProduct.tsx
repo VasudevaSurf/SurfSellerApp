@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {ScrollView, View} from 'react-native';
+import {ScrollView, View, Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useRoute, RouteProp} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
 import ArrowLeftIcon from '../../../../assets/icons/ArrowLeftIcon';
 import {
   Button,
@@ -21,6 +22,13 @@ import ProductInfoStep from './ProgressStepperPages/ProductInfoPages/ProductInfo
 import ProgressStepper from './ProgressStepperPages/ProgressStepper';
 import UploadMediaStep from './ProgressStepperPages/UploadMediaPages/UploadMediaStep';
 import ArrowLeft from '../../../../assets/icons/ArrowLeft';
+import {RootState} from '../../../../redux/store';
+import {
+  createProductApi,
+  updateProductApi,
+  transformFormDataToApiFormat,
+} from '../../../../services/apiService';
+import {useCategories} from '../../../../hooks/useCategories';
 
 const STEPS = [
   {id: 1, label: 'Product Info'},
@@ -89,6 +97,15 @@ const AddProduct = () => {
   const {productId, editMode = false, productData} = route.params || {};
 
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Get userId from Redux store
+  const userId = useSelector(
+    (state: RootState) => state.auth.userData?.user_id,
+  );
+
+  // Use categories hook to get available categories
+  const {categories} = useCategories();
 
   // Initialize formData with all required fields and proper defaults
   const [formData, setFormData] = useState<FormData>({
@@ -187,7 +204,7 @@ const AddProduct = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log('Form submitted:', formData);
     console.log('Edit mode:', editMode);
     console.log('Product ID:', productId);
@@ -200,28 +217,75 @@ const AddProduct = () => {
 
     if (missingFields.length > 0) {
       console.warn('Missing required fields:', missingFields);
-      // You can add alert or validation UI here
+      Alert.alert(
+        'Validation Error',
+        `Please fill in all required fields: ${missingFields.join(', ')}`,
+      );
       return;
     }
 
-    // TODO: Implement actual API call for create/update
-    // Example API call structure:
-    /*
-    try {
-      if (editMode) {
-        await updateProductApi(formData.productId, formData);
-      } else {
-        await createProductApi(formData);
-      }
-      goBack();
-    } catch (error) {
-      console.error("Error saving product:", error);
-      // Handle error
+    if (!userId) {
+      Alert.alert('Error', 'User session expired. Please login again.');
+      return;
     }
-    */
 
-    // For now, just go back
-    goBack();
+    // Show loading state
+    setIsSubmitting(true);
+
+    try {
+      // Transform form data to API format
+      const apiData = transformFormDataToApiFormat(
+        formData,
+        userId,
+        editMode,
+        categories,
+      );
+
+      let result;
+      if (editMode) {
+        console.log('Updating product...');
+        result = await updateProductApi(apiData);
+      } else {
+        console.log('Creating new product...');
+        result = await createProductApi(apiData);
+      }
+
+      console.log('Product operation successful:', result);
+
+      // Show success message
+      Alert.alert(
+        'Success',
+        editMode
+          ? 'Product updated successfully!'
+          : 'Product created successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => goBack(),
+          },
+        ],
+      );
+    } catch (error: any) {
+      console.error('Error saving product:', error);
+
+      Alert.alert(
+        editMode ? 'Update Failed' : 'Creation Failed',
+        error.message ||
+          `Failed to ${
+            editMode ? 'update' : 'create'
+          } product. Please try again.`,
+        [
+          {text: 'OK', style: 'default'},
+          {
+            text: 'Retry',
+            onPress: () => handleSubmit(),
+            style: 'default',
+          },
+        ],
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleStepPress = (stepId: number) => {
@@ -276,6 +340,10 @@ const AddProduct = () => {
   };
 
   const getSubmitButtonText = () => {
+    if (isSubmitting) {
+      return editMode ? 'Updating...' : 'Creating...';
+    }
+
     if (editMode) {
       return currentStep === STEPS.length ? 'Update Product' : 'Continue';
     }
@@ -362,9 +430,9 @@ const AddProduct = () => {
           state={ButtonState.DEFAULT}
           size={ButtonSize.MEDIUM}
           withShadow
-          disabled={!isValidStep()}
+          disabled={!isValidStep() || isSubmitting}
           customStyles={{
-            opacity: isValidStep() ? 1 : 0.6,
+            opacity: !isValidStep() || isSubmitting ? 0.6 : 1,
           }}
         />
       </View>
