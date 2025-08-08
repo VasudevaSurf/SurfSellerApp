@@ -4,9 +4,9 @@ import productsReducer from './slices/productsSlice';
 import productDetailsReducer from './slices/productDetailsSlice';
 import ordersReducer from './slices/ordersSlice';
 import orderDetailsReducer from './slices/orderDetailsSlice';
-import profileReducer from './slices/profileSlice.ts'
-import initializerReducer from './slices/initializerSlice.ts'
-import categoriesReducer from './slices/categoriesSlice.ts';
+import profileReducer from './slices/profileSlice';
+import initializerReducer from './slices/initializerSlice';
+import categoriesReducer from './slices/categoriesSlice';
 
 const store = configureStore({
   reducer: {
@@ -19,6 +19,19 @@ const store = configureStore({
     initializer: initializerReducer,
     categories: categoriesReducer,
   },
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore these action types
+        ignoredActions: [
+          'persist/PERSIST',
+          'persist/REHYDRATE',
+          'persist/PAUSE',
+          'persist/PURGE',
+          'persist/REGISTER',
+        ],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

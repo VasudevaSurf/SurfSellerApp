@@ -47,33 +47,66 @@ export interface ProductDetailsResponse {
   };
 }
 
+export interface OrderProduct {
+  product_id: string;
+  product: string;
+  amount: number;
+  price: string;
+  image_url: string;
+}
+
 export interface Order {
   order_id: string;
-  order_number: string;
+  order_number?: string;
   timestamp: string;
   status: string;
   total: string;
-  customer: {
+  firstname?: string;
+  lastname?: string;
+  email: string;
+  phone?: string;
+  customer?: {
     email: string;
     phone: string;
     name?: string;
   };
-  products: Array<{
-    product_id: string;
-    product: string;
-    amount: number;
-    price: string;
-    image_url: string;
-  }>;
+  products?: OrderProduct[];
+  shipping_cost?: string;
+  subtotal?: string;
+  formattedDate?: string;
+  formattedTime?: string;
 }
 
 export interface OrdersResponse {
   orders: Order[];
   total_items: string;
+  result: boolean;
+  message?: string;
 }
 
 export interface OrderDetailsResponse {
-  order_data: Order;
+  order_info: {
+    order_id: string;
+    order_number?: string;
+    timestamp: string;
+    status: string;
+    total: string;
+    firstname?: string;
+    lastname?: string;
+    email: string;
+    phone?: string;
+    shipping_cost?: string;
+    subtotal?: string;
+    products?: OrderProduct[];
+    [key: string]: any;
+  };
+  result: boolean;
+  message?: string;
+}
+
+export interface OrderStatusUpdateResponse {
+  result: boolean;
+  message: string;
 }
 
 export interface ProfileField {
@@ -564,7 +597,7 @@ export const searchProductsApi = async (
   }
 };
 
-// New Orders API Functions
+// UPDATED: Orders API Functions with new integration
 export const fetchOrdersApi = async (
   userId: string,
   page: number = 1,
@@ -572,9 +605,16 @@ export const fetchOrdersApi = async (
   status?: string,
 ) => {
   try {
-    const params: any = {
-      _d: 'NtSeOrdersApi',
-      user_id: userId,
+    console.log('Fetching orders with params:', {
+      userId,
+      page,
+      itemsPerPage,
+      status,
+    });
+
+    // Use the new API endpoint format
+    const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}`;
+    let params: any = {
       page,
       items_per_page: itemsPerPage,
     };
@@ -583,7 +623,17 @@ export const fetchOrdersApi = async (
       params.status = status;
     }
 
-    const response = await apiClient.get(`/api.php`, {params});
+    const response = await axios({
+      method: 'GET',
+      url: url,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      params: params,
+    });
+
+    console.log('Orders API response:', response.data);
     return response.data as OrdersResponse;
   } catch (error) {
     console.error('Fetch Orders API error:', error);
@@ -593,58 +643,22 @@ export const fetchOrdersApi = async (
 
 export const fetchOrderDetailsApi = async (userId: string, orderId: string) => {
   try {
-    const response = await apiClient.get(`/api.php`, {
-      params: {
-        _d: 'NtSeOrdersApi',
-        user_id: userId,
-        order_id: orderId,
-        for_order_data: true,
+    console.log('Fetching order details for:', {userId, orderId});
+
+    // Use the new API endpoint format
+    const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}&order_id=${orderId}`;
+
+    const response = await axios({
+      method: 'GET',
+      url: url,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
       },
     });
 
-    if (response.data && response.data.order_info) {
-      const orderInfo = response.data.order_info;
-
-      const products = orderInfo.products
-        ? orderInfo.products.map((product: any) => ({
-            product_id: product.product_id,
-            product: product.product,
-            amount: parseInt(product.amount || '1'),
-            price: product.price_format || `€${product.price}`,
-            image_url: product.image_url || '',
-          }))
-        : [];
-
-      const orderData = {
-        order_id: orderInfo.order_id,
-        order_number: orderInfo.order_id,
-        timestamp: orderInfo.timestamp || orderInfo.updated_at,
-        status: orderInfo.status,
-        total: orderInfo.total ? `€${orderInfo.total}` : '€0.00',
-        firstname: orderInfo.firstname,
-        lastname: orderInfo.lastname,
-        email: orderInfo.email,
-        phone: orderInfo.phone,
-        customer: {
-          email: orderInfo.email,
-          phone: orderInfo.phone,
-          name: `${orderInfo.firstname || ''} ${
-            orderInfo.lastname || ''
-          }`.trim(),
-        },
-        products: products,
-        shipping_cost: orderInfo.shipping_cost || '0.00',
-        subtotal: orderInfo.subtotal || orderInfo.total || '0.00',
-      };
-
-      return {
-        order_data: orderData,
-        result: response.data.result,
-        message: response.data.message,
-      } as OrderDetailsResponse;
-    }
-
-    throw new Error('Response missing order_info property');
+    console.log('Order details API response:', response.data);
+    return response.data as OrderDetailsResponse;
   } catch (error) {
     console.error('Fetch Order Details API error:', error);
     throw error;
@@ -657,18 +671,74 @@ export const searchOrdersApi = async (
   page: number = 1,
 ) => {
   try {
-    const response = await apiClient.get(`/api.php`, {
-      params: {
-        _d: 'NtSeOrdersApi',
-        user_id: userId,
-        search: searchTerm,
-        page,
+    console.log('Searching orders with:', {userId, searchTerm, page});
+
+    const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}`;
+    const params = {
+      search: searchTerm,
+      page,
+    };
+
+    const response = await axios({
+      method: 'GET',
+      url: url,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
       },
+      params: params,
     });
+
+    console.log('Search orders API response:', response.data);
     return response.data as OrdersResponse;
   } catch (error) {
     console.error('Search Orders API error:', error);
     throw error;
+  }
+};
+
+// NEW: Update Order Status API
+export const updateOrderStatusApi = async (
+  userId: string,
+  orderId: string,
+  status: string,
+): Promise<OrderStatusUpdateResponse> => {
+  try {
+    console.log('Updating order status:', {userId, orderId, status});
+
+    const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi%2F${orderId}`;
+
+    const response = await axios({
+      method: 'PUT',
+      url: url,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        product_ids: orderId,
+        user_id: userId,
+        action: 'change_status',
+        status_to: status,
+      },
+    });
+
+    console.log('Update order status response:', response.data);
+    return response.data as OrderStatusUpdateResponse;
+  } catch (error: any) {
+    console.error('Update Order Status API error:', error);
+
+    if (error.response?.status === 404) {
+      throw new Error('Order not found');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to update this order');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error occurred while updating order status');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to update order status',
+      );
+    }
   }
 };
 

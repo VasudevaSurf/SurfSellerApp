@@ -11,8 +11,8 @@ export interface CheckboxProps {
 export interface StatusModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSubmit: (selectedStatus: OrderStatus) => void;
-  initialStatus: OrderStatus;
+  onSubmit: (selectedStatus: OrderStatus | OrderStatus[]) => void;
+  initialStatus?: OrderStatus | OrderStatus[];
   options?: Option[];
   title?: string;
   showSearch?: boolean;

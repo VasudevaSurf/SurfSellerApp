@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {ScrollView, View, ActivityIndicator} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BellIcon from '../../../assets/icons/BellIcon';
@@ -15,14 +15,17 @@ import {navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './OrderScreen.styles';
 import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
 import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../../redux/store';
+import {RootState, AppDispatch} from '../../../redux/store';
 import {
   fetchOrders,
   searchOrders,
   setStatusFilter,
   setSearchTerm,
+  updateOrderStatus,
+  clearStatusUpdateError,
 } from '../../../redux/slices/ordersSlice';
 
+// Map API status codes to display status
 const convertOrderStatus = (apiStatus: string): OrderStatus => {
   const statusMap: {[key: string]: OrderStatus} = {
     O: 'Pending',
@@ -31,16 +34,32 @@ const convertOrderStatus = (apiStatus: string): OrderStatus => {
     F: 'Failed',
     I: 'Cancelled',
     D: 'Declined',
-    B: 'Shipping', // Backordered mapped to Shipping
-    Y: 'Processing', // Awaiting call mapped to Processing
-    A: 'Processing', // Fraud checking mapped to Processing
+    B: 'Shipped',
+    Y: 'Processing',
+    A: 'Processing',
   };
 
   return statusMap[apiStatus] || 'Processing';
 };
 
-const getApiStatusFromFilter = (filterId: string): string | null => {
-  if (filterId === 'all') return null;
+// Map display status back to API status codes
+const convertStatusToApi = (displayStatus: OrderStatus): string => {
+  const statusMap: {[key: string]: string} = {
+    Pending: 'O',
+    Processing: 'P',
+    Completed: 'C',
+    Failed: 'F',
+    Cancelled: 'I',
+    Declined: 'D',
+    Shipped: 'B',
+  };
+
+  return statusMap[displayStatus] || 'P';
+};
+
+// Get API status from filter ID
+const getApiStatusFromFilter = (filterId: string): string | undefined => {
+  if (filterId === 'all') return undefined;
 
   const filterToApiMap: {[key: string]: string} = {
     pending: 'O',
@@ -48,172 +67,241 @@ const getApiStatusFromFilter = (filterId: string): string | null => {
     completed: 'C',
     failed: 'F',
     cancelled: 'I',
-    shipping: 'B',
+    declined: 'D',
+    shipped: 'B',
   };
 
+  // Check if it's already an API status code
   if (['O', 'P', 'C', 'F', 'I', 'D', 'B', 'Y', 'A'].includes(filterId)) {
     return filterId;
   }
 
-  return filterToApiMap[filterId] || null;
+  return filterToApiMap[filterId];
 };
 
 const OrderScreen = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const userId = useSelector(
     (state: RootState) => state.auth.userData?.user_id,
   );
+
   const {
     orders,
-    orderStatuses,
     loading,
     error,
     statusFilter,
     searchTerm,
     currentPage,
     totalItems,
+    updatingStatus,
+    statusUpdateError,
   } = useSelector((state: RootState) => state.orders);
 
-  // Debugging: Log userId
+  const [searchText, setSearchText] = useState('');
+  const [searchTimeoutRef, setSearchTimeoutRef] =
+    useState<NodeJS.Timeout | null>(null);
+
+  // Debugging: Log userId and orders
   useEffect(() => {
     console.log('OrderScreen - userId:', userId);
-  }, [userId]);
-
-  const [searchText, setSearchText] = useState('');
-
-  // Log orders received
-  useEffect(() => {
     console.log('OrderScreen - Orders received:', orders?.length || 0);
-    if (orders && orders.length > 0) {
-      console.log('OrderScreen - First order ID:', orders[0].order_id);
-      console.log(
-        'OrderScreen - First order details:',
-        JSON.stringify(orders[0], null, 2),
-      );
-    }
-  }, [orders]);
 
+    if (orders && orders.length > 0) {
+      console.log('OrderScreen - First order:', orders[0]);
+    }
+  }, [userId, orders]);
+
+  // Initialize orders fetch
+  useEffect(() => {
+    if (userId) {
+      const apiStatus = getApiStatusFromFilter(statusFilter);
+      console.log('OrderScreen - Initial fetch with status:', apiStatus);
+      dispatch(fetchOrders({userId, status: apiStatus}));
+    }
+  }, [dispatch, userId]);
+
+  // Format orders for display
   const formattedOrders =
     orders?.map(order => {
+      // Extract customer name from order data
+      const customerName =
+        order.customer?.name ||
+        `${order.firstname || ''} ${order.lastname || ''}`.trim() ||
+        'Customer';
+
+      // Extract product info (use first product if multiple)
+      const firstProduct =
+        order.products && order.products.length > 0 ? order.products[0] : null;
+      const productName = firstProduct?.product || customerName;
+      const productImage =
+        firstProduct?.image_url || 'https://picsum.photos/202';
+
       return {
         id: order.order_id || '',
-        orderImage: 'https://picsum.photos/202',
-        orderName:
-          `${order.firstname || ''} ${order.lastname || ''}`.trim() ||
-          `Customer Order`,
+        orderImage: productImage,
+        orderName: productName,
         orderPrice: order.total || '€0.00',
         orderNumber: parseInt(order.order_id || '0'),
         orderEmail: order.email || '',
         orderPhone: order.phone || '',
-        orderDate: order.timestamp
-          ? new Date(parseInt(order.timestamp) * 1000).toLocaleDateString()
-          : '',
-        orderTime: order.timestamp
-          ? new Date(parseInt(order.timestamp) * 1000).toLocaleTimeString()
-          : '',
+        orderDate: order.formattedDate || new Date().toLocaleDateString(),
+        orderTime: order.formattedTime || new Date().toLocaleTimeString(),
         orderStatus: convertOrderStatus(order.status || ''),
+        orderQuantity: firstProduct?.amount || 1,
       };
     }) || [];
 
-  const defaultFilters = [
+  // Define filter options
+  const filterOptions = [
     {id: 'all', label: 'All'},
+    {id: 'pending', label: 'Pending'},
     {id: 'processing', label: 'Processing'},
     {id: 'completed', label: 'Completed'},
+    {id: 'shipped', label: 'Shipped'},
     {id: 'cancelled', label: 'Cancelled'},
-    {id: 'pending', label: 'Pending'},
     {id: 'failed', label: 'Failed'},
-    {id: 'shipping', label: 'Shipping'},
+    {id: 'declined', label: 'Declined'},
   ];
-
-  const apiStatusMap = {
-    O: 'pending',
-    P: 'processing',
-    C: 'completed',
-    F: 'failed',
-    I: 'cancelled',
-    B: 'shipping',
-  };
-
-  const additionalFilters =
-    orderStatuses
-      ?.filter(status => !Object.keys(apiStatusMap).includes(status.status))
-      .map(status => ({
-        id: status.status,
-        label: status.description,
-      })) || [];
-
-  const filterOptions = [...defaultFilters, ...additionalFilters];
 
   const selectedFilter =
     filterOptions.find(option => option.id === statusFilter) ||
     filterOptions[0];
 
-  useEffect(() => {
-    if (userId) {
-      const apiStatus = getApiStatusFromFilter(statusFilter);
-      console.log(
-        'OrderScreen - Fetching orders with userId:',
-        userId,
-        'status:',
-        apiStatus,
-      );
-      dispatch(fetchOrders({userId, status: apiStatus}) as any);
-    }
-  }, [dispatch, userId]);
+  // Handle search with debouncing
+  const handleSearchTextChange = useCallback(
+    (text: string) => {
+      setSearchText(text);
 
-  const handleSearchTextChange = (text: string) => {
-    setSearchText(text);
-  };
+      // Clear existing timeout
+      if (searchTimeoutRef) {
+        clearTimeout(searchTimeoutRef);
+      }
 
-  const handleSearch = () => {
+      // Set new timeout for debounced search
+      const timeoutId = setTimeout(() => {
+        if (userId) {
+          if (text.trim()) {
+            console.log('OrderScreen - Searching with term:', text);
+            dispatch(searchOrders({userId, searchTerm: text}));
+          } else {
+            // Clear search, fetch with current filter
+            const apiStatus = getApiStatusFromFilter(statusFilter);
+            console.log(
+              'OrderScreen - Clearing search, fetching with status:',
+              apiStatus,
+            );
+            dispatch(fetchOrders({userId, status: apiStatus}));
+          }
+        }
+      }, 500); // 500ms debounce
+
+      setSearchTimeoutRef(timeoutId);
+    },
+    [dispatch, userId, statusFilter, searchTimeoutRef],
+  );
+
+  // Handle search submission
+  const handleSearch = useCallback(() => {
     if (userId) {
       if (searchText.trim()) {
-        console.log('OrderScreen - Searching orders with term:', searchText);
-        dispatch(searchOrders({userId, searchTerm: searchText}) as any);
+        console.log('OrderScreen - Manual search with term:', searchText);
+        dispatch(searchOrders({userId, searchTerm: searchText}));
       } else {
         const apiStatus = getApiStatusFromFilter(statusFilter);
         console.log(
-          'OrderScreen - Clearing search, fetching with status:',
+          'OrderScreen - Manual search cleared, fetching with status:',
           apiStatus,
         );
-        dispatch(fetchOrders({userId, status: apiStatus}) as any);
+        dispatch(fetchOrders({userId, status: apiStatus}));
       }
     }
-  };
+  }, [dispatch, userId, searchText, statusFilter]);
 
-  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    console.log(`Order ${orderId} status changed to ${newStatus}`);
+  // Handle status change for individual orders
+  const handleStatusChange = useCallback(
+    async (orderId: string, newStatus: OrderStatus) => {
+      try {
+        console.log(
+          `OrderScreen - Status change for order ${orderId} to ${newStatus}`,
+        );
 
-    if (userId) {
-      const apiStatus = getApiStatusFromFilter(statusFilter);
-      dispatch(fetchOrders({userId, status: apiStatus}) as any);
-    }
-  };
+        if (!userId) {
+          console.error('No userId available for status update');
+          return;
+        }
 
-  const handleFilterSelect = (filter: {id: string; label: string}) => {
-    console.log('OrderScreen - Filter selected:', filter.id);
-    dispatch(setStatusFilter(filter.id));
-    const apiStatus = getApiStatusFromFilter(filter.id);
+        const apiStatus = convertStatusToApi(newStatus);
+        await dispatch(
+          updateOrderStatus({userId, orderId, status: apiStatus}),
+        ).unwrap();
 
-    if (userId) {
-      console.log('OrderScreen - Fetching with new filter, status:', apiStatus);
-      dispatch(fetchOrders({userId, status: apiStatus}) as any);
-    }
-  };
+        // Refresh orders list after successful update
+        setTimeout(() => {
+          const currentApiStatus = getApiStatusFromFilter(statusFilter);
+          dispatch(fetchOrders({userId: userId!, status: currentApiStatus}));
+        }, 1000);
+      } catch (error: any) {
+        console.error('Failed to update order status:', error);
+        // Error handling is managed by the Redux state
+      }
+    },
+    [dispatch, userId, statusFilter],
+  );
 
-  const handleCardPress = (params: any) => {
-    console.log(
-      'OrderScreen - Card pressed with params:',
-      JSON.stringify(params, null, 2),
-    );
+  // Handle filter selection
+  const handleFilterSelect = useCallback(
+    (filter: {id: string; label: string}) => {
+      console.log('OrderScreen - Filter selected:', filter.id);
+      dispatch(setStatusFilter(filter.id));
+
+      if (userId) {
+        const apiStatus = getApiStatusFromFilter(filter.id);
+        console.log(
+          'OrderScreen - Fetching with new filter, status:',
+          apiStatus,
+        );
+        dispatch(fetchOrders({userId, status: apiStatus}));
+      }
+    },
+    [dispatch, userId],
+  );
+
+  // Handle card press to navigate to order details
+  const handleCardPress = useCallback((params: any) => {
+    console.log('OrderScreen - Card pressed with params:', params);
+
     navigate('Dashboard', {
       screen: 'Orders',
       params: {
         screen: 'OrderDetail',
-        params: params,
+        params: {
+          orderId: params.id,
+          orderImage: params.orderImage,
+          orderName: params.orderName,
+          orderPrice: params.orderPrice,
+          orderNumber: params.orderNumber,
+          orderEmail: params.orderEmail,
+          orderPhone: params.orderPhone,
+          orderDate: params.orderDate,
+          orderTime: params.orderTime,
+          orderStatus: params.orderStatus,
+          orderQuantity: params.orderQuantity,
+        },
       },
     });
-  };
+  }, []);
+
+  // Clear errors when component unmounts
+  useEffect(() => {
+    return () => {
+      if (statusUpdateError) {
+        dispatch(clearStatusUpdateError());
+      }
+      if (searchTimeoutRef) {
+        clearTimeout(searchTimeoutRef);
+      }
+    };
+  }, [statusUpdateError, searchTimeoutRef, dispatch]);
 
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
@@ -247,6 +335,7 @@ const OrderScreen = () => {
           onSubmitEditing={handleSearch}
         />
       </View>
+
       <View style={styles.slidingBarsContainer}>
         <SlidingBar
           options={filterOptions}
@@ -255,16 +344,42 @@ const OrderScreen = () => {
         />
       </View>
 
+      {/* Show status update error if any */}
+      {statusUpdateError && (
+        <View
+          style={{
+            backgroundColor: '#FFEBEE',
+            padding: 12,
+            marginHorizontal: 16,
+            marginVertical: 8,
+            borderRadius: 8,
+          }}>
+          <Typography
+            text={`Error updating status: ${statusUpdateError}`}
+            variant={TypographyVariant.PSMALL_MEDIUM}
+            customTextStyles={{color: '#C62828'}}
+          />
+        </View>
+      )}
+
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={ColorPalette.PRIMARY} />
+          <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+          <Typography
+            text="Loading orders..."
+            variant={TypographyVariant.PMEDIUM_REGULAR}
+            customTextStyles={{
+              color: ColorPalette.GREY_TEXT_300,
+              marginTop: 16,
+            }}
+          />
         </View>
       ) : error ? (
         <View style={styles.errorContainer}>
           <Typography
             text={`Error: ${error}`}
-            variant={TypographyVariant.MEDIUM}
-            color={ColorPalette.ERROR}
+            variant={TypographyVariant.PMEDIUM_REGULAR}
+            customTextStyles={{color: ColorPalette.RED_200}}
           />
         </View>
       ) : (
@@ -290,32 +405,31 @@ const OrderScreen = () => {
                   orderDate={order.orderDate}
                   orderTime={order.orderTime}
                   orderStatus={order.orderStatus}
+                  orderQuantity={order.orderQuantity}
                   onStatusChange={status =>
                     handleStatusChange(order.id, status)
                   }
-                  onCardPress={() =>
-                    handleCardPress({
-                      orderId: order.id,
-                      orderImage: order.orderImage,
-                      orderName: order.orderName,
-                      orderPrice: order.orderPrice,
-                      orderNumber: order.orderNumber,
-                      orderEmail: order.orderEmail,
-                      orderPhone: order.orderPhone,
-                      orderDate: order.orderDate,
-                      orderTime: order.orderTime,
-                      orderStatus: order.orderStatus,
-                    })
-                  }
+                  onCardPress={() => handleCardPress(order)}
                 />
               ))
             ) : (
               <View style={styles.emptyContainer}>
                 <Typography
                   text="No orders found"
-                  variant={TypographyVariant.MEDIUM}
-                  color={ColorPalette.GREY_TEXT_400}
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
                 />
+                {searchText.trim() && (
+                  <Typography
+                    text={`Try searching for different terms or clear the search`}
+                    variant={TypographyVariant.PSMALL_REGULAR}
+                    customTextStyles={{
+                      color: ColorPalette.GREY_TEXT_300,
+                      marginTop: 8,
+                      textAlign: 'center',
+                    }}
+                  />
+                )}
               </View>
             )}
           </View>

@@ -1,3 +1,5 @@
+import {OrderStatus} from '../../../../components/MainComponents/OrderInfo/OrderInfo.types';
+
 export interface OrderDetailProps {
   route?: {
     params?: {
@@ -10,7 +12,8 @@ export interface OrderDetailProps {
       orderPhone?: number;
       orderDate: string;
       orderTime: string;
-      orderStatus: string;
+      orderStatus: OrderStatus;
+      orderQuantity?: number;
     };
   };
 }
