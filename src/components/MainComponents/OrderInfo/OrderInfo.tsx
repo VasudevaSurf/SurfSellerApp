@@ -1,10 +1,9 @@
 import React, {useState} from 'react';
-import {Image, TouchableOpacity, View, ActivityIndicator} from 'react-native';
+import {Image, TouchableOpacity, View} from 'react-native';
 import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
-import CheckIcon from '../../../assets/icons/CheckIcon';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import {getScreenHeight} from '../../../helpers/screenSize';
 import {Badge} from '../../UserComponents/Badges/Badge';
 import {BadgeType, BadgeVariant} from '../../UserComponents/Badges/Badge.types';
 import {Typography} from '../../UserComponents/Typography/Typography';
@@ -16,18 +15,11 @@ import {OrderInfoProps, OrderStatus} from './OrderInfo.types';
 const getStatusBadgeType = (status: OrderStatus): BadgeType => {
   switch (status) {
     case 'Delivered':
-    case 'Completed':
       return BadgeType.SUCCESS;
     case 'Cancelled':
-    case 'Failed':
-    case 'Declined':
       return BadgeType.DANGER;
     case 'Pending':
-    case 'Processing':
       return BadgeType.WARNING;
-    case 'Accepted':
-    case 'Shipped':
-      return BadgeType.PRIMARY;
     default:
       return BadgeType.PRIMARY;
   }
@@ -38,34 +30,24 @@ const getStatusColors = (
 ): {borderColor: string; textColor: string} => {
   switch (status) {
     case 'Delivered':
-    case 'Completed':
       return {
         borderColor: ColorPalette.Green_200,
         textColor: ColorPalette.Green_200,
       };
     case 'Cancelled':
-    case 'Failed':
-    case 'Declined':
       return {
         borderColor: ColorPalette.RED_100,
         textColor: ColorPalette.PURPLE_ROSE_300,
       };
     case 'Pending':
-    case 'Processing':
       return {
         borderColor: '#FFC107', // Yellow color for pending
         textColor: '#FFC107',
       };
-    case 'Accepted':
-    case 'Shipped':
-      return {
-        borderColor: ColorPalette.PURPLE_300,
-        textColor: ColorPalette.PURPLE_300,
-      };
     default:
       return {
-        borderColor: ColorPalette.GREY_TEXT_400,
-        textColor: ColorPalette.GREY_TEXT_400,
+        borderColor: ColorPalette.RED_100,
+        textColor: ColorPalette.PURPLE_ROSE_300,
       };
   }
 };
@@ -87,98 +69,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
   style,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<OrderStatus>(orderStatus);
-  const [statusUpdateSuccess, setStatusUpdateSuccess] = useState(false);
-
-  const statusColors = getStatusColors(currentStatus);
-
-  const handleStatusChange = async (newStatus: OrderStatus) => {
-    if (newStatus === currentStatus) {
-      setIsModalVisible(false);
-      return;
-    }
-
-    try {
-      setIsUpdatingStatus(true);
-      setIsModalVisible(false);
-
-      // Call the parent's status change handler
-      await onStatusChange(newStatus);
-
-      // Update local state
-      setCurrentStatus(newStatus);
-      setStatusUpdateSuccess(true);
-
-      // Show success feedback for 2 seconds
-      setTimeout(() => {
-        setStatusUpdateSuccess(false);
-      }, 2000);
-    } catch (error) {
-      console.error('Failed to update status:', error);
-      // Optionally show error feedback here
-    } finally {
-      setIsUpdatingStatus(false);
-    }
-  };
-
-  const renderStatusBadgeContent = () => {
-    if (isUpdatingStatus) {
-      return (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: getScreenWidth(2),
-          }}>
-          <ActivityIndicator size="small" color={statusColors.textColor} />
-          <Typography
-            text="Updating..."
-            variant={TypographyVariant.LMEDIUM_MEDIUM}
-            customTextStyles={{color: statusColors.textColor}}
-          />
-        </View>
-      );
-    }
-
-    if (statusUpdateSuccess) {
-      return (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: getScreenWidth(2),
-          }}>
-          <CheckIcon
-            size={16}
-            backgroundColor={statusColors.textColor}
-            checkColor="white"
-          />
-          <Typography
-            text={`Updated to ${currentStatus}`}
-            variant={TypographyVariant.LMEDIUM_MEDIUM}
-            customTextStyles={{color: statusColors.textColor}}
-          />
-        </View>
-      );
-    }
-
-    return (
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: getScreenWidth(2),
-        }}>
-        <Typography
-          text={currentStatus}
-          variant={TypographyVariant.LMEDIUM_MEDIUM}
-          customTextStyles={{color: statusColors.textColor}}
-        />
-        <ArrowDownIcon size={16} color={statusColors.textColor} />
-      </View>
-    );
-  };
+  const statusColors = getStatusColors(orderStatus);
 
   return (
     <TouchableOpacity
@@ -195,7 +86,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
           orderPhone,
           orderDate,
           orderTime,
-          orderStatus: currentStatus,
+          orderStatus,
           orderQuantity,
         })
       }
@@ -277,34 +168,26 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
           variant={TypographyVariant.PSMALL_MEDIUM}
           customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
         />
-        <TouchableOpacity
-          style={[
-            styles.statusBadge,
-            {
-              borderColor: statusColors.borderColor,
-              borderWidth: 1,
-              borderRadius: getScreenWidth(2),
-              paddingHorizontal: getScreenWidth(3),
-              paddingVertical: getScreenHeight(1),
-              backgroundColor: 'transparent',
-            },
-          ]}
+        <Badge
+          text={orderStatus}
+          type={getStatusBadgeType(orderStatus)}
+          variant={BadgeVariant.OUTLINE}
+          rightIcon={ArrowDownIcon}
           onPress={e => {
             e.stopPropagation();
-            if (!isUpdatingStatus && !statusUpdateSuccess) {
-              setIsModalVisible(true);
-            }
+            setIsModalVisible(true);
           }}
-          disabled={isUpdatingStatus}
-          activeOpacity={0.7}>
-          {renderStatusBadgeContent()}
-        </TouchableOpacity>
-
+          customBorderColor={statusColors.borderColor}
+          textVariant={TypographyVariant.LMEDIUM_MEDIUM}
+          customContainerStyle={styles.statusBadge}
+          customTextColor={statusColors.textColor}
+          iconSize={16}
+        />
         <StatusModal
           isVisible={isModalVisible}
           onClose={() => setIsModalVisible(false)}
-          onSubmit={handleStatusChange}
-          initialStatus={currentStatus}
+          onSubmit={onStatusChange}
+          initialStatus={orderStatus}
           showSearch={false}
         />
       </View>
