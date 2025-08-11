@@ -1,16 +1,21 @@
-import React, {useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
   View,
 } from 'react-native';
 import {SceneMap, TabBar, TabView} from 'react-native-tab-view';
+import {useSelector} from 'react-redux';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
+import ArrowLeft from '../../../../../../assets/icons/ArrowLeft';
 import BankOutlineIcon from '../../../../../../assets/icons/BankOutlineIcon';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
+import QuestionMarkIcon from '../../../../../../assets/icons/QuestionMarkIcon';
 import WalletIcon from '../../../../../../assets/icons/WalletIcon';
 import {AddModal} from '../../../../../../components/MainComponents/AddModal/AddModal';
 import {SlidingBar} from '../../../../../../components/MainComponents/SlidingBar/SlidingBar';
@@ -31,9 +36,13 @@ import {
   goBack,
   navigate,
 } from '../../../../../../navigation/utils/navigationRef';
+import {RootState} from '../../../../../../redux/store';
+import {
+  fetchBalanceApi,
+  BalanceItem,
+  BalanceResponse,
+} from '../../../../../../services/apiService';
 import {styles} from './PaymentInfo.styles';
-import ArrowLeft from '../../../../../../assets/icons/ArrowLeft';
-import QuestionMarkIcon from '../../../../../../assets/icons/QuestionMarkIcon';
 
 const initialLayout = {width: Dimensions.get('window').width};
 
@@ -52,6 +61,93 @@ const PaymentInfo = () => {
     {key: 'withdrawals', title: 'Withdrawals'},
   ]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // API state
+  const [balanceData, setBalanceData] = useState<BalanceResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentBalance, setCurrentBalance] = useState('€0.00');
+
+  // Separate data for payouts and withdrawals
+  const [payoutsData, setPayoutsData] = useState<BalanceItem[]>([]);
+  const [withdrawalsData, setWithdrawalsData] = useState<BalanceItem[]>([]);
+
+  // Get userId from Redux store
+  const userData = useSelector((state: RootState) => state.auth.userData);
+  const userId = userData?.user_id;
+
+  // Fetch balance data from API
+  const fetchBalanceData = useCallback(
+    async (isRefresh = false) => {
+      if (!userId) {
+        console.error('No userId available');
+        return;
+      }
+
+      if (!isRefresh) {
+        setLoading(true);
+      }
+      setError(null);
+
+      try {
+        // Map filter to API status parameter
+        let statusParam:
+          | 'Pending'
+          | 'Completed'
+          | 'Declined'
+          | 'Failed'
+          | undefined;
+        if (selectedFilter.id !== 'All') {
+          statusParam = selectedFilter.id as 'Pending' | 'Completed' | 'Failed';
+        }
+
+        const response = await fetchBalanceApi(userId, 1, 50, statusParam);
+
+        if (response.result) {
+          setBalanceData(response);
+
+          // Set current balance from totals
+          if (response.totals?.income) {
+            setCurrentBalance(response.totals.income);
+          }
+
+          // Separate payouts and withdrawals based on payout_type
+          const payouts = response.balances.filter(
+            item =>
+              item.payout_type === 'order_placed' ||
+              item.payout_type === 'payout',
+          );
+          const withdrawals = response.balances.filter(
+            item => item.payout_type === 'withdrawal',
+          );
+
+          setPayoutsData(payouts);
+          setWithdrawalsData(withdrawals);
+        } else {
+          setError(response.message || 'Failed to fetch balance data');
+        }
+      } catch (err) {
+        console.error('Error fetching balance:', err);
+        setError('Failed to load balance information');
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [userId, selectedFilter],
+  );
+
+  // Load data on mount and when filter changes
+  useEffect(() => {
+    fetchBalanceData();
+  }, [fetchBalanceData]);
+
+  // Handle pull to refresh
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchBalanceData(true);
+  }, [fetchBalanceData]);
 
   const handleFilterChange = option => {
     setSelectedFilter(option);
@@ -87,6 +183,10 @@ const PaymentInfo = () => {
         color: '#E45151',
         bgColor: '#FFE7E7',
       },
+      Failed: {
+        color: '#E45151',
+        bgColor: '#FFE7E7',
+      },
       default: {
         color: ColorPalette.GREY_TEXT_500,
         bgColor: ColorPalette.GREY_200,
@@ -96,16 +196,25 @@ const PaymentInfo = () => {
     return statusConfig[status] || statusConfig.default;
   };
 
-  const renderHistoryItem = (type, status, amount) => {
-    const {color: statusColor, bgColor: statusBgColor} =
-      getStatusColors(status);
+  const renderHistoryItem = (item: BalanceItem) => {
+    const {color: statusColor, bgColor: statusBgColor} = getStatusColors(
+      item.status,
+    );
+
+    // Parse the type from description for display
+    const typeDisplay =
+      item.payout_type === 'order_placed'
+        ? 'Payouts'
+        : item.payout_type === 'withdrawal'
+        ? 'Withdrawals'
+        : 'Transaction';
 
     return (
-      <View style={styles.payoutItem}>
+      <View key={item.payout_id} style={styles.payoutItem}>
         <View style={styles.payoutItemLeft}>
           <View style={styles.payoutItemHeader}>
             <Typography
-              text={type}
+              text={item.description || typeDisplay}
               variant={TypographyVariant.PMEDIUM_MEDIUM}
               customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
             />
@@ -113,20 +222,20 @@ const PaymentInfo = () => {
           </View>
 
           <Typography
-            text="28/09/2024, 14:25"
+            text={item.date}
             variant={TypographyVariant.LSMALL_REGULAR}
             customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
           />
         </View>
         <View style={styles.payoutItemRight}>
           <Typography
-            text={`€${amount}`}
+            text={item.display_amount}
             variant={TypographyVariant.H6_BOLD}
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <View style={[styles.statusBadge, {backgroundColor: statusBgColor}]}>
             <Typography
-              text={status}
+              text={item.status}
               variant={TypographyVariant.LXSMALL_MEDIUM}
               customTextStyles={{color: statusColor}}
             />
@@ -136,14 +245,31 @@ const PaymentInfo = () => {
     );
   };
 
-  const renderHistorySection = (title, type, hasData = true) => {
+  const renderHistorySection = (
+    title: string,
+    data: BalanceItem[],
+    isLoading: boolean,
+  ) => {
+    // Apply filter to the data if not "All"
+    let filteredData = data;
+    if (selectedFilter.id !== 'All') {
+      filteredData = data.filter(item => item.status === selectedFilter.id);
+    }
+
     return (
       <>
         <View style={styles.divider}></View>
         <ScrollView
           style={styles.tabContent}
           contentContainerStyle={{flexGrow: 1}}
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={ColorPalette.PURPLE_300}
+            />
+          }>
           <View style={styles.tabContent}>
             <Typography
               text={`${title} History`}
@@ -158,17 +284,32 @@ const PaymentInfo = () => {
               customContainerStyle={styles.slidingBarContainer}
             />
 
-            <View style={[styles.payoutsList, !hasData && styles.emptyState]}>
-              {hasData ? (
-                <>
-                  {renderHistoryItem(type, 'Pending', '89.9')}
-                  {renderHistoryItem(type, 'Declined', '89.9')}
-                  {renderHistoryItem(type, 'Completed', '89.9')}
-                  {renderHistoryItem(type, 'Pending', '89.9')}
-                </>
+            <View
+              style={[
+                styles.payoutsList,
+                !filteredData.length && !isLoading && styles.emptyState,
+              ]}>
+              {isLoading ? (
+                <ActivityIndicator
+                  size="large"
+                  color={ColorPalette.PURPLE_300}
+                  style={{marginTop: getScreenHeight(5)}}
+                />
+              ) : error ? (
+                <Typography
+                  text={error}
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.RED_200}}
+                />
+              ) : filteredData.length > 0 ? (
+                filteredData.map(item => renderHistoryItem(item))
               ) : (
                 <Typography
-                  text={`No ${title.toLowerCase()} yet`}
+                  text={`No ${title.toLowerCase()} ${
+                    selectedFilter.id !== 'All'
+                      ? `with status "${selectedFilter.id}"`
+                      : 'yet'
+                  }`}
                   variant={TypographyVariant.PMEDIUM_REGULAR}
                   customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
                 />
@@ -180,9 +321,11 @@ const PaymentInfo = () => {
     );
   };
 
-  const PayoutsRoute = () => renderHistorySection('Payouts', 'Payouts', true);
+  const PayoutsRoute = () =>
+    renderHistorySection('Payouts', payoutsData, loading);
+
   const WithdrawalsRoute = () =>
-    renderHistorySection('Withdrawals', 'Withdrawals', false);
+    renderHistorySection('Withdrawals', withdrawalsData, loading);
 
   const renderScene = SceneMap({
     payouts: PayoutsRoute,
@@ -310,7 +453,7 @@ const PaymentInfo = () => {
                   customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
                 />
                 <Typography
-                  text="€12.50"
+                  text={currentBalance}
                   variant={TypographyVariant.H5_BOLD}
                   customTextStyles={{color: ColorPalette.BalanceColor}}
                 />

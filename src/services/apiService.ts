@@ -297,6 +297,41 @@ export interface CategoriesResponse {
   message: string;
 }
 
+// NEW: Balance API interfaces
+export interface BalanceItem {
+  payout_id: string;
+  status: 'Pending' | 'Completed' | 'Declined' | 'Failed';
+  description: string;
+  payout_type: 'order_placed' | 'withdrawal' | 'payout' | string;
+  display_amount: string;
+  order_amount?: string;
+  date: string;
+  comments?: string | null;
+}
+
+export interface BalanceSearch {
+  page: number;
+  items_per_page: number;
+  sort_by: string;
+  sort_order: string;
+  sort_order_rev: string;
+  total_items: string;
+  api_search: string;
+}
+
+export interface BalanceTotals {
+  income: string;
+  income_carried_forward: string;
+}
+
+export interface BalanceResponse {
+  balances: BalanceItem[];
+  search: BalanceSearch;
+  totals: BalanceTotals;
+  message: string;
+  result: boolean;
+}
+
 // Helper function to find category ID by path
 const findCategoryIdByPath = (
   categories: CategoryData[],
@@ -434,6 +469,49 @@ export const updateProfileApi = async (
         error.response?.data?.message || 'Failed to update profile',
       );
     }
+  }
+};
+
+// NEW: Balance API function
+export const fetchBalanceApi = async (
+  userId: string,
+  page: number = 1,
+  itemsPerPage: number = 10,
+  status?: 'Pending' | 'Completed' | 'Declined' | 'Failed',
+  type?: 'payouts' | 'withdrawals',
+): Promise<BalanceResponse> => {
+  try {
+    console.log('Fetching balance for userId:', userId);
+
+    let url = `https://dev.surf.mt/api.php?_d=NtSeBalanceApi&user_id=${userId}`;
+
+    // Add pagination parameters
+    url += `&page=${page}&items_per_page=${itemsPerPage}`;
+
+    // Add status filter if provided
+    if (status) {
+      url += `&status=${status}`;
+    }
+
+    // Add type filter if provided
+    if (type) {
+      url += `&payout_type=${type}`;
+    }
+
+    const response = await axios({
+      method: 'GET',
+      url: url,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Balance API response:', response.data);
+    return response.data as BalanceResponse;
+  } catch (error) {
+    console.error('Fetch Balance API error:', error);
+    throw error;
   }
 };
 
