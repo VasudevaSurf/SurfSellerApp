@@ -1,8 +1,6 @@
-// src/screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BankDetailsPages/BankDetails.tsx
 import {useFocusEffect, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
 import {Header} from '../../../../../components/UserComponents/Header/Header';
 import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
@@ -10,41 +8,14 @@ import {TypographyVariant} from '../../../../../components/UserComponents/Typogr
 import {ColorPalette} from '../../../../../config/colorPalette';
 import {getScreenHeight} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
-import {fetchProfile} from '../../../../../redux/slices/profileSlice';
 import {styles} from './BankDetails.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
-import {RootState, AppDispatch} from '../../../../../redux/store';
 
 const BankDetails = () => {
   const route = useRoute();
-  const dispatch = useDispatch<AppDispatch>();
-  const userData = useSelector((state: RootState) => state.auth.userData);
-  const {profileData, loading, error} = useSelector(
-    (state: RootState) => state.profile,
-  );
-
-  const [accountName, setAccountName] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [bicCode, setBicCode] = useState('');
-
-  // Fetch profile data when component mounts
-  useEffect(() => {
-    if (userData?.user_id) {
-      dispatch(fetchProfile(userData.user_id));
-    }
-  }, [dispatch, userData?.user_id]);
-
-  // Update state when profile data changes
-  useEffect(() => {
-    if (profileData) {
-      // Get bank details from fields object
-      setAccountName(profileData.fields?.account_holder_name || 'Annie Flora');
-      setAccountNumber(
-        profileData.fields?.account_number || 'MT84APSB1234567890',
-      );
-      setBicCode(profileData.fields?.swift_bic_code || 'APSBMTMT123');
-    }
-  }, [profileData]);
+  const [accountName, setAccountName] = useState('Annie Flora');
+  const [accountNumber, setAccountNumber] = useState('MT84APSB1234567890');
+  const [bicCode, setBicCode] = useState('APSBMTMT123');
 
   useFocusEffect(
     React.useCallback(() => {

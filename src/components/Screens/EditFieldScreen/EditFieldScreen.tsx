@@ -1,6 +1,5 @@
-// src/components/Screens/EditFieldScreen/EditFieldScreen.tsx
 import React, {useCallback, useState} from 'react';
-import {Image, SafeAreaView, ScrollView, View} from 'react-native';
+import {Image, SafeAreaView, ScrollView, View, Alert} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import ArrowLeftIcon from '../../../assets/icons/ArrowLeftIcon';
 import CloseCircleIcon from '../../../assets/icons/CloseCircleIcon';
@@ -17,7 +16,10 @@ import {TypographyVariant} from '../../../components/UserComponents/Typography/T
 import {ColorPalette} from '../../../config/colorPalette';
 import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {goBack, navigate} from '../../../navigation/utils/navigationRef';
-import {updateProfile} from '../../../redux/slices/profileSlice';
+import {
+  updateProfile,
+  clearUpdateSuccess,
+} from '../../../redux/slices/profileSlice';
 import {styles} from './EditFieldScreen.styles';
 import {
   EditFieldParams,
@@ -47,7 +49,6 @@ const submitFormAction = async (
 
     switch (actionType) {
       case 'updateName':
-        // For name updates, values contains firstName and lastName
         profileData = {
           firstname: values.firstName,
           lastname: values.lastName,
@@ -65,53 +66,32 @@ const submitFormAction = async (
         break;
       case 'updateBusinessName':
         profileData = {
-          company: values,
+          company_name: values,
         };
         break;
       case 'updateVATNumber':
         profileData = {
-          tax_number: values,
+          vat_number: values,
         };
         break;
       case 'updateStreetName':
         profileData = {
-          b_address: values,
+          street: values,
         };
         break;
       case 'updateCityName':
         profileData = {
-          b_city: values,
+          city: values,
         };
         break;
       case 'updatePostalCode':
         profileData = {
-          b_zipcode: values,
+          postal_code: values,
         };
         break;
       case 'updateCountry':
         profileData = {
-          b_country: values,
-        };
-        break;
-      case 'updateAccountName':
-        profileData = {
-          fields: {
-            account_holder_name: values,
-          },
-        };
-        break;
-      case 'updateAccountNumber':
-        profileData = {
-          fields: {
-            account_number: values,
-          },
-        };
-        break;
-      case 'updateBicCode':
-        profileData = {
-          fields: {
-            swift_bic_code: values,
-          },
+          country: values,
         };
         break;
       default:
@@ -119,8 +99,7 @@ const submitFormAction = async (
         return false;
     }
 
-    // Dispatch the update action
-    await dispatch(
+    const result = await dispatch(
       updateProfile({
         userId,
         profileData,
@@ -140,7 +119,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const {updating, updateError} = useSelector(
+  const {updating, updateError, updateSuccess} = useSelector(
     (state: RootState) => state.profile,
   );
 
@@ -170,6 +149,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
   const [error, setError] = useState<string>('');
   const [fieldValues, setFieldValues] = useState<FieldValues>(initialValues);
   const [errors, setErrors] = useState<ErrorValues>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const renderIconOrImage = () => {
     if (iconComponent) {
@@ -201,7 +181,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           };
         case 'lastName':
           return value => {
-            if (!value.trim()) return 'Last name cannot be empty';
+            // Last name is optional, so empty is allowed
             return true;
           };
         case 'email':
@@ -214,57 +194,20 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           };
         case 'phone':
           return value => {
-            const phoneRegex = /^\d[\d\s]{5,14}$/;
+            const phoneRegex = /^\d[\d\s]{6,14}$/;
             if (!value.trim()) return 'Phone number cannot be empty';
             if (!phoneRegex.test(value))
               return 'Please enter a valid phone number';
             return true;
           };
         case 'businessName':
-          return value => {
-            if (!value.trim()) return 'Business name cannot be empty';
-            return true;
-          };
         case 'vatNumber':
-          return value => {
-            if (!value.trim()) return 'VAT number cannot be empty';
-            return true;
-          };
         case 'streetName':
-          return value => {
-            if (!value.trim()) return 'Street address cannot be empty';
-            return true;
-          };
         case 'cityName':
-          return value => {
-            if (!value.trim()) return 'City cannot be empty';
-            return true;
-          };
         case 'postalCode':
-          return value => {
-            if (!value.trim()) return 'Postal code cannot be empty';
-            return true;
-          };
         case 'country':
-          return value => {
-            if (!value.trim()) return 'Country cannot be empty';
-            return true;
-          };
-        case 'accountName':
-          return value => {
-            if (!value.trim()) return 'Account holder name cannot be empty';
-            return true;
-          };
-        case 'accountNumber':
-          return value => {
-            if (!value.trim()) return 'Account number cannot be empty';
-            return true;
-          };
-        case 'bicCode':
-          return value => {
-            if (!value.trim()) return 'SWIFT/BIC code cannot be empty';
-            return true;
-          };
+          // All company fields are optional
+          return () => true;
         default:
           return () => true;
       }
@@ -283,24 +226,29 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
   };
 
   const navigateBack = (updatedData: any) => {
-    navigation.goBack();
+    // Show success message
+    Alert.alert(
+      'Success',
+      'Profile updated successfully',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            navigation.goBack();
 
-    // Determine where to navigate based on originScreen
-    if (originScreen === 'CompanyProfile') {
-      navigation.navigate('CompanyProfile', updatedData);
-    } else if (originScreen === 'BankDetails') {
-      navigation.navigate('BankDetails', updatedData);
-    } else if (fieldType === 'email') {
-      navigation.navigate('Dashboard', {
-        screen: 'Account',
-        params: {
-          screen: 'PersonalInfo',
-          params: updatedData,
+            // Navigate to appropriate screen
+            if (originScreen === 'CompanyProfile') {
+              navigation.navigate('CompanyProfile', updatedData);
+            } else if (originScreen === 'BankDetails') {
+              navigation.navigate('BankDetails', updatedData);
+            } else {
+              navigation.navigate('PersonalInfo', updatedData);
+            }
+          },
         },
-      });
-    } else {
-      navigation.navigate('PersonalInfo', updatedData);
-    }
+      ],
+      {cancelable: false},
+    );
   };
 
   const handleSubmit = async (): Promise<void> => {
@@ -309,6 +257,8 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       if (multipleFields) {
         let hasErrors = false;
@@ -316,7 +266,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
 
         fields.forEach(field => {
           const validationFn = getValidationForType(field.validationType);
-          const validationResult = validationFn(fieldValues[field.key]);
+          const validationResult = validationFn(fieldValues[field.key] || '');
 
           if (validationResult !== true) {
             newErrors[field.key] = validationResult;
@@ -326,6 +276,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
 
         if (hasErrors) {
           setErrors(newErrors);
+          setIsSubmitting(false);
           return;
         }
 
@@ -336,25 +287,24 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           userData.user_id,
         );
 
-        if (originScreen === 'CompanyProfile') {
-          // For CompanyProfile, we may still need name combinations in some cases
-          if (fieldValues.firstName && fieldValues.lastName) {
-            const fullName = `${fieldValues.firstName} ${fieldValues.lastName}`;
-            navigateBack({updatedName: fullName});
-          } else {
-            navigateBack(fieldValues);
-          }
-        } else {
-          // Default PersonalInfo handling
-          const fullName = `${fieldValues.firstName} ${fieldValues.lastName}`;
-          navigateBack({updatedName: fullName});
-        }
+        const fullName = fieldValues.firstName
+          ? `${fieldValues.firstName || ''} ${
+              fieldValues.lastName || ''
+            }`.trim()
+          : fieldValues;
+
+        navigateBack(
+          originScreen === 'CompanyProfile'
+            ? fieldValues
+            : {updatedName: fullName},
+        );
       } else {
         const validationFn = getValidationForType(validationType || fieldType);
         const validationResult = validationFn(fieldValue);
 
         if (validationResult !== true) {
           setError(validationResult);
+          setIsSubmitting(false);
           return;
         }
 
@@ -400,15 +350,6 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
             case 'country':
               updatedData = {updatedCountry: fieldValue};
               break;
-            case 'accountName':
-              updatedData = {updatedAccountName: fieldValue};
-              break;
-            case 'accountNumber':
-              updatedData = {updatedAccountNumber: fieldValue};
-              break;
-            case 'bicCode':
-              updatedData = {updatedBicCode: fieldValue};
-              break;
             default:
               updatedData = {updatedName: fieldValue};
           }
@@ -417,25 +358,59 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
       }
     } catch (error: any) {
       console.error('Submit failed:', error);
+      Alert.alert(
+        'Update Failed',
+        error.message || 'Failed to update profile. Please try again.',
+        [{text: 'OK'}],
+      );
       if (multipleFields) {
         setErrors({general: error.message || 'Update failed'});
       } else {
         setError(error.message || 'Update failed');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const isSubmitDisabled = (): boolean => {
-    if (updating) return true;
+    if (updating || isSubmitting) return true;
 
     if (multipleFields) {
-      return fields.some(
+      // Check if any changes were made
+      const hasChanges = fields.some(field => {
+        const currentValue = fieldValues[field.key] || '';
+        const initialValue = initialValues[field.key] || '';
+        return currentValue !== initialValue;
+      });
+
+      // Check required fields
+      const hasRequiredFields = fields.every(
         field =>
-          field.required &&
-          (!fieldValues[field.key] || fieldValues[field.key].trim() === ''),
+          !field.required ||
+          (fieldValues[field.key] && fieldValues[field.key].trim() !== ''),
       );
+
+      return !hasChanges || !hasRequiredFields;
     }
-    return fieldValue.trim() === '';
+
+    // For single fields, check if value changed
+    const hasChanged = fieldValue !== initialValue;
+
+    // For optional fields, allow submission even if empty but changed
+    const optionalFields = [
+      'businessName',
+      'vatNumber',
+      'streetName',
+      'cityName',
+      'postalCode',
+      'country',
+    ];
+    if (optionalFields.includes(fieldType)) {
+      return !hasChanged;
+    }
+
+    return !hasChanged || fieldValue.trim() === '';
   };
 
   // Show update error from Redux if it exists
@@ -479,17 +454,19 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                         handleMultiFieldChange(field.key, text)
                       }
                       keyboardType={field.keyboardType || 'default'}
-                      customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+                      customLabelColorFocused={ColorPalette.PURPLE_300}
                       customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
                       customBorderColor={
                         errors[field.key]
                           ? ColorPalette.RED
                           : ColorPalette.GREY_TEXT_400
                       }
+                      customFocusedBorderColor={ColorPalette.PURPLE_300}
                       customBorderWidth={1}
                       customFocusedBorderWidth={2}
                       customErrorBorderWidth={2}
                       error={errors[field.key]}
+                      customTextColor={ColorPalette.GREY_TEXT_500}
                       rightIcons={[
                         {
                           icon: <CloseCircleIcon style={undefined} />,
@@ -514,15 +491,17 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                   value={fieldValue}
                   onChangeText={handleSingleFieldChange}
                   keyboardType={keyboardType}
-                  customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+                  customLabelColorFocused={ColorPalette.PURPLE_300}
                   customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
                   customBorderColor={
                     displayError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
                   }
+                  customFocusedBorderColor={ColorPalette.PURPLE_300}
                   customBorderWidth={1}
                   customFocusedBorderWidth={2}
                   customErrorBorderWidth={2}
                   error={displayError}
+                  customTextColor={ColorPalette.GREY_TEXT_500}
                   showCountrySection={showCountrySection}
                   countryCode={countryCode}
                   countryFlag={countryFlag}
@@ -555,14 +534,15 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
         </ScrollView>
         <View style={styles.buttonContainer}>
           <Button
-            text="SUBMIT"
+            text={isSubmitting ? 'UPDATING...' : 'SUBMIT'}
             variant={ButtonVariant.PRIMARY}
             state={
               isSubmitDisabled() ? ButtonState.DISABLED : ButtonState.DEFAULT
             }
             size={ButtonSize.MEDIUM}
             onPress={handleSubmit}
-            loading={updating}
+            loading={isSubmitting}
+            disabled={isSubmitDisabled()}
           />
         </View>
       </View>

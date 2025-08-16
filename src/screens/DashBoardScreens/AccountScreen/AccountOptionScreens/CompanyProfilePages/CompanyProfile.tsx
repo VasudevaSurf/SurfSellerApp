@@ -1,4 +1,3 @@
-// src/screens/DashBoardScreens/AccountScreen/AccountOptionScreens/CompanyProfilePages/CompanyProfile.tsx
 import {useFocusEffect, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -51,24 +50,48 @@ const CompanyProfile = () => {
   const [country, setCountry] = useState('Malta');
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
-  // Fetch profile data when component mounts
-  useEffect(() => {
-    if (userData?.user_id) {
-      dispatch(fetchProfile(userData.user_id));
-    }
-  }, [dispatch, userData?.user_id]);
+  // Fetch profile data when component mounts or when returning to screen
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userData?.user_id) {
+        dispatch(fetchProfile(userData.user_id));
+      }
+    }, [dispatch, userData?.user_id]),
+  );
 
   // Update state when profile data changes
   useEffect(() => {
     if (profileData) {
-      setBusinessName(profileData.company || 'Annies flower Shop');
-      setVATNumber(profileData.tax_number || 'MT10927393');
-      setStreetName(profileData.b_address || 'Triq San Pawl');
-      setCityName(profileData.b_city || 'Valletta');
-      setPostalCode(profileData.b_zipcode || 'CLT 1210');
-      setCountry(profileData.b_country || 'Malta');
+      setBusinessName(profileData.company_name || '');
+      setVATNumber(profileData.vat_number || '');
+      setStreetName(profileData.street || '');
+      setCityName(profileData.city || '');
+      setPostalCode(profileData.postal_code || '');
+      setCountry(profileData.country || 'Malta');
     }
   }, [profileData]);
+
+  // Update from route params (for immediate UI feedback)
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params) {
+        const {
+          updatedName,
+          updatedVat,
+          updatedStreet,
+          updatedCity,
+          updatedPostal,
+          updatedCountry,
+        } = route.params;
+        if (updatedName) setBusinessName(updatedName);
+        if (updatedVat) setVATNumber(updatedVat);
+        if (updatedStreet) setStreetName(updatedStreet);
+        if (updatedCity) setCityName(updatedCity);
+        if (updatedPostal) setPostalCode(updatedPostal);
+        if (updatedCountry) setCountry(updatedCountry);
+      }
+    }, [route.params]),
+  );
 
   const handleUpload = () => {
     setIsAddModalVisible(true);
@@ -103,45 +126,18 @@ const CompanyProfile = () => {
     },
   ];
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (route.params) {
-        const {
-          updatedName,
-          updatedVat,
-          updatedStreet,
-          updatedCity,
-          updatedPostal,
-          updatedCountry,
-        } = route.params;
-        if (updatedName) setBusinessName(updatedName);
-        if (updatedVat) setVATNumber(updatedVat);
-        if (updatedStreet) setStreetName(updatedStreet);
-        if (updatedCity) setCityName(updatedCity);
-        if (updatedPostal) setPostalCode(updatedPostal);
-        if (updatedCountry) setCountry(updatedCountry);
-      }
-    }, [route.params]),
-  );
-
   const handleEditBusinessName = () => {
-    navigate('Dashboard', {
-      screen: 'Account',
-      params: {
-        screen: 'EditField',
-        params: {
-          fieldType: 'businessName',
-          initialValue: businessName,
-          headerTitle: 'Update business name',
-          label: 'Business name',
-          description:
-            'Please update your business name to ensure buyers recognize you.',
-          keyboardType: 'default',
-          validationType: 'businessName',
-          onSubmitActionType: 'updateBusinessName',
-          originScreen: 'CompanyProfile',
-        },
-      },
+    navigate('EditField', {
+      fieldType: 'businessName',
+      initialValue: businessName,
+      headerTitle: 'Update business name',
+      label: 'Business name',
+      description:
+        'Please update your business name to ensure buyers recognize you.',
+      keyboardType: 'default',
+      validationType: 'businessName',
+      onSubmitActionType: 'updateBusinessName',
+      originScreen: 'CompanyProfile',
     });
   };
 
@@ -227,14 +223,6 @@ const CompanyProfile = () => {
         },
       },
     });
-  };
-
-  const handleEditCompanyLogo = () => {
-    Alert.alert('Edit Company Logo', 'Upload or change your company logo');
-  };
-
-  const handleEditInvoiceLogo = () => {
-    Alert.alert('Edit Invoice Logo', 'Upload or change your invoice logo');
   };
 
   return (

@@ -1,10 +1,10 @@
-// src/redux/slices/profileSlice.ts
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import {
   fetchProfileApi,
   updateProfileApi,
   ProfileResponse,
   UserProfile,
+  ProfileUpdateResponse,
 } from '../../services/apiService';
 
 export interface ProfileState {
@@ -14,6 +14,8 @@ export interface ProfileState {
   error: string | null;
   updating: boolean;
   updateError: string | null;
+  updateSuccess: boolean;
+  lastUpdated: number | null;
 }
 
 const initialState: ProfileState = {
@@ -23,13 +25,15 @@ const initialState: ProfileState = {
   error: null,
   updating: false,
   updateError: null,
+  updateSuccess: false,
+  lastUpdated: null,
 };
 
 // Helper function to extract user profile from API response
 const extractUserProfile = (
   sections: ProfileResponse['sections'],
 ): UserProfile => {
-  const userProfile: Partial<UserProfile> = {};
+  const userProfile: UserProfile = {};
 
   sections.forEach(section => {
     section.blocks.forEach(block => {
@@ -47,42 +51,30 @@ const extractUserProfile = (
           case 'phone':
             userProfile.phone = field.value;
             break;
-          case 'company':
-            userProfile.company = field.value;
+          case 'company_name':
+            userProfile.company_name = field.value;
             break;
-          case 'tax_number':
-            userProfile.tax_number = field.value;
+          case 'vat_number':
+            userProfile.vat_number = field.value;
             break;
-          case 'b_address':
-            userProfile.b_address = field.value;
+          case 'street':
+            userProfile.street = field.value;
             break;
-          case 'b_city':
-            userProfile.b_city = field.value;
+          case 'city':
+            userProfile.city = field.value;
             break;
-          case 'b_zipcode':
-            userProfile.b_zipcode = field.value;
+          case 'postal_code':
+            userProfile.postal_code = field.value;
             break;
-          case 'b_country':
-            userProfile.b_country = field.value;
-            break;
-          case 'account_holder_name':
-            if (!userProfile.fields) userProfile.fields = {};
-            userProfile.fields.account_holder_name = field.value;
-            break;
-          case 'account_number':
-            if (!userProfile.fields) userProfile.fields = {};
-            userProfile.fields.account_number = field.value;
-            break;
-          case 'swift_bic_code':
-            if (!userProfile.fields) userProfile.fields = {};
-            userProfile.fields.swift_bic_code = field.value;
+          case 'country':
+            userProfile.country = field.value;
             break;
         }
       });
     });
   });
 
-  return userProfile as UserProfile;
+  return userProfile;
 };
 
 // Async thunks
@@ -132,21 +124,19 @@ const profileSlice = createSlice({
       state.error = null;
       state.updateError = null;
     },
+    clearUpdateSuccess: state => {
+      state.updateSuccess = false;
+    },
     updateLocalProfile: (
       state,
       action: PayloadAction<Partial<UserProfile>>,
     ) => {
       if (state.profileData) {
         state.profileData = {...state.profileData, ...action.payload};
-
-        // Handle nested fields object
-        if (action.payload.fields && state.profileData.fields) {
-          state.profileData.fields = {
-            ...state.profileData.fields,
-            ...action.payload.fields,
-          };
-        }
+      } else {
+        state.profileData = action.payload;
       }
+      state.lastUpdated = Date.now();
     },
     resetProfileState: () => {
       return initialState;
@@ -166,6 +156,7 @@ const profileSlice = createSlice({
         state.rawProfileData = action.payload;
         state.profileData = extractUserProfile(action.payload.sections);
         state.error = null;
+        state.lastUpdated = Date.now();
         console.log('Extracted profile data:', state.profileData);
       })
       .addCase(fetchProfile.rejected, (state, action) => {
@@ -178,35 +169,37 @@ const profileSlice = createSlice({
         console.log('updateProfile.pending');
         state.updating = true;
         state.updateError = null;
+        state.updateSuccess = false;
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         console.log('updateProfile.fulfilled with data:', action.payload);
         state.updating = false;
-        // Update local profile data with the changes
+        // Immediately update local profile data
         if (state.profileData) {
           state.profileData = {
             ...state.profileData,
             ...action.payload.profileData,
           };
-
-          // Handle nested fields object
-          if (action.payload.profileData.fields && state.profileData.fields) {
-            state.profileData.fields = {
-              ...state.profileData.fields,
-              ...action.payload.profileData.fields,
-            };
-          }
+        } else {
+          state.profileData = action.payload.profileData;
         }
         state.updateError = null;
+        state.updateSuccess = true;
+        state.lastUpdated = Date.now();
       })
       .addCase(updateProfile.rejected, (state, action) => {
         console.log('updateProfile.rejected with error:', action.payload);
         state.updating = false;
         state.updateError = action.payload as string;
+        state.updateSuccess = false;
       });
   },
 });
 
-export const {clearProfileError, updateLocalProfile, resetProfileState} =
-  profileSlice.actions;
+export const {
+  clearProfileError,
+  clearUpdateSuccess,
+  updateLocalProfile,
+  resetProfileState,
+} = profileSlice.actions;
 export default profileSlice.reducer;

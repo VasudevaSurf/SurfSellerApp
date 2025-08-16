@@ -32,12 +32,14 @@ const PersonalInfo = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [countryCode, setCountryCode] = useState(INITIAL_COUNTRY_CODE);
 
-  // Fetch profile data when component mounts
-  useEffect(() => {
-    if (userData?.user_id) {
-      dispatch(fetchProfile(userData.user_id));
-    }
-  }, [dispatch, userData?.user_id]);
+  // Fetch profile data when component mounts or when returning to screen
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userData?.user_id) {
+        dispatch(fetchProfile(userData.user_id));
+      }
+    }, [dispatch, userData?.user_id]),
+  );
 
   // Update state when profile data changes
   useEffect(() => {
@@ -47,12 +49,13 @@ const PersonalInfo = () => {
       const lastName = profileData.lastname || '';
       const constructedFullName = `${firstName} ${lastName}`.trim();
 
-      setFullName(constructedFullName || 'Annie Flora');
-      setEmail(profileData.email || 'anniesshop@gmail.com');
-      setPhoneNumber(profileData.phone || '9864 1234');
+      setFullName(constructedFullName || '');
+      setEmail(profileData.email || '');
+      setPhoneNumber(profileData.phone || '');
     }
   }, [profileData]);
 
+  // Update from route params (for immediate UI feedback)
   useFocusEffect(
     React.useCallback(() => {
       if (route.params) {
@@ -91,7 +94,7 @@ const PersonalInfo = () => {
           key: 'lastName',
           label: 'Last name',
           keyboardType: 'default',
-          required: true,
+          required: false,
           validationType: 'lastName',
         },
       ],
