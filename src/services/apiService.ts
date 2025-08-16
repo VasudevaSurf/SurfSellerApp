@@ -37,6 +37,95 @@ export interface ProductsResponse {
   total_items: string;
 }
 
+export interface RecentOrder {
+  order_id: string;
+  issuer_id: string | null;
+  user_id: string;
+  is_parent_order: string;
+  parent_order_id: string;
+  company_id: string;
+  company: string;
+  timestamp: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  phone: string;
+  status: string;
+  total: string;
+  issuer_name: string | null;
+  invoice_id: string | null;
+  status_details: {
+    status_id: string;
+    status: string;
+    description: string;
+    type: string;
+    color: string;
+  };
+}
+
+export interface OrderStatus {
+  status: string;
+  description: string;
+  color: string;
+}
+
+export interface Statistic {
+  name: string;
+  value: string;
+  icon: string;
+}
+
+export interface AppConfiguration {
+  is_signup_allowed: boolean;
+  is_setting_enable: boolean;
+  is_booking_enable: boolean;
+  is_auction_enable: boolean;
+  is_change_language_enable: boolean;
+  is_change_storefront_enable: boolean;
+  is_seller_promotion_enable: boolean;
+  is_wallet_enable: boolean;
+  is_blog_enable: boolean;
+  is_dark_mode_enable: boolean;
+  is_dark_mode: boolean;
+  is_biomatric_enable: boolean;
+  is_youtube_enable: boolean;
+  is_product_filter_enable: boolean;
+  is_order_filter_enable: boolean;
+  is_chat_enable: boolean;
+  is_order_enable: boolean;
+  is_product_enable: boolean;
+  is_dashboard: boolean;
+  is_langauge_enable: boolean;
+  is_forgot_password_enable: boolean;
+  is_block_enable: boolean;
+  is_chat_archive_enable: boolean;
+  is_chat_attachment_enable: boolean;
+  is_chat_delete_enable: boolean;
+  is_company_profile_enable: boolean;
+}
+
+export interface Currency {
+  currency_code: string;
+  symbol: string;
+  is_primary: string;
+  description: string;
+}
+
+export interface DashboardResponse {
+  from: string;
+  to: string;
+  recent_orders: RecentOrder[];
+  order_statuses: OrderStatus[];
+  statistics: Statistic[];
+  app_configuration: AppConfiguration;
+  storefronts: any[];
+  languages: Language[];
+  currencies: Currency[];
+  default_currency: string;
+  message: string;
+  result: boolean;
+}
+
 export interface ProductDetailsResponse {
   product_data: Product;
   sections?: any[];
@@ -1124,6 +1213,42 @@ export const createProductApi = async (
     } else {
       throw new Error(
         error.response?.data?.message || 'Failed to create product',
+      );
+    }
+  }
+};
+
+export const fetchDashboardApi = async (
+  userId: string,
+): Promise<DashboardResponse> => {
+  try {
+    console.log('Fetching dashboard for userId:', userId);
+
+    const response = await axios({
+      method: 'GET',
+      url: `https://dev.surf.mt/api/api.php?_d=NtSeDashboardApi&user_id=${userId}`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Dashboard API response:', response.data);
+    return response.data as DashboardResponse;
+  } catch (error: any) {
+    console.error('Fetch Dashboard API error:', error);
+
+    if (error.response?.status === 404) {
+      throw new Error('Dashboard data not found');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to view dashboard');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error. Please try again later.');
+    } else if (!error.response) {
+      throw new Error('Network error. Please check your connection.');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to fetch dashboard data',
       );
     }
   }

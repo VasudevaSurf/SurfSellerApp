@@ -1,5 +1,12 @@
-import React, {useMemo, useState} from 'react';
-import {ScrollView, View} from 'react-native';
+// src/screens/DashBoardScreens/HomeScreen/HomeScreen.tsx
+
+import React, {useEffect, useMemo, useState} from 'react';
+import {
+  ScrollView,
+  View,
+  RefreshControl,
+  ActivityIndicator,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import BellIcon from '../../../assets/icons/BellIcon';
@@ -26,57 +33,89 @@ import {navigate} from '../../../navigation/utils/navigationRef';
 import {RootState} from '../../../redux/store';
 import {useSelector} from 'react-redux';
 import ArrowRightStyle from '../../../assets/icons/ArrowRightStyle';
+import {useDashboard} from '../../../hooks/useDashboard';
 
 const HomeScreen = () => {
   const userData = useSelector((state: RootState) => state.auth.userData);
 
-  const handleNewOrderPress = params => {
+  // Use the dashboard hook
+  const {
+    loading,
+    error,
+    recentOrders,
+    currentBalance,
+    income,
+    sales,
+    taxes,
+    activeProducts,
+    outOfStock,
+    ordersCount,
+    orderCounts,
+    refreshDashboard,
+  } = useDashboard();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleNewOrderPress = (
+    filterType: 'pending' | 'toShip' | 'delivered' = 'pending',
+  ) => {
     navigate('Dashboard', {
       screen: 'Home',
       params: {
         screen: 'NewOrders',
-        params: params,
+        params: {
+          filterType,
+        },
       },
     });
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refreshDashboard();
+    setRefreshing(false);
   };
 
   const menuItems = useMemo(
     () => [
       {
-        label: 'No new orders',
+        label:
+          orderCounts.pending > 0
+            ? `${orderCounts.pending} new orders`
+            : 'No new orders',
         leftIcon: (
           <PackageIcon style={undefined} color={ColorPalette.HomeIcon} />
         ),
         rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {
-          handleNewOrderPress();
-        },
+        onPress: () => handleNewOrderPress('pending'),
         leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
       },
       {
-        label: 'No orders to ship',
+        label:
+          orderCounts.accepted > 0
+            ? `${orderCounts.accepted} orders to ship`
+            : 'No orders to ship',
         leftIcon: (
           <PackageIcon style={undefined} color={ColorPalette.PURPLE_200} />
         ),
         rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {
-          handleNewOrderPress();
-        },
+        onPress: () => handleNewOrderPress('toShip'),
         leftIconBackgroundColor: 'rgba(145, 1, 207, 0.10)',
       },
       {
-        label: 'No orders delivered',
+        label:
+          orderCounts.completed > 0
+            ? `${orderCounts.completed} orders delivered`
+            : 'No orders delivered',
         leftIcon: (
           <PackageIcon style={undefined} color={ColorPalette.Green_200} />
         ),
         rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {
-          handleNewOrderPress();
-        },
+        onPress: () => handleNewOrderPress('delivered'),
         leftIconBackgroundColor: 'rgba(31, 193, 107, 0.10)',
       },
     ],
-    [],
+    [orderCounts],
   );
 
   const statusOptions = [
@@ -86,6 +125,61 @@ const HomeScreen = () => {
   ];
 
   const [selectedOption, setSelectedOption] = useState(statusOptions[0]);
+
+  // Filter recent orders based on selected status
+  const filteredOrders = useMemo(() => {
+    if (!recentOrders || recentOrders.length === 0) return [];
+
+    const statusMap = {
+      pending: 'O',
+      accepted: 'P',
+      cancelled: 'I',
+    };
+
+    return recentOrders
+      .filter(order => order.status === statusMap[selectedOption.id])
+      .slice(0, 4) // Show max 4 recent orders
+      .map(order => ({
+        orderImage:
+          'https://prosodylondon.com/wp-content/uploads/2024/01/perfume-bottles-ingredients.jpg', // Placeholder image
+        productName: `Order from ${order.firstname} ${order.lastname}`,
+        orderId: order.order_id,
+        customerName: `${order.firstname} ${order.lastname}`,
+        orderDate: new Date(
+          parseInt(order.timestamp) * 1000,
+        ).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        }),
+        orderAmount: parseFloat(order.total.replace('€', '')),
+        status: order.status_details.description as any,
+      }));
+  }, [recentOrders, selectedOption]);
+
+  // Calculate percentage changes (mock data for now - you'd calculate these from historical data)
+  const calculateTrend = () => ({
+    sales: '+12.8%',
+    orders: '+8.3%',
+    products: '0%',
+    income: '0%',
+  });
+
+  const trends = calculateTrend();
+
+  if (loading && !refreshing) {
+    return (
+      <SafeAreaView
+        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+        <Typography
+          variant={TypographyVariant.LMEDIUM_REGULAR}
+          text="Loading dashboard..."
+          customTextStyles={{marginTop: 16, color: ColorPalette.GREY_TEXT_300}}
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
@@ -126,7 +220,15 @@ const HomeScreen = () => {
           styles.scrollContent,
           {paddingBottom: getScreenHeight(4)},
         ]}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[ColorPalette.PURPLE_300]}
+            tintColor={ColorPalette.PURPLE_300}
+          />
+        }>
         <View style={styles.verifyContainer}>
           <View style={styles.textVerifyContainer}>
             <Typography
@@ -146,6 +248,7 @@ const HomeScreen = () => {
           </View>
           <View style={styles.verifyStepsContainer}></View>
         </View>
+
         <View style={styles.OrderContainer}>
           {menuItems.map((item, index) => (
             <MenuItem
@@ -173,6 +276,7 @@ const HomeScreen = () => {
             />
           ))}
         </View>
+
         <View style={styles.statsContainer}>
           <View style={styles.containerOne}>
             <View style={styles.totalSales}>
@@ -183,7 +287,7 @@ const HomeScreen = () => {
                 <View style={styles.countBlock}>
                   <Typography
                     variant={TypographyVariant.PXSMALL_REGULAR}
-                    text="+12.8%"
+                    text={trends.sales}
                     customTextStyles={styles.countText}
                     numberOfLines={1}
                   />
@@ -193,7 +297,7 @@ const HomeScreen = () => {
               <View style={styles.salesTwo}>
                 <Typography
                   variant={TypographyVariant.H4_BOLD}
-                  text="€47,125.34"
+                  text={sales}
                   customTextStyles={styles.countValue}
                   numberOfLines={1}
                   adjustsFontSizeToFit
@@ -214,7 +318,7 @@ const HomeScreen = () => {
                 <View style={styles.countBlock}>
                   <Typography
                     variant={TypographyVariant.PXSMALL_REGULAR}
-                    text="8.3%"
+                    text={trends.orders}
                     customTextStyles={styles.countText}
                     numberOfLines={1}
                   />
@@ -224,7 +328,7 @@ const HomeScreen = () => {
               <View style={styles.salesTwo}>
                 <Typography
                   variant={TypographyVariant.H4_BOLD}
-                  text="1,592"
+                  text={ordersCount.toString()}
                   customTextStyles={styles.countValue}
                   numberOfLines={1}
                   adjustsFontSizeToFit
@@ -238,6 +342,7 @@ const HomeScreen = () => {
               </View>
             </View>
           </View>
+
           <View style={styles.containerAnother}>
             <View style={styles.containerAnotherOne}>
               <View style={styles.activeProduct}>
@@ -248,7 +353,7 @@ const HomeScreen = () => {
                   <View style={styles.salesTwo}>
                     <Typography
                       variant={TypographyVariant.H4_BOLD}
-                      text="312"
+                      text={activeProducts}
                       customTextStyles={styles.countValue}
                       numberOfLines={1}
                     />
@@ -260,17 +365,17 @@ const HomeScreen = () => {
                     />
                   </View>
                 </View>
-
                 <View style={styles.countBlock}>
                   <Typography
                     variant={TypographyVariant.PXSMALL_REGULAR}
-                    text="0%"
+                    text={trends.products}
                     customTextStyles={styles.countText}
                     numberOfLines={1}
                   />
                   <TrendIcon size={18} style={undefined} />
                 </View>
               </View>
+
               <View style={styles.activeProduct}>
                 <View style={styles.twoContainer}>
                   <View style={styles.iconBack}>
@@ -279,7 +384,7 @@ const HomeScreen = () => {
                   <View style={styles.salesTwo}>
                     <Typography
                       variant={TypographyVariant.H4_BOLD}
-                      text="€13,48"
+                      text={income}
                       customTextStyles={styles.countValue}
                       numberOfLines={1}
                       adjustsFontSizeToFit
@@ -292,11 +397,10 @@ const HomeScreen = () => {
                     />
                   </View>
                 </View>
-
                 <View style={styles.countBlock}>
                   <Typography
                     variant={TypographyVariant.PXSMALL_REGULAR}
-                    text="0%"
+                    text={trends.income}
                     customTextStyles={styles.countText}
                     numberOfLines={1}
                   />
@@ -304,6 +408,7 @@ const HomeScreen = () => {
                 </View>
               </View>
             </View>
+
             <View style={styles.containerProportional}>
               <View style={styles.stockContainer}>
                 <View style={styles.iconBackTwo}>
@@ -312,7 +417,7 @@ const HomeScreen = () => {
                 <View style={styles.salesTwo}>
                   <Typography
                     variant={TypographyVariant.LSMALL_BOLD}
-                    text="18"
+                    text={outOfStock}
                     customTextStyles={styles.countValue}
                     numberOfLines={1}
                   />
@@ -324,6 +429,7 @@ const HomeScreen = () => {
                   />
                 </View>
               </View>
+
               <View style={styles.stockContainer}>
                 <View style={styles.iconBackThree}>
                   <BookmarkNoteIcon style={undefined} />
@@ -331,7 +437,7 @@ const HomeScreen = () => {
                 <View style={styles.salesTwo}>
                   <Typography
                     variant={TypographyVariant.LSMALL_BOLD}
-                    text="2,547.63"
+                    text={taxes.replace('€', '')}
                     customTextStyles={styles.countValue}
                     numberOfLines={1}
                     adjustsFontSizeToFit
@@ -347,6 +453,7 @@ const HomeScreen = () => {
             </View>
           </View>
         </View>
+
         <View style={styles.salesOverview}>
           <View style={styles.salesHeading}>
             <View style={styles.LeftHeading}>
@@ -365,7 +472,7 @@ const HomeScreen = () => {
                 />
                 <Typography
                   variant={TypographyVariant.LSMALL_SEMIBOLD}
-                  text="25,000€"
+                  text={sales}
                   customTextStyles={styles.countCaptionOne}
                   numberOfLines={1}
                 />
@@ -377,6 +484,7 @@ const HomeScreen = () => {
           </View>
           <View style={styles.salesGraph}></View>
         </View>
+
         <View style={styles.recentOrdersContainer}>
           <View style={styles.recentOrderTitle}>
             <Typography
@@ -400,6 +508,7 @@ const HomeScreen = () => {
               />
             </View>
           </View>
+
           <View>
             <SlidingBar
               options={statusOptions}
@@ -411,55 +520,25 @@ const HomeScreen = () => {
               }}
             />
           </View>
+
           <View style={styles.recentAllOrders}>
-            {[
-              {
-                orderImage:
-                  'https://prosodylondon.com/wp-content/uploads/2024/01/perfume-bottles-ingredients.jpg',
-                productName: 'Nike Air Max 270 React Premium Shoes',
-                orderId: '448448',
-                customerName: 'John Smith',
-                orderDate: 'Oct 28, 2024',
-                orderAmount: 89.9,
-                status: 'Pending',
-              },
-              {
-                orderImage:
-                  'https://prosodylondon.com/wp-content/uploads/2024/01/perfume-bottles-ingredients.jpg',
-                productName: 'Nike Air Max 270 React Premium Shoes',
-                orderId: '448448',
-                customerName: 'John Smith',
-                orderDate: 'Oct 28, 2024',
-                orderAmount: 89.9,
-                status: 'Cancelled',
-              },
-              {
-                orderImage:
-                  'https://prosodylondon.com/wp-content/uploads/2024/01/perfume-bottles-ingredients.jpg',
-                productName: 'Nike Air Max 270 React Premium Shoes',
-                orderId: '448448',
-                customerName: 'John Smith',
-                orderDate: 'Oct 28, 2024',
-                orderAmount: 89.9,
-                status: 'Delivered',
-              },
-              {
-                orderImage:
-                  'https://prosodylondon.com/wp-content/uploads/2024/01/perfume-bottles-ingredients.jpg',
-                productName: 'Nike Air Max 270 React Premium Shoes',
-                orderId: '448448',
-                customerName: 'John Smith',
-                orderDate: 'Oct 28, 2024',
-                orderAmount: 89.9,
-                status: 'Pending',
-              },
-            ].map((order, index, array) => (
-              <RecentOrder
-                key={`${order.orderId}-${index}`}
-                {...order}
-                isLastItem={index === array.length - 1}
-              />
-            ))}
+            {filteredOrders.length > 0 ? (
+              filteredOrders.map((order, index, array) => (
+                <RecentOrder
+                  key={`${order.orderId}-${index}`}
+                  {...order}
+                  isLastItem={index === array.length - 1}
+                />
+              ))
+            ) : (
+              <View style={{padding: 20, alignItems: 'center'}}>
+                <Typography
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
+                  text={`No ${selectedOption.label.toLowerCase()} orders`}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+                />
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>

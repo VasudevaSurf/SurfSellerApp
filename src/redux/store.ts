@@ -1,3 +1,5 @@
+// src/redux/store.ts
+
 import {configureStore} from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import productsReducer from './slices/productsSlice';
@@ -7,6 +9,7 @@ import orderDetailsReducer from './slices/orderDetailsSlice';
 import profileReducer from './slices/profileSlice';
 import initializerReducer from './slices/initializerSlice';
 import categoriesReducer from './slices/categoriesSlice';
+import dashboardReducer from './slices/dashboardSlice'; // Add this line
 
 const store = configureStore({
   reducer: {
@@ -18,6 +21,7 @@ const store = configureStore({
     profile: profileReducer,
     initializer: initializerReducer,
     categories: categoriesReducer,
+    dashboard: dashboardReducer, // Add this line
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

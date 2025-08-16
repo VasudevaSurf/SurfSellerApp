@@ -72,8 +72,10 @@ export type ProductNavigator = {
 };
 
 export type HomeNavigator = {
-  Home: undefined;
-  NewOrders: undefined;
+  HomeScreen: undefined;
+  NewOrders: {
+    filterType?: 'pending' | 'toShip' | 'delivered';
+  };
 };
 
 declare global {
