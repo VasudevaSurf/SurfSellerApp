@@ -1,5 +1,6 @@
+// src/screens/DashBoardScreens/AccountScreen/AccountOptionScreens/CompanyProfilePages/CompanyProfile.tsx
 import {useFocusEffect, useRoute} from '@react-navigation/native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   Image,
@@ -8,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import LockIcon from '../../../../../assets/icons/LockIcon';
 import PencilIcon from '../../../../../assets/icons/PencilIcon';
@@ -25,21 +27,48 @@ import {TypographyVariant} from '../../../../../components/UserComponents/Typogr
 import {ColorPalette} from '../../../../../config/colorPalette';
 import {getScreenHeight} from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
+import {fetchProfile} from '../../../../../redux/slices/profileSlice';
 import {styles} from './CompanyProfile.styles';
 import {containerStyles} from './ImageContainer.styles';
+import {RootState, AppDispatch} from '../../../../../redux/store';
 
 const MALTA_FLAG_URL =
   'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
 
 const CompanyProfile = () => {
   const route = useRoute();
-  const [businessName, setBusinessName] = useState('Annies flower Shop');
-  const [vatNumber, setVATNumber] = useState('MT10927393');
-  const [streetName, setStreetName] = useState('Triq San Pawl');
-  const [cityName, setCityName] = useState('Valletta');
-  const [postalCode, setPostalCode] = useState('CLT 1210');
+  const dispatch = useDispatch<AppDispatch>();
+  const userData = useSelector((state: RootState) => state.auth.userData);
+  const {profileData, loading, error} = useSelector(
+    (state: RootState) => state.profile,
+  );
+
+  const [businessName, setBusinessName] = useState('');
+  const [vatNumber, setVATNumber] = useState('');
+  const [streetName, setStreetName] = useState('');
+  const [cityName, setCityName] = useState('');
+  const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('Malta');
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
+  // Fetch profile data when component mounts
+  useEffect(() => {
+    if (userData?.user_id) {
+      dispatch(fetchProfile(userData.user_id));
+    }
+  }, [dispatch, userData?.user_id]);
+
+  // Update state when profile data changes
+  useEffect(() => {
+    if (profileData) {
+      setBusinessName(profileData.company || 'Annies flower Shop');
+      setVATNumber(profileData.tax_number || 'MT10927393');
+      setStreetName(profileData.b_address || 'Triq San Pawl');
+      setCityName(profileData.b_city || 'Valletta');
+      setPostalCode(profileData.b_zipcode || 'CLT 1210');
+      setCountry(profileData.b_country || 'Malta');
+    }
+  }, [profileData]);
 
   const handleUpload = () => {
     setIsAddModalVisible(true);
@@ -96,17 +125,23 @@ const CompanyProfile = () => {
   );
 
   const handleEditBusinessName = () => {
-    navigate('EditField', {
-      fieldType: 'businessName',
-      initialValue: businessName,
-      headerTitle: 'Update business name',
-      label: 'Business name',
-      description:
-        'Please update your business name to ensure buyers recognize you.',
-      keyboardType: 'default',
-      validationType: 'businessName',
-      onSubmitActionType: 'updateBusinessName',
-      originScreen: 'CompanyProfile',
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'businessName',
+          initialValue: businessName,
+          headerTitle: 'Update business name',
+          label: 'Business name',
+          description:
+            'Please update your business name to ensure buyers recognize you.',
+          keyboardType: 'default',
+          validationType: 'businessName',
+          onSubmitActionType: 'updateBusinessName',
+          originScreen: 'CompanyProfile',
+        },
+      },
     });
   };
 

@@ -1,3 +1,4 @@
+// src/components/Screens/EditFieldScreen/EditFieldScreen.tsx
 import React, {useCallback, useState} from 'react';
 import {Image, SafeAreaView, ScrollView, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
@@ -42,53 +43,90 @@ const submitFormAction = async (
   userId: string,
 ) => {
   try {
+    let profileData: any = {};
+
     switch (actionType) {
       case 'updateName':
         // For name updates, values contains firstName and lastName
-        await dispatch(
-          updateProfile({
-            userId,
-            profileData: {
-              firstname: values.firstName,
-              lastname: values.lastName,
-            },
-          }),
-        ).unwrap();
+        profileData = {
+          firstname: values.firstName,
+          lastname: values.lastName,
+        };
         break;
       case 'updateEmail':
-        await dispatch(
-          updateProfile({
-            userId,
-            profileData: {
-              email: values,
-            },
-          }),
-        ).unwrap();
+        profileData = {
+          email: values,
+        };
         break;
       case 'updatePhone':
-        await dispatch(
-          updateProfile({
-            userId,
-            profileData: {
-              phone: values,
-            },
-          }),
-        ).unwrap();
+        profileData = {
+          phone: values,
+        };
         break;
       case 'updateBusinessName':
+        profileData = {
+          company: values,
+        };
+        break;
       case 'updateVATNumber':
+        profileData = {
+          tax_number: values,
+        };
+        break;
       case 'updateStreetName':
+        profileData = {
+          b_address: values,
+        };
+        break;
       case 'updateCityName':
+        profileData = {
+          b_city: values,
+        };
+        break;
       case 'updatePostalCode':
+        profileData = {
+          b_zipcode: values,
+        };
+        break;
       case 'updateCountry':
+        profileData = {
+          b_country: values,
+        };
+        break;
       case 'updateAccountName':
+        profileData = {
+          fields: {
+            account_holder_name: values,
+          },
+        };
+        break;
       case 'updateAccountNumber':
+        profileData = {
+          fields: {
+            account_number: values,
+          },
+        };
+        break;
       case 'updateBicCode':
-        // These are not profile updates, handle them as before
+        profileData = {
+          fields: {
+            swift_bic_code: values,
+          },
+        };
         break;
       default:
         console.warn(`Unhandled action type: ${actionType}`);
+        return false;
     }
+
+    // Dispatch the update action
+    await dispatch(
+      updateProfile({
+        userId,
+        profileData,
+      }),
+    ).unwrap();
+
     return true;
   } catch (error) {
     console.error('Profile update failed:', error);
@@ -176,7 +214,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           };
         case 'phone':
           return value => {
-            const phoneRegex = /^\d[\d\s]{7,14}$/;
+            const phoneRegex = /^\d[\d\s]{5,14}$/;
             if (!value.trim()) return 'Phone number cannot be empty';
             if (!phoneRegex.test(value))
               return 'Please enter a valid phone number';
@@ -210,6 +248,21 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
         case 'country':
           return value => {
             if (!value.trim()) return 'Country cannot be empty';
+            return true;
+          };
+        case 'accountName':
+          return value => {
+            if (!value.trim()) return 'Account holder name cannot be empty';
+            return true;
+          };
+        case 'accountNumber':
+          return value => {
+            if (!value.trim()) return 'Account number cannot be empty';
+            return true;
+          };
+        case 'bicCode':
+          return value => {
+            if (!value.trim()) return 'SWIFT/BIC code cannot be empty';
             return true;
           };
         default:

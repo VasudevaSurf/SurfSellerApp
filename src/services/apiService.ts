@@ -144,7 +144,24 @@ export interface UserProfile {
   firstname: string;
   lastname: string;
   phone: string;
+  // Company Profile fields
+  company?: string;
+  b_address?: string;
+  b_city?: string;
+  b_zipcode?: string;
+  b_country?: string;
+  tax_exempt?: string;
+  tax_number?: string;
+  // Bank Details fields
+  fields?: {
+    account_holder_name?: string;
+    account_number?: string;
+    swift_bic_code?: string;
+  };
+  // Additional fields
   password?: string;
+  password1?: string;
+  password2?: string;
 }
 
 export interface Language {
@@ -439,25 +456,87 @@ export const updateProfileApi = async (
       profileData,
     );
 
-    // Transform the profile data to match API expectations
-    const requestData = {
-      _d: 'NtSeProfilesApi',
+    // Build the request data based on what fields are being updated
+    const requestData: any = {
       user_id: userId,
-      user_data: profileData,
+      user_data: {},
     };
+
+    // Map fields to API expected format
+    if (profileData.firstname !== undefined) {
+      requestData.user_data.firstname = profileData.firstname;
+    }
+    if (profileData.lastname !== undefined) {
+      requestData.user_data.lastname = profileData.lastname;
+    }
+    if (profileData.email !== undefined) {
+      requestData.user_data.email = profileData.email;
+    }
+    if (profileData.phone !== undefined) {
+      requestData.user_data.phone = profileData.phone;
+    }
+
+    // Company fields
+    if (profileData.company !== undefined) {
+      requestData.user_data.company = profileData.company;
+    }
+    if (profileData.tax_number !== undefined) {
+      requestData.user_data.tax_number = profileData.tax_number;
+    }
+    if (profileData.b_address !== undefined) {
+      requestData.user_data.b_address = profileData.b_address;
+    }
+    if (profileData.b_city !== undefined) {
+      requestData.user_data.b_city = profileData.b_city;
+    }
+    if (profileData.b_zipcode !== undefined) {
+      requestData.user_data.b_zipcode = profileData.b_zipcode;
+    }
+    if (profileData.b_country !== undefined) {
+      requestData.user_data.b_country = profileData.b_country;
+    }
+
+    // Bank details - these might be in a fields object
+    if (profileData.fields) {
+      if (!requestData.user_data.fields) {
+        requestData.user_data.fields = {};
+      }
+      if (profileData.fields.account_holder_name !== undefined) {
+        requestData.user_data.fields.account_holder_name =
+          profileData.fields.account_holder_name;
+      }
+      if (profileData.fields.account_number !== undefined) {
+        requestData.user_data.fields.account_number =
+          profileData.fields.account_number;
+      }
+      if (profileData.fields.swift_bic_code !== undefined) {
+        requestData.user_data.fields.swift_bic_code =
+          profileData.fields.swift_bic_code;
+      }
+    }
 
     console.log('Sending update request:', requestData);
 
-    const response = await apiClient.post(`/api.php`, requestData);
+    const response = await apiClient.post(
+      `/api.php?_d=NtSeProfilesApi`,
+      requestData,
+    );
 
     console.log('Update Profile API response:', response.data);
+
+    if (response.data.status === 400) {
+      throw new Error(response.data.message || 'Invalid profile data');
+    }
+
     return response.data;
   } catch (error: any) {
     console.error('Update Profile API error:', error);
 
     // Handle different error scenarios
     if (error.response?.status === 400) {
-      throw new Error('Invalid profile data provided');
+      throw new Error(
+        error.response?.data?.message || 'Invalid profile data provided',
+      );
     } else if (error.response?.status === 403) {
       throw new Error('You do not have permission to update this profile');
     } else if (error.response?.status === 404) {
@@ -466,7 +545,9 @@ export const updateProfileApi = async (
       throw new Error('Server error occurred while updating profile');
     } else {
       throw new Error(
-        error.response?.data?.message || 'Failed to update profile',
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to update profile',
       );
     }
   }

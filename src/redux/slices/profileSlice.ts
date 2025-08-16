@@ -1,3 +1,4 @@
+// src/redux/slices/profileSlice.ts
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import {
   fetchProfileApi,
@@ -46,8 +47,35 @@ const extractUserProfile = (
           case 'phone':
             userProfile.phone = field.value;
             break;
-          case 'password1':
-            // Don't store password in profile
+          case 'company':
+            userProfile.company = field.value;
+            break;
+          case 'tax_number':
+            userProfile.tax_number = field.value;
+            break;
+          case 'b_address':
+            userProfile.b_address = field.value;
+            break;
+          case 'b_city':
+            userProfile.b_city = field.value;
+            break;
+          case 'b_zipcode':
+            userProfile.b_zipcode = field.value;
+            break;
+          case 'b_country':
+            userProfile.b_country = field.value;
+            break;
+          case 'account_holder_name':
+            if (!userProfile.fields) userProfile.fields = {};
+            userProfile.fields.account_holder_name = field.value;
+            break;
+          case 'account_number':
+            if (!userProfile.fields) userProfile.fields = {};
+            userProfile.fields.account_number = field.value;
+            break;
+          case 'swift_bic_code':
+            if (!userProfile.fields) userProfile.fields = {};
+            userProfile.fields.swift_bic_code = field.value;
             break;
         }
       });
@@ -110,6 +138,14 @@ const profileSlice = createSlice({
     ) => {
       if (state.profileData) {
         state.profileData = {...state.profileData, ...action.payload};
+
+        // Handle nested fields object
+        if (action.payload.fields && state.profileData.fields) {
+          state.profileData.fields = {
+            ...state.profileData.fields,
+            ...action.payload.fields,
+          };
+        }
       }
     },
     resetProfileState: () => {
@@ -152,6 +188,14 @@ const profileSlice = createSlice({
             ...state.profileData,
             ...action.payload.profileData,
           };
+
+          // Handle nested fields object
+          if (action.payload.profileData.fields && state.profileData.fields) {
+            state.profileData.fields = {
+              ...state.profileData.fields,
+              ...action.payload.profileData.fields,
+            };
+          }
         }
         state.updateError = null;
       })
