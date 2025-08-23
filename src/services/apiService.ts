@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {API_ENDPOINTS} from '../constants/apiEndpoints';
-// import {API_BASE_URL, API_AUTH_HEADER} from '@env'
 
 const API_BASE_URL = 'https://dev.surf.mt/2.0/api';
 const API_AUTH_HEADER =
@@ -301,10 +300,8 @@ export interface AppUpdateConfig {
 }
 
 export interface Storefront {
-  // Define storefront structure if needed
   id?: string;
   name?: string;
-  // Add other properties as needed
 }
 
 export interface InitializerResponse {
@@ -321,7 +318,6 @@ export interface InitializerResponse {
   result: boolean;
 }
 
-// Add new interface for filter options
 export interface ProductFilters {
   status?: 'A' | 'P' | 'D' | 'all';
   lowStock?: boolean;
@@ -330,19 +326,16 @@ export interface ProductFilters {
   itemsPerPage?: number;
 }
 
-// Add interface for delete product response
 export interface DeleteProductResponse {
   result: boolean;
   message: string;
 }
 
-// Add interface for status update response
 export interface StatusUpdateResponse {
   result: boolean;
   message: string;
 }
 
-// NEW: Product Creation/Update interfaces
 export interface CreateProductRequest {
   image_pair_positon?: string[];
   lang_code: string;
@@ -377,7 +370,7 @@ export interface CreateProductRequest {
     zero_price_action?: string;
   };
   user_id: string;
-  product_id?: number; // Optional for create, required for update
+  product_id?: number;
 }
 
 export interface CreateProductResponse {
@@ -399,7 +392,6 @@ export interface CategoriesResponse {
   message: string;
 }
 
-// NEW: Balance API interfaces
 export interface BalanceItem {
   payout_id: string;
   status: 'Pending' | 'Completed' | 'Declined' | 'Failed';
@@ -434,6 +426,34 @@ export interface BalanceResponse {
   result: boolean;
 }
 
+// FILE UPLOAD INTERFACES
+export interface FileUploadParams {
+  user_id?: string;
+  lang_code?: string;
+  type?: string;
+  category?: string;
+  product_id?: string;
+}
+
+export interface FileUploadResponse {
+  result: boolean;
+  message: string;
+  file_data?: {
+    relative_path: string;
+    view_url: string;
+  };
+}
+
+// Create the API client with the correct base URL and authorization
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: API_AUTH_HEADER,
+  },
+  timeout: 10000,
+});
+
 // Helper function to find category ID by path
 const findCategoryIdByPath = (
   categories: CategoryData[],
@@ -456,12 +476,10 @@ const findCategoryIdByPath = (
     if (category) {
       categoryIds.push(parseInt(category.id));
 
-      // If this is the last item in path, we're done
       if (depth === path.length - 1) {
         return true;
       }
 
-      // Otherwise, search in subcategories
       if (category.subcategories) {
         return findRecursive(category.subcategories, path, depth + 1);
       }
@@ -474,6 +492,192 @@ const findCategoryIdByPath = (
   return categoryIds;
 };
 
+// FILE UPLOAD API FUNCTIONS
+export const uploadProductImageApi = async (
+  imageUri: string,
+  fileName: string,
+  mimeType: string,
+  params: FileUploadParams = {},
+): Promise<{
+  success: boolean;
+  relativePath?: string;
+  viewUrl?: string;
+  error?: string;
+}> => {
+  try {
+    console.log('🚀 Uploading product image:', {fileName, params});
+
+    const formData = new FormData();
+
+    // Add the file
+    formData.append('file', {
+      uri: imageUri,
+      type: mimeType,
+      name: fileName,
+    } as any);
+
+    // Add required parameters for the API to work
+    formData.append('lang_code', params.lang_code || 'en');
+    formData.append('type', params.type || 'product_image');
+
+    // Add optional parameters if provided
+    if (params.user_id) {
+      formData.append('user_id', params.user_id);
+    }
+    if (params.category) {
+      formData.append('category', params.category);
+    }
+    if (params.product_id) {
+      formData.append('product_id', params.product_id);
+    }
+
+    console.log('📤 Sending upload request...');
+
+    const response = await fetch(
+      'https://dev.surf.mt/api.php?_d=NtSeFileUploaderApi',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: API_AUTH_HEADER,
+        },
+        body: formData,
+      },
+    );
+
+    const responseText = await response.text();
+    console.log(
+      '📥 Upload response:',
+      response.status,
+      responseText.substring(0, 200) + '...',
+    );
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: `HTTP ${response.status}: ${responseText}`,
+      };
+    }
+
+    const responseData: FileUploadResponse = JSON.parse(responseText);
+
+    if (responseData.result && responseData.file_data) {
+      console.log('✅ Upload successful:', {
+        fileName,
+        relativePath: responseData.file_data.relative_path,
+        viewUrl: responseData.file_data.view_url,
+      });
+
+      return {
+        success: true,
+        relativePath: responseData.file_data.relative_path,
+        viewUrl: responseData.file_data.view_url,
+      };
+    } else {
+      return {
+        success: false,
+        error: responseData.message || 'Upload failed - no file data returned',
+      };
+    }
+  } catch (error: any) {
+    console.error('💥 Upload error:', error);
+    return {
+      success: false,
+      error: error.message || 'Network error during upload',
+    };
+  }
+};
+
+// Batch upload function optimized for product images
+export const uploadMultipleProductImages = async (
+  images: Array<{uri: string; fileName: string; type: string}>,
+  params: FileUploadParams = {},
+  onProgress?: (current: number, total: number, fileName: string) => void,
+): Promise<{
+  success: boolean;
+  uploadedImages: Array<{
+    fileName: string;
+    relativePath: string;
+    viewUrl: string;
+  }>;
+  errors: string[];
+}> => {
+  const uploadedImages: Array<{
+    fileName: string;
+    relativePath: string;
+    viewUrl: string;
+  }> = [];
+  const errors: string[] = [];
+
+  console.log(`🚀 Starting batch upload of ${images.length} images`);
+
+  for (let i = 0; i < images.length; i++) {
+    const image = images[i];
+
+    if (onProgress) {
+      onProgress(i, images.length, image.fileName);
+    }
+
+    try {
+      const result = await uploadProductImageApi(
+        image.uri,
+        image.fileName,
+        image.type,
+        params,
+      );
+
+      if (result.success && result.relativePath && result.viewUrl) {
+        uploadedImages.push({
+          fileName: image.fileName,
+          relativePath: result.relativePath,
+          viewUrl: result.viewUrl,
+        });
+        console.log(`✅ Uploaded: ${image.fileName} -> ${result.relativePath}`);
+      } else {
+        const error = `Failed to upload ${image.fileName}: ${result.error}`;
+        errors.push(error);
+        console.error('❌', error);
+      }
+    } catch (error: any) {
+      const errorMsg = `Error uploading ${image.fileName}: ${error.message}`;
+      errors.push(errorMsg);
+      console.error('❌', errorMsg);
+    }
+
+    if (onProgress) {
+      onProgress(i + 1, images.length, image.fileName);
+    }
+  }
+
+  const result = {
+    success: uploadedImages.length > 0,
+    uploadedImages,
+    errors,
+  };
+
+  console.log('📊 Upload Summary:', {
+    total: images.length,
+    successful: uploadedImages.length,
+    failed: errors.length,
+  });
+
+  return result;
+};
+
+// AUTHENTICATION
+export const loginApi = async (email: string, password: string) => {
+  try {
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
+      user_login: email,
+      password: password,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Login API error:', error);
+    throw error;
+  }
+};
+
+// INITIALIZER
 export const fetchInitializerApi = async () => {
   try {
     const response = await apiClient.get(`/api.php`, {
@@ -488,29 +692,7 @@ export const fetchInitializerApi = async () => {
   }
 };
 
-// Create the API client with the correct base URL and authorization
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: API_AUTH_HEADER,
-  },
-  timeout: 10000,
-});
-
-export const loginApi = async (email: string, password: string) => {
-  try {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
-      user_login: email,
-      password: password,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Login API error:', error);
-    throw error;
-  }
-};
-
+// PROFILE
 export const fetchProfileApi = async (userId: string) => {
   try {
     console.log('Fetching profile for userId:', userId);
@@ -553,7 +735,7 @@ export const updateProfileApi = async (
         user_data: profileData,
         user_id: parseInt(userId),
       },
-      timeout: 10000, // 10 second timeout
+      timeout: 10000,
     });
 
     console.log('Update Profile API response:', response.data);
@@ -585,7 +767,7 @@ export const updateProfileApi = async (
   }
 };
 
-// NEW: Balance API function
+// BALANCE
 export const fetchBalanceApi = async (
   userId: string,
   page: number = 1,
@@ -598,15 +780,12 @@ export const fetchBalanceApi = async (
 
     let url = `https://dev.surf.mt/api.php?_d=NtSeBalanceApi&user_id=${userId}`;
 
-    // Add pagination parameters
     url += `&page=${page}&items_per_page=${itemsPerPage}`;
 
-    // Add status filter if provided
     if (status) {
       url += `&status=${status}`;
     }
 
-    // Add type filter if provided
     if (type) {
       url += `&payout_type=${type}`;
     }
@@ -628,7 +807,7 @@ export const fetchBalanceApi = async (
   }
 };
 
-// Updated fetchProductsApi with filter support
+// PRODUCTS
 export const fetchProductsApi = async (
   userId: string,
   filters: ProductFilters = {},
@@ -642,20 +821,16 @@ export const fetchProductsApi = async (
       itemsPerPage = 10,
     } = filters;
 
-    // Build the URL with query parameters
     let url = `${API_BASE_URL}/api.php?_d=NtSeProductsApi&user_id=${userId}`;
 
-    // Add status filter if not 'all'
     if (status !== 'all') {
       url += `&status=${status}`;
     }
 
-    // Add low stock filter
     if (lowStock) {
       url += `&status=A&amount_to=${lowStockThreshold}`;
     }
 
-    // Add pagination parameters
     url += `&page=${page}&items_per_page=${itemsPerPage}`;
 
     console.log('Fetching products from URL:', url);
@@ -680,7 +855,6 @@ export const fetchProductsApi = async (
   }
 };
 
-// New function to get products by specific status
 export const fetchProductsByStatusApi = async (
   userId: string,
   status: 'A' | 'P' | 'D',
@@ -712,7 +886,6 @@ export const fetchProductsByStatusApi = async (
   }
 };
 
-// New function to get low stock products
 export const fetchLowStockProductsApi = async (
   userId: string,
   threshold: number = 2,
@@ -749,7 +922,6 @@ export const fetchProductDetailsApi = async (
   productId: string,
 ) => {
   try {
-    // Using the correct URL format as shown in the curl example
     const response = await apiClient.get(`/api.php`, {
       params: {
         _d: 'NtSeProductsApi',
@@ -765,7 +937,6 @@ export const fetchProductDetailsApi = async (
   }
 };
 
-// Update existing searchProductsApi to include filters
 export const searchProductsApi = async (
   userId: string,
   searchTerm: string,
@@ -780,22 +951,18 @@ export const searchProductsApi = async (
       itemsPerPage = 10,
     } = filters;
 
-    // Build the URL with query parameters
     let url = `${API_BASE_URL}/api.php?_d=NtSeProductsApi&user_id=${userId}&search=${encodeURIComponent(
       searchTerm,
     )}`;
 
-    // Add status filter if not 'all'
     if (status !== 'all') {
       url += `&status=${status}`;
     }
 
-    // Add low stock filter
     if (lowStock) {
       url += `&status=A&amount_to=${lowStockThreshold}`;
     }
 
-    // Add pagination parameters
     url += `&page=${page}&items_per_page=${itemsPerPage}`;
 
     console.log('Searching products from URL:', url);
@@ -820,7 +987,371 @@ export const searchProductsApi = async (
   }
 };
 
-// UPDATED: Orders API Functions with new integration
+export const updateProductStatusApi = async (
+  userId: string,
+  productId: string,
+  status: 'A' | 'D' | 'H' | 'X',
+): Promise<StatusUpdateResponse> => {
+  try {
+    console.log('Updating product status:', {userId, productId, status});
+
+    const response = await axios({
+      method: 'PUT',
+      url: `https://dev.surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        product_ids: productId,
+        user_id: userId,
+        action: 'change_status',
+        status_to: status,
+      },
+    });
+
+    console.log('Update product status response:', response.data);
+    return response.data as StatusUpdateResponse;
+  } catch (error: any) {
+    console.error('Update Product Status API error:', error);
+
+    if (error.response?.status === 404) {
+      throw new Error('Product not found');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to update this product');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error occurred while updating product status');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to update product status',
+      );
+    }
+  }
+};
+
+export const toggleProductStatusApi = async (
+  userId: string,
+  productId: string,
+  isActive: boolean,
+): Promise<StatusUpdateResponse> => {
+  const status = isActive ? 'A' : 'D';
+  return await updateProductStatusApi(userId, productId, status);
+};
+
+export const updateMultipleProductsStatusApi = async (
+  userId: string,
+  productIds: string[],
+  status: 'A' | 'D' | 'H' | 'X',
+): Promise<StatusUpdateResponse> => {
+  try {
+    console.log('Updating multiple products status:', {
+      userId,
+      productIds,
+      status,
+    });
+
+    const response = await axios({
+      method: 'PUT',
+      url: `https://dev.surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        product_ids: productIds.join(','),
+        user_id: userId,
+        action: 'change_status',
+        status_to: status,
+      },
+    });
+
+    console.log('Update multiple products status response:', response.data);
+    return response.data as StatusUpdateResponse;
+  } catch (error: any) {
+    console.error('Update Multiple Products Status API error:', error);
+    throw new Error(
+      error.response?.data?.message || 'Failed to update products status',
+    );
+  }
+};
+
+export const deleteProductApi = async (
+  userId: string,
+  productIds: string | string[],
+): Promise<DeleteProductResponse> => {
+  try {
+    const productIdsString = Array.isArray(productIds)
+      ? productIds.join(',')
+      : productIds;
+
+    console.log('Deleting products:', {userId, productIds: productIdsString});
+
+    const response = await axios({
+      method: 'PUT',
+      url: `https://dev.surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        product_ids: productIdsString,
+        user_id: userId,
+      },
+    });
+
+    console.log('Delete product response:', response.data);
+    return response.data as DeleteProductResponse;
+  } catch (error: any) {
+    console.error('Delete Product API error:', error);
+
+    if (error.response?.status === 404) {
+      throw new Error('Product not found');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to delete this product');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error occurred while deleting product');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to delete product',
+      );
+    }
+  }
+};
+
+export const deleteSingleProductApi = async (
+  userId: string,
+  productId: string,
+): Promise<DeleteProductResponse> => {
+  return deleteProductApi(userId, productId);
+};
+
+export const deleteMultipleProductsApi = async (
+  userId: string,
+  productIds: string[],
+): Promise<DeleteProductResponse> => {
+  return deleteProductApi(userId, productIds);
+};
+
+// CATEGORIES
+export const fetchCategoriesApi = async (
+  userId: string,
+  productId?: string,
+): Promise<CategoriesResponse> => {
+  try {
+    const params: any = {
+      _d: 'NtSeCategoriesApi',
+      user_id: userId,
+      for_product_data: true,
+    };
+
+    if (productId) {
+      params.product_id = productId;
+    }
+
+    console.log('Fetching categories with params:', params);
+
+    const response = await apiClient.get(`/api.php`, {params});
+
+    console.log('Categories API response:', response.data);
+
+    const transformedCategories = transformCategoriesData(response.data);
+
+    return {
+      categories: transformedCategories,
+      result: response.data.result || true,
+      message: response.data.message || 'Categories fetched successfully',
+    };
+  } catch (error) {
+    console.error('Fetch Categories API error:', error);
+    throw error;
+  }
+};
+
+const transformCategoriesData = (apiResponse: any): CategoryData[] => {
+  if (apiResponse.categories && Array.isArray(apiResponse.categories)) {
+    return apiResponse.categories.map((category: any) =>
+      transformCategoryRecursive(category),
+    );
+  }
+
+  return [];
+};
+
+const transformCategoryRecursive = (category: any): CategoryData => {
+  return {
+    id: category.id,
+    name: category.name,
+    subcategories:
+      category.subcategories && Array.isArray(category.subcategories)
+        ? category.subcategories.map((sub: any) =>
+            transformCategoryRecursive(sub),
+          )
+        : undefined,
+  };
+};
+
+// PRODUCT CREATION/UPDATE
+export const createProductApi = async (
+  productData: CreateProductRequest,
+): Promise<CreateProductResponse> => {
+  try {
+    console.log('Creating product with data:', productData);
+
+    const response = await axios({
+      method: 'POST',
+      url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: productData,
+    });
+
+    console.log('Create product response:', response.data);
+    return response.data as CreateProductResponse;
+  } catch (error: any) {
+    console.error('Create Product API error:', error);
+
+    if (error.response?.status === 400) {
+      throw new Error('Invalid product data provided');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to create products');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error occurred while creating product');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to create product',
+      );
+    }
+  }
+};
+
+export const updateProductApi = async (
+  productData: CreateProductRequest,
+): Promise<CreateProductResponse> => {
+  try {
+    if (!productData.product_id) {
+      throw new Error('Product ID is required for update');
+    }
+
+    console.log('Updating product with data:', productData);
+
+    const response = await axios({
+      method: 'POST',
+      url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: productData,
+    });
+
+    console.log('Update product response:', response.data);
+    return response.data as CreateProductResponse;
+  } catch (error: any) {
+    console.error('Update Product API error:', error);
+
+    if (error.response?.status === 404) {
+      throw new Error('Product not found');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to update this product');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error occurred while updating product');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to update product',
+      );
+    }
+  }
+};
+
+export const transformFormDataToApiFormat = (
+  formData: any,
+  userId: string,
+  editMode: boolean = false,
+  availableCategories: CategoryData[] = [],
+): CreateProductRequest => {
+  console.log('🔄 Transforming form data to API format:', formData);
+
+  // Extract category IDs from categoryPath
+  let categoryIds: number[] = [309]; // Default fallback
+
+  if (
+    formData.categoryPath &&
+    formData.categoryPath.length > 0 &&
+    availableCategories.length > 0
+  ) {
+    const foundIds = findCategoryIdByPath(
+      availableCategories,
+      formData.categoryPath,
+    );
+    if (foundIds.length > 0) {
+      categoryIds = foundIds;
+    }
+  }
+
+  const apiData: CreateProductRequest = {
+    lang_code: 'en',
+    product_data: {
+      amount: formData.quantity || '0',
+      avail_since: '',
+      category_ids: categoryIds,
+      details_layout: 'default',
+      discussion_type: 'B',
+      exceptions_type: 'F',
+      full_description: formData.description || '',
+      list_price: '0.00',
+      list_qty_count: '',
+      max_qty: formData.maxQuantity || '',
+      min_qty: formData.minQuantity || '',
+      options_type: 'P',
+      out_of_stock_actions: 'N',
+      popularity: '',
+      price: parseFloat(formData.price || '0').toFixed(8),
+      product: formData.productName || '',
+      product_code: formData.productCode || '',
+      promo_text: '',
+      qty_step: '',
+      sales_amount: '',
+      search_words: '',
+      short_description: '',
+      status: 'A', // Active by default
+      tax_ids: formData.taxType === 'VAT' ? [1] : [],
+      timestamp: Math.floor(Date.now() / 1000).toString(),
+      tracking: formData.trackInventory ? 'B' : 'N',
+      usergroup_ids: [],
+      zero_price_action: 'P',
+    },
+    user_id: userId,
+  };
+
+  // Handle uploaded images - use the relative paths from successful uploads
+  if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
+    apiData.image_pair_positon = formData.imageRelativePaths.filter(
+      path => path && typeof path === 'string' && !path.startsWith('http'),
+    );
+    console.log(
+      '✅ Using uploaded image relative paths:',
+      apiData.image_pair_positon,
+    );
+  } else {
+    console.log('⚠️ No valid image relative paths found');
+  }
+
+  // Add product_id for updates
+  if (editMode && formData.productId) {
+    apiData.product_id = parseInt(formData.productId);
+  }
+
+  console.log('🎯 Final API data:', {
+    ...apiData,
+    image_paths: apiData.image_pair_positon || [],
+  });
+
+  return apiData;
+};
+
+// ORDERS
 export const fetchOrdersApi = async (
   userId: string,
   page: number = 1,
@@ -835,7 +1366,6 @@ export const fetchOrdersApi = async (
       status,
     });
 
-    // Use the new API endpoint format
     const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}`;
     let params: any = {
       page,
@@ -868,7 +1398,6 @@ export const fetchOrderDetailsApi = async (userId: string, orderId: string) => {
   try {
     console.log('Fetching order details for:', {userId, orderId});
 
-    // Use the new API endpoint format
     const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}&order_id=${orderId}`;
 
     const response = await axios({
@@ -920,7 +1449,6 @@ export const searchOrdersApi = async (
   }
 };
 
-// NEW: Update Order Status API
 export const updateOrderStatusApi = async (
   userId: string,
   orderId: string,
@@ -965,259 +1493,7 @@ export const updateOrderStatusApi = async (
   }
 };
 
-// UPDATED: Product Status Change API
-export const updateProductStatusApi = async (
-  userId: string,
-  productId: string,
-  status: 'A' | 'D' | 'H' | 'X',
-): Promise<StatusUpdateResponse> => {
-  try {
-    console.log('Updating product status:', {userId, productId, status});
-
-    const response = await axios({
-      method: 'PUT',
-      url: `https://dev.surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`,
-      headers: {
-        Authorization: API_AUTH_HEADER,
-        'Content-Type': 'application/json',
-      },
-      data: {
-        product_ids: productId,
-        user_id: userId,
-        action: 'change_status',
-        status_to: status,
-      },
-    });
-
-    console.log('Update product status response:', response.data);
-    return response.data as StatusUpdateResponse;
-  } catch (error: any) {
-    console.error('Update Product Status API error:', error);
-
-    // Handle different error scenarios
-    if (error.response?.status === 404) {
-      throw new Error('Product not found');
-    } else if (error.response?.status === 403) {
-      throw new Error('You do not have permission to update this product');
-    } else if (error.response?.status >= 500) {
-      throw new Error('Server error occurred while updating product status');
-    } else {
-      throw new Error(
-        error.response?.data?.message || 'Failed to update product status',
-      );
-    }
-  }
-};
-
-// Product Toggle Status Helper
-export const toggleProductStatusApi = async (
-  userId: string,
-  productId: string,
-  isActive: boolean,
-): Promise<StatusUpdateResponse> => {
-  const status = isActive ? 'A' : 'D'; // A = Active, D = Disabled/Hidden
-  return await updateProductStatusApi(userId, productId, status);
-};
-
-// Bulk status update for multiple products
-export const updateMultipleProductsStatusApi = async (
-  userId: string,
-  productIds: string[],
-  status: 'A' | 'D' | 'H' | 'X',
-): Promise<StatusUpdateResponse> => {
-  try {
-    console.log('Updating multiple products status:', {
-      userId,
-      productIds,
-      status,
-    });
-
-    const response = await axios({
-      method: 'PUT',
-      url: `https://dev.surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`,
-      headers: {
-        Authorization: API_AUTH_HEADER,
-        'Content-Type': 'application/json',
-      },
-      data: {
-        product_ids: productIds.join(','),
-        user_id: userId,
-        action: 'change_status',
-        status_to: status,
-      },
-    });
-
-    console.log('Update multiple products status response:', response.data);
-    return response.data as StatusUpdateResponse;
-  } catch (error: any) {
-    console.error('Update Multiple Products Status API error:', error);
-    throw new Error(
-      error.response?.data?.message || 'Failed to update products status',
-    );
-  }
-};
-
-// Add this function to your apiService.ts
-export const fetchCategoriesApi = async (
-  userId: string,
-  productId?: string,
-): Promise<CategoriesResponse> => {
-  try {
-    const params: any = {
-      _d: 'NtSeCategoriesApi',
-      user_id: userId,
-      for_product_data: true,
-    };
-
-    if (productId) {
-      params.product_id = productId;
-    }
-
-    console.log('Fetching categories with params:', params);
-
-    const response = await apiClient.get(`/api.php`, {params});
-
-    console.log('Categories API response:', response.data);
-
-    // Transform the API response to match your expected format
-    const transformedCategories = transformCategoriesData(response.data);
-
-    return {
-      categories: transformedCategories,
-      result: response.data.result || true,
-      message: response.data.message || 'Categories fetched successfully',
-    };
-  } catch (error) {
-    console.error('Fetch Categories API error:', error);
-    throw error;
-  }
-};
-
-// Helper function to transform API response to your expected format
-const transformCategoriesData = (apiResponse: any): CategoryData[] => {
-  // Your API response has the exact structure we need
-  if (apiResponse.categories && Array.isArray(apiResponse.categories)) {
-    return apiResponse.categories.map((category: any) =>
-      transformCategoryRecursive(category),
-    );
-  }
-
-  // Fallback if structure is different
-  return [];
-};
-
-// Recursive function to handle nested subcategories
-const transformCategoryRecursive = (category: any): CategoryData => {
-  return {
-    id: category.id,
-    name: category.name,
-    subcategories:
-      category.subcategories && Array.isArray(category.subcategories)
-        ? category.subcategories.map((sub: any) =>
-            transformCategoryRecursive(sub),
-          )
-        : undefined,
-  };
-};
-
-// NEW: Delete Product API Function
-export const deleteProductApi = async (
-  userId: string,
-  productIds: string | string[],
-): Promise<DeleteProductResponse> => {
-  try {
-    // Convert productIds to string format (comma-separated if multiple)
-    const productIdsString = Array.isArray(productIds)
-      ? productIds.join(',')
-      : productIds;
-
-    console.log('Deleting products:', {userId, productIds: productIdsString});
-
-    const response = await axios({
-      method: 'PUT',
-      url: `https://dev.surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`,
-      headers: {
-        Authorization: API_AUTH_HEADER,
-        'Content-Type': 'application/json',
-      },
-      data: {
-        product_ids: productIdsString,
-        user_id: userId,
-      },
-    });
-
-    console.log('Delete product response:', response.data);
-    return response.data as DeleteProductResponse;
-  } catch (error: any) {
-    console.error('Delete Product API error:', error);
-
-    // Handle different error scenarios
-    if (error.response?.status === 404) {
-      throw new Error('Product not found');
-    } else if (error.response?.status === 403) {
-      throw new Error('You do not have permission to delete this product');
-    } else if (error.response?.status >= 500) {
-      throw new Error('Server error occurred while deleting product');
-    } else {
-      throw new Error(
-        error.response?.data?.message || 'Failed to delete product',
-      );
-    }
-  }
-};
-
-// Helper function for single product deletion
-export const deleteSingleProductApi = async (
-  userId: string,
-  productId: string,
-): Promise<DeleteProductResponse> => {
-  return deleteProductApi(userId, productId);
-};
-
-// Helper function for multiple product deletion
-export const deleteMultipleProductsApi = async (
-  userId: string,
-  productIds: string[],
-): Promise<DeleteProductResponse> => {
-  return deleteProductApi(userId, productIds);
-};
-
-// NEW: Create new product
-export const createProductApi = async (
-  productData: CreateProductRequest,
-): Promise<CreateProductResponse> => {
-  try {
-    console.log('Creating product with data:', productData);
-
-    const response = await axios({
-      method: 'POST',
-      url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi`,
-      headers: {
-        Authorization: API_AUTH_HEADER,
-        'Content-Type': 'application/json',
-      },
-      data: productData,
-    });
-
-    console.log('Create product response:', response.data);
-    return response.data as CreateProductResponse;
-  } catch (error: any) {
-    console.error('Create Product API error:', error);
-
-    if (error.response?.status === 400) {
-      throw new Error('Invalid product data provided');
-    } else if (error.response?.status === 403) {
-      throw new Error('You do not have permission to create products');
-    } else if (error.response?.status >= 500) {
-      throw new Error('Server error occurred while creating product');
-    } else {
-      throw new Error(
-        error.response?.data?.message || 'Failed to create product',
-      );
-    }
-  }
-};
-
+// DASHBOARD
 export const fetchDashboardApi = async (
   userId: string,
 ): Promise<DashboardResponse> => {
@@ -1252,123 +1528,6 @@ export const fetchDashboardApi = async (
       );
     }
   }
-};
-
-// NEW: Update existing product
-export const updateProductApi = async (
-  productData: CreateProductRequest,
-): Promise<CreateProductResponse> => {
-  try {
-    if (!productData.product_id) {
-      throw new Error('Product ID is required for update');
-    }
-
-    console.log('Updating product with data:', productData);
-
-    const response = await axios({
-      method: 'POST',
-      url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi`,
-      headers: {
-        Authorization: API_AUTH_HEADER,
-        'Content-Type': 'application/json',
-      },
-      data: productData,
-    });
-
-    console.log('Update product response:', response.data);
-    return response.data as CreateProductResponse;
-  } catch (error: any) {
-    console.error('Update Product API error:', error);
-
-    if (error.response?.status === 404) {
-      throw new Error('Product not found');
-    } else if (error.response?.status === 403) {
-      throw new Error('You do not have permission to update this product');
-    } else if (error.response?.status >= 500) {
-      throw new Error('Server error occurred while updating product');
-    } else {
-      throw new Error(
-        error.response?.data?.message || 'Failed to update product',
-      );
-    }
-  }
-};
-
-// Helper function to transform form data to API format
-export const transformFormDataToApiFormat = (
-  formData: any,
-  userId: string,
-  editMode: boolean = false,
-  availableCategories: CategoryData[] = [],
-): CreateProductRequest => {
-  // Extract category IDs from categoryPath
-  let categoryIds: number[] = [309]; // Default fallback
-
-  if (
-    formData.categoryPath &&
-    formData.categoryPath.length > 0 &&
-    availableCategories.length > 0
-  ) {
-    // Find actual category IDs from the path
-    const foundIds = findCategoryIdByPath(
-      availableCategories,
-      formData.categoryPath,
-    );
-    if (foundIds.length > 0) {
-      categoryIds = foundIds;
-    }
-  }
-
-  const apiData: CreateProductRequest = {
-    lang_code: 'en',
-    product_data: {
-      amount: formData.quantity || '0',
-      avail_since: '',
-      category_ids: categoryIds,
-      details_layout: 'default',
-      discussion_type: 'B',
-      exceptions_type: 'F',
-      full_description: formData.description || '',
-      list_price: '0.00',
-      list_qty_count: '',
-      max_qty: formData.maxQuantity || '',
-      min_qty: formData.minQuantity || '',
-      options_type: 'P',
-      out_of_stock_actions: 'N',
-      popularity: '',
-      price: parseFloat(formData.price || '0').toFixed(8), // API expects 8 decimal places
-      product: formData.productName || '',
-      product_code: formData.productCode || '',
-      promo_text: '',
-      qty_step: '',
-      sales_amount: '',
-      search_words: '',
-      short_description: '',
-      status: 'A', // Active by default
-      tax_ids: formData.taxType === 'VAT' ? [1] : [], // Assuming VAT has ID 1
-      timestamp: Math.floor(Date.now() / 1000).toString(),
-      tracking: formData.trackInventory ? 'B' : 'N',
-      usergroup_ids: [],
-      zero_price_action: 'P',
-    },
-    user_id: userId,
-  };
-
-  // Add image positions if available
-  if (formData.images && formData.images.length > 0) {
-    // For now, we'll use placeholder image positions
-    // In a real implementation, you'd upload images first and get their paths
-    apiData.image_pair_positon = formData.images.map(
-      (_, index) => `product_${Date.now()}/image_${index}.jpg`,
-    );
-  }
-
-  // Add product_id for updates
-  if (editMode && formData.productId) {
-    apiData.product_id = parseInt(formData.productId);
-  }
-
-  return apiData;
 };
 
 export default apiClient;

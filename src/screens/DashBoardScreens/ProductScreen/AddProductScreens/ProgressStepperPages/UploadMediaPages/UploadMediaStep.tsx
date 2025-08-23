@@ -24,6 +24,8 @@ import {
   formatFileSize,
   validateImage,
   PickedImage,
+  uploadMultipleImages,
+  getMimeTypeFromExtension,
 } from '../../../../../../utils/imagePicker';
 
 interface FileData {
@@ -35,6 +37,9 @@ interface FileData {
   isExisting?: boolean;
   originalUrl?: string;
   uri?: string; // For newly picked images
+  relativePath?: string; // For uploaded images
+  viewUrl?: string; // For uploaded images
+  isUploaded?: boolean;
 }
 
 interface UploadMediaStepProps {
@@ -52,6 +57,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [currentUpload, setCurrentUpload] = useState({current: 0, total: 0});
 
   const [files, setFiles] = useState<FileData[]>([]);
 
@@ -89,6 +95,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             thumbnailSource: {uri: imageUrl}, // Use actual image URL
             isExisting: true,
             originalUrl: imageUrl, // Keep reference to original URL
+            isUploaded: true,
           };
         },
       );
@@ -110,11 +117,22 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           const updatedFiles = files.filter(file => file.id !== fileId);
           setFiles(updatedFiles);
 
-          // Update form data
-          const imageUrls = updatedFiles
-            .filter(file => file.uri || file.originalUrl)
-            .map(file => file.uri || file.originalUrl);
-          updateFormData({images: imageUrls});
+          // Update form data with relative paths for uploaded images
+          const imageData = updatedFiles
+            .filter(file => file.isUploaded)
+            .map(file => ({
+              relativePath: file.relativePath,
+              viewUrl: file.viewUrl || file.originalUrl || file.uri,
+            }));
+
+          console.log('Delete - Updated image data:', imageData);
+
+          updateFormData({
+            images: imageData.map(img => img.viewUrl), // For display
+            imageRelativePaths: imageData
+              .map(img => img.relativePath)
+              .filter(path => path && !path.startsWith('http')), // Only actual relative paths
+          });
 
           // If no files left, reset to initial state
           if (updatedFiles.length === 0) {
@@ -198,62 +216,150 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
         }
 
         if (validImages.length > 0) {
-          // Simulate upload progress
+          console.log(
+            'Starting upload process for',
+            validImages.length,
+            'images',
+          );
           setUploadStatus('uploading');
           setUploadProgress(0);
+          setCurrentUpload({current: 0, total: validImages.length});
 
-          const progressInterval = setInterval(() => {
-            setUploadProgress(prev => {
-              const newProgress = prev + 20;
-              if (newProgress >= 100) {
-                clearInterval(progressInterval);
+          // Upload images to server
+          try {
+            const uploadResult = await uploadMultipleImages(
+              validImages,
+              (current, total) => {
+                console.log(`Uploading ${current}/${total}`);
+                setCurrentUpload({current, total});
+                const progress = total > 0 ? (current / total) * 100 : 0;
+                setUploadProgress(progress);
+              },
+            );
 
-                // Add new images to files
-                const newFiles: FileData[] = validImages.map(
-                  (image, index) => ({
-                    id: `new-${Date.now()}-${index}`,
-                    name: image.fileName,
-                    size: formatFileSize(image.fileSize),
-                    date: new Date().toLocaleDateString(),
-                    thumbnailSource: {uri: image.uri},
-                    uri: image.uri,
-                  }),
+            console.log('Upload result:', uploadResult);
+
+            if (
+              uploadResult.success &&
+              uploadResult.uploadedImages.length > 0
+            ) {
+              // Create new file entries for uploaded images
+              const newFiles: FileData[] = uploadResult.uploadedImages.map(
+                (image, index) => ({
+                  id: `uploaded-${Date.now()}-${index}`,
+                  name: image.fileName,
+                  size: formatFileSize(image.fileSize),
+                  date: new Date().toLocaleDateString(),
+                  thumbnailSource: image.viewUrl
+                    ? {uri: image.viewUrl}
+                    : {uri: image.uri},
+                  uri: image.uri,
+                  relativePath: image.relativePath,
+                  viewUrl: image.viewUrl,
+                  isUploaded: true,
+                }),
+              );
+
+              const updatedFiles = [...files, ...newFiles];
+              setFiles(updatedFiles);
+
+              // Update form data with both display URLs and relative paths
+              const allUploadedFiles = updatedFiles.filter(
+                file => file.isUploaded,
+              );
+              const imageData = allUploadedFiles.map(file => ({
+                relativePath: file.relativePath || file.originalUrl,
+                viewUrl: file.viewUrl || file.originalUrl || file.uri,
+              }));
+
+              console.log('Image data for form update:', imageData);
+
+              updateFormData({
+                images: imageData.map(img => img.viewUrl), // For display
+                imageRelativePaths: imageData
+                  .map(img => img.relativePath)
+                  .filter(path => path && !path.startsWith('http')), // Only actual relative paths, not URLs
+              });
+
+              console.log('Updated form data with relative paths:', {
+                images: imageData.map(img => img.viewUrl),
+                imageRelativePaths: imageData
+                  .map(img => img.relativePath)
+                  .filter(path => path && !path.startsWith('http')),
+              });
+
+              setUploadStatus('completed');
+
+              // Show success/error message
+              if (uploadResult.errors.length === 0) {
+                Alert.alert(
+                  'Success',
+                  `${uploadResult.uploadedImages.length} image(s) uploaded successfully!`,
                 );
-
-                const updatedFiles = [...files, ...newFiles];
-                setFiles(updatedFiles);
-
-                // Update form data with image URIs
-                const imageUrls = updatedFiles
-                  .filter(file => file.uri || file.originalUrl)
-                  .map(file => file.uri || file.originalUrl);
-                updateFormData({images: imageUrls});
-
-                setUploadStatus('completed');
-                setIsUploading(false);
-
-                return 100;
+              } else {
+                const successCount = uploadResult.uploadedImages.length;
+                const errorCount = uploadResult.errors.length;
+                Alert.alert(
+                  'Partial Success',
+                  `${successCount} image(s) uploaded successfully, ${errorCount} failed.\n\nErrors:\n${uploadResult.errors
+                    .slice(0, 3)
+                    .join('\n')}${errorCount > 3 ? '\n...and more' : ''}`,
+                );
               }
-              return newProgress;
-            });
-          }, 300);
+            } else if (uploadResult.errors.length > 0) {
+              // All uploads failed
+              console.error('All uploads failed:', uploadResult.errors);
+              Alert.alert(
+                'Upload Failed',
+                `All image uploads failed:\n\n${uploadResult.errors
+                  .slice(0, 3)
+                  .join('\n')}${
+                  uploadResult.errors.length > 3 ? '\n...and more' : ''
+                }`,
+              );
+              setUploadStatus(files.length > 0 ? 'completed' : 'initial');
+            } else {
+              // No images and no errors (shouldn't happen)
+              Alert.alert(
+                'Upload Failed',
+                'No images were uploaded successfully.',
+              );
+              setUploadStatus(files.length > 0 ? 'completed' : 'initial');
+            }
+          } catch (uploadError) {
+            console.error('Upload process error:', uploadError);
+            Alert.alert(
+              'Upload Error',
+              `Upload process failed: ${
+                uploadError.message || 'Unknown error'
+              }\n\nPlease check your internet connection and try again.`,
+            );
+            setUploadStatus(files.length > 0 ? 'completed' : 'initial');
+          }
         } else {
-          setIsUploading(false);
+          Alert.alert('No Valid Images', 'No valid images were selected.');
         }
       } else {
         Alert.alert('No Images', 'No images were selected.');
-        setIsUploading(false);
       }
     } catch (error: any) {
-      console.error('Upload error:', error);
-      Alert.alert('Upload Error', error.message || 'Failed to upload images');
+      console.error('Selection error:', error);
+      Alert.alert(
+        'Selection Error',
+        error.message || 'Failed to select images',
+      );
+    } finally {
       setIsUploading(false);
+      setCurrentUpload({current: 0, total: 0});
     }
   };
 
   const handleCancelUpload = () => {
+    // Note: In a real implementation, you might want to cancel ongoing uploads
     setUploadStatus(files.length > 0 ? 'completed' : 'initial');
     setUploadProgress(0);
+    setCurrentUpload({current: 0, total: 0});
+    setIsUploading(false);
   };
 
   const modalButtons = [
@@ -375,9 +481,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           <View style={styles.mainProgress}>
             <View style={styles.progressHeader}>
               <Typography
-                text={`Uploading ${files.length + 1} file${
-                  files.length > 0 ? 's' : ''
-                }`}
+                text={`Uploading ${currentUpload.current}/${currentUpload.total} images`}
                 variant={TypographyVariant.LMEDIUM_EXTRABOLD}
                 customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
               />
@@ -397,7 +501,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             style={[styles.progressLine, {width: `${uploadProgress}%`}]}></View>
           <View style={styles.progressPercent}>
             <Typography
-              text={`${uploadProgress}% uploading`}
+              text={`${Math.round(uploadProgress)}% uploading`}
               variant={TypographyVariant.LMEDIUM_REGULAR}
               customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />

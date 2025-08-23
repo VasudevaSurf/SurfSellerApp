@@ -48,6 +48,7 @@ interface RouteParams {
     subcategory?: string;
     description: string;
     images: string[];
+    imageRelativePaths?: string[];
     productCode: string;
     quantity: string;
     minQuantity: string;
@@ -76,6 +77,7 @@ interface FormData {
   subcategory: string;
   description: string;
   images: string[];
+  imageRelativePaths: string[]; // For API relative paths
   productCode: string;
   quantity: string;
   minQuantity: string;
@@ -116,6 +118,7 @@ const AddProduct = () => {
     subcategory: '',
     description: '',
     images: [],
+    imageRelativePaths: [], // New field for API relative paths
     productCode: '',
     quantity: '',
     minQuantity: '',
@@ -135,7 +138,7 @@ const AddProduct = () => {
   // Pre-fill form data if in edit mode
   useEffect(() => {
     if (editMode && productData) {
-      console.log('Loading product data for editing:', productData);
+      console.log('🔄 Loading product data for editing:', productData);
 
       setFormData(prevData => ({
         ...prevData, // Keep all existing fields as defaults
@@ -146,6 +149,9 @@ const AddProduct = () => {
         subcategory: productData.subcategory || '',
         description: productData.description || '',
         images: Array.isArray(productData.images) ? productData.images : [],
+        imageRelativePaths: Array.isArray(productData.imageRelativePaths)
+          ? productData.imageRelativePaths
+          : [],
         productCode: productData.productCode || '',
         quantity: productData.quantity || '',
         minQuantity: productData.minQuantity || '',
@@ -170,7 +176,7 @@ const AddProduct = () => {
 
   // Safe update function that preserves existing data
   const updateFormData = (newData: Partial<FormData>) => {
-    console.log('Updating form data:', newData);
+    console.log('📝 Updating form data:', newData);
 
     setFormData(prevData => {
       const updatedData = {
@@ -183,20 +189,35 @@ const AddProduct = () => {
         updatedData.categoryDisplay = newData.categoryPath.join(' > ');
       }
 
-      console.log('Form data after update:', updatedData);
+      // Debug log for image data
+      if (newData.images || newData.imageRelativePaths) {
+        console.log('🖼️ Image data update:', {
+          images: updatedData.images,
+          imageRelativePaths: updatedData.imageRelativePaths,
+        });
+      }
+
+      console.log('✅ Form data after update:', {
+        ...updatedData,
+        // Only log key fields to avoid noise
+        productName: updatedData.productName,
+        price: updatedData.price,
+        imageCount: updatedData.images.length,
+        relativePathCount: updatedData.imageRelativePaths.length,
+      });
       return updatedData;
     });
   };
 
   const handleNext = () => {
-    console.log('Moving to next step from:', currentStep);
+    console.log('➡️ Moving to next step from:', currentStep);
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
     }
   };
 
   const handleBack = () => {
-    console.log('Going back from step:', currentStep);
+    console.log('⬅️ Going back from step:', currentStep);
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     } else {
@@ -205,23 +226,50 @@ const AddProduct = () => {
   };
 
   const handleSubmit = async () => {
-    console.log('Form submitted:', formData);
-    console.log('Edit mode:', editMode);
-    console.log('Product ID:', productId);
+    console.log('🚀 Form submitted:', {
+      editMode,
+      productId,
+      formData: {
+        productName: formData.productName,
+        price: formData.price,
+        images: formData.images.length,
+        relativePaths: formData.imageRelativePaths.length,
+      },
+    });
 
-    // Validate required fields
+    // Validate required fields and image upload status
     const requiredFields = ['productName', 'price'];
     const missingFields = requiredFields.filter(
       field => !formData[field]?.trim(),
     );
 
     if (missingFields.length > 0) {
-      console.warn('Missing required fields:', missingFields);
+      console.warn('⚠️ Missing required fields:', missingFields);
       Alert.alert(
         'Validation Error',
         `Please fill in all required fields: ${missingFields.join(', ')}`,
       );
       return;
+    }
+
+    // Check if images are properly uploaded (for new products)
+    if (!editMode && formData.images.length > 0) {
+      if (
+        !formData.imageRelativePaths ||
+        formData.imageRelativePaths.length === 0
+      ) {
+        Alert.alert(
+          'Images Not Uploaded',
+          'Please wait for images to finish uploading before saving the product.',
+        );
+        return;
+      }
+
+      console.log('✅ Images validation passed:', {
+        imageCount: formData.images.length,
+        relativePathCount: formData.imageRelativePaths.length,
+        relativePaths: formData.imageRelativePaths,
+      });
     }
 
     if (!userId) {
@@ -233,7 +281,7 @@ const AddProduct = () => {
     setIsSubmitting(true);
 
     try {
-      // Transform form data to API format
+      // Transform form data to API format with enhanced image handling
       const apiData = transformFormDataToApiFormat(
         formData,
         userId,
@@ -241,16 +289,23 @@ const AddProduct = () => {
         categories,
       );
 
+      console.log('🎯 API Data prepared:', {
+        product: apiData.product_data.product,
+        price: apiData.product_data.price,
+        imageCount: apiData.image_pair_positon?.length || 0,
+        imagePaths: apiData.image_pair_positon || [],
+      });
+
       let result;
       if (editMode) {
-        console.log('Updating product...');
+        console.log('🔄 Updating existing product...');
         result = await updateProductApi(apiData);
       } else {
-        console.log('Creating new product...');
+        console.log('✨ Creating new product...');
         result = await createProductApi(apiData);
       }
 
-      console.log('Product operation successful:', result);
+      console.log('🎉 Product operation successful:', result);
 
       // Show success message
       Alert.alert(
@@ -266,7 +321,7 @@ const AddProduct = () => {
         ],
       );
     } catch (error: any) {
-      console.error('Error saving product:', error);
+      console.error('💥 Error saving product:', error);
 
       Alert.alert(
         editMode ? 'Update Failed' : 'Creation Failed',
@@ -289,12 +344,12 @@ const AddProduct = () => {
   };
 
   const handleStepPress = (stepId: number) => {
-    console.log('Navigating to step:', stepId);
+    console.log('🎯 Navigating to step:', stepId);
     setCurrentStep(stepId);
   };
 
   const renderStep = () => {
-    console.log('Rendering step:', currentStep, 'with formData:', formData);
+    console.log('🖥️ Rendering step:', currentStep);
 
     switch (currentStep) {
       case 1:
@@ -330,7 +385,7 @@ const AddProduct = () => {
           />
         );
       default:
-        console.warn('Unknown step:', currentStep);
+        console.warn('❓ Unknown step:', currentStep);
         return null;
     }
   };
@@ -366,12 +421,21 @@ const AddProduct = () => {
     }
   };
 
-  console.log(
-    'AddProduct render - Current step:',
-    currentStep,
-    'Form data keys:',
-    Object.keys(formData),
-  );
+  // Check if images are still uploading
+  const areImagesUploading = () => {
+    return (
+      formData.images.length > 0 &&
+      (!formData.imageRelativePaths ||
+        formData.imageRelativePaths.length !== formData.images.length)
+    );
+  };
+
+  console.log('🔍 AddProduct render - Current step:', currentStep, {
+    formDataKeys: Object.keys(formData),
+    imageCount: formData.images.length,
+    relativePathCount: formData.imageRelativePaths.length,
+    isUploading: areImagesUploading(),
+  });
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -430,9 +494,14 @@ const AddProduct = () => {
           state={ButtonState.DEFAULT}
           size={ButtonSize.MEDIUM}
           withShadow
-          disabled={!isValidStep() || isSubmitting}
+          disabled={
+            !isValidStep() ||
+            isSubmitting ||
+            (currentStep === STEPS.length && areImagesUploading())
+          }
           customStyles={{
-            opacity: !isValidStep() || isSubmitting ? 0.6 : 1,
+            opacity:
+              !isValidStep() || isSubmitting || areImagesUploading() ? 0.6 : 1,
           }}
         />
       </View>
