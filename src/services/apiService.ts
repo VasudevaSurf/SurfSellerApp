@@ -1293,14 +1293,14 @@ export const transformFormDataToApiFormat = (
   userId: string,
   editMode: boolean = false,
   availableCategories: CategoryData[] = [],
-  originalImages?: string[], // Pass original images for comparison
+  originalImages?: string[],
 ): CreateProductRequest => {
   console.log('🔄 Transforming form data to API format:', {
     editMode,
-    formDataImages: formData.images?.length || 0,
+    productName: formData.productName,
+    currentImages: formData.images?.length || 0,
     imageRelativePaths: formData.imageRelativePaths?.length || 0,
     originalImages: originalImages?.length || 0,
-    deletedOriginalImages: formData.deletedOriginalImages?.length || 0,
   });
 
   // Extract category IDs from categoryPath
@@ -1355,72 +1355,61 @@ export const transformFormDataToApiFormat = (
     user_id: userId,
   };
 
-  // CRITICAL FIX: Handle images properly for edit mode
+  // Handle images for both create and edit modes
+  const imagePaths: string[] = [];
+
   if (editMode) {
     console.log('📸 Processing images for edit mode...');
 
-    // SOLUTION: Send ALL current images (the complete new set)
-    // This will replace the entire image set on the server
-    const allCurrentImages: string[] = [];
+    // For edit mode, we need to collect ALL current images as relative paths
+    const currentImages = formData.images || [];
 
-    // 1. Add newly uploaded images (relative paths)
-    if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
-      const newRelativePaths = formData.imageRelativePaths.filter(
-        (path: string) =>
-          path && typeof path === 'string' && !path.startsWith('http'),
-      );
-      allCurrentImages.push(...newRelativePaths);
-      console.log('✅ Added new uploaded images:', newRelativePaths);
-    }
-
-    // 2. Add existing images that are still in formData.images (not deleted)
-    if (formData.images && formData.images.length > 0) {
-      const existingImages = formData.images.filter(
-        (img: string) => img.startsWith('http'), // These are existing image URLs
-      );
-
-      // Convert existing URLs to relative paths
-      const existingRelativePaths = existingImages.map((url: string) => {
-        return extractRelativePathFromUrl(url);
-      });
-
-      // Only add if they're not already in the list
-      existingRelativePaths.forEach(path => {
-        if (path && !allCurrentImages.includes(path)) {
-          allCurrentImages.push(path);
+    for (const imageUrl of currentImages) {
+      if (imageUrl.startsWith('http')) {
+        // This is an existing image URL - convert to relative path
+        const relativePath = extractRelativePathFromUrl(imageUrl);
+        if (relativePath && !imagePaths.includes(relativePath)) {
+          imagePaths.push(relativePath);
         }
-      });
-
-      console.log(
-        '✅ Added existing images as relative paths:',
-        existingRelativePaths,
-      );
+      }
     }
 
-    // IMPORTANT: Set the complete image array - this replaces all images
-    apiData.image_pair_positon = allCurrentImages;
+    // Add newly uploaded images (relative paths)
+    if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
+      for (const relativePath of formData.imageRelativePaths) {
+        if (
+          relativePath &&
+          !relativePath.startsWith('http') &&
+          !imagePaths.includes(relativePath)
+        ) {
+          imagePaths.push(relativePath);
+        }
+      }
+    }
 
-    console.log('📤 Complete image set being sent to API:', {
-      totalImages: allCurrentImages.length,
-      imagePaths: allCurrentImages,
+    console.log('✅ Collected image paths for edit mode:', {
+      totalPaths: imagePaths.length,
+      paths: imagePaths,
     });
-
-    // If no images, explicitly send empty array to clear all
-    if (allCurrentImages.length === 0) {
-      console.log('🗑️ Sending empty array to clear all product images');
-    }
   } else {
     // For create mode, only use newly uploaded images
     if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
-      apiData.image_pair_positon = formData.imageRelativePaths.filter(
-        (path: string) =>
-          path && typeof path === 'string' && !path.startsWith('http'),
-      );
-      console.log(
-        '✅ Using newly uploaded images for create:',
-        apiData.image_pair_positon,
-      );
+      formData.imageRelativePaths.forEach((path: string) => {
+        if (path && !path.startsWith('http') && !imagePaths.includes(path)) {
+          imagePaths.push(path);
+        }
+      });
     }
+
+    console.log('✅ Collected image paths for create mode:', imagePaths.length);
+  }
+
+  // Set the image_pair_positon with all current relative paths
+  if (imagePaths.length > 0) {
+    apiData.image_pair_positon = imagePaths;
+  } else {
+    // If no images, send empty array to clear all images
+    apiData.image_pair_positon = [];
   }
 
   // Add product_id for updates
@@ -1428,7 +1417,7 @@ export const transformFormDataToApiFormat = (
     apiData.product_id = parseInt(formData.productId);
   }
 
-  console.log('🎯 Final API data:', {
+  console.log('🎯 Final API data for product:', {
     productId: apiData.product_id,
     productName: apiData.product_data.product,
     imageCount: apiData.image_pair_positon?.length || 0,

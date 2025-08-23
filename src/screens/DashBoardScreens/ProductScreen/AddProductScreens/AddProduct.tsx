@@ -1,3 +1,5 @@
+// Updated AddProduct.tsx with proper user ID and product ID passing
+
 import React, {useState, useEffect} from 'react';
 import {ScrollView, View, Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -68,7 +70,6 @@ interface RouteParams {
 
 type AddProductRouteProp = RouteProp<{AddProduct: RouteParams}, 'AddProduct'>;
 
-// Define the complete form data interface
 interface FormData {
   productId: string;
   productName: string;
@@ -77,7 +78,7 @@ interface FormData {
   subcategory: string;
   description: string;
   images: string[];
-  imageRelativePaths: string[]; // For API relative paths
+  imageRelativePaths: string[];
   productCode: string;
   quantity: string;
   minQuantity: string;
@@ -92,6 +93,8 @@ interface FormData {
   countryOfOrigin: string;
   categoryPath: string[];
   categoryDisplay?: string;
+  // NEW: Add user and product context for image operations
+  userId?: string;
 }
 
 const AddProduct = () => {
@@ -100,7 +103,7 @@ const AddProduct = () => {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [originalImages, setOriginalImages] = useState<string[]>([]); // Track original images
+  const [originalImages, setOriginalImages] = useState<string[]>([]);
 
   // Get userId from Redux store
   const userId = useSelector(
@@ -134,6 +137,8 @@ const AddProduct = () => {
     countryOfOrigin: '',
     categoryPath: [],
     categoryDisplay: '',
+    // NEW: Pass user context for image operations
+    userId: userId,
   });
 
   // Pre-fill form data if in edit mode
@@ -141,7 +146,6 @@ const AddProduct = () => {
     if (editMode && productData) {
       console.log('🔄 Loading product data for editing:', productData);
 
-      // Store original images for comparison
       const originalImageList = Array.isArray(productData.images)
         ? productData.images
         : [];
@@ -177,13 +181,28 @@ const AddProduct = () => {
         categoryDisplay: productData.categoryPath
           ? productData.categoryPath.join(' > ')
           : '',
+        // NEW: Ensure user context is passed
+        userId: userId,
       }));
     }
-  }, [editMode, productData, productId]);
+  }, [editMode, productData, productId, userId]);
 
-  // Safe update function that preserves existing data
+  // Update user context when userId changes
+  useEffect(() => {
+    if (userId) {
+      setFormData(prevData => ({
+        ...prevData,
+        userId: userId,
+      }));
+    }
+  }, [userId]);
+
   const updateFormData = (newData: Partial<FormData>) => {
-    console.log('📝 Updating form data:', newData);
+    console.log('📝 Updating form data:', {
+      keys: Object.keys(newData),
+      imageCount: newData.images?.length,
+      relativePathCount: newData.imageRelativePaths?.length,
+    });
 
     setFormData(prevData => {
       const updatedData = {
@@ -191,32 +210,19 @@ const AddProduct = () => {
         ...newData,
       };
 
-      // If categoryPath is updated, also update categoryDisplay
       if (newData.categoryPath) {
         updatedData.categoryDisplay = newData.categoryPath.join(' > ');
-      }
-
-      // Debug log for image data
-      if (newData.images || newData.imageRelativePaths) {
-        console.log('🖼️ Image data update:', {
-          originalImages,
-          currentImages: updatedData.images,
-          imageRelativePaths: updatedData.imageRelativePaths,
-          deletedImages: originalImages.filter(
-            img => !updatedData.images.includes(img),
-          ),
-        });
       }
 
       return updatedData;
     });
   };
 
-  // Enhanced handleSubmit with proper image deletion handling
   const debugImageState = () => {
     console.log('🔍 DEBUG: Current image state before API call:', {
       editMode,
       productId: formData.productId,
+      userId: formData.userId,
 
       // Original images (what we started with)
       originalImages: {
@@ -236,22 +242,11 @@ const AddProduct = () => {
         list: formData.imageRelativePaths || [],
       },
 
-      // Comparison
-      imagesRemoved: originalImages.filter(
-        (img: string) => !formData.images?.includes(img),
-      ),
-      imagesAdded:
-        formData.images?.filter(
-          (img: string) => !originalImages.includes(img),
-        ) || [],
-
-      // What should be sent to API (existing images that remain + new uploads)
+      // What should be sent to API
       shouldSendToAPI: {
         existingImages:
-          formData.images?.filter(
-            (img: string) =>
-              img.startsWith('http') && originalImages.includes(img),
-          ) || [],
+          formData.images?.filter((img: string) => img.startsWith('http')) ||
+          [],
         newImages:
           formData.imageRelativePaths?.filter(
             (path: string) => path && !path.startsWith('http'),
@@ -260,20 +255,19 @@ const AddProduct = () => {
     });
   };
 
-  // Updated handleSubmit with debug info
   const handleSubmit = async () => {
     // Add debug logging
     debugImageState();
 
     console.log('🚀 Form submitted:', {
       editMode,
-      productId,
+      productId: formData.productId,
+      userId: formData.userId,
       formData: {
         productName: formData.productName,
         price: formData.price,
-        originalImages: originalImages.length,
         currentImages: formData.images?.length || 0,
-        newImages: formData.imageRelativePaths?.length || 0,
+        imageRelativePaths: formData.imageRelativePaths?.length || 0,
       },
     });
 
@@ -292,33 +286,8 @@ const AddProduct = () => {
       return;
     }
 
-    // For edit mode: ensure we have a valid image state
-    if (editMode) {
-      const remainingImages = formData.images || [];
-      const newUploads = formData.imageRelativePaths || [];
-
-      console.log('📸 Edit mode image validation:', {
-        remainingImages: remainingImages.length,
-        newUploads: newUploads.length,
-        totalImages: remainingImages.length,
-      });
-
-      // Check if new images are still uploading
-      const newImageUrls = remainingImages.filter(
-        (img: string) => !originalImages.includes(img),
-      );
-
-      if (newImageUrls.length > 0 && newUploads.length === 0) {
-        Alert.alert(
-          'Images Still Uploading',
-          'Please wait for new images to finish uploading before updating the product.',
-        );
-        return;
-      }
-    }
-
     // For new products, check if images are properly uploaded (if any were selected)
-    if (!editMode && formData.images?.length > 0) {
+    if (!editMode && formData.images.length > 0) {
       if (
         !formData.imageRelativePaths ||
         formData.imageRelativePaths.length === 0
@@ -346,10 +315,10 @@ const AddProduct = () => {
         userId,
         editMode,
         categories,
-        originalImages, // Pass original images for comparison
+        originalImages,
       );
 
-      console.log('🎯 Final API call data:', {
+      console.log('🎯 Final API call:', {
         method: editMode ? 'UPDATE' : 'CREATE',
         productId: apiData.product_id,
         productName: apiData.product_data.product,
@@ -372,7 +341,7 @@ const AddProduct = () => {
       Alert.alert(
         'Success',
         editMode
-          ? 'Product updated successfully!'
+          ? 'Product updated successfully! Image changes have been saved.'
           : 'Product created successfully!',
         [
           {
@@ -419,124 +388,6 @@ const AddProduct = () => {
       goBack();
     }
   };
-
-  // const handleSubmit = async () => {
-  //   console.log('🚀 Form submitted:', {
-  //     editMode,
-  //     productId,
-  //     formData: {
-  //       productName: formData.productName,
-  //       price: formData.price,
-  //       images: formData.images.length,
-  //       relativePaths: formData.imageRelativePaths.length,
-  //     },
-  //   });
-
-  //   // Validate required fields
-  //   const requiredFields = ['productName', 'price'];
-  //   const missingFields = requiredFields.filter(
-  //     field => !formData[field]?.trim(),
-  //   );
-
-  //   if (missingFields.length > 0) {
-  //     console.warn('⚠️ Missing required fields:', missingFields);
-  //     Alert.alert(
-  //       'Validation Error',
-  //       `Please fill in all required fields: ${missingFields.join(', ')}`,
-  //     );
-  //     return;
-  //   }
-
-  //   // For new products, check if images are properly uploaded (if any were selected)
-  //   if (!editMode && formData.images.length > 0) {
-  //     if (
-  //       !formData.imageRelativePaths ||
-  //       formData.imageRelativePaths.length === 0
-  //     ) {
-  //       Alert.alert(
-  //         'Images Not Uploaded',
-  //         'Please wait for images to finish uploading before saving the product.',
-  //       );
-  //       return;
-  //     }
-
-  //     console.log('✅ Images validation passed:', {
-  //       imageCount: formData.images.length,
-  //       relativePathCount: formData.imageRelativePaths.length,
-  //       relativePaths: formData.imageRelativePaths,
-  //     });
-  //   }
-
-  //   if (!userId) {
-  //     Alert.alert('Error', 'User session expired. Please login again.');
-  //     return;
-  //   }
-
-  //   // Show loading state
-  //   setIsSubmitting(true);
-
-  //   try {
-  //     // Transform form data to API format with enhanced image handling
-  //     const apiData = transformFormDataToApiFormat(
-  //       formData,
-  //       userId,
-  //       editMode,
-  //       categories,
-  //     );
-
-  //     console.log('🎯 API Data prepared:', {
-  //       product: apiData.product_data.product,
-  //       price: apiData.product_data.price,
-  //       imageCount: apiData.image_pair_positon?.length || 0,
-  //       imagePaths: apiData.image_pair_positon || [],
-  //     });
-
-  //     let result;
-  //     if (editMode) {
-  //       console.log('🔄 Updating existing product...');
-  //       result = await updateProductApi(apiData);
-  //     } else {
-  //       console.log('✨ Creating new product...');
-  //       result = await createProductApi(apiData);
-  //     }
-
-  //     console.log('🎉 Product operation successful:', result);
-
-  //     // Show success message
-  //     Alert.alert(
-  //       'Success',
-  //       editMode
-  //         ? 'Product updated successfully!'
-  //         : 'Product created successfully!',
-  //       [
-  //         {
-  //           text: 'OK',
-  //           onPress: () => goBack(),
-  //         },
-  //       ],
-  //     );
-  //   } catch (error: any) {
-  //     console.error('💥 Error saving product:', error);
-
-  //     Alert.alert(
-  //       editMode ? 'Update Failed' : 'Creation Failed',
-  //       error.message ||
-  //         `Failed to ${
-  //           editMode ? 'update' : 'create'
-  //         } product. Please try again.`,
-  //       [
-  //         {text: 'OK', style: 'default'},
-  //         {
-  //           text: 'Retry',
-  //           onPress: () => handleSubmit(),
-  //           style: 'default',
-  //         },
-  //       ],
-  //     );
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
 
   const handleStepPress = (stepId: number) => {
     console.log('🎯 Navigating to step:', stepId);
@@ -600,66 +451,36 @@ const AddProduct = () => {
     return currentStep === STEPS.length ? 'Save Product' : 'Continue';
   };
 
-  // FIXED: Improved validation logic that accounts for edit mode
   const isValidStep = () => {
     switch (currentStep) {
       case 1:
-        // Product info step - always require name and price
         return formData.productName.trim() && formData.price.trim();
       case 2:
-        // Media step - always valid (images are optional)
-        return true;
+        return true; // Images are optional
       case 3:
-        // Inventory step - require product code
         return formData.productCode.trim();
       case 4:
-        // Features step - always valid (features are optional)
-        return true;
+        return true; // Features are optional
       default:
         return true;
     }
   };
 
-  // FIXED: Improved image upload check that accounts for edit mode
-  const areImagesUploading = () => {
-    // In edit mode, if we have existing images, don't block submission
-    if (editMode && formData.images.length > 0) {
-      return false; // Allow submission in edit mode even if some images are still uploading
-    }
-
-    // For new products, only block if there are images selected but none uploaded
-    return (
-      !editMode &&
-      formData.images.length > 0 &&
-      (!formData.imageRelativePaths ||
-        formData.imageRelativePaths.length !== formData.images.length)
-    );
-  };
-
-  // FIXED: Better disabled state logic for edit mode
   const isButtonDisabled = () => {
-    // Always disable if submitting
     if (isSubmitting) return true;
-
-    // Always disable if step validation fails
     if (!isValidStep()) return true;
-
-    // Only disable for image uploading on final step for new products
-    if (currentStep === STEPS.length && !editMode && areImagesUploading()) {
-      return true;
-    }
-
     return false;
   };
 
-  console.log('🔍 AddProduct render - Current step:', currentStep, {
-    formDataKeys: Object.keys(formData),
+  console.log('🔍 AddProduct render state:', {
+    currentStep,
+    editMode,
+    userId,
+    productId: formData.productId,
     imageCount: formData.images.length,
     relativePathCount: formData.imageRelativePaths.length,
-    isUploading: areImagesUploading(),
     isValidStep: isValidStep(),
     isDisabled: isButtonDisabled(),
-    editMode,
   });
 
   return (
