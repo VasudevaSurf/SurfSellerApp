@@ -213,7 +213,58 @@ const AddProduct = () => {
   };
 
   // Enhanced handleSubmit with proper image deletion handling
+  const debugImageState = () => {
+    console.log('🔍 DEBUG: Current image state before API call:', {
+      editMode,
+      productId: formData.productId,
+
+      // Original images (what we started with)
+      originalImages: {
+        count: originalImages.length,
+        list: originalImages,
+      },
+
+      // Current form data images (what's currently shown in UI)
+      formDataImages: {
+        count: formData.images?.length || 0,
+        list: formData.images || [],
+      },
+
+      // Uploaded image paths (new images that were uploaded)
+      imageRelativePaths: {
+        count: formData.imageRelativePaths?.length || 0,
+        list: formData.imageRelativePaths || [],
+      },
+
+      // Comparison
+      imagesRemoved: originalImages.filter(
+        (img: string) => !formData.images?.includes(img),
+      ),
+      imagesAdded:
+        formData.images?.filter(
+          (img: string) => !originalImages.includes(img),
+        ) || [],
+
+      // What should be sent to API (existing images that remain + new uploads)
+      shouldSendToAPI: {
+        existingImages:
+          formData.images?.filter(
+            (img: string) =>
+              img.startsWith('http') && originalImages.includes(img),
+          ) || [],
+        newImages:
+          formData.imageRelativePaths?.filter(
+            (path: string) => path && !path.startsWith('http'),
+          ) || [],
+      },
+    });
+  };
+
+  // Updated handleSubmit with debug info
   const handleSubmit = async () => {
+    // Add debug logging
+    debugImageState();
+
     console.log('🚀 Form submitted:', {
       editMode,
       productId,
@@ -221,8 +272,8 @@ const AddProduct = () => {
         productName: formData.productName,
         price: formData.price,
         originalImages: originalImages.length,
-        currentImages: formData.images.length,
-        newImages: formData.imageRelativePaths.length,
+        currentImages: formData.images?.length || 0,
+        newImages: formData.imageRelativePaths?.length || 0,
       },
     });
 
@@ -241,8 +292,33 @@ const AddProduct = () => {
       return;
     }
 
+    // For edit mode: ensure we have a valid image state
+    if (editMode) {
+      const remainingImages = formData.images || [];
+      const newUploads = formData.imageRelativePaths || [];
+
+      console.log('📸 Edit mode image validation:', {
+        remainingImages: remainingImages.length,
+        newUploads: newUploads.length,
+        totalImages: remainingImages.length,
+      });
+
+      // Check if new images are still uploading
+      const newImageUrls = remainingImages.filter(
+        (img: string) => !originalImages.includes(img),
+      );
+
+      if (newImageUrls.length > 0 && newUploads.length === 0) {
+        Alert.alert(
+          'Images Still Uploading',
+          'Please wait for new images to finish uploading before updating the product.',
+        );
+        return;
+      }
+    }
+
     // For new products, check if images are properly uploaded (if any were selected)
-    if (!editMode && formData.images.length > 0) {
+    if (!editMode && formData.images?.length > 0) {
       if (
         !formData.imageRelativePaths ||
         formData.imageRelativePaths.length === 0
@@ -250,25 +326,6 @@ const AddProduct = () => {
         Alert.alert(
           'Images Not Uploaded',
           'Please wait for images to finish uploading before saving the product.',
-        );
-        return;
-      }
-    }
-
-    // For edit mode, check if new images are still uploading
-    if (editMode) {
-      const newImageCount = formData.images.filter(
-        img => !originalImages.includes(img),
-      ).length;
-      const uploadedNewImages =
-        formData.imageRelativePaths?.filter(
-          path => path && !path.startsWith('http'),
-        ).length || 0;
-
-      if (newImageCount > 0 && uploadedNewImages !== newImageCount) {
-        Alert.alert(
-          'Images Still Uploading',
-          'Please wait for new images to finish uploading before updating the product.',
         );
         return;
       }
@@ -283,25 +340,7 @@ const AddProduct = () => {
     setIsSubmitting(true);
 
     try {
-      // Log image changes for debugging
-      if (editMode) {
-        const deletedImages = originalImages.filter(
-          img => !formData.images.includes(img),
-        );
-        const addedImages = formData.images.filter(
-          img => !originalImages.includes(img),
-        );
-
-        console.log('📸 Image changes detected:', {
-          original: originalImages,
-          current: formData.images,
-          deleted: deletedImages,
-          added: addedImages,
-          newUploads: formData.imageRelativePaths,
-        });
-      }
-
-      // Transform form data to API format with enhanced image handling
+      // Transform form data to API format
       const apiData = transformFormDataToApiFormat(
         formData,
         userId,
@@ -310,17 +349,17 @@ const AddProduct = () => {
         originalImages, // Pass original images for comparison
       );
 
-      console.log('🎯 API Data prepared for submission:', {
-        product: apiData.product_data.product,
-        price: apiData.product_data.price,
+      console.log('🎯 Final API call data:', {
+        method: editMode ? 'UPDATE' : 'CREATE',
+        productId: apiData.product_id,
+        productName: apiData.product_data.product,
         imageCount: apiData.image_pair_positon?.length || 0,
         imagePaths: apiData.image_pair_positon || [],
-        isEdit: editMode,
       });
 
       let result;
       if (editMode) {
-        console.log('🔄 Updating existing product with image changes...');
+        console.log('🔄 Updating existing product...');
         result = await updateProductApi(apiData);
       } else {
         console.log('✨ Creating new product...');

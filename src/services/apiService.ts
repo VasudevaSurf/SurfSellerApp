@@ -1234,23 +1234,34 @@ export const updateProductApi = async (
       throw new Error('Product ID is required for update');
     }
 
-    console.log('🔄 Updating product with enhanced image handling:', {
+    console.log('🔄 Updating product with complete image replacement:', {
       productId: productData.product_id,
+      productName: productData.product_data.product,
       imageCount: productData.image_pair_positon?.length || 0,
       imagePaths: productData.image_pair_positon,
     });
 
+    // IMPORTANT: The API should replace ALL images with this new set
     const response = await axios({
-      method: 'POST', // Using POST as per your existing API
+      method: 'POST',
       url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi`,
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
       },
-      data: productData,
+      data: {
+        ...productData,
+        // Ensure we're explicitly updating images
+        update_images: true, // Add this flag if your API supports it
+      },
     });
 
-    console.log('✅ Update product response:', response.data);
+    console.log('✅ Product update response:', response.data);
+
+    if (response.data.result === false) {
+      throw new Error(response.data.message || 'Product update failed');
+    }
+
     return response.data as CreateProductResponse;
   } catch (error: any) {
     console.error('❌ Update Product API error:', error);
@@ -1262,9 +1273,17 @@ export const updateProductApi = async (
     } else if (error.response?.status >= 500) {
       throw new Error('Server error occurred while updating product');
     } else {
-      throw new Error(
-        error.response?.data?.message || 'Failed to update product',
-      );
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to update product';
+      console.error('Full error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: errorMessage,
+      });
+      throw new Error(errorMessage);
     }
   }
 };
@@ -1274,13 +1293,14 @@ export const transformFormDataToApiFormat = (
   userId: string,
   editMode: boolean = false,
   availableCategories: CategoryData[] = [],
-  originalImages?: string[], // NEW: Add original images for comparison
+  originalImages?: string[], // Pass original images for comparison
 ): CreateProductRequest => {
   console.log('🔄 Transforming form data to API format:', {
     editMode,
-    formDataImages: formData.images,
-    imageRelativePaths: formData.imageRelativePaths,
-    originalImages,
+    formDataImages: formData.images?.length || 0,
+    imageRelativePaths: formData.imageRelativePaths?.length || 0,
+    originalImages: originalImages?.length || 0,
+    deletedOriginalImages: formData.deletedOriginalImages?.length || 0,
   });
 
   // Extract category IDs from categoryPath
@@ -1335,53 +1355,66 @@ export const transformFormDataToApiFormat = (
     user_id: userId,
   };
 
-  // ENHANCED: Handle images for both create and edit modes
+  // CRITICAL FIX: Handle images properly for edit mode
   if (editMode) {
     console.log('📸 Processing images for edit mode...');
 
-    // For edit mode, we need to send ALL current images (both existing and new)
-    const allImagePaths: string[] = [];
+    // SOLUTION: Send ALL current images (the complete new set)
+    // This will replace the entire image set on the server
+    const allCurrentImages: string[] = [];
 
-    // Add newly uploaded images (relative paths)
+    // 1. Add newly uploaded images (relative paths)
     if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
       const newRelativePaths = formData.imageRelativePaths.filter(
-        path => path && typeof path === 'string' && !path.startsWith('http'),
+        (path: string) =>
+          path && typeof path === 'string' && !path.startsWith('http'),
       );
-      allImagePaths.push(...newRelativePaths);
+      allCurrentImages.push(...newRelativePaths);
       console.log('✅ Added new uploaded images:', newRelativePaths);
     }
 
-    // Add existing images that weren't deleted
-    // These are the images that are still in formData.images but are URLs (not relative paths)
-    const existingImageUrls = formData.images.filter(
-      (img: string) => img && img.startsWith('http'),
-    );
+    // 2. Add existing images that are still in formData.images (not deleted)
+    if (formData.images && formData.images.length > 0) {
+      const existingImages = formData.images.filter(
+        (img: string) => img.startsWith('http'), // These are existing image URLs
+      );
 
-    // Convert existing URLs to relative paths if possible
-    const existingRelativePaths = existingImageUrls.map((url: string) => {
-      // Extract relative path from URL (assuming your URLs follow a pattern)
-      // Example: https://dev.surf.mt/images/product/123/image.jpg -> images/product/123/image.jpg
-      const match = url.match(/https?:\/\/[^\/]+\/(.+)/);
-      return match ? match[1] : url;
+      // Convert existing URLs to relative paths
+      const existingRelativePaths = existingImages.map((url: string) => {
+        return extractRelativePathFromUrl(url);
+      });
+
+      // Only add if they're not already in the list
+      existingRelativePaths.forEach(path => {
+        if (path && !allCurrentImages.includes(path)) {
+          allCurrentImages.push(path);
+        }
+      });
+
+      console.log(
+        '✅ Added existing images as relative paths:',
+        existingRelativePaths,
+      );
+    }
+
+    // IMPORTANT: Set the complete image array - this replaces all images
+    apiData.image_pair_positon = allCurrentImages;
+
+    console.log('📤 Complete image set being sent to API:', {
+      totalImages: allCurrentImages.length,
+      imagePaths: allCurrentImages,
     });
 
-    allImagePaths.push(...existingRelativePaths);
-    console.log('✅ Added existing images:', existingRelativePaths);
-
-    // Set the image paths for the API
-    if (allImagePaths.length > 0) {
-      apiData.image_pair_positon = allImagePaths;
-      console.log('📤 Final image paths for API:', apiData.image_pair_positon);
-    } else {
-      // If no images, explicitly set empty array to clear all images
-      apiData.image_pair_positon = [];
-      console.log('🗑️ No images - will clear all product images');
+    // If no images, explicitly send empty array to clear all
+    if (allCurrentImages.length === 0) {
+      console.log('🗑️ Sending empty array to clear all product images');
     }
   } else {
     // For create mode, only use newly uploaded images
     if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
       apiData.image_pair_positon = formData.imageRelativePaths.filter(
-        path => path && typeof path === 'string' && !path.startsWith('http'),
+        (path: string) =>
+          path && typeof path === 'string' && !path.startsWith('http'),
       );
       console.log(
         '✅ Using newly uploaded images for create:',
@@ -1396,41 +1429,55 @@ export const transformFormDataToApiFormat = (
   }
 
   console.log('🎯 Final API data:', {
-    ...apiData,
-    image_count: apiData.image_pair_positon?.length || 0,
-    image_paths: apiData.image_pair_positon || [],
+    productId: apiData.product_id,
+    productName: apiData.product_data.product,
+    imageCount: apiData.image_pair_positon?.length || 0,
+    imagePaths: apiData.image_pair_positon || [],
+    isEdit: editMode,
   });
 
   return apiData;
 };
 
+// ENHANCED: Better relative path extraction function
 export const extractRelativePathFromUrl = (url: string): string => {
   if (!url || !url.startsWith('http')) {
     return url; // Already a relative path
   }
 
   try {
-    // Common patterns for extracting relative paths from URLs
-    const patterns = [
-      // Pattern 1: https://domain.com/path/to/image.jpg -> path/to/image.jpg
-      /https?:\/\/[^\/]+\/(.+)$/,
-      // Pattern 2: Handle your specific domain pattern
-      /https?:\/\/dev\.surf\.mt\/(.+)$/,
-      // Add more patterns as needed based on your URL structure
-    ];
+    console.log('🔗 Extracting relative path from URL:', url);
 
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) {
-        return match[1];
-      }
+    // Specific pattern for dev.surf.mt URLs
+    // Example: https://dev.surf.mt/images/detailed/123/image.jpg -> images/detailed/123/image.jpg
+    const devSurfPattern = /https?:\/\/dev\.surf\.mt\/(.+)$/;
+    const match = url.match(devSurfPattern);
+
+    if (match && match[1]) {
+      // Remove any query parameters
+      const relativePath = match[1].split('?')[0];
+      console.log(`✅ Extracted relative path: ${url} -> ${relativePath}`);
+      return relativePath;
     }
 
-    // Fallback: return the URL as-is if no pattern matches
-    console.warn('Could not extract relative path from URL:', url);
+    // Fallback: try general pattern
+    const generalPattern = /https?:\/\/[^\/]+\/(.+)$/;
+    const generalMatch = url.match(generalPattern);
+
+    if (generalMatch && generalMatch[1]) {
+      const relativePath = generalMatch[1].split('?')[0];
+      console.log(`✅ Extracted with fallback: ${url} -> ${relativePath}`);
+      return relativePath;
+    }
+
+    // Last resort: return URL as-is
+    console.warn(
+      '⚠️ Could not extract relative path, returning original URL:',
+      url,
+    );
     return url;
   } catch (error) {
-    console.error('Error extracting relative path from URL:', error);
+    console.error('❌ Error extracting relative path:', error);
     return url;
   }
 };

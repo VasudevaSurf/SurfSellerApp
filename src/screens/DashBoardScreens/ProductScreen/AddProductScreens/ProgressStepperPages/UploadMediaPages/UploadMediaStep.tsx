@@ -40,6 +40,8 @@ interface FileData {
   relativePath?: string; // For uploaded images
   viewUrl?: string; // For uploaded images
   isUploaded?: boolean;
+  // NEW: Add unique identifier for tracking deletions
+  originalIndex?: number; // Track which original image this was
 }
 
 interface UploadMediaStepProps {
@@ -61,10 +63,22 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
   const [files, setFiles] = useState<FileData[]>([]);
 
+  // NEW: Track which original images have been deleted
+  const [deletedOriginalImages, setDeletedOriginalImages] = useState<string[]>(
+    [],
+  );
+  const [originalImages, setOriginalImages] = useState<string[]>([]);
+
   // Pre-fill images if in edit mode
   useEffect(() => {
     if (editMode && formData.images && formData.images.length > 0) {
       console.log('🔄 Pre-filling images in edit mode:', formData.images);
+
+      // Store original images for deletion tracking
+      const originalImageList = Array.isArray(formData.images)
+        ? formData.images
+        : [];
+      setOriginalImages(originalImageList);
 
       const preFilledFiles = formData.images.map(
         (imageUrl: string, index: number) => {
@@ -90,15 +104,16 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               : '200 KB';
 
           return {
-            id: `prefilled-${index}-${Date.now()}`, // More unique ID
+            id: `prefilled-${index}-${Date.now()}`,
             name: filename,
             size: estimatedSize,
             date: 'Uploaded',
-            thumbnailSource: {uri: imageUrl}, // Use actual image URL
+            thumbnailSource: {uri: imageUrl},
             isExisting: true,
-            originalUrl: imageUrl, // Keep reference to original URL
-            viewUrl: imageUrl, // For display purposes
+            originalUrl: imageUrl,
+            viewUrl: imageUrl,
             isUploaded: true,
+            originalIndex: index, // NEW: Track which original image this is
           };
         },
       );
@@ -106,17 +121,11 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       setFiles(preFilledFiles);
       setUploadStatus('completed');
 
-      console.log(
-        '✅ Pre-filled files created:',
-        preFilledFiles.map(f => ({
-          id: f.id,
-          name: f.name,
-          originalUrl: f.originalUrl,
-        })),
-      );
+      console.log('✅ Pre-filled files created:', preFilledFiles);
     }
   }, [editMode, formData.images]);
 
+  // ENHANCED: Better image deletion handling
   const handleDelete = (fileId: string) => {
     Alert.alert('Delete File', 'Are you sure you want to delete this file?', [
       {
@@ -130,53 +139,62 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
           // Find the file being deleted
           const fileToDelete = files.find(file => file.id === fileId);
+          if (!fileToDelete) {
+            console.error('File to delete not found');
+            return;
+          }
+
+          // Remove from files list
           const updatedFiles = files.filter(file => file.id !== fileId);
           setFiles(updatedFiles);
 
-          // IMPORTANT: Update the form data to reflect the deletion
-          if (fileToDelete) {
-            // Remove from images array (both URLs and relative paths)
-            const updatedImages = formData.images.filter(img => {
-              // Handle both original URLs and view URLs
+          // CRITICAL FIX: Update formData.images to reflect the current state
+          // Remove the image from the images array based on what type it is
+          const updatedImages = formData.images.filter((img: string) => {
+            // For existing images, compare with originalUrl or viewUrl
+            if (fileToDelete.isExisting) {
               return (
-                img !== fileToDelete.originalUrl &&
-                img !== fileToDelete.viewUrl &&
-                img !== fileToDelete.uri
-              );
-            });
-
-            // Remove from relative paths array if it exists
-            let updatedRelativePaths = formData.imageRelativePaths || [];
-            if (fileToDelete.relativePath) {
-              updatedRelativePaths = updatedRelativePaths.filter(
-                path => path !== fileToDelete.relativePath,
+                img !== fileToDelete.originalUrl && img !== fileToDelete.viewUrl
               );
             }
+            // For new images, compare with uri and viewUrl
+            return img !== fileToDelete.uri && img !== fileToDelete.viewUrl;
+          });
 
-            console.log('📸 Image deletion - updating form data:', {
-              deletedFile: {
-                id: fileToDelete.id,
-                name: fileToDelete.name,
-                originalUrl: fileToDelete.originalUrl,
-                viewUrl: fileToDelete.viewUrl,
-                relativePath: fileToDelete.relativePath,
-              },
-              before: {
-                images: formData.images.length,
-                relativePaths: formData.imageRelativePaths?.length || 0,
-              },
-              after: {
-                images: updatedImages.length,
-                relativePaths: updatedRelativePaths.length,
-              },
-            });
-
-            // Update the form data with the new arrays
-            updateFormData({
-              images: updatedImages,
-              imageRelativePaths: updatedRelativePaths,
-            });
+          // Update relative paths - remove the relative path if it's a new upload
+          let updatedRelativePaths = formData.imageRelativePaths || [];
+          if (fileToDelete.relativePath && !fileToDelete.isExisting) {
+            updatedRelativePaths = updatedRelativePaths.filter(
+              (path: string) => path !== fileToDelete.relativePath,
+            );
           }
+
+          console.log('📸 Image deletion - updating form data:', {
+            deletedFile: {
+              id: fileToDelete.id,
+              name: fileToDelete.name,
+              isExisting: fileToDelete.isExisting,
+              originalUrl: fileToDelete.originalUrl,
+              viewUrl: fileToDelete.viewUrl,
+              uri: fileToDelete.uri,
+              relativePath: fileToDelete.relativePath,
+            },
+            before: {
+              images: formData.images?.length || 0,
+              relativePaths: formData.imageRelativePaths?.length || 0,
+            },
+            after: {
+              images: updatedImages.length,
+              relativePaths: updatedRelativePaths.length,
+            },
+          });
+
+          // SOLUTION: Update form data with the current state of images
+          // This ensures that the API receives only the images that are currently visible in the UI
+          updateFormData({
+            images: updatedImages,
+            imageRelativePaths: updatedRelativePaths,
+          });
 
           // If no files left, reset to initial state
           if (updatedFiles.length === 0) {
@@ -300,54 +318,46 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                   relativePath: image.relativePath,
                   viewUrl: image.viewUrl,
                   isUploaded: true,
-                  isExisting: false, // Mark as new image
+                  isExisting: false,
                 }),
               );
 
               const updatedFiles = [...files, ...newFiles];
               setFiles(updatedFiles);
 
-              // ENHANCED: Update form data with proper separation of existing and new images
-              const allUploadedFiles = updatedFiles.filter(
-                file => file.isUploaded,
-              );
+              // Get current images (existing ones that haven't been deleted)
+              const currentImages = formData.images || [];
 
-              // Separate existing images (URLs) from newly uploaded images (relative paths)
-              const existingImages = allUploadedFiles
-                .filter(file => file.isExisting)
-                .map(file => file.originalUrl || file.viewUrl || file.uri)
+              // Add new image URLs for display
+              const newImageUrls = uploadResult.uploadedImages
+                .map(image => image.viewUrl || image.uri)
                 .filter(url => url);
 
-              const newImageUrls = allUploadedFiles
-                .filter(file => !file.isExisting)
-                .map(file => file.viewUrl || file.uri)
-                .filter(url => url);
-
-              const newRelativePaths = allUploadedFiles
-                .filter(file => !file.isExisting && file.relativePath)
-                .map(file => file.relativePath)
+              // Get new relative paths for API
+              const newRelativePaths = uploadResult.uploadedImages
+                .map(image => image.relativePath)
                 .filter(path => path);
 
-              // Combine all images for display
-              const allImages = [...existingImages, ...newImageUrls];
-
-              // Get all relative paths (both existing converted and new)
+              // Combine all images and paths
+              const allImages = [...currentImages, ...newImageUrls];
               const allRelativePaths = [
-                ...(formData.imageRelativePaths || []), // Keep existing relative paths
-                ...newRelativePaths, // Add new relative paths
+                ...(formData.imageRelativePaths || []),
+                ...newRelativePaths,
               ];
 
               console.log('📸 Form data update after upload:', {
-                existingImages,
-                newImageUrls,
-                newRelativePaths,
-                allImages,
-                allRelativePaths,
+                currentImages: currentImages.length,
+                newImages: newImageUrls.length,
+                newRelativePaths: newRelativePaths.length,
+                allImages: allImages.length,
+                allRelativePaths: allRelativePaths.length,
               });
 
               updateFormData({
                 images: allImages,
                 imageRelativePaths: allRelativePaths,
+                // Keep existing deleted images tracking
+                deletedOriginalImages: formData.deletedOriginalImages || [],
               });
 
               setUploadStatus('completed');
@@ -367,7 +377,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 );
               }
             } else {
-              // Handle upload failures...
               console.error('Upload failed:', uploadResult.errors);
               Alert.alert(
                 'Upload Failed',
@@ -392,7 +401,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   };
 
   const handleCancelUpload = () => {
-    // Note: In a real implementation, you might want to cancel ongoing uploads
     setUploadStatus(files.length > 0 ? 'completed' : 'initial');
     setUploadProgress(0);
     setCurrentUpload({current: 0, total: 0});
