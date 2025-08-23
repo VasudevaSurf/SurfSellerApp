@@ -26,7 +26,10 @@ import {AddModal, ButtonConfig} from '../AddModal/AddModal';
 import {styles} from './ProductInfo.styles';
 import {ProductInfoProps} from './ProductInfo.types';
 import {navigate} from '../../../navigation/utils/navigationRef';
-import {deleteProduct} from '../../../redux/slices/productsSlice';
+import {
+  deleteProduct,
+  fetchProductDetails,
+} from '../../../redux/slices/productsSlice';
 import {AppDispatch, RootState} from '../../../redux/store';
 
 const DefaultProduct = require('../../../assets/images/defaultProduct.png');
@@ -50,6 +53,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [showModal, setShowModal] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
+  const [loadingProductDetails, setLoadingProductDetails] = useState(false);
 
   // Get userId and state from Redux
   const userId = useSelector(
@@ -62,12 +66,82 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   // Check if this product is being deleted or status is being updated
   const isDeleting = deletingProducts.includes(productId);
   const isUpdatingStatus = updatingStatus.includes(productId);
-  const isDisabled = disabled || isDeleting || isUpdatingStatus;
+  const isDisabled =
+    disabled || isDeleting || isUpdatingStatus || loadingProductDetails;
 
-  const handlePress = () => {
+  const handlePress = async () => {
     if (isDisabled) return;
 
-    // Navigate to AddProduct with pre-filled data for editing
+    try {
+      setLoadingProductDetails(true);
+      console.log('🔄 Loading full product details for editing:', productId);
+
+      if (!userId) {
+        Alert.alert('Error', 'Please login to edit products');
+        return;
+      }
+
+      // Fetch complete product details from API
+      const productDetails = await dispatch(
+        fetchProductDetails({userId, productId}),
+      ).unwrap();
+
+      console.log('✅ Product details loaded:', productDetails);
+
+      // Extract comprehensive product data from API response
+      const comprehensiveProductData = extractProductDataFromAPI(
+        productDetails,
+        productData,
+        {
+          productId,
+          productName,
+          sellerPrice,
+          stock,
+          active,
+          orderImage,
+        },
+      );
+
+      console.log(
+        '🎯 Navigating to edit with comprehensive data:',
+        comprehensiveProductData,
+      );
+
+      // Navigate to AddProduct with complete product data
+      navigate('Dashboard', {
+        screen: 'Product',
+        params: {
+          screen: 'AddProduct',
+          params: {
+            productId,
+            editMode: true,
+            productData: comprehensiveProductData,
+          },
+        },
+      });
+    } catch (error: any) {
+      console.error('❌ Failed to load product details:', error);
+      Alert.alert(
+        'Error',
+        'Failed to load product details. Please try again.',
+        [
+          {text: 'OK', style: 'default'},
+          {
+            text: 'Edit Anyway',
+            onPress: () => navigateWithBasicData(),
+            style: 'default',
+          },
+        ],
+      );
+    } finally {
+      setLoadingProductDetails(false);
+    }
+  };
+
+  // Fallback navigation with basic data if API fails
+  const navigateWithBasicData = () => {
+    console.log('📝 Using fallback basic product data');
+
     navigate('Dashboard', {
       screen: 'Product',
       params: {
@@ -75,31 +149,38 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         params: {
           productId,
           editMode: true,
-          productData: productData || {
-            productId,
-            productName,
-            price: sellerPrice.replace('€', ''), // Remove currency symbol
-            category: '', // Will be fetched from API
-            subcategory: '',
-            description: '',
-            images: orderImage ? [orderImage] : [],
-            productCode: '',
-            quantity: stock,
-            minQuantity: '',
-            maxQuantity: '',
-            trackInventory: false,
-            taxType: 'VAT',
-            brand: '',
-            color: '',
-            size: '',
-            weight: '',
-            manufacturer: '',
-            countryOfOrigin: '',
-            status: active ? 'A' : 'D',
-          },
+          productData: productData || createBasicProductData(),
         },
       },
     });
+  };
+
+  // Create basic product data as fallback
+  const createBasicProductData = () => {
+    return {
+      productId,
+      productName,
+      price: sellerPrice.replace(/[€$,]/g, ''), // Remove currency symbols and commas
+      category: '',
+      subcategory: '',
+      description: '',
+      images: orderImage ? [orderImage] : [],
+      imageRelativePaths: [], // Will be populated if images exist
+      productCode: '',
+      quantity: stock || '0',
+      minQuantity: '1',
+      maxQuantity: '',
+      trackInventory: true,
+      taxType: 'VAT',
+      brand: '',
+      color: '',
+      size: '',
+      weight: '',
+      manufacturer: '',
+      countryOfOrigin: '',
+      categoryPath: [],
+      status: active ? 'A' : 'D',
+    };
   };
 
   const handlePreview = () => {
@@ -136,7 +217,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           style: 'destructive',
           onPress: async () => {
             try {
-              console.log('Deleting product:', productId);
+              console.log('🗑️ Deleting product:', productId);
 
               // Dispatch delete action
               const result = await dispatch(
@@ -146,14 +227,14 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 }),
               ).unwrap();
 
-              console.log('Product deleted successfully:', result);
+              console.log('✅ Product deleted successfully:', result);
 
               // Show success message
               Alert.alert('Success', 'Product deleted successfully', [
                 {text: 'OK', style: 'default'},
               ]);
             } catch (error: any) {
-              console.error('Failed to delete product:', error);
+              console.error('❌ Failed to delete product:', error);
 
               // Show error message
               Alert.alert(
@@ -179,14 +260,14 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
     setShowModal(false);
   };
 
-  // UPDATED: Handle toggle change with proper error handling
+  // Handle toggle change with proper error handling
   const handleToggleChange = (isOn: boolean) => {
     if (isDisabled) {
       console.log('Toggle disabled, ignoring change');
       return;
     }
 
-    console.log('Toggle changed:', {productId, isOn});
+    console.log('🔄 Toggle changed:', {productId, isOn});
 
     // Call the parent handler
     if (onActiveChange) {
@@ -245,7 +326,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   };
 
   const handleImageError = () => {
-    console.log('Image load error, falling back to default');
+    console.log('🖼️ Image load error, falling back to default');
     setImageLoadError(true);
   };
 
@@ -274,6 +355,32 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           onError={handleImageError}
         />
 
+        {/* Show loading indicator for product details */}
+        {loadingProductDetails && (
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(91, 1, 207, 0.2)',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: getFigmaDimension(8),
+            }}>
+            <ActivityIndicator size="small" color={ColorPalette.PURPLE_300} />
+            <Typography
+              variant={TypographyVariant.LSMALL_MEDIUM}
+              text="Loading..."
+              customTextStyles={{
+                color: ColorPalette.PURPLE_300,
+                marginTop: getFigmaDimension(4),
+              }}
+            />
+          </View>
+        )}
+
         {/* Show deletion indicator */}
         {isDeleting && (
           <View
@@ -301,7 +408,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         )}
 
         {/* Show status update indicator */}
-        {isUpdatingStatus && !isDeleting && (
+        {isUpdatingStatus && !isDeleting && !loadingProductDetails && (
           <View
             style={{
               position: 'absolute',
@@ -487,4 +594,144 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       </View>
     </TouchableOpacity>
   );
+};
+
+// Helper function to extract comprehensive product data from API response
+const extractProductDataFromAPI = (
+  apiResponse: any,
+  existingProductData: any,
+  basicInfo: any,
+) => {
+  console.log('🔍 Extracting product data from API response:', apiResponse);
+
+  // Initialize with basic info
+  let extractedData = {
+    productId: basicInfo.productId,
+    productName: basicInfo.productName,
+    price: basicInfo.sellerPrice.replace(/[€$,]/g, ''),
+    category: '',
+    subcategory: '',
+    description: '',
+    images: [],
+    imageRelativePaths: [],
+    productCode: '',
+    quantity: basicInfo.stock || '0',
+    minQuantity: '1',
+    maxQuantity: '',
+    trackInventory: true,
+    taxType: 'VAT',
+    brand: '',
+    color: '',
+    size: '',
+    weight: '',
+    manufacturer: '',
+    countryOfOrigin: '',
+    categoryPath: [],
+    status: basicInfo.active ? 'A' : 'D',
+  };
+
+  try {
+    // Extract images from API response
+    if (apiResponse?.images && Array.isArray(apiResponse.images)) {
+      const imageUrls = apiResponse.images
+        .map((img: any) => {
+          if (typeof img === 'string') return img;
+          if (img?.image) return img.image;
+          if (img?.view_url) return img.view_url;
+          if (img?.url) return img.url;
+          return null;
+        })
+        .filter((url: string | null) => url !== null);
+
+      extractedData.images = imageUrls;
+      console.log('📸 Extracted images from API:', imageUrls);
+    } else if (basicInfo.orderImage) {
+      // Fallback to the basic image from the listing
+      extractedData.images = [basicInfo.orderImage];
+      console.log('📸 Using fallback image:', basicInfo.orderImage);
+    }
+
+    // Extract product details from sections if available
+    if (apiResponse?.sections && Array.isArray(apiResponse.sections)) {
+      apiResponse.sections.forEach((section: any) => {
+        if (section.blocks && Array.isArray(section.blocks)) {
+          section.blocks.forEach((block: any) => {
+            if (block.fields && Array.isArray(block.fields)) {
+              block.fields.forEach((field: any) => {
+                switch (field.field_name) {
+                  case 'product':
+                    extractedData.productName =
+                      field.value || extractedData.productName;
+                    break;
+                  case 'nt_price':
+                    extractedData.price = field.value || extractedData.price;
+                    break;
+                  case 'amount':
+                    extractedData.quantity =
+                      field.value || extractedData.quantity;
+                    break;
+                  case 'full_description':
+                    extractedData.description = field.value || '';
+                    break;
+                  case 'product_code':
+                    extractedData.productCode = field.value || '';
+                    break;
+                  case 'min_qty':
+                    extractedData.minQuantity =
+                      field.value || extractedData.minQuantity;
+                    break;
+                  case 'max_qty':
+                    extractedData.maxQuantity =
+                      field.value || extractedData.maxQuantity;
+                    break;
+                  case 'status':
+                    extractedData.status = field.value || extractedData.status;
+                    break;
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+
+    // Extract categories
+    if (
+      apiResponse?.category_listing &&
+      Array.isArray(apiResponse.category_listing)
+    ) {
+      const categories = apiResponse.category_listing;
+      if (categories.length > 0) {
+        extractedData.categoryPath = categories.map(
+          (cat: any) => cat.name || cat.category,
+        );
+        extractedData.category =
+          categories[0].name || categories[0].category || '';
+      }
+      console.log('📂 Extracted categories:', extractedData.categoryPath);
+    }
+
+    // Use existing product data if available for additional fields
+    if (existingProductData) {
+      extractedData = {
+        ...extractedData,
+        ...existingProductData,
+        // Preserve the extracted API data for key fields
+        images: extractedData.images,
+        categoryPath: extractedData.categoryPath,
+        description: extractedData.description,
+        productCode: extractedData.productCode,
+      };
+    }
+
+    console.log('✅ Final extracted product data:', extractedData);
+    return extractedData;
+  } catch (error) {
+    console.error('❌ Error extracting product data:', error);
+    // Return basic data as fallback
+    return {
+      ...extractedData,
+      images: basicInfo.orderImage ? [basicInfo.orderImage] : [],
+    };
+  }
 };

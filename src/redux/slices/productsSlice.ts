@@ -261,20 +261,106 @@ export const fetchProductDetails = createAsyncThunk(
     {rejectWithValue},
   ) => {
     try {
-      console.log('fetchProductDetails thunk called with:', {
+      console.log('🔍 Fetching product details for editing:', {
         userId,
         productId,
       });
+
       const response = await fetchProductDetailsApi(userId, productId);
-      return response;
+
+      console.log('📦 Raw product details response:', response);
+
+      // Enhanced product details extraction
+      const enhancedResponse = {
+        ...response,
+        // Ensure images array is properly formatted
+        images: extractImagesFromResponse(response),
+        // Add any additional processing needed
+        productData: response.product_data || response,
+      };
+
+      console.log('✅ Enhanced product details:', enhancedResponse);
+
+      return enhancedResponse;
     } catch (error: any) {
-      console.error('fetchProductDetails thunk error:', error);
+      console.error('❌ fetchProductDetails thunk error:', error);
       return rejectWithValue(
         error.message || 'Failed to fetch product details',
       );
     }
   },
 );
+
+const extractImagesFromResponse = (response: any): string[] => {
+  try {
+    const images: string[] = [];
+
+    // Method 1: Direct images array
+    if (response.images && Array.isArray(response.images)) {
+      response.images.forEach((img: any) => {
+        if (typeof img === 'string') {
+          images.push(img);
+        } else if (img && typeof img === 'object') {
+          // Handle various image object formats
+          const imageUrl = img.image || img.view_url || img.url || img.path;
+          if (imageUrl) {
+            images.push(imageUrl);
+          }
+        }
+      });
+    }
+
+    // Method 2: Check in sections (if your API uses this structure)
+    if (response.sections && Array.isArray(response.sections)) {
+      response.sections.forEach((section: any) => {
+        if (section.images && Array.isArray(section.images)) {
+          section.images.forEach((img: any) => {
+            const imageUrl =
+              typeof img === 'string' ? img : img?.image || img?.view_url;
+            if (imageUrl) {
+              images.push(imageUrl);
+            }
+          });
+        }
+      });
+    }
+
+    // Method 3: Check in product_data
+    if (response.product_data && response.product_data.images) {
+      const productImages = response.product_data.images;
+      if (Array.isArray(productImages)) {
+        productImages.forEach((img: any) => {
+          const imageUrl =
+            typeof img === 'string' ? img : img?.image || img?.view_url;
+          if (imageUrl) {
+            images.push(imageUrl);
+          }
+        });
+      }
+    }
+
+    // Method 4: Check for image_pairs or similar fields
+    if (response.image_pairs && Array.isArray(response.image_pairs)) {
+      response.image_pairs.forEach((pair: any) => {
+        if (pair.detailed && pair.detailed.image_path) {
+          images.push(pair.detailed.image_path);
+        }
+      });
+    }
+
+    // Remove duplicates and filter valid URLs
+    const uniqueImages = [...new Set(images)].filter(
+      img => img && typeof img === 'string' && img.trim() !== '',
+    );
+
+    console.log(`📸 Extracted ${uniqueImages.length} images:`, uniqueImages);
+
+    return uniqueImages;
+  } catch (error) {
+    console.error('❌ Error extracting images:', error);
+    return [];
+  }
+};
 
 // NEW: Product Status Update Thunk
 export const updateProductStatus = createAsyncThunk(
@@ -615,6 +701,20 @@ const productsSlice = createSlice({
         console.log('fetchProductDetails.rejected with:', action.payload);
         state.loading = false;
         state.error = action.payload as string;
+      })
+
+      .addCase(fetchProductDetails.fulfilled, (state, action) => {
+        console.log(
+          '✅ fetchProductDetails.fulfilled with enhanced data:',
+          action.payload,
+        );
+        state.loading = false;
+        state.productDetails = {
+          ...action.payload,
+          // Ensure images are properly set
+          images: action.payload.images || [],
+        };
+        state.error = null;
       })
 
       // Update Product Status Cases
