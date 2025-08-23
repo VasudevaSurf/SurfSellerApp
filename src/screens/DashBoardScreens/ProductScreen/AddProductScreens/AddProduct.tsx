@@ -100,6 +100,7 @@ const AddProduct = () => {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [originalImages, setOriginalImages] = useState<string[]>([]); // Track original images
 
   // Get userId from Redux store
   const userId = useSelector(
@@ -118,7 +119,7 @@ const AddProduct = () => {
     subcategory: '',
     description: '',
     images: [],
-    imageRelativePaths: [], // New field for API relative paths
+    imageRelativePaths: [],
     productCode: '',
     quantity: '',
     minQuantity: '',
@@ -140,15 +141,21 @@ const AddProduct = () => {
     if (editMode && productData) {
       console.log('🔄 Loading product data for editing:', productData);
 
+      // Store original images for comparison
+      const originalImageList = Array.isArray(productData.images)
+        ? productData.images
+        : [];
+      setOriginalImages(originalImageList);
+
       setFormData(prevData => ({
-        ...prevData, // Keep all existing fields as defaults
+        ...prevData,
         productId: productData.productId || productId || '',
         productName: productData.productName || '',
         price: productData.price || '',
         category: productData.category || '',
         subcategory: productData.subcategory || '',
         description: productData.description || '',
-        images: Array.isArray(productData.images) ? productData.images : [],
+        images: originalImageList,
         imageRelativePaths: Array.isArray(productData.imageRelativePaths)
           ? productData.imageRelativePaths
           : [],
@@ -192,39 +199,20 @@ const AddProduct = () => {
       // Debug log for image data
       if (newData.images || newData.imageRelativePaths) {
         console.log('🖼️ Image data update:', {
-          images: updatedData.images,
+          originalImages,
+          currentImages: updatedData.images,
           imageRelativePaths: updatedData.imageRelativePaths,
+          deletedImages: originalImages.filter(
+            img => !updatedData.images.includes(img),
+          ),
         });
       }
 
-      console.log('✅ Form data after update:', {
-        ...updatedData,
-        // Only log key fields to avoid noise
-        productName: updatedData.productName,
-        price: updatedData.price,
-        imageCount: updatedData.images.length,
-        relativePathCount: updatedData.imageRelativePaths.length,
-      });
       return updatedData;
     });
   };
 
-  const handleNext = () => {
-    console.log('➡️ Moving to next step from:', currentStep);
-    if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleBack = () => {
-    console.log('⬅️ Going back from step:', currentStep);
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    } else {
-      goBack();
-    }
-  };
-
+  // Enhanced handleSubmit with proper image deletion handling
   const handleSubmit = async () => {
     console.log('🚀 Form submitted:', {
       editMode,
@@ -232,12 +220,13 @@ const AddProduct = () => {
       formData: {
         productName: formData.productName,
         price: formData.price,
-        images: formData.images.length,
-        relativePaths: formData.imageRelativePaths.length,
+        originalImages: originalImages.length,
+        currentImages: formData.images.length,
+        newImages: formData.imageRelativePaths.length,
       },
     });
 
-    // Validate required fields and image upload status
+    // Validate required fields
     const requiredFields = ['productName', 'price'];
     const missingFields = requiredFields.filter(
       field => !formData[field]?.trim(),
@@ -252,7 +241,7 @@ const AddProduct = () => {
       return;
     }
 
-    // Check if images are properly uploaded (for new products)
+    // For new products, check if images are properly uploaded (if any were selected)
     if (!editMode && formData.images.length > 0) {
       if (
         !formData.imageRelativePaths ||
@@ -264,12 +253,25 @@ const AddProduct = () => {
         );
         return;
       }
+    }
 
-      console.log('✅ Images validation passed:', {
-        imageCount: formData.images.length,
-        relativePathCount: formData.imageRelativePaths.length,
-        relativePaths: formData.imageRelativePaths,
-      });
+    // For edit mode, check if new images are still uploading
+    if (editMode) {
+      const newImageCount = formData.images.filter(
+        img => !originalImages.includes(img),
+      ).length;
+      const uploadedNewImages =
+        formData.imageRelativePaths?.filter(
+          path => path && !path.startsWith('http'),
+        ).length || 0;
+
+      if (newImageCount > 0 && uploadedNewImages !== newImageCount) {
+        Alert.alert(
+          'Images Still Uploading',
+          'Please wait for new images to finish uploading before updating the product.',
+        );
+        return;
+      }
     }
 
     if (!userId) {
@@ -281,24 +283,44 @@ const AddProduct = () => {
     setIsSubmitting(true);
 
     try {
+      // Log image changes for debugging
+      if (editMode) {
+        const deletedImages = originalImages.filter(
+          img => !formData.images.includes(img),
+        );
+        const addedImages = formData.images.filter(
+          img => !originalImages.includes(img),
+        );
+
+        console.log('📸 Image changes detected:', {
+          original: originalImages,
+          current: formData.images,
+          deleted: deletedImages,
+          added: addedImages,
+          newUploads: formData.imageRelativePaths,
+        });
+      }
+
       // Transform form data to API format with enhanced image handling
       const apiData = transformFormDataToApiFormat(
         formData,
         userId,
         editMode,
         categories,
+        originalImages, // Pass original images for comparison
       );
 
-      console.log('🎯 API Data prepared:', {
+      console.log('🎯 API Data prepared for submission:', {
         product: apiData.product_data.product,
         price: apiData.product_data.price,
         imageCount: apiData.image_pair_positon?.length || 0,
         imagePaths: apiData.image_pair_positon || [],
+        isEdit: editMode,
       });
 
       let result;
       if (editMode) {
-        console.log('🔄 Updating existing product...');
+        console.log('🔄 Updating existing product with image changes...');
         result = await updateProductApi(apiData);
       } else {
         console.log('✨ Creating new product...');
@@ -342,6 +364,140 @@ const AddProduct = () => {
       setIsSubmitting(false);
     }
   };
+
+  const handleNext = () => {
+    console.log('➡️ Moving to next step from:', currentStep);
+    if (currentStep < STEPS.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    console.log('⬅️ Going back from step:', currentStep);
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      goBack();
+    }
+  };
+
+  // const handleSubmit = async () => {
+  //   console.log('🚀 Form submitted:', {
+  //     editMode,
+  //     productId,
+  //     formData: {
+  //       productName: formData.productName,
+  //       price: formData.price,
+  //       images: formData.images.length,
+  //       relativePaths: formData.imageRelativePaths.length,
+  //     },
+  //   });
+
+  //   // Validate required fields
+  //   const requiredFields = ['productName', 'price'];
+  //   const missingFields = requiredFields.filter(
+  //     field => !formData[field]?.trim(),
+  //   );
+
+  //   if (missingFields.length > 0) {
+  //     console.warn('⚠️ Missing required fields:', missingFields);
+  //     Alert.alert(
+  //       'Validation Error',
+  //       `Please fill in all required fields: ${missingFields.join(', ')}`,
+  //     );
+  //     return;
+  //   }
+
+  //   // For new products, check if images are properly uploaded (if any were selected)
+  //   if (!editMode && formData.images.length > 0) {
+  //     if (
+  //       !formData.imageRelativePaths ||
+  //       formData.imageRelativePaths.length === 0
+  //     ) {
+  //       Alert.alert(
+  //         'Images Not Uploaded',
+  //         'Please wait for images to finish uploading before saving the product.',
+  //       );
+  //       return;
+  //     }
+
+  //     console.log('✅ Images validation passed:', {
+  //       imageCount: formData.images.length,
+  //       relativePathCount: formData.imageRelativePaths.length,
+  //       relativePaths: formData.imageRelativePaths,
+  //     });
+  //   }
+
+  //   if (!userId) {
+  //     Alert.alert('Error', 'User session expired. Please login again.');
+  //     return;
+  //   }
+
+  //   // Show loading state
+  //   setIsSubmitting(true);
+
+  //   try {
+  //     // Transform form data to API format with enhanced image handling
+  //     const apiData = transformFormDataToApiFormat(
+  //       formData,
+  //       userId,
+  //       editMode,
+  //       categories,
+  //     );
+
+  //     console.log('🎯 API Data prepared:', {
+  //       product: apiData.product_data.product,
+  //       price: apiData.product_data.price,
+  //       imageCount: apiData.image_pair_positon?.length || 0,
+  //       imagePaths: apiData.image_pair_positon || [],
+  //     });
+
+  //     let result;
+  //     if (editMode) {
+  //       console.log('🔄 Updating existing product...');
+  //       result = await updateProductApi(apiData);
+  //     } else {
+  //       console.log('✨ Creating new product...');
+  //       result = await createProductApi(apiData);
+  //     }
+
+  //     console.log('🎉 Product operation successful:', result);
+
+  //     // Show success message
+  //     Alert.alert(
+  //       'Success',
+  //       editMode
+  //         ? 'Product updated successfully!'
+  //         : 'Product created successfully!',
+  //       [
+  //         {
+  //           text: 'OK',
+  //           onPress: () => goBack(),
+  //         },
+  //       ],
+  //     );
+  //   } catch (error: any) {
+  //     console.error('💥 Error saving product:', error);
+
+  //     Alert.alert(
+  //       editMode ? 'Update Failed' : 'Creation Failed',
+  //       error.message ||
+  //         `Failed to ${
+  //           editMode ? 'update' : 'create'
+  //         } product. Please try again.`,
+  //       [
+  //         {text: 'OK', style: 'default'},
+  //         {
+  //           text: 'Retry',
+  //           onPress: () => handleSubmit(),
+  //           style: 'default',
+  //         },
+  //       ],
+  //     );
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   const handleStepPress = (stepId: number) => {
     console.log('🎯 Navigating to step:', stepId);
@@ -405,29 +561,56 @@ const AddProduct = () => {
     return currentStep === STEPS.length ? 'Save Product' : 'Continue';
   };
 
-  // Check if current step is valid
+  // FIXED: Improved validation logic that accounts for edit mode
   const isValidStep = () => {
     switch (currentStep) {
       case 1:
+        // Product info step - always require name and price
         return formData.productName.trim() && formData.price.trim();
       case 2:
-        return true; // Media is optional
+        // Media step - always valid (images are optional)
+        return true;
       case 3:
+        // Inventory step - require product code
         return formData.productCode.trim();
       case 4:
-        return true; // Features are optional
+        // Features step - always valid (features are optional)
+        return true;
       default:
         return true;
     }
   };
 
-  // Check if images are still uploading
+  // FIXED: Improved image upload check that accounts for edit mode
   const areImagesUploading = () => {
+    // In edit mode, if we have existing images, don't block submission
+    if (editMode && formData.images.length > 0) {
+      return false; // Allow submission in edit mode even if some images are still uploading
+    }
+
+    // For new products, only block if there are images selected but none uploaded
     return (
+      !editMode &&
       formData.images.length > 0 &&
       (!formData.imageRelativePaths ||
         formData.imageRelativePaths.length !== formData.images.length)
     );
+  };
+
+  // FIXED: Better disabled state logic for edit mode
+  const isButtonDisabled = () => {
+    // Always disable if submitting
+    if (isSubmitting) return true;
+
+    // Always disable if step validation fails
+    if (!isValidStep()) return true;
+
+    // Only disable for image uploading on final step for new products
+    if (currentStep === STEPS.length && !editMode && areImagesUploading()) {
+      return true;
+    }
+
+    return false;
   };
 
   console.log('🔍 AddProduct render - Current step:', currentStep, {
@@ -435,6 +618,9 @@ const AddProduct = () => {
     imageCount: formData.images.length,
     relativePathCount: formData.imageRelativePaths.length,
     isUploading: areImagesUploading(),
+    isValidStep: isValidStep(),
+    isDisabled: isButtonDisabled(),
+    editMode,
   });
 
   return (
@@ -494,14 +680,9 @@ const AddProduct = () => {
           state={ButtonState.DEFAULT}
           size={ButtonSize.MEDIUM}
           withShadow
-          disabled={
-            !isValidStep() ||
-            isSubmitting ||
-            (currentStep === STEPS.length && areImagesUploading())
-          }
+          disabled={isButtonDisabled()}
           customStyles={{
-            opacity:
-              !isValidStep() || isSubmitting || areImagesUploading() ? 0.6 : 1,
+            opacity: isButtonDisabled() ? 0.6 : 1,
           }}
         />
       </View>

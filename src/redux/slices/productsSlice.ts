@@ -18,6 +18,7 @@ import {
 // Define the ProductDetail interface
 export interface ProductDetail extends Product {
   full_description?: string;
+  images?: string[]; // Add images array
   // Add any additional fields that might be in the product details response
 }
 
@@ -686,23 +687,12 @@ const productsSlice = createSlice({
         console.error('Failed to fetch filter counts:', action.payload);
       })
 
-      // Fetch Product Details
+      // FIXED: Fetch Product Details - Only ONE case now
       .addCase(fetchProductDetails.pending, state => {
         console.log('fetchProductDetails.pending');
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchProductDetails.fulfilled, (state, action) => {
-        console.log('fetchProductDetails.fulfilled with:', action.payload);
-        state.loading = false;
-        state.productDetails = action.payload;
-      })
-      .addCase(fetchProductDetails.rejected, (state, action) => {
-        console.log('fetchProductDetails.rejected with:', action.payload);
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-
       .addCase(fetchProductDetails.fulfilled, (state, action) => {
         console.log(
           '✅ fetchProductDetails.fulfilled with enhanced data:',
@@ -715,6 +705,11 @@ const productsSlice = createSlice({
           images: action.payload.images || [],
         };
         state.error = null;
+      })
+      .addCase(fetchProductDetails.rejected, (state, action) => {
+        console.log('fetchProductDetails.rejected with:', action.payload);
+        state.loading = false;
+        state.error = action.payload as string;
       })
 
       // Update Product Status Cases

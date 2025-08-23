@@ -64,6 +64,8 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   // Pre-fill images if in edit mode
   useEffect(() => {
     if (editMode && formData.images && formData.images.length > 0) {
+      console.log('🔄 Pre-filling images in edit mode:', formData.images);
+
       const preFilledFiles = formData.images.map(
         (imageUrl: string, index: number) => {
           // Extract filename from URL or create a descriptive name
@@ -88,13 +90,14 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               : '200 KB';
 
           return {
-            id: `prefilled-${index}`,
+            id: `prefilled-${index}-${Date.now()}`, // More unique ID
             name: filename,
             size: estimatedSize,
             date: 'Uploaded',
             thumbnailSource: {uri: imageUrl}, // Use actual image URL
             isExisting: true,
             originalUrl: imageUrl, // Keep reference to original URL
+            viewUrl: imageUrl, // For display purposes
             isUploaded: true,
           };
         },
@@ -102,6 +105,15 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
       setFiles(preFilledFiles);
       setUploadStatus('completed');
+
+      console.log(
+        '✅ Pre-filled files created:',
+        preFilledFiles.map(f => ({
+          id: f.id,
+          name: f.name,
+          originalUrl: f.originalUrl,
+        })),
+      );
     }
   }, [editMode, formData.images]);
 
@@ -114,25 +126,57 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       {
         text: 'Delete',
         onPress: () => {
+          console.log('🗑️ Deleting file:', fileId);
+
+          // Find the file being deleted
+          const fileToDelete = files.find(file => file.id === fileId);
           const updatedFiles = files.filter(file => file.id !== fileId);
           setFiles(updatedFiles);
 
-          // Update form data with relative paths for uploaded images
-          const imageData = updatedFiles
-            .filter(file => file.isUploaded)
-            .map(file => ({
-              relativePath: file.relativePath,
-              viewUrl: file.viewUrl || file.originalUrl || file.uri,
-            }));
+          // IMPORTANT: Update the form data to reflect the deletion
+          if (fileToDelete) {
+            // Remove from images array (both URLs and relative paths)
+            const updatedImages = formData.images.filter(img => {
+              // Handle both original URLs and view URLs
+              return (
+                img !== fileToDelete.originalUrl &&
+                img !== fileToDelete.viewUrl &&
+                img !== fileToDelete.uri
+              );
+            });
 
-          console.log('Delete - Updated image data:', imageData);
+            // Remove from relative paths array if it exists
+            let updatedRelativePaths = formData.imageRelativePaths || [];
+            if (fileToDelete.relativePath) {
+              updatedRelativePaths = updatedRelativePaths.filter(
+                path => path !== fileToDelete.relativePath,
+              );
+            }
 
-          updateFormData({
-            images: imageData.map(img => img.viewUrl), // For display
-            imageRelativePaths: imageData
-              .map(img => img.relativePath)
-              .filter(path => path && !path.startsWith('http')), // Only actual relative paths
-          });
+            console.log('📸 Image deletion - updating form data:', {
+              deletedFile: {
+                id: fileToDelete.id,
+                name: fileToDelete.name,
+                originalUrl: fileToDelete.originalUrl,
+                viewUrl: fileToDelete.viewUrl,
+                relativePath: fileToDelete.relativePath,
+              },
+              before: {
+                images: formData.images.length,
+                relativePaths: formData.imageRelativePaths?.length || 0,
+              },
+              after: {
+                images: updatedImages.length,
+                relativePaths: updatedRelativePaths.length,
+              },
+            });
+
+            // Update the form data with the new arrays
+            updateFormData({
+              images: updatedImages,
+              imageRelativePaths: updatedRelativePaths,
+            });
+          }
 
           // If no files left, reset to initial state
           if (updatedFiles.length === 0) {
@@ -181,7 +225,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           break;
 
         case 'drive':
-          // TODO: Implement drive integration if needed
           Alert.alert(
             'Coming Soon',
             'Drive integration will be available soon.',
@@ -217,9 +260,9 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
         if (validImages.length > 0) {
           console.log(
-            'Starting upload process for',
+            '🚀 Starting upload process for',
             validImages.length,
-            'images',
+            'new images',
           );
           setUploadStatus('uploading');
           setUploadProgress(0);
@@ -237,7 +280,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               },
             );
 
-            console.log('Upload result:', uploadResult);
+            console.log('📤 Upload result:', uploadResult);
 
             if (
               uploadResult.success &&
@@ -257,40 +300,59 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                   relativePath: image.relativePath,
                   viewUrl: image.viewUrl,
                   isUploaded: true,
+                  isExisting: false, // Mark as new image
                 }),
               );
 
               const updatedFiles = [...files, ...newFiles];
               setFiles(updatedFiles);
 
-              // Update form data with both display URLs and relative paths
+              // ENHANCED: Update form data with proper separation of existing and new images
               const allUploadedFiles = updatedFiles.filter(
                 file => file.isUploaded,
               );
-              const imageData = allUploadedFiles.map(file => ({
-                relativePath: file.relativePath || file.originalUrl,
-                viewUrl: file.viewUrl || file.originalUrl || file.uri,
-              }));
 
-              console.log('Image data for form update:', imageData);
+              // Separate existing images (URLs) from newly uploaded images (relative paths)
+              const existingImages = allUploadedFiles
+                .filter(file => file.isExisting)
+                .map(file => file.originalUrl || file.viewUrl || file.uri)
+                .filter(url => url);
 
-              updateFormData({
-                images: imageData.map(img => img.viewUrl), // For display
-                imageRelativePaths: imageData
-                  .map(img => img.relativePath)
-                  .filter(path => path && !path.startsWith('http')), // Only actual relative paths, not URLs
+              const newImageUrls = allUploadedFiles
+                .filter(file => !file.isExisting)
+                .map(file => file.viewUrl || file.uri)
+                .filter(url => url);
+
+              const newRelativePaths = allUploadedFiles
+                .filter(file => !file.isExisting && file.relativePath)
+                .map(file => file.relativePath)
+                .filter(path => path);
+
+              // Combine all images for display
+              const allImages = [...existingImages, ...newImageUrls];
+
+              // Get all relative paths (both existing converted and new)
+              const allRelativePaths = [
+                ...(formData.imageRelativePaths || []), // Keep existing relative paths
+                ...newRelativePaths, // Add new relative paths
+              ];
+
+              console.log('📸 Form data update after upload:', {
+                existingImages,
+                newImageUrls,
+                newRelativePaths,
+                allImages,
+                allRelativePaths,
               });
 
-              console.log('Updated form data with relative paths:', {
-                images: imageData.map(img => img.viewUrl),
-                imageRelativePaths: imageData
-                  .map(img => img.relativePath)
-                  .filter(path => path && !path.startsWith('http')),
+              updateFormData({
+                images: allImages,
+                imageRelativePaths: allRelativePaths,
               });
 
               setUploadStatus('completed');
 
-              // Show success/error message
+              // Show success message
               if (uploadResult.errors.length === 0) {
                 Alert.alert(
                   'Success',
@@ -301,53 +363,28 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 const errorCount = uploadResult.errors.length;
                 Alert.alert(
                   'Partial Success',
-                  `${successCount} image(s) uploaded successfully, ${errorCount} failed.\n\nErrors:\n${uploadResult.errors
-                    .slice(0, 3)
-                    .join('\n')}${errorCount > 3 ? '\n...and more' : ''}`,
+                  `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
                 );
               }
-            } else if (uploadResult.errors.length > 0) {
-              // All uploads failed
-              console.error('All uploads failed:', uploadResult.errors);
-              Alert.alert(
-                'Upload Failed',
-                `All image uploads failed:\n\n${uploadResult.errors
-                  .slice(0, 3)
-                  .join('\n')}${
-                  uploadResult.errors.length > 3 ? '\n...and more' : ''
-                }`,
-              );
-              setUploadStatus(files.length > 0 ? 'completed' : 'initial');
             } else {
-              // No images and no errors (shouldn't happen)
+              // Handle upload failures...
+              console.error('Upload failed:', uploadResult.errors);
               Alert.alert(
                 'Upload Failed',
-                'No images were uploaded successfully.',
+                'Failed to upload images. Please try again.',
               );
               setUploadStatus(files.length > 0 ? 'completed' : 'initial');
             }
           } catch (uploadError) {
-            console.error('Upload process error:', uploadError);
-            Alert.alert(
-              'Upload Error',
-              `Upload process failed: ${
-                uploadError.message || 'Unknown error'
-              }\n\nPlease check your internet connection and try again.`,
-            );
+            console.error('Upload error:', uploadError);
+            Alert.alert('Upload Error', 'Upload failed. Please try again.');
             setUploadStatus(files.length > 0 ? 'completed' : 'initial');
           }
-        } else {
-          Alert.alert('No Valid Images', 'No valid images were selected.');
         }
-      } else {
-        Alert.alert('No Images', 'No images were selected.');
       }
     } catch (error: any) {
       console.error('Selection error:', error);
-      Alert.alert(
-        'Selection Error',
-        error.message || 'Failed to select images',
-      );
+      Alert.alert('Selection Error', 'Failed to select images');
     } finally {
       setIsUploading(false);
       setCurrentUpload({current: 0, total: 0});

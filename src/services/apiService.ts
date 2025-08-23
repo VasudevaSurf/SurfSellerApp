@@ -1234,10 +1234,14 @@ export const updateProductApi = async (
       throw new Error('Product ID is required for update');
     }
 
-    console.log('Updating product with data:', productData);
+    console.log('🔄 Updating product with enhanced image handling:', {
+      productId: productData.product_id,
+      imageCount: productData.image_pair_positon?.length || 0,
+      imagePaths: productData.image_pair_positon,
+    });
 
     const response = await axios({
-      method: 'POST',
+      method: 'POST', // Using POST as per your existing API
       url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi`,
       headers: {
         Authorization: API_AUTH_HEADER,
@@ -1246,10 +1250,10 @@ export const updateProductApi = async (
       data: productData,
     });
 
-    console.log('Update product response:', response.data);
+    console.log('✅ Update product response:', response.data);
     return response.data as CreateProductResponse;
   } catch (error: any) {
-    console.error('Update Product API error:', error);
+    console.error('❌ Update Product API error:', error);
 
     if (error.response?.status === 404) {
       throw new Error('Product not found');
@@ -1270,8 +1274,14 @@ export const transformFormDataToApiFormat = (
   userId: string,
   editMode: boolean = false,
   availableCategories: CategoryData[] = [],
+  originalImages?: string[], // NEW: Add original images for comparison
 ): CreateProductRequest => {
-  console.log('🔄 Transforming form data to API format:', formData);
+  console.log('🔄 Transforming form data to API format:', {
+    editMode,
+    formDataImages: formData.images,
+    imageRelativePaths: formData.imageRelativePaths,
+    originalImages,
+  });
 
   // Extract category IDs from categoryPath
   let categoryIds: number[] = [309]; // Default fallback
@@ -1325,17 +1335,59 @@ export const transformFormDataToApiFormat = (
     user_id: userId,
   };
 
-  // Handle uploaded images - use the relative paths from successful uploads
-  if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
-    apiData.image_pair_positon = formData.imageRelativePaths.filter(
-      path => path && typeof path === 'string' && !path.startsWith('http'),
+  // ENHANCED: Handle images for both create and edit modes
+  if (editMode) {
+    console.log('📸 Processing images for edit mode...');
+
+    // For edit mode, we need to send ALL current images (both existing and new)
+    const allImagePaths: string[] = [];
+
+    // Add newly uploaded images (relative paths)
+    if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
+      const newRelativePaths = formData.imageRelativePaths.filter(
+        path => path && typeof path === 'string' && !path.startsWith('http'),
+      );
+      allImagePaths.push(...newRelativePaths);
+      console.log('✅ Added new uploaded images:', newRelativePaths);
+    }
+
+    // Add existing images that weren't deleted
+    // These are the images that are still in formData.images but are URLs (not relative paths)
+    const existingImageUrls = formData.images.filter(
+      (img: string) => img && img.startsWith('http'),
     );
-    console.log(
-      '✅ Using uploaded image relative paths:',
-      apiData.image_pair_positon,
-    );
+
+    // Convert existing URLs to relative paths if possible
+    const existingRelativePaths = existingImageUrls.map((url: string) => {
+      // Extract relative path from URL (assuming your URLs follow a pattern)
+      // Example: https://dev.surf.mt/images/product/123/image.jpg -> images/product/123/image.jpg
+      const match = url.match(/https?:\/\/[^\/]+\/(.+)/);
+      return match ? match[1] : url;
+    });
+
+    allImagePaths.push(...existingRelativePaths);
+    console.log('✅ Added existing images:', existingRelativePaths);
+
+    // Set the image paths for the API
+    if (allImagePaths.length > 0) {
+      apiData.image_pair_positon = allImagePaths;
+      console.log('📤 Final image paths for API:', apiData.image_pair_positon);
+    } else {
+      // If no images, explicitly set empty array to clear all images
+      apiData.image_pair_positon = [];
+      console.log('🗑️ No images - will clear all product images');
+    }
   } else {
-    console.log('⚠️ No valid image relative paths found');
+    // For create mode, only use newly uploaded images
+    if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
+      apiData.image_pair_positon = formData.imageRelativePaths.filter(
+        path => path && typeof path === 'string' && !path.startsWith('http'),
+      );
+      console.log(
+        '✅ Using newly uploaded images for create:',
+        apiData.image_pair_positon,
+      );
+    }
   }
 
   // Add product_id for updates
@@ -1345,10 +1397,42 @@ export const transformFormDataToApiFormat = (
 
   console.log('🎯 Final API data:', {
     ...apiData,
+    image_count: apiData.image_pair_positon?.length || 0,
     image_paths: apiData.image_pair_positon || [],
   });
 
   return apiData;
+};
+
+export const extractRelativePathFromUrl = (url: string): string => {
+  if (!url || !url.startsWith('http')) {
+    return url; // Already a relative path
+  }
+
+  try {
+    // Common patterns for extracting relative paths from URLs
+    const patterns = [
+      // Pattern 1: https://domain.com/path/to/image.jpg -> path/to/image.jpg
+      /https?:\/\/[^\/]+\/(.+)$/,
+      // Pattern 2: Handle your specific domain pattern
+      /https?:\/\/dev\.surf\.mt\/(.+)$/,
+      // Add more patterns as needed based on your URL structure
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    // Fallback: return the URL as-is if no pattern matches
+    console.warn('Could not extract relative path from URL:', url);
+    return url;
+  } catch (error) {
+    console.error('Error extracting relative path from URL:', error);
+    return url;
+  }
 };
 
 // ORDERS
