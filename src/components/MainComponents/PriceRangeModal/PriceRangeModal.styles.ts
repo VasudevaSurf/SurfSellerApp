@@ -23,11 +23,11 @@ export const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
   },
   headerText: {
-    textAlign: 'center',
+    textAlign: 'left',
     flexShrink: 1,
   },
   closeButton: {
@@ -41,46 +41,43 @@ export const styles = StyleSheet.create({
     gap: getScreenHeight(3),
   },
   priceRangeContainer: {
-    paddingHorizontal: getScreenWidth(2),
-  },
-  sliderContainer: {
+    paddingHorizontal: getScreenWidth(4),
     paddingVertical: getScreenHeight(2),
-    paddingHorizontal: getScreenWidth(2),
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+    borderRadius: BorderRadius.XSmall,
+    backgroundColor: ColorPalette.White,
+  },
+  priceRangeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: getScreenWidth(2),
+    marginBottom: getScreenHeight(2),
+  },
+  infoIcon: {
+    width: 20,
+    height: 20,
   },
   priceLabelsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: getScreenHeight(2),
+    alignItems: 'center', // Center align all items
+    marginVertical: getScreenHeight(1),
   },
   priceLabel: {
     color: ColorPalette.GREY_TEXT_400,
+    minWidth: getScreenWidth(12), // Ensure labels have consistent width
   },
-  selectedPricesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: getScreenHeight(2),
-    paddingHorizontal: getScreenWidth(2),
-  },
-  selectedPriceItem: {
+  sliderContainer: {
     flex: 1,
     alignItems: 'center',
-  },
-  selectedPriceLabel: {
-    color: ColorPalette.GREY_TEXT_300,
-    marginBottom: getScreenHeight(0.5),
-  },
-  selectedPriceValue: {
-    color: ColorPalette.GREY_TEXT_500,
-  },
-  separator: {
-    width: getScreenWidth(8),
-    height: 1,
-    backgroundColor: ColorPalette.GREY_200,
+    justifyContent: 'center',
     marginHorizontal: getScreenWidth(2),
   },
+
   slider: {
     height: 40,
+    width: '100%',
   },
   track: {
     height: 4,
@@ -88,13 +85,17 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.GREY_200,
   },
   selectedTrack: {
-    backgroundColor: ColorPalette.PURPLE_300,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#3A5AFE',
   },
   thumb: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: ColorPalette.PURPLE_300,
+    backgroundColor: ColorPalette.White,
+    borderWidth: 3,
+    borderColor: '#3A5AFE',
     shadowColor: ColorPalette.Black,
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
@@ -104,6 +105,7 @@ export const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     gap: getScreenWidth(3),
+    marginTop: getScreenHeight(2),
   },
   button: {
     flex: 1,

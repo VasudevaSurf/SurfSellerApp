@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Modal as RNModal, TouchableOpacity, View} from 'react-native';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import Svg, {Circle, Path} from 'react-native-svg';
 import CloseIcon from '../../../assets/icons/CloseIcon';
 import {ColorPalette} from '../../../config/colorPalette';
 import {
@@ -14,6 +15,33 @@ import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
 import {styles} from './PriceRangeModal.styles';
 import {PriceRangeModalProps} from './PriceRangeModal.types';
+
+// Info Icon Component
+const InfoIcon = () => (
+  <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <Circle
+      cx="9.99984"
+      cy="9.99996"
+      r="8.33333"
+      stroke="#4A4A4A"
+      strokeWidth="1.5"
+    />
+    <Path
+      d="M9.99325 12.5H10.0007"
+      stroke="#4A4A4A"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M10 10L10 6.66667"
+      stroke="#4A4A4A"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
 
 export const PriceRangeModal: React.FC<PriceRangeModalProps> = ({
   isVisible,
@@ -112,77 +140,52 @@ export const PriceRangeModal: React.FC<PriceRangeModalProps> = ({
 
           {/* Content */}
           <View style={styles.content}>
-            {/* Price Range Section */}
+            {/* Price Range Section with Border */}
             <View style={styles.priceRangeContainer}>
-              <Typography
-                variant={TypographyVariant.LMEDIUM_MEDIUM}
-                text="Filter Using the Price Range"
-                customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
-              />
-            </View>
-
-            {/* Min/Max Price Labels */}
-            <View style={styles.priceLabelsContainer}>
-              <Typography
-                variant={TypographyVariant.LMEDIUM_REGULAR}
-                text={formatPrice(minValue)}
-                customTextStyles={styles.priceLabel}
-              />
-              <Typography
-                variant={TypographyVariant.LMEDIUM_REGULAR}
-                text={formatPrice(maxValue)}
-                customTextStyles={styles.priceLabel}
-              />
-            </View>
-
-            {/* Multi Slider */}
-            <View style={styles.sliderContainer}>
-              <MultiSlider
-                values={priceRange}
-                sliderLength={280}
-                onValuesChange={handleSliderChange}
-                min={minValue}
-                max={maxValue}
-                step={step}
-                allowOverlap={false}
-                snapped={true}
-                minMarkerOverlapDistance={40}
-                customMarker={renderCustomMarker}
-                customTrack={renderCustomTrack}
-                selectedStyle={styles.selectedTrack}
-                unselectedStyle={styles.track}
-                containerStyle={styles.slider}
-                trackStyle={styles.track}
-                markerStyle={styles.thumb}
-                pressedMarkerStyle={[styles.thumb, {transform: [{scale: 1.2}]}]}
-              />
-            </View>
-
-            {/* Selected Price Values */}
-            <View style={styles.selectedPricesContainer}>
-              <View style={styles.selectedPriceItem}>
+              <View style={styles.priceRangeHeader}>
                 <Typography
-                  variant={TypographyVariant.LSMALL_REGULAR}
-                  text="Min Price"
-                  customTextStyles={styles.selectedPriceLabel}
+                  variant={TypographyVariant.LMEDIUM_MEDIUM}
+                  text="Filter Using the Price Range"
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
                 />
-                <Typography
-                  variant={TypographyVariant.LMEDIUM_BOLD}
-                  text={formatPrice(priceRange[0])}
-                  customTextStyles={styles.selectedPriceValue}
-                />
+                <InfoIcon />
               </View>
-              <View style={styles.separator} />
-              <View style={styles.selectedPriceItem}>
+
+              {/* Min/Max Price Labels with Slider in between */}
+              <View style={styles.priceLabelsContainer}>
                 <Typography
-                  variant={TypographyVariant.LSMALL_REGULAR}
-                  text="Max Price"
-                  customTextStyles={styles.selectedPriceLabel}
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
+                  text={formatPrice(priceRange[0])}
+                  customTextStyles={styles.priceLabel}
                 />
+                <View style={styles.sliderContainer}>
+                  <MultiSlider
+                    values={priceRange}
+                    sliderLength={200} // Adjusted to fit between labels
+                    onValuesChange={handleSliderChange}
+                    min={minValue}
+                    max={maxValue}
+                    step={step}
+                    allowOverlap={false}
+                    snapped={true}
+                    minMarkerOverlapDistance={40}
+                    customMarker={renderCustomMarker}
+                    customTrack={renderCustomTrack}
+                    selectedStyle={styles.selectedTrack}
+                    unselectedStyle={styles.track}
+                    containerStyle={styles.slider}
+                    trackStyle={styles.track}
+                    markerStyle={styles.thumb}
+                    pressedMarkerStyle={[
+                      styles.thumb,
+                      {transform: [{scale: 1.2}]},
+                    ]}
+                  />
+                </View>
                 <Typography
-                  variant={TypographyVariant.LMEDIUM_BOLD}
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
                   text={formatPrice(priceRange[1])}
-                  customTextStyles={styles.selectedPriceValue}
+                  customTextStyles={styles.priceLabel}
                 />
               </View>
             </View>
