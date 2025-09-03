@@ -52,12 +52,16 @@ import {
 } from '../../../redux/slices/productsSlice';
 import {AppDispatch, RootState} from '../../../redux/store';
 import {styles} from './ProductScreen.styles';
+import FilterIcon from '../../../assets/icons/FilterIcon';
+import {PriceRangeModal} from '../../../components/MainComponents/PriceRangeModal';
 
 const ProductScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchText, setSearchText] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isPriceModalVisible, setIsPriceModalVisible] = useState(false);
+  const [priceRange, setPriceRange] = useState({min: 0, max: 1000});
 
   // Multi-select state
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
@@ -68,6 +72,14 @@ const ProductScreen = () => {
   const userId = useSelector(
     (state: RootState) => state.auth.userData?.user_id,
   );
+
+  const handleOpenPriceModal = () => {
+    setIsPriceModalVisible(true);
+  };
+
+  const handleClosePriceModal = () => {
+    setIsPriceModalVisible(false);
+  };
 
   const {
     products = [],
@@ -636,6 +648,15 @@ const ProductScreen = () => {
     return selectedFilter.id === 'all' && !searchText.trim();
   };
 
+  const handleApplyPriceRange = (minPrice: number, maxPrice: number) => {
+    setPriceRange({min: minPrice, max: maxPrice});
+    console.log('Applied price range:', {minPrice, maxPrice});
+
+    // Here you can implement your filtering logic
+    // For example, filter products based on the price range
+    // filterProductsByPrice(minPrice, maxPrice);
+  };
+
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
@@ -664,9 +685,9 @@ const ProductScreen = () => {
             strokeWidth: 1.5,
           },
           {
-            icon: QuestionMarkIcon,
-            onPress: () => console.log('Info icon pressed'),
-            size: 24,
+            icon: FilterIcon,
+            onPress: handleOpenPriceModal, // This will open the modal
+            size: 18,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
@@ -1028,6 +1049,19 @@ const ProductScreen = () => {
         onClose={() => setShowDeleteConfirmModal(false)}
         headerText="Delete Products"
         buttons={deleteConfirmButtons}
+      />
+
+      <PriceRangeModal
+        isVisible={isPriceModalVisible}
+        onClose={handleClosePriceModal}
+        onApply={handleApplyPriceRange}
+        initialMinPrice={priceRange.min}
+        initialMaxPrice={priceRange.max}
+        minValue={0}
+        maxValue={1000}
+        currency="€"
+        headerText="Filter Product"
+        step={10}
       />
 
       {/* Floating Add Button (hidden in multi-select mode) */}
