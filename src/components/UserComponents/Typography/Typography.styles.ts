@@ -273,6 +273,12 @@ export const textBaseStyles = StyleSheet.create({
     fontStyle: 'normal',
     fontFamily: Fonts.POPPINS_SEMIBOLD,
   },
+  [TypographyVariant.LMEDIUM_EXTRASEMIBOLD_BOLD]: {
+    fontSize: 18,
+    fontStyle: 'normal',
+    fontFamily: Fonts.POPPINS_SEMIBOLD,
+    fontWeight: '700',
+  },
   [TypographyVariant.LSMALL_REGULAR]: {
     fontSize: 12,
     lineHeight: 14,

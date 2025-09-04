@@ -1,5 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import {Modal as RNModal, TouchableOpacity, View} from 'react-native';
+import {
+  Modal as RNModal,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from 'react-native';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import Svg, {Circle, Path} from 'react-native-svg';
 import CloseIcon from '../../../assets/icons/CloseIcon';
@@ -15,6 +20,7 @@ import {Typography} from '../../UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
 import {styles} from './PriceRangeModal.styles';
 import {PriceRangeModalProps} from './PriceRangeModal.types';
+import {getScreenWidth} from '../../../helpers/screenSize';
 
 // Info Icon Component
 const InfoIcon = () => (
@@ -62,6 +68,23 @@ export const PriceRangeModal: React.FC<PriceRangeModalProps> = ({
     initialMinPrice,
     initialMaxPrice,
   ]);
+
+  // Get screen dimensions for responsive slider
+  const screenWidth = Dimensions.get('window').width;
+
+  // Calculate slider width more accurately
+  const containerPadding = getScreenWidth(4) * 2; // horizontal padding from modal container
+  const priceRangePadding = getScreenWidth(4) * 2; // horizontal padding from priceRangeContainer
+  const labelWidth = getScreenWidth(15); // Fixed width for price labels to ensure consistency
+  const sliderMargin = getScreenWidth(3) * 2; // margin between labels and slider
+
+  // Calculate available slider width
+  const availableSliderWidth =
+    screenWidth -
+    containerPadding -
+    priceRangePadding -
+    labelWidth * 2 -
+    sliderMargin;
 
   useEffect(() => {
     setPriceRange([initialMinPrice, initialMaxPrice]);
@@ -125,7 +148,7 @@ export const PriceRangeModal: React.FC<PriceRangeModalProps> = ({
           <View style={styles.header}>
             <View style={styles.headerContent}>
               <Typography
-                variant={TypographyVariant.PMEDIUM_REGULAR}
+                variant={TypographyVariant.H5_BOLD}
                 text={headerText}
                 customTextStyles={[
                   styles.headerText,
@@ -144,24 +167,29 @@ export const PriceRangeModal: React.FC<PriceRangeModalProps> = ({
             <View style={styles.priceRangeContainer}>
               <View style={styles.priceRangeHeader}>
                 <Typography
-                  variant={TypographyVariant.LMEDIUM_MEDIUM}
+                  variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD_BOLD}
                   text="Filter Using the Price Range"
                   customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
                 />
                 <InfoIcon />
               </View>
 
-              {/* Min/Max Price Labels with Slider in between */}
+              {/* Fixed Min/Max Price Labels with Slider in between */}
               <View style={styles.priceLabelsContainer}>
-                <Typography
-                  variant={TypographyVariant.LMEDIUM_REGULAR}
-                  text={formatPrice(priceRange[0])}
-                  customTextStyles={styles.priceLabel}
-                />
+                {/* Min Price Label - Fixed width */}
+                <View style={styles.priceLabelWrapper}>
+                  <Typography
+                    variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD_BOLD}
+                    text={formatPrice(priceRange[0])}
+                    customTextStyles={styles.priceLabel}
+                  />
+                </View>
+
+                {/* Slider Container - Flex to fill remaining space */}
                 <View style={styles.sliderContainer}>
                   <MultiSlider
                     values={priceRange}
-                    sliderLength={200} // Adjusted to fit between labels
+                    sliderLength={Math.max(availableSliderWidth, 120)}
                     onValuesChange={handleSliderChange}
                     min={minValue}
                     max={maxValue}
@@ -182,11 +210,16 @@ export const PriceRangeModal: React.FC<PriceRangeModalProps> = ({
                     ]}
                   />
                 </View>
-                <Typography
-                  variant={TypographyVariant.LMEDIUM_REGULAR}
-                  text={formatPrice(priceRange[1])}
-                  customTextStyles={styles.priceLabel}
-                />
+
+                {/* Max Price Label - Fixed width */}
+                <View
+                  style={[styles.priceLabelWrapper, {alignItems: 'flex-end'}]}>
+                  <Typography
+                    variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD_BOLD}
+                    text={formatPrice(priceRange[1])}
+                    customTextStyles={styles.priceLabel}
+                  />
+                </View>
               </View>
             </View>
           </View>

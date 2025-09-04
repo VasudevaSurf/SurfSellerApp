@@ -62,6 +62,7 @@ export enum TypographyVariant {
   LMEDIUM_BOLD = 'lmedium_bold',
   LMEDIUM_EXTRABOLD = 'lmedium-extrabold',
   LMEDIUM_EXTRASEMIBOLD = 'lmedium-extrasemibold',
+  LMEDIUM_EXTRASEMIBOLD_BOLD= 'lmedium-extrasemibold_bold',
 
   LSMALL_REGULAR = 'lsmall_regular',
   LSMALL_MEDIUM = 'lsmall_medium',

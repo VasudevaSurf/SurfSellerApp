@@ -10,16 +10,16 @@ export const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: ColorPalette.White,
-    borderTopLeftRadius: BorderRadius.Small,
-    borderTopRightRadius: BorderRadius.Small,
-    paddingVertical: getScreenHeight(2.5),
-    paddingHorizontal: getScreenWidth(4),
+    borderTopLeftRadius: BorderRadius.XSmall,
+    borderTopRightRadius: BorderRadius.XSmall,
     gap: getScreenWidth(4),
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: getScreenHeight(2),
+    paddingHorizontal: getScreenWidth(4),
   },
   headerContent: {
     flex: 1,
@@ -37,16 +37,18 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   content: {
-    paddingVertical: getScreenHeight(2),
     gap: getScreenHeight(3),
+    paddingVertical: getScreenHeight(2),
+    paddingHorizontal: getScreenWidth(4),
   },
   priceRangeContainer: {
     paddingHorizontal: getScreenWidth(4),
     paddingVertical: getScreenHeight(2),
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    borderRadius: BorderRadius.XSmall,
+    borderWidth: 2,
+    borderColor: ColorPalette.SearchBack,
+    borderRadius: BorderRadius.Small,
     backgroundColor: ColorPalette.White,
+    marginBottom: getScreenHeight(12), // Large gap below the entire slider container
   },
   priceRangeHeader: {
     flexDirection: 'row',
@@ -60,58 +62,64 @@ export const styles = StyleSheet.create({
   },
   priceLabelsContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center', // Center align all items
-    marginVertical: getScreenHeight(1),
+  },
+  priceLabelWrapper: {
+    width: getScreenWidth(15), // Fixed width for consistent spacing
+    justifyContent: 'center',
   },
   priceLabel: {
     color: ColorPalette.GREY_TEXT_400,
-    minWidth: getScreenWidth(12), // Ensure labels have consistent width
+    textAlign: 'left', // Default alignment, will be overridden for right label
   },
   sliderContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: getScreenWidth(2),
+    marginHorizontal: getScreenWidth(3), // Equal margins on both sides
+    paddingVertical: getScreenHeight(1),
   },
-
   slider: {
-    height: 40,
-    width: '100%',
+    width: getScreenHeight(25),
+    height: getScreenHeight(3),
   },
   track: {
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: ColorPalette.GREY_200,
+    height: getScreenHeight(1),
+    borderRadius: BorderRadius.Small,
+    backgroundColor: ColorPalette.SearchBack,
+    marginVertical: -getScreenHeight(0.4),
   },
   selectedTrack: {
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#3A5AFE',
+    height: getScreenHeight(1),
+    borderRadius: BorderRadius.Small,
+    backgroundColor: ColorPalette.ProgressLine,
+    marginVertical: -getScreenHeight(0.4),
   },
   thumb: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: getScreenWidth(6),
+    height: getScreenHeight(3),
+    borderRadius: BorderRadius.XLarge,
     backgroundColor: ColorPalette.White,
-    borderWidth: 3,
-    borderColor: '#3A5AFE',
-    shadowColor: ColorPalette.Black,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    borderWidth: 5,
+    borderColor: ColorPalette.ProgressLine,
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
   footer: {
     flexDirection: 'row',
     gap: getScreenWidth(3),
     marginTop: getScreenHeight(2),
+    borderTopWidth: 1,
+    borderColor: ColorPalette.GREY_200,
+    paddingVertical: getScreenHeight(2),
+    paddingHorizontal: getScreenWidth(4),
   },
   button: {
     flex: 1,
   },
   cancelButton: {
     borderWidth: 1,
-    borderColor: ColorPalette.GREY_TEXT_400,
+    borderColor: ColorPalette.PURPLE_300,
   },
 });
