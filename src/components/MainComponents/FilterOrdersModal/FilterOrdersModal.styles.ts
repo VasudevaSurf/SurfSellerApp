@@ -13,14 +13,13 @@ export const styles = StyleSheet.create({
     borderTopLeftRadius: BorderRadius.Small,
     borderTopRightRadius: BorderRadius.Small,
     paddingVertical: getScreenHeight(2.5),
-    paddingHorizontal: getScreenWidth(4),
     gap: getScreenWidth(4),
-    maxHeight: '90%',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: getScreenWidth(4),
   },
   headerContent: {
     flex: 1,
@@ -41,6 +40,7 @@ export const styles = StyleSheet.create({
   content: {
     gap: getScreenHeight(1.5),
     paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(4),
   },
   section: {
     gap: getScreenHeight(1.5),
@@ -99,7 +99,9 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: getScreenWidth(3),
     borderTopWidth: 1,
-    borderTopColor: ColorPalette.GREY_100,
+    borderColor: ColorPalette.GREY_200,
+    paddingTop: getScreenHeight(2),
+    paddingHorizontal: getScreenWidth(4),
   },
   button: {
     flex: 1,

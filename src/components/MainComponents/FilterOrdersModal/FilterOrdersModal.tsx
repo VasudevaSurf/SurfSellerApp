@@ -317,7 +317,7 @@ export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
           {/* Footer */}
           <View style={styles.footer}>
             <Button
-              text="CLEAR FILTERS"
+              text="Cancel"
               onPress={handleClear}
               variant={ButtonVariant.PRIMARY}
               state={
@@ -329,7 +329,7 @@ export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
               disabled={!hasActiveFilters()}
             />
             <Button
-              text="APPLY"
+              text="Apply"
               onPress={handleApply}
               variant={ButtonVariant.PRIMARY}
               state={ButtonState.DEFAULT}
