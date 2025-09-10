@@ -24,6 +24,11 @@ import {
   updateOrderStatus,
   clearStatusUpdateError,
 } from '../../../redux/slices/ordersSlice';
+import FilterIcon from '../../../assets/icons/FilterIcon';
+import {
+  FilterOrdersModal,
+  FilterOrdersData,
+} from '../../../components/MainComponents/FilterOrdersModal';
 
 // Map API status codes to display status
 const convertOrderStatus = (apiStatus: string): OrderStatus => {
@@ -96,6 +101,25 @@ const OrderScreen = () => {
     updatingStatus,
     statusUpdateError,
   } = useSelector((state: RootState) => state.orders);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [currentFilters, setCurrentFilters] = useState<OrderFilters>({});
+
+  const handleApplyFilters = (filters: OrderFilters) => {
+    console.log('Applied filters:', filters);
+    setCurrentFilters(filters);
+
+    // Apply your filtering logic here
+    // For example, update your orders list based on filters
+    // fetchFilteredOrders(filters);
+  };
+
+  const openFilterModal = () => {
+    setIsFilterModalVisible(true);
+  };
+
+  const closeFilterModal = () => {
+    setIsFilterModalVisible(false);
+  };
 
   const [searchText, setSearchText] = useState('');
   const [searchTimeoutRef, setSearchTimeoutRef] =
@@ -318,9 +342,9 @@ const OrderScreen = () => {
             strokeWidth: 1.5,
           },
           {
-            icon: QuestionMarkIcon,
-            onPress: () => console.log('Info icon pressed'),
-            size: 24,
+            icon: FilterIcon,
+            onPress: openFilterModal,
+            size: 18,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
@@ -435,6 +459,12 @@ const OrderScreen = () => {
           </View>
         </ScrollView>
       )}
+      <FilterOrdersModal
+        isVisible={isFilterModalVisible}
+        onClose={closeFilterModal}
+        onApply={handleApplyFilters}
+        initialFilters={currentFilters}
+      />
     </SafeAreaView>
   );
 };

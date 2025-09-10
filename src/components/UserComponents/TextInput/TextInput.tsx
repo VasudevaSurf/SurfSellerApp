@@ -79,6 +79,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   customFocusedBorderWidth = 2,
   customErrorBorderWidth = 2,
   disabled = false,
+  validationEnabled = true, // New prop with default value true
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -97,9 +98,12 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
     new Animated.Value(hasValue ? 1 : 0),
   ).current;
 
+  // Determine if we should show error state
+  const shouldShowError = validationEnabled && (error || localError);
+
   const styles = createStyles(
     isFocused,
-    Boolean(error || localError),
+    Boolean(shouldShowError),
     Boolean(value),
     height,
     width,
@@ -121,8 +125,11 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
 
   const handleBlur = () => {
     setIsFocused(false);
-    const validationError = validateInput(value, type);
-    setLocalError(validationError);
+    // Only validate if validation is enabled
+    if (validationEnabled) {
+      const validationError = validateInput(value, type);
+      setLocalError(validationError);
+    }
     if (!value) {
       animateLabel(0);
     }
@@ -170,6 +177,13 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
       animateLabel(0);
     }
   }, [value, isFocused]); // Keep both dependencies but with proper logic
+
+  // Clear local error when validation is disabled
+  useEffect(() => {
+    if (!validationEnabled) {
+      setLocalError(null);
+    }
+  }, [validationEnabled]);
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -379,18 +393,16 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
         style={[
           getInputContainerStyle(),
           {
-            borderColor:
-              error || localError
-                ? customErrorBorderColor || ColorPalette.RED_100
-                : isFocused
-                ? customFocusedBorderColor || ColorPalette.GREY_TEXT_400
-                : customBorderColor || ColorPalette.GREY_100,
-            borderWidth:
-              error || localError
-                ? customErrorBorderWidth
-                : isFocused
-                ? customFocusedBorderWidth
-                : customBorderWidth,
+            borderColor: shouldShowError
+              ? customErrorBorderColor || ColorPalette.RED_100
+              : isFocused
+              ? customFocusedBorderColor || ColorPalette.GREY_TEXT_400
+              : customBorderColor || ColorPalette.GREY_100,
+            borderWidth: shouldShowError
+              ? customErrorBorderWidth
+              : isFocused
+              ? customFocusedBorderWidth
+              : customBorderWidth,
           },
         ]}>
         {renderLeftSection()}
@@ -412,7 +424,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
         {renderRightSection()}
       </View>
       <Animated.Text style={labelStyle}>{label}</Animated.Text>
-      {(error || localError) && (
+      {shouldShowError && (
         <Typography
           variant={TypographyVariant.PSMALL_REGULAR}
           customTextStyles={styles.error}

@@ -46,4 +46,5 @@ export interface TextInputProps {
   customFocusedBorderWidth?: number; // New prop
   customErrorBorderWidth?: number;
   disabled?: boolean;
+  validationEnabled?: boolean; // New prop to control validation
 }
