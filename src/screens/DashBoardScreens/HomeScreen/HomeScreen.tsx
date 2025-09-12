@@ -1,5 +1,4 @@
 // src/screens/DashBoardScreens/HomeScreen/HomeScreen.tsx
-
 import React, {useEffect, useMemo, useState} from 'react';
 import {
   ScrollView,
@@ -34,6 +33,7 @@ import {RootState} from '../../../redux/store';
 import {useSelector} from 'react-redux';
 import ArrowRightStyle from '../../../assets/icons/ArrowRightStyle';
 import {useDashboard} from '../../../hooks/useDashboard';
+import SalesChart from './components/SalesChart'; // Import the React Native chart component
 
 const HomeScreen = () => {
   const userData = useSelector((state: RootState) => state.auth.userData);
@@ -52,9 +52,11 @@ const HomeScreen = () => {
     ordersCount,
     orderCounts,
     refreshDashboard,
+    dashboardData, // Get the full dashboard data for the chart
   } = useDashboard();
 
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedToggle, setSelectedToggle] = useState('7days'); // For toggle buttons
 
   const handleNewOrderPress = (
     filterType: 'pending' | 'toShip' | 'delivered' = 'pending',
@@ -74,6 +76,12 @@ const HomeScreen = () => {
     setRefreshing(true);
     await refreshDashboard();
     setRefreshing(false);
+  };
+
+  // Handle toggle button change
+  const handleToggleChange = (value: string) => {
+    setSelectedToggle(value);
+    console.log('Toggle changed to:', value);
   };
 
   const menuItems = useMemo(
@@ -157,15 +165,51 @@ const HomeScreen = () => {
       }));
   }, [recentOrders, selectedOption]);
 
-  // Calculate percentage changes (mock data for now - you'd calculate these from historical data)
-  const calculateTrend = () => ({
-    sales: '+12.8%',
-    orders: '+8.3%',
-    products: '0%',
-    income: '0%',
-  });
+  // Calculate percentage changes (you can replace this with real historical data calculation)
+  const calculateTrend = () => {
+    // You can implement real trend calculation here using historical data
+    // For now, using mock data as requested in original implementation
+    return {
+      sales: '+12.8%',
+      orders: '+8.3%',
+      products: '0%',
+      income: '0%',
+    };
+  };
 
   const trends = calculateTrend();
+
+  // Calculate current week sales from the dashboard data using statistics
+  const currentWeekSales = useMemo(() => {
+    if (!dashboardData?.statistics) return '€0.00';
+    
+    // Find sales from statistics array
+    const salesStat = dashboardData.statistics.find(
+      (stat: any) => stat.icon === 'sales'
+    );
+    
+    if (salesStat && salesStat.value !== '€0.00') {
+      return salesStat.value;
+    }
+
+    // Fallback: calculate from recent orders if statistics show 0
+    if (!dashboardData?.recent_orders) return '€0.00';
+    
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const weeklyTotal = dashboardData.recent_orders
+      .filter(order => {
+        const orderDate = new Date(parseInt(order.timestamp) * 1000);
+        return orderDate >= oneWeekAgo;
+      })
+      .reduce((sum, order) => {
+        const amount = parseFloat(order.total.replace('€', '')) || 0;
+        return sum + amount;
+      }, 0);
+    
+    return `€${weeklyTotal.toFixed(2)}`;
+  }, [dashboardData]);
 
   if (loading && !refreshing) {
     return (
@@ -229,6 +273,8 @@ const HomeScreen = () => {
             tintColor={ColorPalette.PURPLE_300}
           />
         }>
+        
+        {/* Get Started Section */}
         <View style={styles.verifyContainer}>
           <View style={styles.textVerifyContainer}>
             <Typography
@@ -236,19 +282,18 @@ const HomeScreen = () => {
               text="Get Started with Selling"
               customTextStyles={styles.textOne}
               numberOfLines={2}
-              adjustsFontSizeToFit
             />
             <Typography
               variant={TypographyVariant.LSMALL_REGULAR}
               text="Complete these steps to activate your seller account."
               customTextStyles={styles.textTwo}
               numberOfLines={2}
-              adjustsFontSizeToFit
             />
           </View>
           <View style={styles.verifyStepsContainer}></View>
         </View>
 
+        {/* Orders Menu */}
         <View style={styles.OrderContainer}>
           {menuItems.map((item, index) => (
             <MenuItem
@@ -277,6 +322,7 @@ const HomeScreen = () => {
           ))}
         </View>
 
+        {/* Statistics Cards */}
         <View style={styles.statsContainer}>
           <View style={styles.containerOne}>
             <View style={styles.totalSales}>
@@ -300,7 +346,6 @@ const HomeScreen = () => {
                   text={sales}
                   customTextStyles={styles.countValue}
                   numberOfLines={1}
-                  adjustsFontSizeToFit
                 />
                 <Typography
                   variant={TypographyVariant.LMEDIUM_REGULAR}
@@ -331,7 +376,6 @@ const HomeScreen = () => {
                   text={ordersCount.toString()}
                   customTextStyles={styles.countValue}
                   numberOfLines={1}
-                  adjustsFontSizeToFit
                 />
                 <Typography
                   variant={TypographyVariant.LMEDIUM_REGULAR}
@@ -387,7 +431,6 @@ const HomeScreen = () => {
                       text={income}
                       customTextStyles={styles.countValue}
                       numberOfLines={1}
-                      adjustsFontSizeToFit
                     />
                     <Typography
                       variant={TypographyVariant.LMEDIUM_REGULAR}
@@ -440,7 +483,6 @@ const HomeScreen = () => {
                     text={taxes.replace('€', '')}
                     customTextStyles={styles.countValue}
                     numberOfLines={1}
-                    adjustsFontSizeToFit
                   />
                   <Typography
                     variant={TypographyVariant.LSMALL_REGULAR}
@@ -454,6 +496,7 @@ const HomeScreen = () => {
           </View>
         </View>
 
+        {/* Sales Overview Section with Chart */}
         <View style={styles.salesOverview}>
           <View style={styles.salesHeading}>
             <View style={styles.LeftHeading}>
@@ -472,19 +515,52 @@ const HomeScreen = () => {
                 />
                 <Typography
                   variant={TypographyVariant.LSMALL_SEMIBOLD}
-                  text={sales}
+                  text={currentWeekSales}
                   customTextStyles={styles.countCaptionOne}
                   numberOfLines={1}
                 />
               </View>
             </View>
             <View style={styles.rightHeadingButtons}>
-              <ToggleButtons buttonStyle={styles.buttonStyles} />
+              <ToggleButtons 
+                buttonStyle={styles.buttonStyles}
+                onSelectionChange={handleToggleChange}
+                initialActiveButton={selectedToggle}
+                leftButtonText="Last 7 days"
+                rightButtonText="Monthly"
+                leftButtonValue="7days"
+                rightButtonValue="monthly"
+              />
             </View>
           </View>
-          <View style={styles.salesGraph}></View>
+          
+          {/* Sales Chart */}
+          <View style={styles.salesGraph}>
+            {dashboardData ? (
+              <SalesChart 
+                dashboardData={dashboardData} 
+                selectedPeriod={selectedToggle as '7days' | 'monthly'}
+              />
+            ) : (
+              <View style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#f8f9fa',
+                borderRadius: 8
+              }}>
+                <ActivityIndicator size="small" color={ColorPalette.PURPLE_300} />
+                <Typography
+                  variant={TypographyVariant.LSMALL_REGULAR}
+                  text="Loading chart..."
+                  customTextStyles={{marginTop: 8, color: ColorPalette.GREY_TEXT_300}}
+                />
+              </View>
+            )}
+          </View>
         </View>
 
+        {/* Recent Orders Section */}
         <View style={styles.recentOrdersContainer}>
           <View style={styles.recentOrderTitle}>
             <Typography
