@@ -182,22 +182,22 @@ const HomeScreen = () => {
   // Calculate current week sales from the dashboard data using statistics
   const currentWeekSales = useMemo(() => {
     if (!dashboardData?.statistics) return '€0.00';
-    
+
     // Find sales from statistics array
     const salesStat = dashboardData.statistics.find(
-      (stat: any) => stat.icon === 'sales'
+      (stat: any) => stat.icon === 'sales',
     );
-    
+
     if (salesStat && salesStat.value !== '€0.00') {
       return salesStat.value;
     }
 
     // Fallback: calculate from recent orders if statistics show 0
     if (!dashboardData?.recent_orders) return '€0.00';
-    
+
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
+
     const weeklyTotal = dashboardData.recent_orders
       .filter(order => {
         const orderDate = new Date(parseInt(order.timestamp) * 1000);
@@ -207,7 +207,7 @@ const HomeScreen = () => {
         const amount = parseFloat(order.total.replace('€', '')) || 0;
         return sum + amount;
       }, 0);
-    
+
     return `€${weeklyTotal.toFixed(2)}`;
   }, [dashboardData]);
 
@@ -273,7 +273,6 @@ const HomeScreen = () => {
             tintColor={ColorPalette.PURPLE_300}
           />
         }>
-        
         {/* Get Started Section */}
         <View style={styles.verifyContainer}>
           <View style={styles.textVerifyContainer}>
@@ -522,7 +521,7 @@ const HomeScreen = () => {
               </View>
             </View>
             <View style={styles.rightHeadingButtons}>
-              <ToggleButtons 
+              <ToggleButtons
                 buttonStyle={styles.buttonStyles}
                 onSelectionChange={handleToggleChange}
                 initialActiveButton={selectedToggle}
@@ -533,27 +532,34 @@ const HomeScreen = () => {
               />
             </View>
           </View>
-          
+
           {/* Sales Chart */}
           <View style={styles.salesGraph}>
             {dashboardData ? (
-              <SalesChart 
-                dashboardData={dashboardData} 
+              <SalesChart
+                dashboardData={dashboardData}
                 selectedPeriod={selectedToggle as '7days' | 'monthly'}
               />
             ) : (
-              <View style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: '#f8f9fa',
-                borderRadius: 8
-              }}>
-                <ActivityIndicator size="small" color={ColorPalette.PURPLE_300} />
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: 8,
+                }}>
+                <ActivityIndicator
+                  size="small"
+                  color={ColorPalette.PURPLE_300}
+                />
                 <Typography
                   variant={TypographyVariant.LSMALL_REGULAR}
                   text="Loading chart..."
-                  customTextStyles={{marginTop: 8, color: ColorPalette.GREY_TEXT_300}}
+                  customTextStyles={{
+                    marginTop: 8,
+                    color: ColorPalette.GREY_TEXT_300,
+                  }}
                 />
               </View>
             )}
