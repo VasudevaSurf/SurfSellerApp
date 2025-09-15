@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View} from 'react-native';
+import {Pressable, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import InfoIcon from '../../../../../../assets/icons/InfoIcon';
 import Dropdown from '../../../../../../components/MainComponents/DropdownModal/Dropdown';
 import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
@@ -8,6 +8,7 @@ import {TypographyVariant} from '../../../../../../components/UserComponents/Typ
 import {ColorPalette} from '../../../../../../config/colorPalette';
 import {getScreenWidth} from '../../../../../../helpers/screenSize';
 import {styles} from './FeaturesStep.styles';
+import CheckIcon from '../../../../../../assets/icons/CheckIcon';
 
 const BRAND_OPTIONS = [
   {value: 'Kinnie', label: 'Kinnie'},
@@ -83,6 +84,15 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
   const [selectedSize, setSelectedSize] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
 
+  const [shippingPrice, setShippingPrice] = useState('');
+  const [shippingWeight, setShippingWeight] = useState('');
+  const [freeShippingChecked, setFreeShippingChecked] = useState(false);
+  const [boxDimensionLength, setBoxDimensionLength] = useState('');
+  const [boxDimensionWidth, setBoxDimensionWidth] = useState('');
+  const [boxDimensionHeigth, setBoxDimensionHeight] = useState('');
+  const [unitsPerBox, setUnitsPerBox] = useState('');
+  const [extraUnitsInSameBox, setExtraUnitsInSameBox] = useState(''); //optional
+
   // State to manage which dropdown is currently active
   const [activeDropdown, setActiveDropdown] = useState(null);
 
@@ -129,6 +139,38 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
     updateFormData({countryOfOrigin: value});
   };
 
+  const handleShippingWeightChange = (value: string) => {
+    setShippingWeight(value);
+  };
+
+  const handleShippingPriceChange = (value: string) => {
+    setShippingPrice(value);
+  };
+
+  const handleFreeShippingCheckbox = (checked: boolean) => {
+    setFreeShippingChecked(checked);
+  };
+
+  const handleUnitsPerBoxChange = (value: string) => {
+    setUnitsPerBox(value);
+  };
+
+  const handleExtraUnitInSameBoxChange = (value: string) => {
+    setExtraUnitsInSameBox(value);
+  };
+
+  const handleBoxDimensionLengthChange = (value: string) => {
+    setBoxDimensionLength(value);
+  };
+
+  const handleBoxDimensionWidthChange = (value: string) => {
+    setBoxDimensionWidth(value);
+  };
+
+  const handleBoxDimensionHeightChange = (value: string) => {
+    setBoxDimensionHeight(value);
+  };
+
   // Handler for dropdown toggle
   const handleDropdownToggle = (dropdownName, isOpen) => {
     if (isOpen) {
@@ -149,7 +191,7 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <InfoIcon
-            size={16}
+            size={26}
             color={ColorPalette.IconColor}
             style={undefined}
           />
@@ -227,7 +269,7 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <InfoIcon
-            size={16}
+            size={26}
             color={ColorPalette.IconColor}
             style={undefined}
           />
@@ -262,6 +304,128 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
               }
             />
           </View>
+        </View>
+      </View>
+
+      {/* Shipping Property Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Typography
+            variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+            text="Shipping properties"
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+          />
+          <InfoIcon
+            size={26}
+            color={ColorPalette.IconColor}
+            style={undefined}
+          />
+        </View>
+
+        <View style={styles.inputContainerOne}>
+          {/* Weight input */}
+          <AnimatedTextInput
+            label="Enter weight(Kgs : 0.000)"
+            value={shippingWeight}
+            onChangeText={handleShippingWeightChange}
+            keyboardType="numeric"
+          />
+
+          {/* Enter Price */}
+          <AnimatedTextInput
+            label="Enter price"
+            value={shippingPrice}
+            onChangeText={handleShippingPriceChange}
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={styles.checkBoxContainer}>
+          <TouchableOpacity
+            style={styles.checkboxRow}
+            onPress={() => handleFreeShippingCheckbox(!freeShippingChecked)}>
+            <View style={[styles.checkbox]}>
+              {freeShippingChecked && (
+                <View style={styles.checkmark}>
+                  <CheckIcon size={24} />
+                </View>
+              )}
+            </View>
+            <Typography
+              text="Free Shipping"
+              variant={TypographyVariant.PMEDIUM_REGULAR}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Item in a box Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Typography
+            variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+            text="Item in a box"
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+          />
+          <InfoIcon
+            size={26}
+            color={ColorPalette.IconColor}
+            style={undefined}
+          />
+        </View>
+
+        <AnimatedTextInput
+          label="Enter units per box (e.g., 18)"
+          value={unitsPerBox}
+          onChangeText={handleUnitsPerBoxChange}
+          keyboardType="numeric"
+        />
+        <AnimatedTextInput
+          label="Enter extra units in the same box (optional)"
+          value={extraUnitsInSameBox}
+          onChangeText={handleExtraUnitInSameBoxChange}
+          keyboardType="numeric"
+          required={false}
+        />
+      </View>
+
+      {/* Box Dimension Section*/}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Typography
+            variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+            text="Box Dimension"
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+          />
+          <InfoIcon
+            size={26}
+            color={ColorPalette.IconColor}
+            style={undefined}
+          />
+        </View>
+
+        <View style={styles.inputContainerOne}>
+          {/* Weight input */}
+          <AnimatedTextInput
+            label="Enter length (Inch : 0.000)"
+            value={boxDimensionLength}
+            onChangeText={handleBoxDimensionLengthChange}
+            keyboardType="numeric"
+          />
+          {/* Weight input */}
+          <AnimatedTextInput
+            label="Enter width (Inch : 0.000)"
+            value={boxDimensionWidth}
+            onChangeText={handleBoxDimensionWidthChange}
+            keyboardType="numeric"
+          />
+          {/* Weight input */}
+          <AnimatedTextInput
+            label="Enter height (Inch : 0.000)"
+            value={boxDimensionHeigth}
+            onChangeText={handleBoxDimensionHeightChange}
+            keyboardType="numeric"
+          />
         </View>
       </View>
     </View>
