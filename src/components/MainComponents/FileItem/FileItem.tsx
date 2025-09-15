@@ -1,7 +1,7 @@
 import React from 'react';
 import {Image, TouchableOpacity, View} from 'react-native';
 import ImageWithStarIcon from '../../../assets/icons/NewProductIcons/ImageWithStarIcon';
-import TrashIcon from '../../../assets/icons/NewProductIcons/TrashIcon';
+import TrashIcon, { DeleteIcon } from '../../../assets/icons/NewProductIcons/TrashIcon';
 import {ColorPalette} from '../../../config/colorPalette';
 import {Button, ButtonSize, ButtonType} from '../../UserComponents/Button';
 import {Typography} from '../../UserComponents/Typography/Typography';
@@ -40,38 +40,38 @@ const FileItem: React.FC<FileItemProps> = ({
           {isNumberSource ? (
             <>
               <Image source={thumbnailSource} style={styles.thumbnail} />
-              {onDelete && (
+              {/* {onDelete && (
                 <TouchableOpacity
                   style={styles.deleteIconOverlay}
                   onPress={onDelete}
                   activeOpacity={0.7}>
-                  <TrashIcon size={16} />
+                  <DeleteIcon size={18} />
                 </TouchableOpacity>
-              )}
+              )} */}
             </>
           ) : isUriSource ? (
             <>
               <Image source={thumbnailSource} style={styles.thumbnail} />
-              {onDelete && (
+              {/* {onDelete && (
                 <TouchableOpacity
                   style={styles.deleteIconOverlay}
                   onPress={onDelete}
                   activeOpacity={0.7}>
-                  <TrashIcon size={16} />
+                  <DeleteIcon size={16} />
                 </TouchableOpacity>
-              )}
+              )} */}
             </>
           ) : (
             <View style={styles.placeholderThumbnail}>
               <ImageWithStarIcon size={24} color="#9101CF" style={undefined} />
-              {onDelete && (
+              {/* {onDelete && (
                 <TouchableOpacity
                   style={styles.deleteIconOverlay}
                   onPress={onDelete}
                   activeOpacity={0.7}>
-                  <TrashIcon size={20} />
+                  <DeleteIcon size={20} />
                 </TouchableOpacity>
-              )}
+              )} */}
             </View>
           )}
         </View>
@@ -97,7 +97,7 @@ const FileItem: React.FC<FileItemProps> = ({
       </View>
 
       <View style={styles.actions}>
-        {onOptimise && (
+        {/* {onOptimise && (
           <Button
             text="Optimise"
             size={ButtonSize.SMALL}
@@ -114,6 +114,15 @@ const FileItem: React.FC<FileItemProps> = ({
               />
             )}
           />
+        )} */}
+
+        {onDelete && (
+          <TouchableOpacity
+            style={styles.deleteIconOverlay}
+            onPress={onDelete}
+            activeOpacity={0.7}>
+            <DeleteIcon size={18} />
+          </TouchableOpacity>
         )}
       </View>
     </View>

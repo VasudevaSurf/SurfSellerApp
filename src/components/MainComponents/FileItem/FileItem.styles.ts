@@ -5,6 +5,7 @@ import {BorderRadius} from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -39,15 +40,15 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     top: getScreenHeight(-1.25),
     left: getScreenWidth(-2.5),
-    backgroundColor: ColorPalette.White,
+    backgroundColor: 'rgba(255, 153, 181, 0.2)',
     borderRadius: getScreenWidth(5),
-    padding: getScreenWidth(1),
-    zIndex: 10,
-    shadowColor: 'rgba(0, 0, 0, 0.15)',
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 10,
-    shadowRadius: 5,
-    elevation: 3,
+    padding: getScreenWidth(3),
+    // zIndex: 10,
+    // shadowColor: 'rgba(0, 0, 0, 0.15)',
+    // shadowOffset: {width: 0, height: 0},
+    // shadowOpacity: 10,
+    // shadowRadius: getScreenWidth(5),
+    // elevation: 0,
   },
   textContainer: {
     gap: getScreenHeight(0.5),
@@ -63,6 +64,7 @@ export const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginRight: getScreenWidth(7),
   },
   optimiseButton: {
     borderRadius: getScreenWidth(4.5),
