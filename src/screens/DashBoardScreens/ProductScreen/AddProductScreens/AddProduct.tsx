@@ -1,3 +1,5 @@
+// Updated AddProduct.tsx with proper user ID and product ID passing
+
 import React, {useState, useEffect} from 'react';
 import {ScrollView, View, Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -68,7 +70,6 @@ interface RouteParams {
 
 type AddProductRouteProp = RouteProp<{AddProduct: RouteParams}, 'AddProduct'>;
 
-// Define the complete form data interface
 interface FormData {
   productId: string;
   productName: string;
@@ -77,7 +78,7 @@ interface FormData {
   subcategory: string;
   description: string;
   images: string[];
-  imageRelativePaths: string[]; // For API relative paths
+  imageRelativePaths: string[];
   productCode: string;
   quantity: string;
   minQuantity: string;
@@ -92,6 +93,8 @@ interface FormData {
   countryOfOrigin: string;
   categoryPath: string[];
   categoryDisplay?: string;
+  // NEW: Add user and product context for image operations
+  userId?: string;
 }
 
 const AddProduct = () => {
@@ -100,6 +103,7 @@ const AddProduct = () => {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [originalImages, setOriginalImages] = useState<string[]>([]);
 
   // Get userId from Redux store
   const userId = useSelector(
@@ -118,7 +122,7 @@ const AddProduct = () => {
     subcategory: '',
     description: '',
     images: [],
-    imageRelativePaths: [], // New field for API relative paths
+    imageRelativePaths: [],
     productCode: '',
     quantity: '',
     minQuantity: '',
@@ -133,22 +137,27 @@ const AddProduct = () => {
     countryOfOrigin: '',
     categoryPath: [],
     categoryDisplay: '',
+    // NEW: Pass user context for image operations
+    userId: userId,
   });
 
   // Pre-fill form data if in edit mode
   useEffect(() => {
     if (editMode && productData) {
-      console.log('🔄 Loading product data for editing:', productData);
+      const originalImageList = Array.isArray(productData.images)
+        ? productData.images
+        : [];
+      setOriginalImages(originalImageList);
 
       setFormData(prevData => ({
-        ...prevData, // Keep all existing fields as defaults
+        ...prevData,
         productId: productData.productId || productId || '',
         productName: productData.productName || '',
         price: productData.price || '',
         category: productData.category || '',
         subcategory: productData.subcategory || '',
         description: productData.description || '',
-        images: Array.isArray(productData.images) ? productData.images : [],
+        images: originalImageList,
         imageRelativePaths: Array.isArray(productData.imageRelativePaths)
           ? productData.imageRelativePaths
           : [],
@@ -170,74 +179,91 @@ const AddProduct = () => {
         categoryDisplay: productData.categoryPath
           ? productData.categoryPath.join(' > ')
           : '',
+        // NEW: Ensure user context is passed
+        userId: userId,
       }));
     }
-  }, [editMode, productData, productId]);
+  }, [editMode, productData, productId, userId]);
 
-  // Safe update function that preserves existing data
+  // Update user context when userId changes
+  useEffect(() => {
+    if (userId) {
+      setFormData(prevData => ({
+        ...prevData,
+        userId: userId,
+      }));
+    }
+  }, [userId]);
+
   const updateFormData = (newData: Partial<FormData>) => {
-    console.log('📝 Updating form data:', newData);
-
     setFormData(prevData => {
       const updatedData = {
         ...prevData,
         ...newData,
       };
 
-      // If categoryPath is updated, also update categoryDisplay
       if (newData.categoryPath) {
         updatedData.categoryDisplay = newData.categoryPath.join(' > ');
       }
 
-      // Debug log for image data
-      if (newData.images || newData.imageRelativePaths) {
-        console.log('🖼️ Image data update:', {
-          images: updatedData.images,
-          imageRelativePaths: updatedData.imageRelativePaths,
-        });
-      }
-
-      console.log('✅ Form data after update:', {
-        ...updatedData,
-        // Only log key fields to avoid noise
-        productName: updatedData.productName,
-        price: updatedData.price,
-        imageCount: updatedData.images.length,
-        relativePathCount: updatedData.imageRelativePaths.length,
-      });
       return updatedData;
     });
   };
 
-  const handleNext = () => {
-    console.log('➡️ Moving to next step from:', currentStep);
-    if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
+  // const debugImageState = () => {
+  //   console.log('🔍 DEBUG: Current image state before API call:', {
+  //     editMode,
+  //     productId: formData.productId,
+  //     userId: formData.userId,
 
-  const handleBack = () => {
-    console.log('⬅️ Going back from step:', currentStep);
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    } else {
-      goBack();
-    }
-  };
+  //     // Original images (what we started with)
+  //     originalImages: {
+  //       count: originalImages.length,
+  //       list: originalImages,
+  //     },
+
+  //     // Current form data images (what's currently shown in UI)
+  //     formDataImages: {
+  //       count: formData.images?.length || 0,
+  //       list: formData.images || [],
+  //     },
+
+  //     // Uploaded image paths (new images that were uploaded)
+  //     imageRelativePaths: {
+  //       count: formData.imageRelativePaths?.length || 0,
+  //       list: formData.imageRelativePaths || [],
+  //     },
+
+  //     // What should be sent to API
+  //     shouldSendToAPI: {
+  //       existingImages:
+  //         formData.images?.filter((img: string) => img.startsWith('http')) ||
+  //         [],
+  //       newImages:
+  //         formData.imageRelativePaths?.filter(
+  //           (path: string) => path && !path.startsWith('http'),
+  //         ) || [],
+  //     },
+  //   });
+  // };
 
   const handleSubmit = async () => {
-    console.log('🚀 Form submitted:', {
-      editMode,
-      productId,
-      formData: {
-        productName: formData.productName,
-        price: formData.price,
-        images: formData.images.length,
-        relativePaths: formData.imageRelativePaths.length,
-      },
-    });
+    // Add debug logging
+    // debugImageState();
 
-    // Validate required fields and image upload status
+    // console.log('🚀 Form submitted:', {
+    //   editMode,
+    //   productId: formData.productId,
+    //   userId: formData.userId,
+    //   formData: {
+    //     productName: formData.productName,
+    //     price: formData.price,
+    //     currentImages: formData.images?.length || 0,
+    //     imageRelativePaths: formData.imageRelativePaths?.length || 0,
+    //   },
+    // });
+
+    // Validate required fields
     const requiredFields = ['productName', 'price'];
     const missingFields = requiredFields.filter(
       field => !formData[field]?.trim(),
@@ -252,7 +278,7 @@ const AddProduct = () => {
       return;
     }
 
-    // Check if images are properly uploaded (for new products)
+    // For new products, check if images are properly uploaded (if any were selected)
     if (!editMode && formData.images.length > 0) {
       if (
         !formData.imageRelativePaths ||
@@ -264,12 +290,6 @@ const AddProduct = () => {
         );
         return;
       }
-
-      console.log('✅ Images validation passed:', {
-        imageCount: formData.images.length,
-        relativePathCount: formData.imageRelativePaths.length,
-        relativePaths: formData.imageRelativePaths,
-      });
     }
 
     if (!userId) {
@@ -281,37 +301,37 @@ const AddProduct = () => {
     setIsSubmitting(true);
 
     try {
-      // Transform form data to API format with enhanced image handling
+      // Transform form data to API format
       const apiData = transformFormDataToApiFormat(
         formData,
         userId,
         editMode,
         categories,
+        originalImages,
       );
 
-      console.log('🎯 API Data prepared:', {
-        product: apiData.product_data.product,
-        price: apiData.product_data.price,
-        imageCount: apiData.image_pair_positon?.length || 0,
-        imagePaths: apiData.image_pair_positon || [],
-      });
+      // console.log('🎯 Final API call:', {
+      //   method: editMode ? 'UPDATE' : 'CREATE',
+      //   productId: apiData.product_id,
+      //   productName: apiData.product_data.product,
+      //   imageCount: apiData.image_pair_positon?.length || 0,
+      //   imagePaths: apiData.image_pair_positon || [],
+      // });
 
       let result;
       if (editMode) {
-        console.log('🔄 Updating existing product...');
+        // console.log('🔄 Updating existing product...');
         result = await updateProductApi(apiData);
       } else {
-        console.log('✨ Creating new product...');
+        // console.log('✨ Creating new product...');
         result = await createProductApi(apiData);
       }
-
-      console.log('🎉 Product operation successful:', result);
 
       // Show success message
       Alert.alert(
         'Success',
         editMode
-          ? 'Product updated successfully!'
+          ? 'Product updated successfully! Image changes have been saved.'
           : 'Product created successfully!',
         [
           {
@@ -343,14 +363,25 @@ const AddProduct = () => {
     }
   };
 
+  const handleNext = () => {
+    if (currentStep < STEPS.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      goBack();
+    }
+  };
+
   const handleStepPress = (stepId: number) => {
-    console.log('🎯 Navigating to step:', stepId);
     setCurrentStep(stepId);
   };
 
   const renderStep = () => {
-    console.log('🖥️ Rendering step:', currentStep);
-
     switch (currentStep) {
       case 1:
         return (
@@ -400,18 +431,17 @@ const AddProduct = () => {
     }
 
     if (editMode) {
-      return currentStep === STEPS.length ? 'Update Product' : 'Continue';
+      return currentStep === STEPS.length ? 'Update Product' : 'Next';
     }
-    return currentStep === STEPS.length ? 'Save Product' : 'Continue';
+    return currentStep === STEPS.length ? 'Save Product' : 'Next';
   };
 
-  // Check if current step is valid
   const isValidStep = () => {
     switch (currentStep) {
       case 1:
         return formData.productName.trim() && formData.price.trim();
       case 2:
-        return true; // Media is optional
+        return true; // Images are optional
       case 3:
         return formData.productCode.trim();
       case 4:
@@ -421,27 +451,17 @@ const AddProduct = () => {
     }
   };
 
-  // Check if images are still uploading
-  const areImagesUploading = () => {
-    return (
-      formData.images.length > 0 &&
-      (!formData.imageRelativePaths ||
-        formData.imageRelativePaths.length !== formData.images.length)
-    );
+  const isButtonDisabled = () => {
+    if (isSubmitting) return true;
+    if (!isValidStep()) return true;
+    return false;
   };
-
-  console.log('🔍 AddProduct render - Current step:', currentStep, {
-    formDataKeys: Object.keys(formData),
-    imageCount: formData.images.length,
-    relativePathCount: formData.imageRelativePaths.length,
-    isUploading: areImagesUploading(),
-  });
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name={getHeaderTitle()}
-        variant={TypographyVariant.H6_SMALL_SEMIBOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={
           <ArrowLeft
@@ -459,7 +479,7 @@ const AddProduct = () => {
         onStepPress={handleStepPress}
       />
 
-      <View style={[styles.mainContainer, {paddingBottom: getScreenHeight(9)}]}>
+      <View style={[styles.mainContainer, {paddingBottom: getScreenHeight(7)}]}>
         <ScrollView
           style={styles.mainContainer}
           contentContainerStyle={[styles.scrollContent]}
@@ -494,14 +514,9 @@ const AddProduct = () => {
           state={ButtonState.DEFAULT}
           size={ButtonSize.MEDIUM}
           withShadow
-          disabled={
-            !isValidStep() ||
-            isSubmitting ||
-            (currentStep === STEPS.length && areImagesUploading())
-          }
+          disabled={isButtonDisabled()}
           customStyles={{
-            opacity:
-              !isValidStep() || isSubmitting || areImagesUploading() ? 0.6 : 1,
+            opacity: isButtonDisabled() ? 0.6 : 1,
           }}
         />
       </View>
