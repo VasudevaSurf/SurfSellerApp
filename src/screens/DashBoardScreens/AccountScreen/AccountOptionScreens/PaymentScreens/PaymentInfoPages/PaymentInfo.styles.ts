@@ -86,13 +86,13 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   withdrawButton: {
-    width: getScreenWidth(26),
-    height: getScreenHeight(4),
+    width: getScreenWidth(28),
+    height: getScreenHeight(5),
     borderRadius: BorderRadius.Full,
     paddingHorizontal: getScreenWidth(2.5),
   },
   withdrawButtonText: {
-    fontSize: getScreenWidth(3),
+    fontSize: getScreenWidth(3.7),
   },
 
   // Tab Navigation
@@ -125,15 +125,19 @@ export const styles = StyleSheet.create({
     alignSelf: 'center', // Center the wrapper
     padding: getScreenHeight(0.5),
     gap: getScreenWidth(3), // Gap between tab buttons
+    marginHorizontal: getScreenWidth(4),
   },
   tabButton: {
+    flex: 1,
     paddingVertical: getScreenHeight(1),
-    paddingHorizontal: getScreenWidth(10),
+    // paddingHorizontal: getScreenWidth(10),
     borderRadius: BorderRadius.XSmall,
     backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   activeTabButton: {
-    backgroundColor: ColorPalette.ProgressLine, // Purple color for active tab
+    backgroundColor: 'rgba(58, 90, 254, 0.12)',
   },
 
   // Tab Content
@@ -196,5 +200,11 @@ export const styles = StyleSheet.create({
   customButton: {
     borderWidth: 1,
     borderColor: ColorPalette.PURPLE_300,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: getScreenWidth(5),
   },
 });
