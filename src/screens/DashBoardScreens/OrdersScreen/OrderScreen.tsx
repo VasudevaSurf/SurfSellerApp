@@ -24,6 +24,8 @@ import {
   updateOrderStatus,
   clearStatusUpdateError,
 } from '../../../redux/slices/ordersSlice';
+import AnimatedLoader from '../../../assets/icons/LoaderIcon';
+import FilterIcon from '../../../assets/icons/FilterIcon';
 
 // Map API status codes to display status
 const convertOrderStatus = (apiStatus: string): OrderStatus => {
@@ -100,22 +102,22 @@ const OrderScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [searchTimeoutRef, setSearchTimeoutRef] =
     useState<NodeJS.Timeout | null>(null);
+  const [showFilterModal, setShowFilterModal] = useState(false); // added for filter icon
 
   // Debugging: Log userId and orders
-  useEffect(() => {
-    console.log('OrderScreen - userId:', userId);
-    console.log('OrderScreen - Orders received:', orders?.length || 0);
+  // useEffect(() => {
+  //   console.log('OrderScreen - userId:', userId);
+  //   console.log('OrderScreen - Orders received:', orders?.length || 0);
 
-    if (orders && orders.length > 0) {
-      console.log('OrderScreen - First order:', orders[0]);
-    }
-  }, [userId, orders]);
+  //   if (orders && orders.length > 0) {
+  //     console.log('OrderScreen - First order:', orders[0]);
+  //   }
+  // }, [userId, orders]);
 
   // Initialize orders fetch
   useEffect(() => {
     if (userId) {
       const apiStatus = getApiStatusFromFilter(statusFilter);
-      console.log('OrderScreen - Initial fetch with status:', apiStatus);
       dispatch(fetchOrders({userId, status: apiStatus}));
     }
   }, [dispatch, userId]);
@@ -181,15 +183,11 @@ const OrderScreen = () => {
       const timeoutId = setTimeout(() => {
         if (userId) {
           if (text.trim()) {
-            console.log('OrderScreen - Searching with term:', text);
             dispatch(searchOrders({userId, searchTerm: text}));
           } else {
             // Clear search, fetch with current filter
             const apiStatus = getApiStatusFromFilter(statusFilter);
-            console.log(
-              'OrderScreen - Clearing search, fetching with status:',
-              apiStatus,
-            );
+
             dispatch(fetchOrders({userId, status: apiStatus}));
           }
         }
@@ -204,14 +202,10 @@ const OrderScreen = () => {
   const handleSearch = useCallback(() => {
     if (userId) {
       if (searchText.trim()) {
-        console.log('OrderScreen - Manual search with term:', searchText);
         dispatch(searchOrders({userId, searchTerm: searchText}));
       } else {
         const apiStatus = getApiStatusFromFilter(statusFilter);
-        console.log(
-          'OrderScreen - Manual search cleared, fetching with status:',
-          apiStatus,
-        );
+
         dispatch(fetchOrders({userId, status: apiStatus}));
       }
     }
@@ -221,10 +215,6 @@ const OrderScreen = () => {
   const handleStatusChange = useCallback(
     async (orderId: string, newStatus: OrderStatus) => {
       try {
-        console.log(
-          `OrderScreen - Status change for order ${orderId} to ${newStatus}`,
-        );
-
         if (!userId) {
           console.error('No userId available for status update');
           return;
@@ -251,15 +241,11 @@ const OrderScreen = () => {
   // Handle filter selection
   const handleFilterSelect = useCallback(
     (filter: {id: string; label: string}) => {
-      console.log('OrderScreen - Filter selected:', filter.id);
       dispatch(setStatusFilter(filter.id));
 
       if (userId) {
         const apiStatus = getApiStatusFromFilter(filter.id);
-        console.log(
-          'OrderScreen - Fetching with new filter, status:',
-          apiStatus,
-        );
+
         dispatch(fetchOrders({userId, status: apiStatus}));
       }
     },
@@ -268,8 +254,6 @@ const OrderScreen = () => {
 
   // Handle card press to navigate to order details
   const handleCardPress = useCallback((params: any) => {
-    console.log('OrderScreen - Card pressed with params:', params);
-
     navigate('Dashboard', {
       screen: 'Orders',
       params: {
@@ -303,23 +287,36 @@ const OrderScreen = () => {
     };
   }, [statusUpdateError, searchTimeoutRef, dispatch]);
 
+  console.log(
+    'loading:',
+    loading,
+    'error:',
+    error,
+    'orders:',
+    formattedOrders.length,
+  );
+
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
         name="Orders"
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.GREY_TEXT_500}
         rightIcons={[
           {
             icon: BellIcon,
-            onPress: () => console.log('Bell icon pressed'),
-            size: 20,
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'NotificationScreen'},
+              }),
+            size: 22,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
           {
-            icon: QuestionMarkIcon,
-            onPress: () => console.log('Info icon pressed'),
+            icon: FilterIcon,
+            onPress: () => setShowFilterModal(prev => !prev),
             size: 24,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,
@@ -364,13 +361,13 @@ const OrderScreen = () => {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+          <AnimatedLoader size={52} />
           <Typography
-            text="Loading orders..."
-            variant={TypographyVariant.PMEDIUM_REGULAR}
+            text="Loading"
+            variant={TypographyVariant.PSMALL_MEDIUM}
             customTextStyles={{
-              color: ColorPalette.GREY_TEXT_300,
-              marginTop: 16,
+              color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+              marginTop: getScreenHeight(1),
             }}
           />
         </View>
