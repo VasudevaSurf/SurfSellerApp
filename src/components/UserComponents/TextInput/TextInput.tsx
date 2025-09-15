@@ -17,32 +17,35 @@ import {TypographyVariant} from '../Typography/Typography.types';
 import {createStyles} from './TextInput.styles';
 import {TextInputProps} from './TextInput.types';
 import {validateInput} from './TextInput.utils';
+import EyeClose from '../../../assets/icons/EyeClose';
+import EyeOpen from '../../../assets/icons/EyeOpen';
+import EuroIcon from '../../../assets/icons/EuroIcon';
 
 // Add these imports at the top of your file
 // You can replace these with your actual eye icons
-const EyeOpenIcon = () => (
-  <View
-    style={{
-      width: 24,
-      height: 24,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
-    <Typography variant={TypographyVariant.PSMALL_REGULAR} text="👁️" />
-  </View>
-);
+// const EyeOpenIcon = () => (
+//   <View
+//     style={{
+//       width: 24,
+//       height: 24,
+//       justifyContent: 'center',
+//       alignItems: 'center',
+//     }}>
+//     <Typography variant={TypographyVariant.PSMALL_REGULAR} text="👁️" />
+//   </View>
+// );
 
-const EyeCloseIcon = () => (
-  <View
-    style={{
-      width: 24,
-      height: 24,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
-    <Typography variant={TypographyVariant.PSMALL_REGULAR} text="👁️‍🗨️" />
-  </View>
-);
+// const EyeCloseIcon = () => (
+//   <View
+//     style={{
+//       width: 24,
+//       height: 24,
+//       justifyContent: 'center',
+//       alignItems: 'center',
+//     }}>
+//     <Typography variant={TypographyVariant.PSMALL_REGULAR} text="👁️‍🗨️" />
+//   </View>
+// );
 
 const AnimatedTextInput: React.FC<TextInputProps> = ({
   label,
@@ -79,6 +82,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   customFocusedBorderWidth = 2,
   customErrorBorderWidth = 2,
   disabled = false,
+  required = true, //
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -121,8 +125,14 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
 
   const handleBlur = () => {
     setIsFocused(false);
-    const validationError = validateInput(value, type);
-    setLocalError(validationError);
+
+    if (!required && !value) {
+      setLocalError(null);
+    } else {
+      const validationError = validateInput(value, type);
+      setLocalError(validationError);
+    }
+
     if (!value) {
       animateLabel(0);
     }
@@ -253,11 +263,17 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
               />
             ) : (
               countryCode && (
-                <Typography
-                  variant={TypographyVariant.PSMALL_REGULAR}
-                  customTextStyles={styles.countryCode}
-                  text={countryCode}
-                />
+                <>
+                  {typeof countryCode === 'string' ? (
+                    <Typography
+                      variant={TypographyVariant.PSMALL_REGULAR}
+                      customTextStyles={styles.countryCode}
+                      text={countryCode}
+                    />
+                  ) : (
+                    countryCode
+                  )}
+                </>
               )
             )}
           </TouchableOpacity>
@@ -312,7 +328,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
           ...rightIcons,
           {
             id: 'password-toggle',
-            icon: passwordVisible ? <EyeOpenIcon /> : <EyeCloseIcon />,
+            icon: passwordVisible ? <EyeOpen /> : <EyeClose />,
             onPress: togglePasswordVisibility,
           },
         ];
