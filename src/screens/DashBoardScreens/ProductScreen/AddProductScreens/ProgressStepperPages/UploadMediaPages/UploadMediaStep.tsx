@@ -16,7 +16,11 @@ import {
 import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {
+  getFigmaDimension,
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../../helpers/screenSize';
 import {styles} from './UploadMediaStep.styles';
 import {
   pickImagesFromGallery,
@@ -24,9 +28,14 @@ import {
   formatFileSize,
   validateImage,
   PickedImage,
-  uploadMultipleImages,
-  getMimeTypeFromExtension,
 } from '../../../../../../utils/imagePicker';
+import {
+  uploadMultipleProductImages,
+  deleteProductImage,
+  extractRelativePathFromUrl,
+  UploadedImageData,
+} from '../../../../../../services/imageService';
+import {Spacing} from '../../../../../../config/globalStyles';
 
 interface FileData {
   id: string;
@@ -36,10 +45,11 @@ interface FileData {
   thumbnailSource: any;
   isExisting?: boolean;
   originalUrl?: string;
-  uri?: string; // For newly picked images
-  relativePath?: string; // For uploaded images
-  viewUrl?: string; // For uploaded images
+  uri?: string;
+  relativePath?: string;
+  viewUrl?: string;
   isUploaded?: boolean;
+  fileId?: string;
 }
 
 interface UploadMediaStepProps {
@@ -58,28 +68,30 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [currentUpload, setCurrentUpload] = useState({current: 0, total: 0});
-
   const [files, setFiles] = useState<FileData[]>([]);
+  const [originalImages, setOriginalImages] = useState<string[]>([]);
 
   // Pre-fill images if in edit mode
   useEffect(() => {
     if (editMode && formData.images && formData.images.length > 0) {
+      console.log('🔄 Pre-filling images in edit mode:', formData.images);
+
+      const originalImageList = Array.isArray(formData.images)
+        ? formData.images
+        : [];
+      setOriginalImages(originalImageList);
+
       const preFilledFiles = formData.images.map(
         (imageUrl: string, index: number) => {
-          // Extract filename from URL or create a descriptive name
           const urlParts = imageUrl.split('/');
           const fullFilename =
             urlParts[urlParts.length - 1] || `product-image-${index + 1}.jpg`;
-
-          // Remove query parameters if any
           const filename = fullFilename.split('?')[0];
 
-          // Get file extension from URL or default to jpg
           const fileExtension = filename.includes('.')
             ? filename.split('.').pop()?.toLowerCase()
             : 'jpg';
 
-          // Estimate file size based on image dimensions (this is approximate)
           const estimatedSize =
             fileExtension === 'jpg' || fileExtension === 'jpeg'
               ? '180 KB'
@@ -88,13 +100,15 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               : '200 KB';
 
           return {
-            id: `prefilled-${index}`,
+            id: `prefilled-${index}-${Date.now()}`,
             name: filename,
             size: estimatedSize,
             date: 'Uploaded',
-            thumbnailSource: {uri: imageUrl}, // Use actual image URL
+            thumbnailSource: {uri: imageUrl},
             isExisting: true,
-            originalUrl: imageUrl, // Keep reference to original URL
+            originalUrl: imageUrl,
+            viewUrl: imageUrl,
+            relativePath: extractRelativePathFromUrl(imageUrl),
             isUploaded: true,
           };
         },
@@ -102,10 +116,18 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
       setFiles(preFilledFiles);
       setUploadStatus('completed');
+
+      console.log('✅ Pre-filled files created:', preFilledFiles.length);
     }
   }, [editMode, formData.images]);
 
-  const handleDelete = (fileId: string) => {
+  const handleDelete = async (fileId: string) => {
+    const fileToDelete = files.find(file => file.id === fileId);
+    if (!fileToDelete) {
+      console.error('File to delete not found');
+      return;
+    }
+
     Alert.alert('Delete File', 'Are you sure you want to delete this file?', [
       {
         text: 'Cancel',
@@ -113,25 +135,80 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       },
       {
         text: 'Delete',
-        onPress: () => {
+        onPress: async () => {
+          console.log('🗑️ Deleting file:', fileToDelete);
+
+          // If it's an existing image, try to delete it from server
+          if (fileToDelete.isExisting && fileToDelete.relativePath) {
+            try {
+              console.log(
+                '🗑️ Attempting to delete image from server:',
+                fileToDelete.relativePath,
+              );
+
+              const deleteResult = await deleteProductImage(
+                fileToDelete.relativePath,
+                {
+                  user_id: formData.userId, // Pass user ID if available
+                  product_id: formData.productId, // Pass product ID if available
+                  file_id: fileToDelete.fileId,
+                },
+              );
+
+              if (deleteResult.success) {
+                console.log('✅ Image deleted from server successfully');
+              } else {
+                console.warn(
+                  '⚠️ Failed to delete image from server:',
+                  deleteResult.error,
+                );
+                // Continue with UI deletion even if server deletion fails
+                // The product update API will handle the final image list
+              }
+            } catch (error) {
+              console.error('❌ Error deleting image from server:', error);
+              // Continue with UI deletion even if server deletion fails
+            }
+          }
+
+          // Remove from files list
           const updatedFiles = files.filter(file => file.id !== fileId);
           setFiles(updatedFiles);
 
-          // Update form data with relative paths for uploaded images
-          const imageData = updatedFiles
-            .filter(file => file.isUploaded)
-            .map(file => ({
-              relativePath: file.relativePath,
-              viewUrl: file.viewUrl || file.originalUrl || file.uri,
-            }));
+          // Update form data - remove the deleted image
+          const updatedImages = formData.images.filter((img: string) => {
+            if (fileToDelete.isExisting) {
+              return (
+                img !== fileToDelete.originalUrl && img !== fileToDelete.viewUrl
+              );
+            } else {
+              return img !== fileToDelete.uri && img !== fileToDelete.viewUrl;
+            }
+          });
 
-          console.log('Delete - Updated image data:', imageData);
+          // Update relative paths - remove if it's a new upload
+          let updatedRelativePaths = formData.imageRelativePaths || [];
+          if (fileToDelete.relativePath && !fileToDelete.isExisting) {
+            updatedRelativePaths = updatedRelativePaths.filter(
+              (path: string) => path !== fileToDelete.relativePath,
+            );
+          }
 
+          console.log('📸 Updating form data after deletion:', {
+            before: {
+              images: formData.images?.length || 0,
+              relativePaths: formData.imageRelativePaths?.length || 0,
+            },
+            after: {
+              images: updatedImages.length,
+              relativePaths: updatedRelativePaths.length,
+            },
+          });
+
+          // Update form data
           updateFormData({
-            images: imageData.map(img => img.viewUrl), // For display
-            imageRelativePaths: imageData
-              .map(img => img.relativePath)
-              .filter(path => path && !path.startsWith('http')), // Only actual relative paths
+            images: updatedImages,
+            imageRelativePaths: updatedRelativePaths,
           });
 
           // If no files left, reset to initial state
@@ -181,7 +258,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           break;
 
         case 'drive':
-          // TODO: Implement drive integration if needed
           Alert.alert(
             'Coming Soon',
             'Drive integration will be available soon.',
@@ -217,27 +293,39 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
         if (validImages.length > 0) {
           console.log(
-            'Starting upload process for',
+            '🚀 Starting upload process for',
             validImages.length,
-            'images',
+            'new images',
           );
+
           setUploadStatus('uploading');
           setUploadProgress(0);
           setCurrentUpload({current: 0, total: validImages.length});
 
-          // Upload images to server
           try {
-            const uploadResult = await uploadMultipleImages(
-              validImages,
-              (current, total) => {
-                console.log(`Uploading ${current}/${total}`);
+            // Upload images using the dedicated image service
+            const uploadResult = await uploadMultipleProductImages(
+              validImages.map(img => ({
+                uri: img.uri,
+                fileName: img.fileName,
+                type: img.type,
+                fileSize: img.fileSize,
+              })),
+              (current, total, fileName) => {
+                console.log(`Uploading ${current}/${total}: ${fileName}`);
                 setCurrentUpload({current, total});
                 const progress = total > 0 ? (current / total) * 100 : 0;
                 setUploadProgress(progress);
               },
+              {
+                user_id: formData.userId,
+                product_id: formData.productId,
+                lang_code: 'en',
+                type: 'product_image',
+              },
             );
 
-            console.log('Upload result:', uploadResult);
+            console.log('📤 Upload result:', uploadResult);
 
             if (
               uploadResult.success &&
@@ -250,47 +338,49 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                   name: image.fileName,
                   size: formatFileSize(image.fileSize),
                   date: new Date().toLocaleDateString(),
-                  thumbnailSource: image.viewUrl
-                    ? {uri: image.viewUrl}
-                    : {uri: image.uri},
+                  thumbnailSource: {uri: image.viewUrl || image.uri},
                   uri: image.uri,
                   relativePath: image.relativePath,
                   viewUrl: image.viewUrl,
+                  fileId: image.fileId,
                   isUploaded: true,
+                  isExisting: false,
                 }),
               );
 
               const updatedFiles = [...files, ...newFiles];
               setFiles(updatedFiles);
 
-              // Update form data with both display URLs and relative paths
-              const allUploadedFiles = updatedFiles.filter(
-                file => file.isUploaded,
-              );
-              const imageData = allUploadedFiles.map(file => ({
-                relativePath: file.relativePath || file.originalUrl,
-                viewUrl: file.viewUrl || file.originalUrl || file.uri,
-              }));
+              // Update form data with new images
+              const currentImages = formData.images || [];
+              const newImageUrls = uploadResult.uploadedImages
+                .map(image => image.viewUrl)
+                .filter(url => url);
+              const newRelativePaths = uploadResult.uploadedImages
+                .map(image => image.relativePath)
+                .filter(path => path);
 
-              console.log('Image data for form update:', imageData);
+              const allImages = [...currentImages, ...newImageUrls];
+              const allRelativePaths = [
+                ...(formData.imageRelativePaths || []),
+                ...newRelativePaths,
+              ];
 
-              updateFormData({
-                images: imageData.map(img => img.viewUrl), // For display
-                imageRelativePaths: imageData
-                  .map(img => img.relativePath)
-                  .filter(path => path && !path.startsWith('http')), // Only actual relative paths, not URLs
+              console.log('📸 Form data update after upload:', {
+                currentImages: currentImages.length,
+                newImages: newImageUrls.length,
+                totalImages: allImages.length,
+                totalRelativePaths: allRelativePaths.length,
               });
 
-              console.log('Updated form data with relative paths:', {
-                images: imageData.map(img => img.viewUrl),
-                imageRelativePaths: imageData
-                  .map(img => img.relativePath)
-                  .filter(path => path && !path.startsWith('http')),
+              updateFormData({
+                images: allImages,
+                imageRelativePaths: allRelativePaths,
               });
 
               setUploadStatus('completed');
 
-              // Show success/error message
+              // Show success message
               if (uploadResult.errors.length === 0) {
                 Alert.alert(
                   'Success',
@@ -301,53 +391,27 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 const errorCount = uploadResult.errors.length;
                 Alert.alert(
                   'Partial Success',
-                  `${successCount} image(s) uploaded successfully, ${errorCount} failed.\n\nErrors:\n${uploadResult.errors
-                    .slice(0, 3)
-                    .join('\n')}${errorCount > 3 ? '\n...and more' : ''}`,
+                  `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
                 );
               }
-            } else if (uploadResult.errors.length > 0) {
-              // All uploads failed
-              console.error('All uploads failed:', uploadResult.errors);
-              Alert.alert(
-                'Upload Failed',
-                `All image uploads failed:\n\n${uploadResult.errors
-                  .slice(0, 3)
-                  .join('\n')}${
-                  uploadResult.errors.length > 3 ? '\n...and more' : ''
-                }`,
-              );
-              setUploadStatus(files.length > 0 ? 'completed' : 'initial');
             } else {
-              // No images and no errors (shouldn't happen)
+              console.error('Upload failed:', uploadResult.errors);
               Alert.alert(
                 'Upload Failed',
-                'No images were uploaded successfully.',
+                'Failed to upload images. Please try again.',
               );
               setUploadStatus(files.length > 0 ? 'completed' : 'initial');
             }
           } catch (uploadError) {
-            console.error('Upload process error:', uploadError);
-            Alert.alert(
-              'Upload Error',
-              `Upload process failed: ${
-                uploadError.message || 'Unknown error'
-              }\n\nPlease check your internet connection and try again.`,
-            );
+            console.error('Upload error:', uploadError);
+            Alert.alert('Upload Error', 'Upload failed. Please try again.');
             setUploadStatus(files.length > 0 ? 'completed' : 'initial');
           }
-        } else {
-          Alert.alert('No Valid Images', 'No valid images were selected.');
         }
-      } else {
-        Alert.alert('No Images', 'No images were selected.');
       }
     } catch (error: any) {
       console.error('Selection error:', error);
-      Alert.alert(
-        'Selection Error',
-        error.message || 'Failed to select images',
-      );
+      Alert.alert('Selection Error', 'Failed to select images');
     } finally {
       setIsUploading(false);
       setCurrentUpload({current: 0, total: 0});
@@ -355,7 +419,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   };
 
   const handleCancelUpload = () => {
-    // Note: In a real implementation, you might want to cancel ongoing uploads
     setUploadStatus(files.length > 0 ? 'completed' : 'initial');
     setUploadProgress(0);
     setCurrentUpload({current: 0, total: 0});
@@ -403,7 +466,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
   const getBrowseButtonText = () => {
     if (editMode && files.length > 0) {
-      return 'Add More Files';
+      return 'Upload More Images';
     }
     return 'Browse Files';
   };
@@ -413,12 +476,12 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       <View style={styles.mainHeader}>
         <View style={styles.headerContainer}>
           <Typography
-            variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
+            variant={TypographyVariant.LMEDIUM_EXTRABOLD}
             text={getHeaderText()}
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <InfoIconPay
-            size={19}
+            size={22}
             color={ColorPalette.GREY_TEXT_400}
             style={undefined}
             strokeWidth={1.5}
@@ -448,20 +511,46 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           </View>
         )}
 
-        {/* Show add more button if files exist */}
         {uploadStatus === 'completed' && files.length > 0 && !isUploading && (
-          <View style={{alignItems: 'center', marginTop: 16}}>
-            <Button
-              text="Add More Images"
-              variant={ButtonVariant.PRIMARY}
-              state={ButtonState.DEFAULT}
-              size={ButtonSize.SMALL}
-              type={ButtonType.OUTLINED}
-              onPress={handleBrowseFiles}
-              customStyles={{
-                borderWidth: 1,
-                borderColor: ColorPalette.PURPLE_300,
-              }}
+          // <View style={{alignItems: 'center', marginTop: 16}}>
+          //   <Button
+          //     text="Add More Images"
+          //     variant={ButtonVariant.PRIMARY}
+          //     state={ButtonState.DEFAULT}
+          //     size={ButtonSize.SMALL}
+          //     type={ButtonType.OUTLINED}
+          //     onPress={handleBrowseFiles}
+          //     customStyles={{
+          //       borderWidth: 1,
+          //       borderColor: ColorPalette.PURPLE_300,
+          //     }}
+          //   />
+          // </View>
+
+          <View style={styles.uploadContainer}>
+            <View style={styles.uploadBox}>
+              <CloudManIcon size={70} style={undefined} />
+
+              <Button
+                text="Upload More Images"
+                variant={ButtonVariant.PRIMARY}
+                state={ButtonState.FILEUPLOAD}
+                size={ButtonSize.SMALL}
+                type={ButtonType.PRIMARY}
+                onPress={handleBrowseFiles} 
+                withShadow
+                textVariant={TypographyVariant.PSMALL_MEDIUM}
+                disabled={isUploading}
+                customStyles={{
+                  borderRadius: getScreenHeight(1.4),
+                }}
+              />
+            </View>
+
+            <Typography
+              variant={TypographyVariant.LMEDIUM_REGULAR}
+              text="PNG, JPG, GIF up to 10MB"
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
           </View>
         )}

@@ -114,7 +114,7 @@ export const styles = StyleSheet.create({
   showCaseContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getScreenWidth(3),
+    // gap: getScreenWidth(1),
     paddingVertical: getScreenHeight(1.5),
     paddingHorizontal: getScreenWidth(4),
     backgroundColor: ColorPalette.White,
