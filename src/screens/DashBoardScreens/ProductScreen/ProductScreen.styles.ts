@@ -44,7 +44,28 @@ export const styles = StyleSheet.create({
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
   },
-  floatingButton: {
+  floatingButtonWithText: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: ColorPalette.PURPLE_300,
+    width: getScreenWidth(40),
+    height: getScreenHeight(6),
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: getScreenWidth(3),
+    padding: getScreenWidth(2),
+    shadowColor: ColorPalette.PURPLE_300,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  floatingButtonIconOnly: {
     position: 'absolute',
     bottom: 20,
     right: 20,
@@ -77,16 +98,17 @@ export const styles = StyleSheet.create({
     paddingHorizontal: getScreenWidth(5),
   },
   emptyStateContainer: {
-    flex: 1,
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     padding: getScreenWidth(5),
     minHeight: getScreenHeight(30),
+    gap: getScreenHeight(3),
   },
   emptyStateText: {
     color: ColorPalette.GREY_TEXT_300,
     textAlign: 'center',
-    marginBottom: getScreenHeight(2),
+    lineHeight:20
   },
   retryButton: {
     marginTop: getScreenHeight(2),
@@ -95,5 +117,23 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     color: ColorPalette.GREY_TEXT_100,
     marginLeft: getScreenWidth(1),
+  },
+  emptyMessageContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // gap: getScreenHeight(2),
+  },
+  textContainer: {
+    gap: getScreenHeight(0.5),
+  },
+  emptyBoxPng: {
+    width: getScreenWidth(45),
+    height: getScreenWidth(45),
+    resizeMode: 'contain',
+  },
+  addProductText: {
+    fontSize: 18,
+    color: '#ffffffff',
   },
 });
