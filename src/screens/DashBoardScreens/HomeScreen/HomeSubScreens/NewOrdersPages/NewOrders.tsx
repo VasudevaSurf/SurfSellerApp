@@ -6,6 +6,7 @@ import {
   View,
   ActivityIndicator,
   RefreshControl,
+  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BellIcon from '../../../../../assets/icons/BellIcon';
@@ -22,6 +23,7 @@ import {styles} from './NewOrders.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import {useDashboard} from '../../../../../hooks/useDashboard';
 import {useRoute} from '@react-navigation/native';
+import AnimatedLoader from '../../../../../assets/icons/LoaderIcon';
 
 const NewOrders = () => {
   const route = useRoute();
@@ -154,11 +156,14 @@ const NewOrders = () => {
     return (
       <SafeAreaView
         style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+        <AnimatedLoader size={52} />
         <Typography
-          variant={TypographyVariant.LMEDIUM_REGULAR}
-          text="Loading orders..."
-          customTextStyles={{marginTop: 16, color: ColorPalette.GREY_TEXT_300}}
+          text="Loading"
+          variant={TypographyVariant.PSMALL_MEDIUM}
+          customTextStyles={{
+            color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+            marginTop: getScreenHeight(1),
+          }}
         />
       </SafeAreaView>
     );
@@ -170,22 +175,31 @@ const NewOrders = () => {
         <Header
           name={getTitle()}
           leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
-          variant={TypographyVariant.LMEDIUM_BOLD}
+          variant={TypographyVariant.LMEDIUM_EXTRABOLD}
           textColor={ColorPalette.GREY_TEXT_500}
           rightIcons={[
             {
               icon: BellIcon,
-              onPress: () => console.log('Bell icon pressed'),
+              onPress: () =>
+                navigate('Dashboard', {
+                  screen: 'Account',
+                  params: {screen: 'NotificationScreen'},
+                }),
               size: 24,
-              color: ColorPalette.GREY_TEXT_400,
-              strokeWidth: 2,
+              color: ColorPalette.IconColor,
+              strokeWidth: 1.5,
             },
             {
               icon: QuestionMarkIcon,
-              onPress: () => {},
+              onPress: () => {
+                navigate('Dashboard', {
+                  screen: 'Account',
+                  params: {screen: 'FAQScreen'},
+                });
+              },
               size: 24,
-              color: ColorPalette.GREY_TEXT_400,
-              strokeWidth: 2,
+              color: ColorPalette.IconColor,
+              strokeWidth: 1.5,
             },
           ]}
         />
@@ -219,44 +233,52 @@ const NewOrders = () => {
       <Header
         name={getTitle()}
         leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.GREY_TEXT_500}
         rightIcons={[
           {
             icon: BellIcon,
-            onPress: () => console.log('Bell icon pressed'),
-            size: 24,
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'NotificationScreen'},
+              }),
+            size: 22,
             color: ColorPalette.GREY_TEXT_400,
-            strokeWidth: 2,
+            strokeWidth: 1.4,
           },
           {
             icon: QuestionMarkIcon,
-            onPress: () => {},
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'FAQScreen'},
+              }),
             size: 24,
             color: ColorPalette.GREY_TEXT_400,
-            strokeWidth: 2,
+            strokeWidth: 1.4,
           },
         ]}
       />
 
-      <ScrollView
-        style={styles.mainContainer}
-        contentContainerStyle={[
-          styles.scrollContent,
-          {paddingBottom: getScreenHeight(4)},
-        ]}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            colors={[ColorPalette.PURPLE_300]}
-            tintColor={ColorPalette.PURPLE_300}
-          />
-        }>
-        <View style={styles.productContainer}>
-          {orders.length > 0 ? (
-            orders.map(order => (
+      {orders.length > 0 ? (
+        <ScrollView
+          style={styles.mainContainer}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {paddingBottom: getScreenHeight(4)},
+          ]}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[ColorPalette.PURPLE_300]}
+              tintColor={ColorPalette.PURPLE_300}
+            />
+          }>
+          <View style={styles.productContainer}>
+            {orders.map(order => (
               <OrderInfo
                 key={order.id}
                 orderId={order.id}
@@ -272,37 +294,53 @@ const NewOrders = () => {
                 onStatusChange={status => handleStatusChange(order.id, status)}
                 onCardPress={() => handleCardPress(order)}
               />
-            ))
-          ) : (
-            <View style={{padding: 40, alignItems: 'center'}}>
-              <Typography
-                variant={TypographyVariant.H6_SEMIBOLD}
-                text="No Orders Found"
-                customTextStyles={{
-                  color: ColorPalette.GREY_TEXT_500,
-                  marginBottom: 8,
-                }}
-              />
-              <Typography
-                variant={TypographyVariant.LMEDIUM_REGULAR}
-                text={`You don't have any ${
-                  filterType === 'pending'
-                    ? 'new'
-                    : filterType === 'toShip'
-                    ? 'orders to ship'
-                    : filterType === 'delivered'
-                    ? 'delivered'
-                    : 'recent'
-                } orders at the moment.`}
-                customTextStyles={{
-                  color: ColorPalette.GREY_TEXT_300,
-                  textAlign: 'center',
-                }}
-              />
-            </View>
-          )}
+            ))}
+          </View>
+        </ScrollView>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingBottom: getScreenHeight(16),
+          }}>
+          <Image
+            source={require('../../../../../assets/images/emptyBox.png')}
+            style={styles.emptyBoxPng}
+          />
+          <Typography
+            text={`${
+              filterType === 'pending'
+                ? 'No new orders'
+                : filterType === 'toShip'
+                ? 'Nothing to ship'
+                : filterType === 'delivered'
+                ? 'No orders to deliver yet'
+                : ''
+            }`}
+            variant={TypographyVariant.PMEDIUM_SEMIBOLD}
+            customTextStyles={styles.emptyStateText}
+          />
+          <Typography
+            variant={TypographyVariant.LSMALL_REGULAR}
+            text={`${
+              filterType === 'pending'
+                ? 'We’ll notify you as soon as a new one comes in.'
+                : filterType === 'toShip'
+                ? 'You’ll get an alert when an order is ready to be shipped.'
+                : filterType === 'delivered'
+                ? 'We’ll notify you if there’s an order to deliver.'
+                : ''
+            } `}
+            customTextStyles={{
+              color: ColorPalette.GREY_TEXT_300,
+              textAlign: 'center',
+              lineHeight: 24,
+            }}
+          />
         </View>
-      </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
