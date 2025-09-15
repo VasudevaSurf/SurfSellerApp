@@ -21,7 +21,7 @@ export const headerStyles = StyleSheet.create({
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.Medium,
+    gap: Spacing.Small,
   },
   profileImage: {
     width: getScreenWidth(8),
@@ -49,7 +49,7 @@ export const headerStyles = StyleSheet.create({
   },
   badgeContainer: {
     backgroundColor: ColorPalette.Green_200,
-    paddingVertical: getScreenWidth(0.5),
+    paddingVertical: getScreenWidth(1), //0.5 previously
     paddingHorizontal: Spacing.XXSmall,
     minWidth: 0,
     alignSelf: 'flex-start',
