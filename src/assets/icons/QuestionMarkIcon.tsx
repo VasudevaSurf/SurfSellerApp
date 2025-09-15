@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, {Path} from 'react-native-svg';
+import Svg, {Circle, Path, Rect} from 'react-native-svg';
 
 const QuestionMarkIcon = ({
   size = 24,
@@ -14,10 +14,19 @@ const QuestionMarkIcon = ({
       viewBox="0 0 24 24"
       fill="none"
       style={style}>
+      <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth={strokeWidth} />
+
       <Path
-        d="M10.0203 7.81769C11.1138 6.8609 12.8866 6.8609 13.9801 7.81769C15.0736 8.77447 15.0736 10.3257 13.9801 11.2825C13.7898 11.449 13.5789 11.5866 13.3546 11.6951C12.6586 12.032 12.0002 12.6269 12.0002 13.4001V14.1001M20.4 12.0001C20.4 16.6393 16.6392 20.4001 12 20.4001C7.36081 20.4001 3.60001 16.6393 3.60001 12.0001C3.60001 7.36091 7.36081 3.6001 12 3.6001C16.6392 3.6001 20.4 7.36091 20.4 12.0001ZM12 16.9001H12.007V16.9071H12V16.9001Z"
+        d="M10 9C10 7.89543 10.8954 7 12 7C13.1046 7 14 7.89543 14 9C14 9.39815 13.8837 9.76913 13.6831 10.0808C13.0854 11.0097 12 11.8954 12 13V13.5"
         stroke={color}
         strokeWidth={strokeWidth}
+        strokeLinecap="round"
+      />
+
+      <Path
+        d="M11.992 17H12.001"
+        stroke={color}
+        strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
