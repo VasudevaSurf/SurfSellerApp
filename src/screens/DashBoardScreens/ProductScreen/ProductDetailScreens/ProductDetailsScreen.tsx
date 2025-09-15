@@ -20,6 +20,7 @@ import {TypographyVariant} from '../../../../components/UserComponents/Typograph
 import {ColorPalette} from '../../../../config/colorPalette';
 import {
   getFigmaDimension,
+  getScreenHeight,
   getScreenWidth,
 } from '../../../../helpers/screenSize';
 import {fetchProductDetails} from '../../../../redux/slices/productDetailsSlice';
@@ -31,6 +32,7 @@ import {
   renderHtmlContent,
 } from './ProductDetailsHelpers';
 import {styles} from './ProductDetailsScreen.styles';
+import AnimatedLoader from '../../../../assets/icons/LoaderIcon';
 
 type ProductDetailsParams = {
   productId: string;
@@ -164,11 +166,14 @@ const ProductDetailsScreen = () => {
           leftIconComponent={renderLeftIcon()}
         />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={ColorPalette.Primary} />
+          <AnimatedLoader size={52} />
           <Typography
-            text="Loading product details..."
-            variant={TypographyVariant.LSMALL_REGULAR}
-            customTextStyles={{marginTop: 10}}
+            text="Loading"
+            variant={TypographyVariant.PSMALL_MEDIUM}
+            customTextStyles={{
+              color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+              marginTop: getScreenHeight(1),
+            }}
           />
         </View>
       </SafeAreaView>
