@@ -25,11 +25,13 @@ const OTP_LENGTH = 4;
 
 const OTPVerificationScreen = ({route, navigation}) => {
   const {
+    countryCode,
     phoneNumber,
     flow = 'login',
     returnData = {},
     returnScreen = '',
   } = route.params;
+
   const [otp, setOtp] = useState('');
   const [buttonState, setButtonState] = useState(ButtonState.DISABLED);
 
@@ -44,8 +46,6 @@ const OTPVerificationScreen = ({route, navigation}) => {
   const handleResendOtp = () => {};
 
   const handleNavigate = () => {
-    const {flow, returnData, returnScreen} = route.params;
-
     switch (flow) {
       case 'create':
         navigation.navigate('CreateSuccess');
@@ -61,6 +61,29 @@ const OTPVerificationScreen = ({route, navigation}) => {
         break;
       default:
         navigation.navigate('AuthSuccess');
+        break;
+    }
+  };
+
+  const handleEditNavigate = () => {
+    switch (flow) {
+      case 'create':
+        navigation.navigate('CreateAccount', {
+          countryCode,
+          phoneNumber,
+        });
+        break;
+      case 'login':
+        navigation.navigate('PhoneNumber', {
+          countryCode,
+          phoneNumber,
+        });
+        break;
+      default:
+        navigation.navigate('PhoneNumber', {
+          countryCode,
+          phoneNumber,
+        });
         break;
     }
   };
@@ -94,12 +117,14 @@ const OTPVerificationScreen = ({route, navigation}) => {
                   customTextStyles={styles.subCaption}
                 />
                 <Typography
-                  text={phoneNumber}
+                  text={`${countryCode}${phoneNumber}`}
                   variant={TypographyVariant.LMEDIUM_BOLD}
                   customTextStyles={styles.subCaptionTwo}
                 />
               </View>
-              <TouchableOpacity style={styles.iconContainer}>
+              <TouchableOpacity
+                style={styles.iconContainer}
+                onPress={handleEditNavigate}>
                 <FlowBite
                   size={20}
                   color={ColorPalette.GREY_TEXT_400}
