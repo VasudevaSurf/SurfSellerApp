@@ -87,6 +87,7 @@ const WithdrawScreen = () => {
                 keyboardType="default"
                 customLabelColorFocused={ColorPalette.GREY_TEXT_400}
                 customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+                required={false}
               />
             </View>
           </View>
