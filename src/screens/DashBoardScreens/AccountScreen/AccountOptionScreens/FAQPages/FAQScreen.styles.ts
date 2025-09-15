@@ -4,12 +4,12 @@ import {
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
-import {BorderRadius} from '../../../../../config/globalStyles';
+import {BorderRadius, Spacing} from '../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ColorPalette.White,
+    backgroundColor: ColorPalette.SearchBack,
   },
   mainContainer: {
     flex: 1,
@@ -22,6 +22,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     flexGrow: 1,
     gap: getScreenHeight(1.5),
+    marginTop: getScreenHeight(1.5),
+    paddingBottom: getScreenHeight(5),
   },
   searchContainer: {
     padding: getScreenWidth(4),
@@ -64,5 +66,15 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: getScreenHeight(1.5),
+  },
+  containerStyle: {
+    paddingHorizontal: getScreenWidth(1),
+    backgroundColor: ColorPalette.White,
+    paddingTop: getScreenHeight(2.5),
+    gap: getScreenHeight(1),
+  },
+  menuContainer: {
+    width: '100%',
+    gap: getScreenHeight(1),
   },
 });
