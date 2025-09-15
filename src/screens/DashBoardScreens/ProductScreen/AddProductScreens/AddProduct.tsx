@@ -144,7 +144,10 @@ const AddProduct = () => {
   // Pre-fill form data if in edit mode
   useEffect(() => {
     if (editMode && productData) {
-      console.log('🔄 Loading product data for editing:', productData);
+      const originalImageList = Array.isArray(productData.images)
+        ? productData.images
+        : [];
+      setOriginalImages(originalImageList);
 
       const originalImageList = Array.isArray(productData.images)
         ? productData.images
@@ -218,58 +221,58 @@ const AddProduct = () => {
     });
   };
 
-  const debugImageState = () => {
-    console.log('🔍 DEBUG: Current image state before API call:', {
-      editMode,
-      productId: formData.productId,
-      userId: formData.userId,
+  // const debugImageState = () => {
+  //   console.log('🔍 DEBUG: Current image state before API call:', {
+  //     editMode,
+  //     productId: formData.productId,
+  //     userId: formData.userId,
 
-      // Original images (what we started with)
-      originalImages: {
-        count: originalImages.length,
-        list: originalImages,
-      },
+  //     // Original images (what we started with)
+  //     originalImages: {
+  //       count: originalImages.length,
+  //       list: originalImages,
+  //     },
 
-      // Current form data images (what's currently shown in UI)
-      formDataImages: {
-        count: formData.images?.length || 0,
-        list: formData.images || [],
-      },
+  //     // Current form data images (what's currently shown in UI)
+  //     formDataImages: {
+  //       count: formData.images?.length || 0,
+  //       list: formData.images || [],
+  //     },
 
-      // Uploaded image paths (new images that were uploaded)
-      imageRelativePaths: {
-        count: formData.imageRelativePaths?.length || 0,
-        list: formData.imageRelativePaths || [],
-      },
+  //     // Uploaded image paths (new images that were uploaded)
+  //     imageRelativePaths: {
+  //       count: formData.imageRelativePaths?.length || 0,
+  //       list: formData.imageRelativePaths || [],
+  //     },
 
-      // What should be sent to API
-      shouldSendToAPI: {
-        existingImages:
-          formData.images?.filter((img: string) => img.startsWith('http')) ||
-          [],
-        newImages:
-          formData.imageRelativePaths?.filter(
-            (path: string) => path && !path.startsWith('http'),
-          ) || [],
-      },
-    });
-  };
+  //     // What should be sent to API
+  //     shouldSendToAPI: {
+  //       existingImages:
+  //         formData.images?.filter((img: string) => img.startsWith('http')) ||
+  //         [],
+  //       newImages:
+  //         formData.imageRelativePaths?.filter(
+  //           (path: string) => path && !path.startsWith('http'),
+  //         ) || [],
+  //     },
+  //   });
+  // };
 
   const handleSubmit = async () => {
     // Add debug logging
-    debugImageState();
+    // debugImageState();
 
-    console.log('🚀 Form submitted:', {
-      editMode,
-      productId: formData.productId,
-      userId: formData.userId,
-      formData: {
-        productName: formData.productName,
-        price: formData.price,
-        currentImages: formData.images?.length || 0,
-        imageRelativePaths: formData.imageRelativePaths?.length || 0,
-      },
-    });
+    // console.log('🚀 Form submitted:', {
+    //   editMode,
+    //   productId: formData.productId,
+    //   userId: formData.userId,
+    //   formData: {
+    //     productName: formData.productName,
+    //     price: formData.price,
+    //     currentImages: formData.images?.length || 0,
+    //     imageRelativePaths: formData.imageRelativePaths?.length || 0,
+    //   },
+    // });
 
     // Validate required fields
     const requiredFields = ['productName', 'price'];
@@ -318,24 +321,22 @@ const AddProduct = () => {
         originalImages,
       );
 
-      console.log('🎯 Final API call:', {
-        method: editMode ? 'UPDATE' : 'CREATE',
-        productId: apiData.product_id,
-        productName: apiData.product_data.product,
-        imageCount: apiData.image_pair_positon?.length || 0,
-        imagePaths: apiData.image_pair_positon || [],
-      });
+      // console.log('🎯 Final API call:', {
+      //   method: editMode ? 'UPDATE' : 'CREATE',
+      //   productId: apiData.product_id,
+      //   productName: apiData.product_data.product,
+      //   imageCount: apiData.image_pair_positon?.length || 0,
+      //   imagePaths: apiData.image_pair_positon || [],
+      // });
 
       let result;
       if (editMode) {
-        console.log('🔄 Updating existing product...');
+        // console.log('🔄 Updating existing product...');
         result = await updateProductApi(apiData);
       } else {
-        console.log('✨ Creating new product...');
+        // console.log('✨ Creating new product...');
         result = await createProductApi(apiData);
       }
-
-      console.log('🎉 Product operation successful:', result);
 
       // Show success message
       Alert.alert(
@@ -390,13 +391,10 @@ const AddProduct = () => {
   };
 
   const handleStepPress = (stepId: number) => {
-    console.log('🎯 Navigating to step:', stepId);
     setCurrentStep(stepId);
   };
 
   const renderStep = () => {
-    console.log('🖥️ Rendering step:', currentStep);
-
     switch (currentStep) {
       case 1:
         return (
@@ -446,9 +444,9 @@ const AddProduct = () => {
     }
 
     if (editMode) {
-      return currentStep === STEPS.length ? 'Update Product' : 'Continue';
+      return currentStep === STEPS.length ? 'Update Product' : 'Next';
     }
-    return currentStep === STEPS.length ? 'Save Product' : 'Continue';
+    return currentStep === STEPS.length ? 'Save Product' : 'Next';
   };
 
   const isValidStep = () => {
@@ -487,7 +485,7 @@ const AddProduct = () => {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name={getHeaderTitle()}
-        variant={TypographyVariant.H6_SMALL_SEMIBOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={
           <ArrowLeft
@@ -505,7 +503,7 @@ const AddProduct = () => {
         onStepPress={handleStepPress}
       />
 
-      <View style={[styles.mainContainer, {paddingBottom: getScreenHeight(9)}]}>
+      <View style={[styles.mainContainer, {paddingBottom: getScreenHeight(7)}]}>
         <ScrollView
           style={styles.mainContainer}
           contentContainerStyle={[styles.scrollContent]}

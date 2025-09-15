@@ -34,9 +34,11 @@ const INITIAL_COUNTRY_CODE = '+356';
 const MALTA_FLAG_URL =
   'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
 
-const PhoneNumberScreen = () => {
+const PhoneNumberScreen = ({route}) => {
+  const {phoneNumber: initialPhoneNumber = ''} = route.params || {};
+
   // State
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber);
   const [countryCode, setCountryCode] = useState(INITIAL_COUNTRY_CODE);
   const [buttonState, setButtonState] = useState(ButtonState.DISABLED);
 
@@ -60,9 +62,8 @@ const PhoneNumberScreen = () => {
     console.log('Navigate to Privacy Policy');
   };
 
-  const handleCreateAccount = () => {
-    console.log('Navigate to Learn More');
-  };
+  const handleCreateAccount = () =>
+    navigate('Create', {screen: 'CreateAccount'});
 
   const handleEmailSignIn = () => {
     navigate('EmailSignIn');
@@ -71,7 +72,8 @@ const PhoneNumberScreen = () => {
   const handleGetOtp = () => {
     if (phoneNumber) {
       navigate('OTPVerification', {
-        phoneNumber: `${countryCode}${phoneNumber}`,
+        countryCode,
+        phoneNumber,
         flow: 'login',
       });
     }

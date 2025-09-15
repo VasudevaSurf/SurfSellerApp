@@ -29,15 +29,20 @@ export const styles = StyleSheet.create({
   headerText: {
     textAlign: 'center',
     flexShrink: 1, // Prevents text overflow
+    color: ColorPalette.GREY_TEXT_300,
   },
   closeButton: {
     width: getScreenWidth(6), // More responsive than fixed 24px
-    height: getScreenWidth(6), // More responsive than fixed 24px
+    height: getScreenWidth(8), // More responsive than fixed 24px
     alignItems: 'center',
     justifyContent: 'center',
   },
   footer: {
     flexDirection: 'column',
     gap: getScreenWidth(3),
+  },
+  headerTitle: {
+    color: ColorPalette.BLACK,
+    marginBottom: 6,
   },
 });

@@ -28,7 +28,7 @@ export interface TextInputProps {
     | 'phone-pad'
     | 'password';
   showCountrySection?: boolean;
-  countryCode?: string;
+countryCode?: string | React.ReactNode;
   countryFlag?: string;
   onCountryPress?: () => void;
   type?: 'email' | 'phone' | 'password' | 'default';
@@ -47,4 +47,5 @@ export interface TextInputProps {
   customErrorBorderWidth?: number;
   disabled?: boolean;
   validationEnabled?: boolean; // New prop to control validation
+  required?:boolean // added new prop for optional fields
 }

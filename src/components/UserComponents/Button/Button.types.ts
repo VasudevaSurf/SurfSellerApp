@@ -45,4 +45,5 @@ export interface ButtonProps {
   bgColor?: string;
   withShadow?: boolean;
   textVariant?: TypographyVariant;
+  iconProps?: Record<string, any>; //new prop to style icon
 }

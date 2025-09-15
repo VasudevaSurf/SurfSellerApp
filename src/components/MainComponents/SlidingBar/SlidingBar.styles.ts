@@ -8,7 +8,7 @@ export const slidingBarStyles = StyleSheet.create({
   },
   scrollContent: {
     flexDirection: 'row',
-    gap: getScreenWidth(4),
+    gap: getScreenWidth(3), //4 previously
   },
   option: {
     borderRadius: getScreenWidth(2),

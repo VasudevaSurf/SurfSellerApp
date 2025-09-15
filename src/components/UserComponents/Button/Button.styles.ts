@@ -145,7 +145,7 @@ export const createButtonStyles = (buttonHeight: number) =>
       marginRight: 8,
     },
     iconRight: {
-      marginLeft: 8,
+      // marginLeft: 4, //reduce the left margin
     },
     outlined: {
       borderWidth: 1,

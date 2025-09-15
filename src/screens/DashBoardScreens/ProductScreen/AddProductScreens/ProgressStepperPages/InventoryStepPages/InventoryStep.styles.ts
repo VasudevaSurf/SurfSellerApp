@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
     gap: Spacing.Small,
     marginBottom: Spacing.Medium,
     backgroundColor: ColorPalette.SearchBack,
+    paddingBottom: getScreenHeight(8),
   },
   section: {
     display: 'flex',
@@ -41,12 +42,13 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
     paddingVertical: Spacing.Small,
     paddingHorizontal: Spacing.Medium,
-    gap: Spacing.XXSmall,
+    // gap: Spacing.XXSmall,
   },
   textContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    // paddingHorizontal: Spacing.Medium,
   },
   primaryText: {
     color: ColorPalette.GREY_TEXT_500,
@@ -60,11 +62,12 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
     borderRadius: BorderRadius.Medium,
     gap: Spacing.XSmall,
+    marginTop: Spacing.Small,
   },
   toggleButton: {
     borderRadius: BorderRadius.Full,
     paddingVertical: Spacing.XSmall,
-    paddingHorizontal: Spacing.XLarge,
+    paddingHorizontal: Spacing.XXLarge,
     borderWidth: 1,
     borderColor: ColorPalette.GREY_TEXT_100,
   },
@@ -101,5 +104,23 @@ export const styles = StyleSheet.create({
   checkmark: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  sectionHeaderDiscount: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: Spacing.XXSmall,
+    alignItems: 'center',
+    // justifyContent: 'flex-start',
+  },
+  customButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: ColorPalette.GREY_200,
+    height: getScreenHeight(7),
+    borderRadius: BorderRadius.Medium,
+  },
+  customText: {
+    color: ColorPalette.GREY_TEXT_100,
   },
 });

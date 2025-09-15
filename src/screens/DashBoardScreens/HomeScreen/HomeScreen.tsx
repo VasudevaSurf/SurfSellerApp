@@ -34,6 +34,7 @@ import {useSelector} from 'react-redux';
 import ArrowRightStyle from '../../../assets/icons/ArrowRightStyle';
 import {useDashboard} from '../../../hooks/useDashboard';
 import SalesChart from './components/SalesChart'; // Import the React Native chart component
+import AnimatedLoader from '../../../assets/icons/LoaderIcon';
 
 const HomeScreen = () => {
   const userData = useSelector((state: RootState) => state.auth.userData);
@@ -68,6 +69,15 @@ const HomeScreen = () => {
         params: {
           filterType,
         },
+      },
+    });
+  };
+
+  const handleViewAllPress = () => {
+    navigate('Dashboard', {
+      screen: 'Orders',
+      params: {
+        screen: 'OrderPage',
       },
     });
   };
@@ -113,7 +123,7 @@ const HomeScreen = () => {
       {
         label:
           orderCounts.completed > 0
-            ? `${orderCounts.completed} orders delivered`
+            ? `${orderCounts.completed} orders to deliver`
             : 'No orders delivered',
         leftIcon: (
           <PackageIcon style={undefined} color={ColorPalette.Green_200} />
@@ -213,14 +223,62 @@ const HomeScreen = () => {
 
   if (loading && !refreshing) {
     return (
-      <SafeAreaView
-        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
-        <Typography
-          variant={TypographyVariant.LMEDIUM_REGULAR}
-          text="Loading dashboard..."
-          customTextStyles={{marginTop: 16, color: ColorPalette.GREY_TEXT_300}}
+      <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+        <Header
+          name={`Hello, ${userData?.firstname || 'User'}! 👋`}
+          image={{
+            source: require('../../../assets/images/placeholder-profile.png'),
+          }}
+          variant={TypographyVariant.H6_SMALL_SEMIBOLD}
+          textColor={ColorPalette.GREY_TEXT_500}
+          rightIcons={[
+            {
+              icon: SearchIcon,
+              onPress: () => console.log('Search pressed'),
+              size: 22,
+              color: ColorPalette.IconColor,
+              strokeWidth: 1.4,
+            },
+            {
+              icon: BellIcon,
+              onPress: () =>
+                navigate('Dashboard', {
+                  screen: 'Account',
+                  params: {screen: 'NotificationScreen'},
+                }),
+              size: 22,
+              color: ColorPalette.IconColor,
+              strokeWidth: 1.5,
+            },
+            {
+              icon: QuestionMarkIcon,
+              onPress: () => {
+                navigate('Dashboard', {
+                  screen: 'Account',
+                  params: {screen: 'FAQScreen'},
+                });
+              },
+              size: 24,
+              color: ColorPalette.IconColor,
+              strokeWidth: 1.5,
+            },
+          ]}
         />
+        <View
+          style={[
+            styles.mainContainer,
+            {justifyContent: 'center', alignItems: 'center'},
+          ]}>
+          <AnimatedLoader size={52} />
+          <Typography
+            text="Loading"
+            variant={TypographyVariant.PSMALL_MEDIUM}
+            customTextStyles={{
+              color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+              marginTop: getScreenHeight(1),
+            }}
+          />
+        </View>
       </SafeAreaView>
     );
   }
@@ -238,22 +296,31 @@ const HomeScreen = () => {
           {
             icon: SearchIcon,
             onPress: () => console.log('Search pressed'),
-            size: 20,
-            color: ColorPalette.GREY_TEXT_400,
-            strokeWidth: 1.5,
+            size: 22,
+            color: ColorPalette.IconColor,
+            strokeWidth: 1.4,
           },
           {
             icon: BellIcon,
-            onPress: () => console.log('Bell pressed'),
-            size: 20,
-            color: ColorPalette.GREY_TEXT_400,
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'NotificationScreen'},
+              }),
+            size: 22,
+            color: ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
           {
             icon: QuestionMarkIcon,
-            onPress: () => console.log('Help pressed'),
+            onPress: () => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'FAQScreen'},
+              });
+            },
             size: 24,
-            color: ColorPalette.GREY_TEXT_400,
+            color: ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
         ]}
@@ -581,12 +648,13 @@ const HomeScreen = () => {
                 text="View All"
                 customTextStyles={styles.viewAllText}
                 numberOfLines={1}
+                onPress={handleViewAllPress}
               />
               <ArrowRightStyle
                 style={undefined}
                 color={ColorPalette.PURPLE_200}
                 size={13}
-                onPress={undefined}
+                onPress={handleViewAllPress}
               />
             </View>
           </View>

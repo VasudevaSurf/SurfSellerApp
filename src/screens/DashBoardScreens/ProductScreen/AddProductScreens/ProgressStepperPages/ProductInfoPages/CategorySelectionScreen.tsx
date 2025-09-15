@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   TouchableOpacity,
+  Text,
 } from 'react-native';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
 import InfoIcon from '../../../../../../assets/icons/InfoIcon';
@@ -20,7 +21,10 @@ import {Typography} from '../../../../../../components/UserComponents/Typography
 import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../../config/colorPalette';
 import {SearchBox} from '../../../../../../components/UserComponents/SearchBox/SearchBox';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {
+  getFigmaDimension,
+  getScreenWidth,
+} from '../../../../../../helpers/screenSize';
 import {
   FALLBACK_CATEGORIES,
   Category,
@@ -34,12 +38,16 @@ import {
   ButtonState,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button';
+import CheckIcon from '../../../../../../assets/icons/CheckIcon';
+import {BorderRadius, Spacing} from '../../../../../../config/globalStyles';
+import Accordion from 'react-native-collapsible/Accordion';
+import {ScrollView} from 'react-native-gesture-handler';
 
 interface CategorySelectionScreenProps {
   route: {
     params?: {
-      onSelectCategory: (categoryPath: string[]) => void; // Changed to support category path
-      initialCategory?: string;
+      onSelectCategory: (categories: {id: string; name: string}[]) => void;
+      initialCategory?: string[];
       initialSubcategory?: string;
       productId?: string;
     };
@@ -59,11 +67,31 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
   navigation,
 }) => {
   const params = route?.params || {};
+
   const {onSelectCategory, initialCategory, productId} = params;
 
   const [searchText, setSearchText] = useState('');
   const [categoryPath, setCategoryPath] = useState<CategoryPath[]>([]); // Navigation stack
+
   const [currentCategories, setCurrentCategories] = useState<Category[]>([]); // Current level categories
+  const [expandedSubcategories, setExpandedSubcategories] = useState<{
+    [categoryId: string]: Category[];
+  }>({});
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<Set<string>>(
+    new Set(),
+  );
+
+  useEffect(() => {
+    if (
+      initialCategory &&
+      Array.isArray(initialCategory) &&
+      initialCategory.length > 0
+    ) {
+      const idsSet = new Set(initialCategory.map(String));
+      console.log('idsSet:', Array.from(idsSet)); // good
+      setSelectedCategoryIds(idsSet);
+    }
+  }, [initialCategory]);
 
   // Use the categories hook
   const {
@@ -139,32 +167,6 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
     [],
   );
 
-  // Initialize with initial category if provided
-  useEffect(() => {
-    if (
-      initialCategory &&
-      rootCategories.length > 0 &&
-      categoryPath.length === 0
-    ) {
-      const foundCategory = rootCategories.find(
-        cat =>
-          cat.name === initialCategory || initialCategory.startsWith(cat.name),
-      );
-
-      if (foundCategory) {
-        const newPath = [
-          {
-            id: foundCategory.id,
-            name: foundCategory.name,
-            level: 0,
-          },
-        ];
-        setCategoryPath(newPath);
-        setCurrentCategories(foundCategory.subcategories || []);
-      }
-    }
-  }, [initialCategory, rootCategories, categoryPath.length]);
-
   // Filter categories based on search
   const filteredCategories = useMemo(() => {
     if (!searchText.trim()) return currentCategories;
@@ -173,12 +175,10 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
 
     const filterRecursive = (categories: Category[]): Category[] => {
       return categories.filter(cat => {
-        // Check if category name matches
         if (cat.name.toLowerCase().includes(searchLower)) {
           return true;
         }
 
-        // Check if any subcategory matches (recursive)
         if (cat.subcategories) {
           return filterRecursive(cat.subcategories).length > 0;
         }
@@ -190,37 +190,46 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
     return filterRecursive(currentCategories);
   }, [currentCategories, searchText]);
 
-  // Navigate to subcategory
-  const handleCategoryPress = useCallback(
-    (category: Category) => {
-      if (category.subcategories && category.subcategories.length > 0) {
-        // Navigate deeper
-        const newPath = [
-          ...categoryPath,
-          {
-            id: category.id,
-            name: category.name,
-            level: categoryPath.length,
-          },
-        ];
-        setCategoryPath(newPath);
-        setCurrentCategories(category.subcategories);
-        setSearchText('');
+  const toggleCategorySelection = (id: string) => {
+    setSelectedCategoryIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
       } else {
-        // Final selection - build category path array
-        const fullPath = [...categoryPath.map(p => p.name), category.name];
-
-        if (onSelectCategory) {
-          onSelectCategory(fullPath);
-          navigation.goBack();
-        } else {
-          console.warn('onSelectCategory is undefined');
-          navigation.goBack();
-        }
+        newSet.add(id);
       }
-    },
-    [categoryPath, onSelectCategory, navigation],
-  );
+      return newSet;
+    });
+  };
+
+  const [activeRootSections, setActiveRootSections] = useState<number[]>([]);
+  const [activeSubSectionsMap, setActiveSubSectionsMap] = useState<{
+    [key: string]: number[];
+  }>({});
+
+  console.log('activeRootSectionsactiveRootSections', activeSubSectionsMap);
+
+  const handleConfirmSelection = () => {
+    if (onSelectCategory) {
+      const selectedCategories: {id: string; name: string}[] = [];
+
+      const collectCategories = (categories: Category[]) => {
+        categories.forEach(cat => {
+          if (selectedCategoryIds.has(cat.id)) {
+            selectedCategories.push({id: cat.id, name: cat.name});
+          }
+          if (cat.subcategories) {
+            collectCategories(cat.subcategories);
+          }
+        });
+      };
+
+      collectCategories(rootCategories);
+
+      onSelectCategory(selectedCategories);
+    }
+    navigation.goBack();
+  };
 
   // Navigate back one level
   const handleNavigateBack = useCallback(() => {
@@ -255,71 +264,9 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
     if (categoryPath.length === 0) {
       return UI_TEXT.SELECT_CATEGORY;
     }
-    return `Select in ${categoryPath[categoryPath.length - 1].name}`;
+    return `${categoryPath[categoryPath.length - 1].name}`;
+    // return `Select in ${categoryPath[categoryPath.length - 1].name}`;
   }, [categoryPath]);
-
-  // Handle header back button press
-  const handleHeaderBackPress = useCallback(() => {
-    if (categoryPath.length > 0) {
-      handleNavigateBack();
-    } else {
-      navigation.goBack();
-    }
-  }, [categoryPath.length, handleNavigateBack, navigation]);
-
-  // Render breadcrumb navigation
-  const renderBreadcrumb = useCallback(() => {
-    if (categoryPath.length === 0) return null;
-
-    return (
-      <View style={styles.breadcrumbContainer}>
-        <FlatList
-          horizontal
-          data={categoryPath}
-          keyExtractor={item => `${item.level}-${item.id}`}
-          renderItem={({item, index}) => (
-            <TouchableOpacity
-              style={styles.breadcrumbItem}
-              onPress={() => {
-                // Navigate to specific level
-                const newPath = categoryPath.slice(0, index + 1);
-                setCategoryPath(newPath);
-
-                const pathIds = newPath.map(p => p.id);
-                const targetCategory = findCategoryByPath(
-                  rootCategories,
-                  pathIds,
-                );
-                if (targetCategory && targetCategory.subcategories) {
-                  setCurrentCategories(targetCategory.subcategories);
-                } else if (index === 0) {
-                  setCurrentCategories(rootCategories);
-                }
-              }}>
-              <Typography
-                variant={TypographyVariant.PSMALL_MEDIUM}
-                text={item.name}
-                customTextStyles={[
-                  styles.breadcrumbText,
-                  index === categoryPath.length - 1 &&
-                    styles.breadcrumbTextActive,
-                ]}
-              />
-              {index < categoryPath.length - 1 && (
-                <ArrowRightIcon
-                  size={12}
-                  color={ColorPalette.GREY_TEXT_300}
-                  style={styles.breadcrumbArrow}
-                />
-              )}
-            </TouchableOpacity>
-          )}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.breadcrumbContent}
-        />
-      </View>
-    );
-  }, [categoryPath, findCategoryByPath, rootCategories]);
 
   // Loading state
   if (categoriesLoading && rootCategories.length === 0) {
@@ -338,12 +285,20 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
           variant={TypographyVariant.LMEDIUM_BOLD}
         />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+          <AnimatedLoader size={52} />
           <Typography
+            text={UI_TEXT.LOADING_CATEGORIES}
+            variant={TypographyVariant.PSMALL_MEDIUM}
+            customTextStyles={{
+              color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+              marginTop: getScreenHeight(1),
+            }}
+          />
+          {/* <Typography
             variant={TypographyVariant.LMEDIUM_REGULAR}
             text={UI_TEXT.LOADING_CATEGORIES}
             customTextStyles={styles.loadingText}
-          />
+          /> */}
         </View>
       </SafeAreaView>
     );
@@ -351,6 +306,247 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
 
   // Error state (but show fallback categories)
   const showErrorMessage = categoriesError && apiCategories.length === 0;
+
+  //accordion code
+
+  // Root Header
+  const renderRootHeader = (
+    section: Category,
+    index: number,
+    isActive: boolean,
+  ) => {
+    const isSelected = selectedCategoryIds.has(section.id);
+    const hasChildren = section.subcategories?.length > 0;
+
+    // Single handler for the entire row
+    const handlePress = () => {
+      toggleCategorySelection(section.id); // toggle checkbox
+
+      if (hasChildren) {
+        setActiveRootSections(prev => {
+          if (!isSelected) {
+            // if now checked, open accordion
+            return [...prev, index];
+          } else {
+            // if now unchecked, close accordion
+            return prev.filter(i => i !== index);
+          }
+        });
+
+        setExpandedSubcategories(prev => ({
+          ...prev,
+          [section.id]: !isSelected ? section.subcategories! : [],
+        }));
+      }
+    };
+
+    return (
+      <TouchableOpacity
+        onPress={handlePress}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 16,
+          backgroundColor: '#fff',
+          borderBottomWidth: 1,
+          borderColor: ColorPalette.GREY_100,
+        }}>
+        {/* Checkbox */}
+        <View
+          style={{
+            width: 26,
+            height: 26,
+            borderRadius: 4,
+            borderWidth: 1,
+            borderColor: ColorPalette.GREY_400,
+            backgroundColor: isSelected
+              ? ColorPalette.PURPLE_300
+              : 'transparent',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 12,
+          }}>
+          {isSelected && (
+            <CheckIcon size={26} checkColor={ColorPalette.White} />
+          )}
+        </View>
+
+        {/* Label */}
+        <Typography
+          text={section.name}
+          variant={TypographyVariant.PMEDIUM_REGULAR}
+          customTextStyles={{flex: 1}}
+        />
+
+        {/* Arrow */}
+        {hasChildren && (
+          <ArrowRightIcon
+            color={ColorPalette.GREY_TEXT_500}
+            style={{transform: [{rotate: isActive ? '90deg' : '0deg'}]}}
+          />
+        )}
+      </TouchableOpacity>
+    );
+  };
+
+  // Root Content (load only that category’s subcategories accordion)
+  const renderRootContent = (category: Category) => {
+    const subcategories = expandedSubcategories[category.id];
+    if (!subcategories || subcategories.length === 0) return null;
+
+    return (
+      <View
+        style={{
+          borderWidth: 1,
+          borderColor: ColorPalette.GREY_100,
+          borderRadius: BorderRadius.Small,
+          marginHorizontal: getScreenWidth(3),
+          marginBottom: getScreenWidth(3),
+          paddingVertical: 8,
+          paddingHorizontal: 12,
+          backgroundColor: '#fff',
+        }}>
+        {subcategories.map(sub => {
+          const isSelected = selectedCategoryIds.has(sub.id);
+          const hasChildren = sub.subcategories && sub.subcategories.length > 0;
+          const activeSubSections = activeSubSectionsMap[sub.id] || [];
+
+          const handlePress = () => {
+            toggleCategorySelection(sub.id);
+
+            if (hasChildren) {
+              setActiveSubSectionsMap(prev => ({
+                ...prev,
+                [sub.id]: isSelected ? [] : [0], // open if checked, close if unchecked
+              }));
+
+              setExpandedSubcategories(prev => ({
+                ...prev,
+                [sub.id]: !isSelected ? sub.subcategories! : [],
+              }));
+            }
+          };
+
+          return (
+            <Accordion
+              key={sub.id}
+              sections={[sub]}
+              activeSections={activeSubSections}
+              expandMultiple
+              underlayColor="transparent"
+              renderHeader={(_, __, isActive) => (
+                <TouchableOpacity
+                  onPress={handlePress}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingVertical: 10,
+                    paddingHorizontal: 12,
+                  }}>
+                  {/* Checkbox */}
+                  <View
+                    style={{
+                      width: 26,
+                      height: 26,
+                      borderRadius: 4,
+                      borderWidth: 1,
+                      borderColor: '#aaa',
+                      backgroundColor: isSelected ? '#6c5ce7' : 'transparent',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 12,
+                    }}>
+                    {isSelected && <CheckIcon size={26} checkColor="#fff" />}
+                  </View>
+
+                  {/* Label */}
+                  <Typography
+                    text={sub.name}
+                    variant={TypographyVariant.PMEDIUM_REGULAR}
+                    customTextStyles={{flex: 1}}
+                  />
+
+                  {/* Arrow */}
+                  {hasChildren && (
+                    <ArrowRightIcon
+                      color="#888"
+                      style={{
+                        transform: [{rotate: isActive ? '90deg' : '0deg'}],
+                      }}
+                    />
+                  )}
+                </TouchableOpacity>
+              )}
+              renderContent={() => {
+                if (!hasChildren) return null;
+                return renderRootContent(sub); // recursion for deeper levels
+              }}
+              onChange={newActive =>
+                setActiveSubSectionsMap(prev => ({
+                  ...prev,
+                  [sub.id]: newActive,
+                }))
+              }
+            />
+          );
+        })}
+      </View>
+    );
+  };
+
+  // expand parents when initialCategory pre-fills - encountering a small issue in opening sub/sub cat accordion.
+  useEffect(() => {
+    if (rootCategories.length > 0 && selectedCategoryIds.size > 0) {
+      const expandParents = (
+        categories: Category[],
+        parentIndex?: number,
+        parentId?: string,
+      ): boolean => {
+        let found = false;
+
+        categories.forEach((cat, index) => {
+          if (selectedCategoryIds.has(cat.id)) {
+            found = true;
+          }
+
+          if (cat.subcategories && cat.subcategories.length > 0) {
+            const childHasSelected = expandParents(
+              cat.subcategories,
+              index,
+              cat.id,
+            );
+            if (childHasSelected) {
+              found = true;
+
+              // open this accordion section
+              if (parentId) {
+                // it's a sub accordion
+                setActiveSubSectionsMap(prev => ({
+                  ...prev,
+                  [parentId]: [0], // expand this parent
+                }));
+                setExpandedSubcategories(prev => ({
+                  ...prev,
+                  [parentId]: cat.subcategories!,
+                }));
+              } else {
+                // it's a root accordion
+                setActiveRootSections(prev => [...new Set([...prev, index])]);
+                setExpandedSubcategories(prev => ({
+                  ...prev,
+                  [cat.id]: cat.subcategories!,
+                }));
+              }
+            }
+          }
+        });
+
+        return found;
+      };
+
+      expandParents(rootCategories);
+    }
+  }, [rootCategories, selectedCategoryIds]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -375,8 +571,6 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
           },
         ]}
       />
-
-      {renderBreadcrumb()}
 
       {showErrorMessage && (
         <View style={styles.errorContainer}>
@@ -406,53 +600,138 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
         />
       </View>
 
-      {filteredCategories.length > 0 ? (
-        <FlatList
-          data={filteredCategories}
-          keyExtractor={item => item.id}
-          renderItem={({item, index}) => (
-            <MenuItem
-              label={item.name}
-              leftIcon={item.icon}
-              onPress={() => handleCategoryPress(item)}
-              variant={TypographyVariant.LMEDIUM_MEDIUM}
-              containerStyle={styles.categoryItem}
-              rightIcon={
-                item.subcategories && item.subcategories.length > 0 ? (
-                  <ArrowRightIcon
-                    style={undefined}
-                    color={ColorPalette.GREY_TEXT_500}
-                  />
-                ) : null
+      {/* {renderBreadcrumb()} commented out after discussion */}
+
+      <View style={{flex: 1}}>
+        {filteredCategories.length > 0 ? (
+          // <FlatList
+          //   data={filteredCategories}
+          //   keyExtractor={item => item.id}
+          //   ItemSeparatorComponent={() => (
+          //     <View
+          //       style={{height: 1, backgroundColor: ColorPalette.GREY_100}}
+          //     />
+          //   )}
+          //   renderItem={({item, index}) => {
+          //     const isLastLevel =
+          //       !item.subcategories || item.subcategories.length === 0;
+          //     const isRootLevel = categoryPath.length === 0;
+
+          //     const isSelected = selectedCategories.includes(item.id);
+          //     return (
+          //       <MenuItem
+          //         label={item.name}
+          //         leftIcon={
+          //           isLastLevel &&
+          //           !isRootLevel && (
+          //             <View
+          //               style={[
+          //                 styles.checkbox,
+          //                 isSelected && styles.checkboxSelected,
+          //               ]}>
+          //               {isSelected && (
+          //                 <CheckIcon
+          //                   size={24}
+          //                   backgroundColor="transparent"
+          //                   checkColor={ColorPalette.White}
+          //                 />
+          //               )}
+          //             </View>
+          //           )
+          //         }
+          //         leftIconContainerStyle={{marginRight: getScreenWidth(-4)}}
+          //         onPress={() => {
+          //           if (!isLastLevel) {
+          //             handleCategoryPress(item);
+          //           } else if (!isRootLevel) {
+          //             toggleCategorySelection(item.id);
+          //           } else {
+          //             handleCategoryPress(item);
+          //           }
+          //         }}
+          //         variant={TypographyVariant.LMEDIUM_MEDIUM}
+          //         containerStyle={styles.categoryItem}
+          //         rightIcon={
+          //           !isLastLevel ? (
+          //             <ArrowRightIcon
+          //               style={undefined}
+          //               color={ColorPalette.GREY_TEXT_500}
+          //             />
+          //           ) : null
+          //         }
+          //         showBottomBorder
+          //         textStyle={styles.menuItemText}
+          //         isLastItem={index === filteredCategories.length - 1}
+          //       />
+          //     );
+          //   }}
+          //   refreshControl={
+          //     <RefreshControl
+          //       refreshing={categoriesLoading}
+          //       onRefresh={() => refreshCategories(productId)}
+          //       colors={[ColorPalette.PURPLE_300]}
+          //       tintColor={ColorPalette.PURPLE_300}
+          //     />
+          //   }
+          //   contentContainerStyle={styles.listContent}
+          // />
+
+          <ScrollView>
+            {filteredCategories.map((category, index) => (
+              <Accordion
+                key={category.id}
+                sections={[category]}
+                activeSections={activeRootSections.includes(index) ? [0] : []}
+                renderHeader={(section, _, isActive) =>
+                  renderRootHeader(section, index, isActive)
+                }
+                renderContent={renderRootContent}
+                onChange={newActive =>
+                  setActiveRootSections(
+                    prev =>
+                      newActive.length > 0
+                        ? [...prev, index] // expand
+                        : prev.filter(i => i !== index), // collapse
+                  )
+                }
+                expandMultiple={false}
+                underlayColor="transparent"
+              />
+            ))}
+          </ScrollView>
+        ) : (
+          <View style={styles.emptyStateContainer}>
+            <Typography
+              variant={TypographyVariant.PMEDIUM_REGULAR}
+              text={
+                searchText.trim()
+                  ? 'No matching categories found'
+                  : 'No categories available'
               }
-              showBottomBorder
-              textStyle={styles.menuItemText}
-              isLastItem={index === filteredCategories.length - 1}
+              customTextStyles={styles.emptyStateText}
             />
-          )}
-          refreshControl={
-            <RefreshControl
-              refreshing={categoriesLoading}
-              onRefresh={() => refreshCategories(productId)}
-              colors={[ColorPalette.PURPLE_300]}
-              tintColor={ColorPalette.PURPLE_300}
-            />
-          }
-          contentContainerStyle={styles.listContent}
-        />
-      ) : (
-        <View style={styles.emptyStateContainer}>
-          <Typography
-            variant={TypographyVariant.PMEDIUM_REGULAR}
-            text={
-              searchText.trim()
-                ? 'No matching categories found'
-                : 'No categories available'
-            }
-            customTextStyles={styles.emptyStateText}
+          </View>
+        )}
+        {/* {categoryPath.length > 0 &&
+          currentCategories.every(
+            c => !c.subcategories || c.subcategories.length === 0,
+          ) && ( */}
+        <View style={styles.doneButtonContainer}>
+          <Button
+            text="Save"
+            onPress={handleConfirmSelection}
+            variant={ButtonVariant.PRIMARY}
+            state={ButtonState.DEFAULT}
+            size={ButtonSize.MEDIUM}
+            withShadow
+            // disabled={selectedCategories.length === 0}
+            // customStyles={{
+            //   opacity: selectedCategories.length === 0 ? 0.6 : 1,
+            // }}
           />
         </View>
-      )}
+        {/* )} */}
+      </View>
     </SafeAreaView>
   );
 };
@@ -584,6 +863,26 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: getFigmaDimension(20),
+  },
+  checkbox: {
+    width: getScreenWidth(6),
+    height: getScreenWidth(6),
+    borderRadius: BorderRadius.XXSmall,
+    borderWidth: 2,
+    borderColor: ColorPalette.GREY_200,
+    marginRight: getScreenWidth(2.5),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxSelected: {
+    backgroundColor: ColorPalette.PURPLE_300,
+    borderColor: ColorPalette.PURPLE_300,
+  },
+  doneButtonContainer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: ColorPalette.GREY_100,
+    backgroundColor: ColorPalette.White,
   },
 });
 

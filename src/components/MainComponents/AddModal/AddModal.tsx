@@ -48,11 +48,13 @@ export interface AddModalProps {
   backdropColor?: string;
   animationIn?: string;
   animationOut?: string;
+  headerTitle?: string; // new optional title
 }
 
 export const AddModal: React.FC<AddModalProps> = ({
   isVisible,
   onClose,
+  headerTitle, // new optional title
   headerText,
   showCloseIcon = true,
   buttons = [],
@@ -88,14 +90,23 @@ export const AddModal: React.FC<AddModalProps> = ({
         />
         <View style={[styles.modalContainer, containerStyle]}>
           <View style={styles.header}>
-            {headerText ? (
+            {headerTitle || headerText ? (
               <>
                 <View style={styles.headerContent}>
-                  <Typography
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                    text={headerText}
-                    customTextStyles={styles.headerText}
-                  />
+                  {headerTitle && (
+                    <Typography
+                      variant={TypographyVariant.H5_BOLD}
+                      text={headerTitle}
+                      customTextStyles={styles.headerTitle}
+                    />
+                  )}
+                  {headerText && (
+                    <Typography
+                      variant={TypographyVariant.PMEDIUM_REGULAR}
+                      text={headerText}
+                      customTextStyles={styles.headerText}
+                    />
+                  )}
                 </View>
 
                 {showCloseIcon && (
@@ -119,6 +130,7 @@ export const AddModal: React.FC<AddModalProps> = ({
               </>
             )}
           </View>
+
           <View style={[styles.footer, footerStyle]}>
             {buttons.map((button, index) => (
               <Button

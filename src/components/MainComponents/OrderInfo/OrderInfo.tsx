@@ -96,7 +96,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
         <View style={{gap: getScreenHeight(0.5)}}>
           <Typography
             text={`Order #${orderNumber}`}
-            variant={TypographyVariant.H5_SEMIBOLD}
+            variant={TypographyVariant.H5_BOLD}
             customTextStyles={styles.orderNumberText}
           />
           <Typography
@@ -153,7 +153,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
               customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
             <Typography
-              text={`€${orderPrice}`}
+              text={`${orderPrice}`}
               variant={TypographyVariant.LMEDIUM_BOLD}
               customTextStyles={styles.priceText}
             />
@@ -185,6 +185,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
         />
         <StatusModal
           isVisible={isModalVisible}
+          title="Order Status"
           onClose={() => setIsModalVisible(false)}
           onSubmit={onStatusChange}
           initialStatus={orderStatus}

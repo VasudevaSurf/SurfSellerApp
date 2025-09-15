@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     gap: Spacing.Medium,
-    paddingBottom: getScreenHeight(8),
+    paddingBottom: getScreenHeight(18),
     paddingHorizontal: getScreenWidth(4), // Add padding to ensure content doesn't get hidden behind the button
   },
   productCard: {
@@ -23,8 +23,9 @@ export const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     gap: Spacing.Medium,
-    paddingBottom: Spacing.Medium,
+    paddingBottom: Spacing.Small,
     borderRadius: Spacing.Small,
+    paddingVertical: getScreenHeight(2),
   },
   productCardContent: {
     paddingHorizontal: Spacing.Medium,
@@ -44,8 +45,8 @@ export const styles = StyleSheet.create({
     paddingBottom: getScreenHeight(2),
   },
   imageContainer: {
-    width: getScreenWidth(15.1),
-    height: getScreenWidth(15.1),
+    width: getScreenWidth(20), //previously 15.1
+    height: getScreenWidth(20), //previously 15.1
     borderRadius: BorderRadius.XSmall,
     overflow: 'hidden',
     flexShrink: 0,
@@ -88,6 +89,7 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
     borderRadius: Spacing.Small,
     overflow: 'hidden',
+    // marginBottom: getScreenHeight(10),
   },
   sectionContainer: {
     backgroundColor: ColorPalette.White,
@@ -107,12 +109,23 @@ export const styles = StyleSheet.create({
     paddingHorizontal: getScreenHeight(2),
     // Remove backgroundColor as it's handled by CustomSquircle
   },
+  // accordionHeaderActive: {
+  //   paddingVertical: getScreenHeight(0),
+  //   marginTop: getScreenHeight(2.5),
+  // },
+
   accordionContent: {
     paddingVertical: Spacing.Small,
     paddingHorizontal: Spacing.Medium,
     paddingBottom: Spacing.Medium,
-    marginTop: -Spacing.XSmall,
+    // marginTop: -Spacing.XSmall,
+
     // Remove backgroundColor and borderRadius as they're handled by CustomSquircle
+
+    borderWidth: 1,
+    borderColor: ColorPalette.GREY_100,
+    borderRadius: BorderRadius.Small,
+    margin: 20,
   },
   accordionContainer: {
     display: 'flex',
@@ -120,13 +133,14 @@ export const styles = StyleSheet.create({
   },
   buttonContainer: {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'col',
     padding: getScreenHeight(2),
+    gap: getScreenHeight(1),
     backgroundColor: ColorPalette.White,
     alignItems: 'center',
     justifyContent: 'space-between',
     position: 'absolute',
-    bottom: 0,
+    bottom: -6,
     left: 0,
     right: 0,
   },
@@ -145,5 +159,25 @@ export const styles = StyleSheet.create({
   },
   dateTimeText: {
     color: ColorPalette.GREY_TEXT_300,
+  },
+  orderCard: {
+    backgroundColor: ColorPalette.White,
+    paddingHorizontal: Spacing.Medium,
+    display: 'flex',
+    flexDirection: 'column',
+    // gap: Spacing.Small,
+    paddingBottom: Spacing.Medium,
+    borderRadius: Spacing.Small,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  label: {
+    color: ColorPalette.GREY_TEXT_100,
+  },
+  value: {
+    color: ColorPalette.GREY_TEXT_500,
   },
 });

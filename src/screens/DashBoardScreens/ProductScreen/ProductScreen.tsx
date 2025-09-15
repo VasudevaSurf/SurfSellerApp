@@ -9,6 +9,7 @@ import {
   View,
   RefreshControl,
   Alert,
+  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useDispatch, useSelector} from 'react-redux';
@@ -54,11 +55,15 @@ import {AppDispatch, RootState} from '../../../redux/store';
 import {styles} from './ProductScreen.styles';
 import FilterIcon from '../../../assets/icons/FilterIcon';
 import {PriceRangeModal} from '../../../components/MainComponents/PriceRangeModal';
+import EyeOpen from '../../../assets/icons/EyeOpen';
+import EmptyBox from '../../../assets/icons/EmptyBox.tsx';
+import LoaderIcon, {AnimatedLoader} from '../../../assets/icons/LoaderIcon.tsx';
 
 const ProductScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchText, setSearchText] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showFilterModal, setShowFilterModal] = useState(false); // added for filter icon
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPriceModalVisible, setIsPriceModalVisible] = useState(false);
   const [priceRange, setPriceRange] = useState({min: 0, max: 1000});
@@ -94,21 +99,6 @@ const ProductScreen = () => {
     updatingStatus = [],
     statusUpdateError,
   } = useSelector((state: RootState) => state.products);
-
-  console.log('ProductScreen - User ID:', userId);
-  console.log('ProductScreen - Current state:', {
-    productsCount: products.length,
-    loading,
-    error,
-    totalItems,
-    currentFilter,
-    filterCounts,
-    searchTerm,
-    deletingProducts,
-    deleteError,
-    updatingStatus,
-    statusUpdateError,
-  });
 
   // Create filter options with dynamic counts
   const filterOptions = [
@@ -178,10 +168,6 @@ const ProductScreen = () => {
   const fetchProductsForFilter = (filterId: string, search: string = '') => {
     if (!userId) return;
 
-    console.log(
-      `Fetching products for filter: ${filterId}, search: "${search}"`,
-    );
-
     if (search.trim()) {
       // If there's a search term, use search API with filter
       const statusMap: {[key: string]: 'A' | 'P' | 'D' | 'all'} = {
@@ -229,7 +215,6 @@ const ProductScreen = () => {
   // Fetch filter counts on component mount
   useEffect(() => {
     if (userId) {
-      console.log('Fetching filter counts for userId:', userId);
       dispatch(fetchFilterCounts({userId}));
     }
   }, [dispatch, userId]);
@@ -237,14 +222,12 @@ const ProductScreen = () => {
   // Initial load
   useEffect(() => {
     if (userId && products.length === 0 && !loading && !error) {
-      console.log('Initial products load');
       fetchProductsForFilter('all');
     }
   }, [userId]);
 
   // Handle filter selection
   const handleFilterSelect = (option: any) => {
-    console.log('Filter selected:', option);
     setSelectedFilter(option);
     dispatch(setCurrentFilter(option.id));
     fetchProductsForFilter(option.id, searchText);
@@ -258,7 +241,6 @@ const ProductScreen = () => {
 
   // Handle search with debouncing
   const handleSearch = (text: string) => {
-    console.log('Search text changed:', text);
     setSearchText(text);
     dispatch(setSearchTerm(text));
 
@@ -270,7 +252,6 @@ const ProductScreen = () => {
 
   // Handle refresh
   const handleRefresh = async () => {
-    console.log('Refresh triggered');
     setIsRefreshing(true);
     try {
       if (userId) {
@@ -288,7 +269,6 @@ const ProductScreen = () => {
   };
 
   const handleAddManually = () => {
-    console.log('Add manually pressed');
     setShowAddModal(false);
     setTimeout(() => {
       navigate('Dashboard', {
@@ -299,19 +279,16 @@ const ProductScreen = () => {
   };
 
   const handleUploadCsv = () => {
-    console.log('Upload CSV pressed');
     setShowAddModal(false);
   };
 
   // Multi-select functions
   const activateMultiSelectMode = (productId: string) => {
-    console.log('Activating multi-select mode with product:', productId);
     setIsMultiSelectMode(true);
     setSelectedProducts([productId]);
   };
 
   const exitMultiSelectMode = () => {
-    console.log('Exiting multi-select mode');
     setIsMultiSelectMode(false);
     setSelectedProducts([]);
   };
@@ -322,12 +299,6 @@ const ProductScreen = () => {
       const newSelection = isSelected
         ? prev.filter(id => id !== productId)
         : [...prev, productId];
-
-      console.log('Product selection toggled:', {
-        productId,
-        isSelected,
-        newSelection,
-      });
 
       // If no products selected, exit multi-select mode
       if (newSelection.length === 0) {
@@ -341,12 +312,10 @@ const ProductScreen = () => {
   const selectAllProducts = () => {
     const allProductIds = products.map(p => p.product_id);
     setSelectedProducts(allProductIds);
-    console.log('All products selected:', allProductIds);
   };
 
   const deselectAllProducts = () => {
     setSelectedProducts([]);
-    console.log('All products deselected');
   };
 
   const handleBulkDelete = () => {
@@ -371,16 +340,12 @@ const ProductScreen = () => {
     }
 
     try {
-      console.log('Deleting multiple products:', selectedProducts);
-
       const result = await dispatch(
         deleteMultipleProducts({
           userId,
           productIds: selectedProducts,
         }),
       ).unwrap();
-
-      console.log('Products deleted successfully:', result);
 
       // Reset multi-select state
       setSelectedProducts([]);
@@ -433,21 +398,12 @@ const ProductScreen = () => {
       return;
     }
 
-    console.log('Toggling product status:', {productId, isActive, userId});
-
     // Prevent multiple simultaneous updates for the same product
     if (updatingStatus.includes(productId)) {
-      console.log('Status update already in progress for product:', productId);
       return;
     }
 
     try {
-      console.log(
-        `Updating product ${productId} status to ${
-          isActive ? 'Active' : 'Hidden'
-        }`,
-      );
-
       // Dispatch the async thunk
       const result = await dispatch(
         updateProductStatus({
@@ -456,8 +412,6 @@ const ProductScreen = () => {
           isActive,
         }),
       ).unwrap();
-
-      console.log('Product status successfully updated:', result);
 
       // Show success message
       Alert.alert(
@@ -519,12 +473,6 @@ const ProductScreen = () => {
           text: 'Update',
           onPress: async () => {
             try {
-              console.log(
-                'Updating multiple products status:',
-                selectedProducts,
-                status,
-              );
-
               const result = await dispatch(
                 updateMultipleProductsStatus({
                   userId,
@@ -532,8 +480,6 @@ const ProductScreen = () => {
                   status,
                 }),
               ).unwrap();
-
-              console.log('Products status updated successfully:', result);
 
               // Reset multi-select state
               setSelectedProducts([]);
@@ -622,25 +568,168 @@ const ProductScreen = () => {
     },
   ];
 
+  // Filter modal buttons
+  const filerModalButtons: ButtonConfig[] = [
+    {
+      text: `Apply`,
+      onPress: confirmBulkDelete,
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      size: ButtonSize.MEDIUM,
+      customStyles: {backgroundColor: ColorPalette.RED_100},
+      textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
+    },
+    {
+      text: 'Cancel',
+      onPress: () => setShowDeleteConfirmModal(false),
+      variant: ButtonVariant.PRIMARY,
+      state: ButtonState.DEFAULT,
+      type: ButtonType.OUTLINED,
+      size: ButtonSize.MEDIUM,
+      customStyles: {borderWidth: 1},
+      textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
+    },
+  ];
+
   const searchBarHeight = getScreenHeight(6);
+
+  // const getEmptyStateMessage = () => {
+  //   if (searchText.trim()) {
+  //     return `No products found for "${searchText}"`;
+  //   }
+
+  //   switch (selectedFilter.id) {
+  //     case 'active':
+  //       return 'No active products found';
+  //     case 'pending':
+  //       return 'No pending products found';
+  //     case 'disabled':
+  //       return 'No hidden products found';
+  //     case 'lowStock':
+  //       return 'No low stock products found';
+  //     case 'all':
+  //     default:
+  //       return 'No products found';
+  //   }
+  // };
 
   const getEmptyStateMessage = () => {
     if (searchText.trim()) {
-      return `No products found for "${searchText}"`;
+      return (
+        <View style={styles.emptyMessageContainer}>
+          <Image
+            source={require('../../../assets/images/emptyBox.png')}
+            style={styles.emptyBoxPng}
+          />{' '}
+          <Typography
+            text={`No products found for "${searchText}"`}
+            variant={TypographyVariant.LMEDIUM_REGULAR}
+            customTextStyles={styles.emptyStateText}
+          />
+        </View>
+      );
     }
 
     switch (selectedFilter.id) {
-      case 'active':
-        return 'No active products found';
-      case 'pending':
-        return 'No pending products found';
-      case 'disabled':
-        return 'No hidden products found';
-      case 'lowStock':
-        return 'No low stock products found';
       case 'all':
+        return (
+          <View style={styles.emptyMessageContainer}>
+            <Image
+              source={require('../../../assets/images/emptyBox.png')}
+              style={styles.emptyBoxPng}
+            />
+            <View style={styles.textContainer}>
+              <Typography
+                text="No products listed!"
+                variant={TypographyVariant.LMEDIUM_BOLD}
+                customTextStyles={styles.emptyStateText}
+              />
+              <Typography
+                text="Add a product to start selling."
+                variant={TypographyVariant.LSMALL_REGULAR}
+                customTextStyles={styles.emptyStateText}
+              />
+            </View>
+          </View>
+        );
+      case 'active':
+        return (
+          <View style={styles.emptyMessageContainer}>
+            <Image
+              source={require('../../../assets/images/emptyBox.png')}
+              style={styles.emptyBoxPng}
+            />
+            <View style={styles.textContainer}>
+              <Typography
+                text="No active products listed!"
+                variant={TypographyVariant.PMEDIUM_SEMIBOLD}
+                customTextStyles={styles.emptyStateText}
+              />
+              <Typography
+                text="Add a product to start selling."
+                variant={TypographyVariant.LSMALL_REGULAR}
+                customTextStyles={styles.emptyStateText}
+              />
+            </View>
+          </View>
+        );
+      case 'lowStock':
+        return (
+          <View style={styles.emptyMessageContainer}>
+            <Image
+              source={require('../../../assets/images/emptyBox.png')}
+              style={styles.emptyBoxPng}
+            />
+            <Typography
+              text="No low stocks products found"
+              variant={TypographyVariant.LSMALL_REGULAR}
+              customTextStyles={styles.emptyStateText}
+            />
+          </View>
+        );
+      case 'pending':
+        return (
+          <View style={styles.emptyMessageContainer}>
+            <Image
+              source={require('../../../assets/images/emptyBox.png')}
+              style={styles.emptyBoxPng}
+            />
+            <Typography
+              text="No pending products found"
+              variant={TypographyVariant.LSMALL_REGULAR}
+              customTextStyles={styles.emptyStateText}
+            />
+          </View>
+        );
+      case 'disabled':
+        return (
+          <View style={styles.emptyMessageContainer}>
+            <Image
+              source={require('../../../assets/images/emptyBox.png')}
+              style={styles.emptyBoxPng}
+            />
+            <Typography
+              text="No hidden products found"
+              variant={TypographyVariant.LSMALL_REGULAR}
+              customTextStyles={styles.emptyStateText}
+            />
+          </View>
+        );
+      // add other cases...
       default:
-        return 'No products found';
+        return (
+          <View style={styles.emptyMessageContainer}>
+            <Image
+              source={require('../../../assets/images/emptyBox.png')}
+              style={styles.emptyBoxPng}
+            />
+            <Typography
+              text="No products found"
+              variant={TypographyVariant.LSMALL_REGULAR}
+              customTextStyles={styles.emptyStateText}
+            />
+          </View>
+        );
     }
   };
 
@@ -663,7 +752,7 @@ const ProductScreen = () => {
         name={
           isMultiSelectMode ? `${selectedProducts.length} Selected` : 'Products'
         }
-        variant={TypographyVariant.H6_SMALL_SEMIBOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={
           isMultiSelectMode ? (
@@ -679,15 +768,19 @@ const ProductScreen = () => {
         rightIcons={[
           {
             icon: BellIcon,
-            onPress: () => console.log('Bell icon pressed'),
-            size: 20,
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'NotificationScreen'},
+              }),
+            size: 22,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
           {
             icon: FilterIcon,
-            onPress: handleOpenPriceModal, // This will open the modal
-            size: 18,
+            onPress: () => setShowFilterModal(prev => !prev),
+            size: 24,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
@@ -705,76 +798,78 @@ const ProductScreen = () => {
           }}
         />
 
-        {isMultiSelectMode ? (
-          <View style={{flexDirection: 'row', gap: getScreenWidth(2)}}>
-            {selectedProducts.length > 0 && (
+        {
+          isMultiSelectMode && (
+            <View style={{flexDirection: 'row', gap: getScreenWidth(2)}}>
+              {selectedProducts.length > 0 && (
+                <Button
+                  text={`Delete (${selectedProducts.length})`}
+                  type={ButtonType.PRIMARY}
+                  variant={ButtonVariant.PRIMARY}
+                  size={ButtonSize.MEDIUM}
+                  state={ButtonState.DEFAULT}
+                  customStyles={{
+                    height: searchBarHeight,
+                    paddingHorizontal: getScreenWidth(3),
+                    backgroundColor: ColorPalette.RED_100,
+                  }}
+                  IconComponent={() => (
+                    <TrashIcon
+                      color={ColorPalette.White}
+                      strokeWidth={2}
+                      size={20}
+                    />
+                  )}
+                  iconPosition="left"
+                  onPress={handleBulkDelete}
+                  textVariant={TypographyVariant.PMEDIUM_SEMIBOLD}
+                />
+              )}
+
               <Button
-                text={`Delete (${selectedProducts.length})`}
-                type={ButtonType.PRIMARY}
+                text={
+                  selectedProducts.length === products.length
+                    ? 'Deselect All'
+                    : 'Select All'
+                }
+                type={ButtonType.OUTLINED}
                 variant={ButtonVariant.PRIMARY}
                 size={ButtonSize.MEDIUM}
                 state={ButtonState.DEFAULT}
                 customStyles={{
                   height: searchBarHeight,
                   paddingHorizontal: getScreenWidth(3),
-                  backgroundColor: ColorPalette.RED_100,
+                  borderColor: ColorPalette.PURPLE_300,
                 }}
-                IconComponent={() => (
-                  <TrashIcon
-                    color={ColorPalette.White}
-                    strokeWidth={2}
-                    size={20}
-                  />
-                )}
-                iconPosition="left"
-                onPress={handleBulkDelete}
+                onPress={
+                  selectedProducts.length === products.length
+                    ? deselectAllProducts
+                    : selectAllProducts
+                }
                 textVariant={TypographyVariant.PMEDIUM_SEMIBOLD}
               />
-            )}
+            </View>
+          )
 
-            <Button
-              text={
-                selectedProducts.length === products.length
-                  ? 'Deselect All'
-                  : 'Select All'
-              }
-              type={ButtonType.OUTLINED}
-              variant={ButtonVariant.PRIMARY}
-              size={ButtonSize.MEDIUM}
-              state={ButtonState.DEFAULT}
-              customStyles={{
-                height: searchBarHeight,
-                paddingHorizontal: getScreenWidth(3),
-                borderColor: ColorPalette.PURPLE_300,
-              }}
-              onPress={
-                selectedProducts.length === products.length
-                  ? deselectAllProducts
-                  : selectAllProducts
-              }
-              textVariant={TypographyVariant.PMEDIUM_SEMIBOLD}
-            />
-          </View>
-        ) : (
-          <Button
-            text="Add"
-            type={ButtonType.PRIMARY}
-            variant={ButtonVariant.PRIMARY}
-            size={ButtonSize.MEDIUM}
-            state={ButtonState.DEFAULT}
-            customStyles={{
-              height: searchBarHeight,
-              paddingHorizontal: getScreenWidth(3),
-            }}
-            IconComponent={() => (
-              <PlusIcon color={ColorPalette.White} strokeWidth={2} size={24} />
-            )}
-            iconPosition="right"
-            withShadow
-            onPress={() => setShowAddModal(true)}
-            textVariant={TypographyVariant.PMEDIUM_SEMIBOLD}
-          />
-        )}
+          // <Button
+          //   text="Add"
+          //   type={ButtonType.PRIMARY}
+          //   variant={ButtonVariant.PRIMARY}
+          //   size={ButtonSize.MEDIUM}
+          //   state={ButtonState.DEFAULT}
+          //   customStyles={{
+          //     height: searchBarHeight,
+          //     paddingHorizontal: getScreenWidth(3),
+          //   }}
+          //   IconComponent={() => (
+          //     <PlusIcon color={ColorPalette.White} strokeWidth={2} size={24} />
+          //   )}
+          //   iconPosition="right"
+          //   withShadow
+          //   onPress={() => setShowAddModal(true)}
+          //   textVariant={TypographyVariant.PMEDIUM_SEMIBOLD}
+          // />
+        }
       </View>
 
       <View style={styles.slidingBarsContainer}>
@@ -829,12 +924,13 @@ const ProductScreen = () => {
 
       {loading && !isRefreshing ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+          {/* <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} /> */}
+          <AnimatedLoader size={52} />
           <Typography
-            text="Loading products..."
-            variant={TypographyVariant.LMEDIUM_REGULAR}
+            text="Loading"
+            variant={TypographyVariant.PSMALL_MEDIUM}
             customTextStyles={{
-              color: ColorPalette.GREY_TEXT_300,
+              color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
               marginTop: getScreenHeight(1),
             }}
           />
@@ -1016,18 +1112,23 @@ const ProductScreen = () => {
               })
             ) : (
               <View style={styles.emptyStateContainer}>
-                <Typography
-                  text={getEmptyStateMessage()}
-                  variant={TypographyVariant.LMEDIUM_REGULAR}
-                  customTextStyles={styles.emptyStateText}
-                />
+                {getEmptyStateMessage()}
                 {getEmptyStateAction() && (
                   <Button
-                    text="Add Your First Product"
+                    IconComponent={PlusIcon}
+                    iconProps={{
+                      size: 30,
+                      color: ColorPalette.White,
+                      strokeWidth: 2.5,
+                    }}
+                    text="ADD NEW PRODUCT"
                     variant={ButtonVariant.PRIMARY}
                     state={ButtonState.DEFAULT}
                     size={ButtonSize.MEDIUM}
                     onPress={() => setShowAddModal(true)}
+                    customStyles={{
+                      minWidth: getScreenWidth(70),
+                    }}
                   />
                 )}
               </View>
@@ -1065,16 +1166,21 @@ const ProductScreen = () => {
       />
 
       {/* Floating Add Button (hidden in multi-select mode) */}
-      {!isMultiSelectMode && (
+      {!isMultiSelectMode && products.length > 0 && (
         <TouchableOpacity
-          style={styles.floatingButton}
+          style={styles.floatingButtonWithText}
           onPress={() => setShowAddModal(true)}
           activeOpacity={0.8}>
           <PlusIcon
-            size={24}
+            size={36}
             color={ColorPalette.White}
-            style={undefined}
             strokeWidth={2.5}
+            style={{marginRight: 8}}
+          />
+          <Typography
+            text="Add Product"
+            variant={TypographyVariant.LMEDIUM_BOLD}
+            customTextStyles={styles.addProductText}
           />
         </TouchableOpacity>
       )}
@@ -1083,3 +1189,32 @@ const ProductScreen = () => {
 };
 
 export default ProductScreen;
+
+//floating plus icon button if needed
+// {
+//   !isMultiSelectMode && (
+//     <TouchableOpacity
+//       style={
+//         products.length > 0
+//           ? styles.floatingButtonWithText
+//           : styles.floatingButtonIconOnly
+//       }
+//       onPress={() => setShowAddModal(true)}
+//       activeOpacity={0.8}>
+//       <PlusIcon
+//         size={products.length > 0 ? 36 : 24}
+//         color={ColorPalette.White}
+//         strokeWidth={2.5}
+//         style={products.length > 0 ? {marginRight: 8} : undefined}
+//       />
+
+//       {products.length > 0 && (
+//         <Typography
+//           text="Add Product"
+//           variant={TypographyVariant.LMEDIUM_BOLD}
+//           customTextStyles={styles.addProductText}
+//         />
+//       )}
+//     </TouchableOpacity>
+//   );
+// }

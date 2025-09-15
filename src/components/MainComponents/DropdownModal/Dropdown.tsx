@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     borderColor: ColorPalette.GREY_100,
     borderRadius: BorderRadius.XSmall,
     backgroundColor: ColorPalette.White,
-    paddingVertical: getScreenHeight(2),
+    paddingVertical: getScreenHeight(2.5), // previously 2
   },
   dropdownTriggerActive: {
     borderColor: ColorPalette.GREY_TEXT_400,

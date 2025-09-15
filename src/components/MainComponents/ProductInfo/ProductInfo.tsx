@@ -31,6 +31,7 @@ import {
   fetchProductDetails,
 } from '../../../redux/slices/productsSlice';
 import {AppDispatch, RootState} from '../../../redux/store';
+import AnimatedLoader from '../../../assets/icons/LoaderIcon';
 
 const DefaultProduct = require('../../../assets/images/defaultProduct.png');
 
@@ -369,12 +370,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               alignItems: 'center',
               borderRadius: getFigmaDimension(8),
             }}>
-            <ActivityIndicator size="small" color={ColorPalette.PURPLE_300} />
+            <AnimatedLoader size={52} />
             <Typography
-              variant={TypographyVariant.LSMALL_MEDIUM}
-              text="Loading..."
+              text="Loading"
+              variant={TypographyVariant.PSMALL_MEDIUM}
               customTextStyles={{
-                color: ColorPalette.PURPLE_300,
+                color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
                 marginTop: getFigmaDimension(4),
               }}
             />
@@ -395,12 +396,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               alignItems: 'center',
               borderRadius: getFigmaDimension(8),
             }}>
-            <ActivityIndicator size="small" color={ColorPalette.White} />
+            <AnimatedLoader size={52} />
             <Typography
-              variant={TypographyVariant.LSMALL_MEDIUM}
-              text="Deleting..."
+              text="Deleting"
+              variant={TypographyVariant.PSMALL_MEDIUM}
               customTextStyles={{
-                color: ColorPalette.White,
+                color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
                 marginTop: getFigmaDimension(4),
               }}
             />
@@ -421,13 +422,13 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               alignItems: 'center',
               borderRadius: getFigmaDimension(8),
             }}>
-            <ActivityIndicator size="small" color={ColorPalette.PURPLE_300} />
+            <AnimatedLoader size={52} />
             <Typography
-              variant={TypographyVariant.LSMALL_MEDIUM}
-              text="Updating..."
+              text="Updating"
+              variant={TypographyVariant.PSMALL_MEDIUM}
               customTextStyles={{
-                color: ColorPalette.PURPLE_300,
-                marginTop: getFigmaDimension(4),
+                color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+                marginTop: getFigmaDimension(1),
               }}
             />
           </View>

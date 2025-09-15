@@ -52,4 +52,30 @@ export const styles = StyleSheet.create({
     borderColor: ColorPalette.GREY_100,
     borderRadius: BorderRadius.XSmall, // Using the enum instead of getFigmaDimension(8)
   },
+  checkBoxContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    paddingHorizontal: Spacing.Medium,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.Small,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: BorderRadius.XXSmall,
+    borderWidth: 1,
+    borderColor: ColorPalette.GREY_200,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkmark: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+
 });

@@ -34,6 +34,7 @@ export const Button: React.FC<ButtonProps> = ({
   bgColor,
   withShadow = false,
   textVariant, // New prop
+  iconProps, // new prop for icon css
 }) => {
   const buttonHeight = getButtonHeight(size);
   const currentState = disabled ? ButtonState.DISABLED : state;
@@ -84,7 +85,7 @@ export const Button: React.FC<ButtonProps> = ({
     <View style={styles.content}>
       {IconComponent && iconPosition === 'left' && (
         <View style={styles.icon}>
-          <IconComponent />
+          <IconComponent {...iconProps} />
         </View>
       )}
       <Typography
@@ -97,7 +98,7 @@ export const Button: React.FC<ButtonProps> = ({
       />
       {IconComponent && iconPosition === 'right' && (
         <View style={styles.iconRight}>
-          <IconComponent />
+          <IconComponent {...iconProps} />
         </View>
       )}
     </View>

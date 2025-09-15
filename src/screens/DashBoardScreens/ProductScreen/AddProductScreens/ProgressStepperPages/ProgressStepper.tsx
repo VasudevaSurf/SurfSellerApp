@@ -73,7 +73,7 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
                     : styles.inactiveCircle,
                 ]}>
                 <Typography
-                  variant={TypographyVariant.LXSMALL_REGULAR}
+                  variant={TypographyVariant.PSMALL_REGULAR}
                   text={String(step.id).padStart(2, '0')}
                   customTextStyles={[
                     styles.stepNumber,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: getScreenWidth(4),
+    // paddingHorizontal: getScreenWidth(4),
     paddingVertical: getScreenHeight(1.5),
     backgroundColor: ColorPalette.White,
     position: 'relative',
@@ -130,8 +130,8 @@ const styles = StyleSheet.create({
     marginHorizontal: getScreenWidth(1),
   },
   activeConnector: {
-    backgroundColor: ColorPalette.PURPLE_300,
-    borderColor: ColorPalette.PURPLE_300,
+    backgroundColor: ColorPalette.ProgressLine,
+    borderColor: ColorPalette.ProgressLine,
   },
   inactiveConnector: {
     backgroundColor: ColorPalette.ConnectLine,
@@ -149,18 +149,18 @@ const styles = StyleSheet.create({
     height: getScreenWidth(13),
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: getScreenHeight(0.5),
+    marginBottom: getScreenHeight(-0.5),
   },
   haloEffect: {
     position: 'absolute',
-    width: getScreenWidth(11),
-    height: getScreenWidth(11),
+    width: getScreenWidth(9),
+    height: getScreenWidth(9),
     borderRadius: getScreenWidth(6.5),
     backgroundColor: 'rgba(58, 90, 254, 0.12)',
   },
   circle: {
-    width: getScreenWidth(8),
-    height: getScreenWidth(8),
+    width: getScreenWidth(7),
+    height: getScreenWidth(7),
     borderRadius: getScreenWidth(4),
     justifyContent: 'center',
     alignItems: 'center',
@@ -169,12 +169,12 @@ const styles = StyleSheet.create({
   activeCircle: {
     backgroundColor: ColorPalette.White,
     borderWidth: 3,
-    borderColor: ColorPalette.PURPLE_300,
+    borderColor: ColorPalette.ProgressLine,
   },
   passedCircle: {
-    backgroundColor: ColorPalette.PURPLE_300,
+    backgroundColor: ColorPalette.ProgressLine,
     borderWidth: 1.5,
-    borderColor: ColorPalette.PURPLE_300,
+    borderColor: ColorPalette.ProgressLine,
   },
   inactiveCircle: {
     backgroundColor: ColorPalette.SearchBack,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     borderColor: ColorPalette.ConnectLine,
   },
   activeStepNumber: {
-    color: ColorPalette.PURPLE_300,
+    color: ColorPalette.ProgressLine,
   },
   passedStepNumber: {
     color: ColorPalette.White,

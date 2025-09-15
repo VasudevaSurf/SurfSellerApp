@@ -4,9 +4,15 @@ import {ColorPalette} from '../../../config/colorPalette';
 import {BorderRadius, Spacing} from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
+  // mainContainer: {
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  // },
   mainContainer: {
-    display: 'flex',
+    flex: 1,
     flexDirection: 'column',
+    paddingVertical: getScreenHeight(2),
+    paddingHorizontal: getScreenHeight(2),
   },
   scrollContent: {
     gap: getScreenWidth(4),
@@ -18,7 +24,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: Spacing.Medium,
     backgroundColor: ColorPalette.White,
     gap: Spacing.Small,
-    marginTop: getScreenHeight(2),
+    // marginTop: getScreenHeight(2),
+    borderRadius: BorderRadius.Small,
   },
   imageContainer: {
     width: getScreenWidth(15),
@@ -98,5 +105,21 @@ export const styles = StyleSheet.create({
   },
   customText: {
     color: ColorPalette.GREY_TEXT_100,
+  },
+
+  containerStyle: {
+    // borderRadius: BorderRadius.Small,
+    borderRadius: getScreenWidth(3), // matching with dashboards sections radius
+    backgroundColor: ColorPalette.White,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    paddingVertical: getScreenHeight(1),
+    // marginTop: getScreenHeight(0.4),
+    width: '100%',
+  },
+  menuContainer: {
+    // paddingVertical: getScreenHeight(1),
+    width: '100%', // Ensure full width
   },
 });

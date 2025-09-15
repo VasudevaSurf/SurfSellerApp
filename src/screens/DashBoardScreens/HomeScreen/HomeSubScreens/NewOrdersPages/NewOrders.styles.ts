@@ -24,4 +24,19 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: getScreenWidth(4),
   },
+  emptyMessageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // gap: getScreenHeight(2),
+  },
+  emptyBoxPng: {
+    width: getScreenWidth(45),
+    height: getScreenWidth(45),
+    resizeMode: 'contain',
+  },
+  emptyStateText: {
+    // color: ColorPalette.GREY_TEXT_300,
+    textAlign: 'center',
+  },
 });

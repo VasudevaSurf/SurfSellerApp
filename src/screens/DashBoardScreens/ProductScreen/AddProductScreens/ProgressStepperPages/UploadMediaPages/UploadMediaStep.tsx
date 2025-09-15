@@ -16,7 +16,11 @@ import {
 import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getFigmaDimension} from '../../../../../../helpers/screenSize';
+import {
+  getFigmaDimension,
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../../helpers/screenSize';
 import {styles} from './UploadMediaStep.styles';
 import {
   pickImagesFromGallery,
@@ -31,6 +35,7 @@ import {
   extractRelativePathFromUrl,
   UploadedImageData,
 } from '../../../../../../services/imageService';
+import {Spacing} from '../../../../../../config/globalStyles';
 
 interface FileData {
   id: string;
@@ -461,7 +466,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
   const getBrowseButtonText = () => {
     if (editMode && files.length > 0) {
-      return 'Add More Files';
+      return 'Upload More Images';
     }
     return 'Browse Files';
   };
@@ -471,12 +476,12 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       <View style={styles.mainHeader}>
         <View style={styles.headerContainer}>
           <Typography
-            variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
+            variant={TypographyVariant.LMEDIUM_EXTRABOLD}
             text={getHeaderText()}
             customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <InfoIconPay
-            size={19}
+            size={22}
             color={ColorPalette.GREY_TEXT_400}
             style={undefined}
             strokeWidth={1.5}
@@ -507,18 +512,45 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
         )}
 
         {uploadStatus === 'completed' && files.length > 0 && !isUploading && (
-          <View style={{alignItems: 'center', marginTop: 16}}>
-            <Button
-              text="Add More Images"
-              variant={ButtonVariant.PRIMARY}
-              state={ButtonState.DEFAULT}
-              size={ButtonSize.SMALL}
-              type={ButtonType.OUTLINED}
-              onPress={handleBrowseFiles}
-              customStyles={{
-                borderWidth: 1,
-                borderColor: ColorPalette.PURPLE_300,
-              }}
+          // <View style={{alignItems: 'center', marginTop: 16}}>
+          //   <Button
+          //     text="Add More Images"
+          //     variant={ButtonVariant.PRIMARY}
+          //     state={ButtonState.DEFAULT}
+          //     size={ButtonSize.SMALL}
+          //     type={ButtonType.OUTLINED}
+          //     onPress={handleBrowseFiles}
+          //     customStyles={{
+          //       borderWidth: 1,
+          //       borderColor: ColorPalette.PURPLE_300,
+          //     }}
+          //   />
+          // </View>
+
+          <View style={styles.uploadContainer}>
+            <View style={styles.uploadBox}>
+              <CloudManIcon size={70} style={undefined} />
+
+              <Button
+                text="Upload More Images"
+                variant={ButtonVariant.PRIMARY}
+                state={ButtonState.FILEUPLOAD}
+                size={ButtonSize.SMALL}
+                type={ButtonType.PRIMARY}
+                onPress={handleBrowseFiles} 
+                withShadow
+                textVariant={TypographyVariant.PSMALL_MEDIUM}
+                disabled={isUploading}
+                customStyles={{
+                  borderRadius: getScreenHeight(1.4),
+                }}
+              />
+            </View>
+
+            <Typography
+              variant={TypographyVariant.LMEDIUM_REGULAR}
+              text="PNG, JPG, GIF up to 10MB"
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
           </View>
         )}

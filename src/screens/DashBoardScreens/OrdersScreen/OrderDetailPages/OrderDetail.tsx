@@ -20,7 +20,7 @@ import {TypographyVariant} from '../../../../components/UserComponents/Typograph
 import {ColorPalette} from '../../../../config/colorPalette';
 import {Spacing} from '../../../../config/globalStyles';
 import {getScreenHeight, getScreenWidth} from '../../../../helpers/screenSize';
-import {goBack} from '../../../../navigation/utils/navigationRef';
+import {goBack, navigate} from '../../../../navigation/utils/navigationRef';
 import {styles} from './OrderDetail.styles';
 import {OrderDetailProps} from './OrderDetail.types';
 import {Badge} from '../../../../components/UserComponents/Badges/Badge';
@@ -35,6 +35,8 @@ import {
   clearStatusUpdateError,
   resetOrderDetails,
 } from '../../../../redux/slices/orderDetailsSlice';
+import ChatIcon from '../../../../assets/icons/ChatIcon';
+import AnimatedLoader from '../../../../assets/icons/LoaderIcon';
 
 // Map API status codes to display status
 const mapStatusToDisplay = (apiStatus: string): OrderStatus => {
@@ -116,11 +118,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     shipping: '€0.00',
   });
 
-  console.log('OrderDetail - Mounted with params:', {
-    orderId,
-    userId,
-    hasRouteParams: !!route?.params,
-  });
+  console.log('orderDetails orderDetails orderDetails', orderDetails);
 
   // Reset state when component mounts
   useEffect(() => {
@@ -270,35 +268,50 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
   // Define accordion sections data
   const SECTIONS = [
     {
-      title: 'Customer Information',
+      title: 'Customer details',
       content: (
         <View style={styles.accordionContent}>
-          <Typography
-            text={`Name: ${customerInfo.name || 'N/A'}`}
-            variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{
-              color: ColorPalette.GREY_TEXT_300,
-              marginBottom: 8,
-            }}
-          />
-          <Typography
-            text={`Email: ${customerInfo.email || 'N/A'}`}
-            variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{
-              color: ColorPalette.GREY_TEXT_300,
-              marginBottom: 8,
-            }}
-          />
-          <Typography
-            text={`Phone: ${customerInfo.phone || 'N/A'}`}
-            variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
-          />
+          <View style={styles.row}>
+            <Typography
+              text="Name"
+              variant={TypographyVariant.PMEDIUM_REGULAR}
+              customTextStyles={styles.label}
+            />
+            <Typography
+              text={customerInfo.name || 'N/A'}
+              variant={TypographyVariant.PMEDIUM_REGULAR}
+              customTextStyles={styles.value}
+            />
+          </View>
+          <View style={styles.row}>
+            <Typography
+              text="Email"
+              variant={TypographyVariant.PMEDIUM_REGULAR}
+              customTextStyles={styles.label}
+            />
+            <Typography
+              text={customerInfo.email || 'N/A'}
+              variant={TypographyVariant.PMEDIUM_REGULAR}
+              customTextStyles={styles.value}
+            />
+          </View>
+          <View style={styles.row}>
+            <Typography
+              text="Phone"
+              variant={TypographyVariant.PMEDIUM_REGULAR}
+              customTextStyles={styles.label}
+            />
+            <Typography
+              text={customerInfo.phone || 'N/A'}
+              variant={TypographyVariant.PMEDIUM_REGULAR}
+              customTextStyles={styles.value}
+            />
+          </View>
         </View>
       ),
     },
     {
-      title: 'Billing Address',
+      title: 'Shipping details',
       content: (
         <View style={styles.accordionContent}>
           <Typography
@@ -310,11 +323,23 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
       ),
     },
     {
-      title: 'Payment Information',
+      title: 'Payment details',
       content: (
         <View style={styles.accordionContent}>
           <Typography
             text="Payment information not available in current API response"
+            variant={TypographyVariant.PMEDIUM_REGULAR}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+          />
+        </View>
+      ),
+    },
+    {
+      title: 'Coupon code',
+      content: (
+        <View style={styles.accordionContent}>
+          <Typography
+            text="AO877AW"
             variant={TypographyVariant.PMEDIUM_REGULAR}
             customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
           />
@@ -334,7 +359,11 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
             }}
           />
         )}
-        <View style={styles.accordionHeader}>
+        <View
+          style={[
+            styles.accordionHeader,
+            // isActive && styles.accordionHeaderActive, // override padding when open
+          ]}>
           <Typography
             text={section.title}
             variant={TypographyVariant.LMEDIUM_BOLD}
@@ -363,7 +392,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     const statusColorMap: {[key: string]: string} = {
       Pending: '#ff9522',
       Processing: '#97cf4d',
-      Completed: '#97cf4d',
+      Completed: '#1FC16B',
       Failed: '#ff5215',
       Cancelled: '#c2c2c2',
       Declined: '#ff5215',
@@ -374,27 +403,55 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
   };
 
   // Show loading spinner while initial data fetching completes
-  if (loading && !orderData.orderNumber) {
+  if (loading && orderData.orderNumber) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <Header
           name="Order summary"
-          variant={TypographyVariant.LMEDIUM_BOLD}
+          variant={TypographyVariant.H6_BOLD}
           textColor={ColorPalette.AgreeTerms}
-          leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+          leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
+          rightIcons={[
+            {
+              isBadge: true,
+              text: 'Chat With Us',
+              badgeType: BadgeType.PRIMARY,
+              badgeVariant: BadgeVariant.FILLED,
+              onPress: () => {
+                navigate('Dashboard', {
+                  screen: 'Account',
+                  params: {screen: 'ChatScreen'},
+                });
+              },
+              customContainerStyle: {
+                borderRadius: Spacing.Small,
+                paddingVertical: getScreenHeight(1.5),
+                paddingHorizontal: getScreenWidth(3),
+                shadowColor: '#101828',
+                shadowOffset: {width: 0, height: 6},
+                shadowOpacity: 0.08,
+                shadowRadius: 15,
+                elevation: 6,
+              },
+              textVariant: TypographyVariant.H6_BOLD,
+              // customTextColor: ColorPalette.PURPLE_300,
+              leftIcon: ChatIcon,
+              iconSize: 26,
+            },
+          ]}
         />
         <View
           style={[
             styles.mainContainer,
             {justifyContent: 'center', alignItems: 'center'},
           ]}>
-          <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+          <AnimatedLoader size={52} />
           <Typography
-            text="Loading order details..."
-            variant={TypographyVariant.PMEDIUM_REGULAR}
+            text="Loading"
+            variant={TypographyVariant.PSMALL_MEDIUM}
             customTextStyles={{
-              color: ColorPalette.GREY_TEXT_300,
-              marginTop: 16,
+              color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+              marginTop: getScreenHeight(1),
             }}
           />
         </View>
@@ -406,26 +463,35 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name="Order summary"
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+        leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
         rightIcons={[
           {
             isBadge: true,
-            text: 'Print Invoice',
+            text: 'Chat With Us',
             badgeType: BadgeType.PRIMARY,
-            badgeVariant: BadgeVariant.OUTLINE,
-            onPress: handlePrintInvoice,
+            badgeVariant: BadgeVariant.FILLED,
+            onPress: () => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'ChatScreen'},
+              });
+            },
             customContainerStyle: {
-              borderColor: ColorPalette.ProgressLine,
-              borderRadius: Spacing.XXXLarge,
+              borderRadius: Spacing.Small,
               paddingVertical: getScreenHeight(1.5),
               paddingHorizontal: getScreenWidth(3),
+              shadowColor: '#101828',
+              shadowOffset: {width: 0, height: 6},
+              shadowOpacity: 0.08,
+              shadowRadius: 15,
+              elevation: 6,
             },
-            textVariant: TypographyVariant.LMEDIUM_MEDIUM,
-            customTextColor: ColorPalette.PURPLE_300,
-            leftIcon: PrintIcon,
-            iconSize: 16,
+            textVariant: TypographyVariant.H6_BOLD,
+            // customTextColor: ColorPalette.PURPLE_300,
+            leftIcon: ChatIcon,
+            iconSize: 26,
           },
         ]}
       />
@@ -474,7 +540,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
             {paddingTop: getScreenHeight(2)},
           ]}
           showsVerticalScrollIndicator={false}>
-          <View style={styles.productCard}>
+          <View style={styles.orderCard}>
             <View style={styles.headerContainer}>
               <View style={{gap: getScreenHeight(0.5)}}>
                 <Typography
@@ -490,6 +556,21 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
               </View>
             </View>
 
+            <View style={styles.totalRow}>
+              <Typography
+                text="Admin"
+                variant={TypographyVariant.LMEDIUM_MEDIUM}
+                customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+              />
+              <Typography
+                text={'+356 9282 9128'}
+                variant={TypographyVariant.LMEDIUM_REGULAR}
+                customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+              />
+            </View>
+          </View>
+
+          <View style={styles.productCard}>
             <View style={styles.productRow}>
               <View style={styles.imageContainer}>
                 <Image
@@ -519,11 +600,30 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
                   }}>
                   <Typography
                     text="Quantity: "
-                    variant={TypographyVariant.PSMALL_REGULAR}
+                    variant={TypographyVariant.LMEDIUM_MEDIUM}
                     customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
                   />
                   <Typography
                     text={productInfo.quantity.toString()}
+                    variant={TypographyVariant.LSMALL_BOLD}
+                    customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+                  />
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: getScreenWidth(1),
+                    width: '100%',
+                  }}>
+                  <Typography
+                    text="Price: "
+                    variant={TypographyVariant.PSMALL_REGULAR}
+                    customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+                  />
+                  <Typography
+                    text={priceInfo.subtotal}
                     variant={TypographyVariant.LSMALL_BOLD}
                     customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
                   />
@@ -534,27 +634,66 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
             <View style={styles.dataContainer}>
               <View style={styles.totalRow}>
                 <Typography
-                  text="Sub Total:"
+                  text="Sub Total"
                   variant={TypographyVariant.PMEDIUM_REGULAR}
                   customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
                 />
                 <Typography
                   text={priceInfo.subtotal}
                   variant={TypographyVariant.PMEDIUM_REGULAR}
-                  customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
                 />
               </View>
 
               <View style={styles.totalRow}>
                 <Typography
-                  text="Shipping Cost:"
+                  text="Shipping"
                   variant={TypographyVariant.PMEDIUM_REGULAR}
                   customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
                 />
                 <Typography
                   text={priceInfo.shipping}
                   variant={TypographyVariant.PMEDIUM_REGULAR}
-                  customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+                />
+              </View>
+
+              <View style={styles.totalRow}>
+                <Typography
+                  text="Order Discount"
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+                />
+                <Typography
+                  text={'0'}
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+                />
+              </View>
+
+              <View style={styles.totalRow}>
+                <Typography
+                  text="VAT (12% included)"
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+                />
+                <Typography
+                  text={'0'}
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+                />
+              </View>
+
+              <View style={styles.totalRow}>
+                <Typography
+                  text="Payment Surcharge"
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+                />
+                <Typography
+                  text={'0'}
+                  variant={TypographyVariant.PMEDIUM_REGULAR}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
                 />
               </View>
 
@@ -580,7 +719,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
               renderHeader={_renderHeader}
               renderContent={_renderContent}
               onChange={_updateSections}
-              expandMultiple={false}
+              expandMultiple={true}
               underlayColor="transparent"
               containerStyle={styles.accordionContainer}
             />
@@ -588,18 +727,38 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         </ScrollView>
 
         <View style={styles.buttonContainer}>
-          <Typography
+          {/* <Typography
             text="Order Status:"
             variant={TypographyVariant.PSMALL_MEDIUM}
             customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+          /> */}
+
+          <Badge
+            text="Print Invoice"
+            type={BadgeType.PRIMARY}
+            variant={BadgeVariant.OUTLINE}
+            onPress={handlePrintInvoice}
+            customContainerStyle={{
+              borderColor: ColorPalette.ProgressLine,
+              borderRadius: Spacing.XSmall,
+              paddingVertical: getScreenHeight(2),
+              paddingHorizontal: getScreenWidth(3),
+              width: '100%',
+            }}
+            textVariant={TypographyVariant.LMEDIUM_MEDIUM}
+            customTextColor={ColorPalette.ProgressLine}
+            leftIcon={PrintIcon}
+            iconSize={16}
           />
+
           <Badge
             text={updatingStatus ? 'Updating...' : currentStatus}
             variant={BadgeVariant.FILLED}
             type={BadgeType.PRIMARY}
             onPress={() => !updatingStatus && setIsModalVisible(true)}
             customContainerStyle={{
-              paddingVertical: getScreenHeight(1.5),
+              width: '100%',
+              paddingVertical: getScreenHeight(2),
               paddingHorizontal: getScreenHeight(2),
               backgroundColor: updatingStatus
                 ? ColorPalette.GREY_300

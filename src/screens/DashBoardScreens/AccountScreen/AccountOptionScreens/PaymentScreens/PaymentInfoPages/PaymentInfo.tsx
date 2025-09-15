@@ -31,7 +31,10 @@ import {TextButton} from '../../../../../../components/UserComponents/TextButton
 import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getScreenHeight} from '../../../../../../helpers/screenSize';
+import {
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../../helpers/screenSize';
 import {
   goBack,
   navigate,
@@ -43,6 +46,8 @@ import {
   BalanceResponse,
 } from '../../../../../../services/apiService';
 import {styles} from './PaymentInfo.styles';
+import PayPalIcon from '../../../../../../assets/icons/PaypalIcon';
+import AnimatedLoader from '../../../../../../assets/icons/LoaderIcon';
 
 const initialLayout = {width: Dimensions.get('window').width};
 
@@ -290,12 +295,23 @@ const PaymentInfo = () => {
                 !filteredData.length && !isLoading && styles.emptyState,
               ]}>
               {isLoading ? (
-                <ActivityIndicator
-                  size="large"
-                  color={ColorPalette.PURPLE_300}
-                  style={{marginTop: getScreenHeight(5)}}
-                />
-              ) : error ? (
+                <View style={styles.loadingContainer}>
+                  <AnimatedLoader size={52} />
+                  <Typography
+                    text="Loading"
+                    variant={TypographyVariant.PSMALL_MEDIUM}
+                    customTextStyles={{
+                      color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+                      marginTop: getScreenHeight(1),
+                    }}
+                  />
+                </View>
+              ) : // <ActivityIndicator
+              //   size="large"
+              //   color={ColorPalette.PURPLE_300}
+              //   style={{marginTop: getScreenHeight(5)}}
+              // />
+              error ? (
                 <Typography
                   text={error}
                   variant={TypographyVariant.PMEDIUM_REGULAR}
@@ -337,6 +353,7 @@ const PaymentInfo = () => {
       <View style={styles.tabButtonWrapper}>
         {props.navigationState.routes.map((route, i) => {
           const isFocused = props.navigationState.index === i;
+          console.log('props', props);
 
           return (
             <TouchableOpacity
@@ -348,7 +365,7 @@ const PaymentInfo = () => {
                 variant={TypographyVariant.PMEDIUM_MEDIUM}
                 customTextStyles={{
                   color: isFocused
-                    ? ColorPalette.White
+                    ? ColorPalette.ProgressLine
                     : ColorPalette.GREY_TEXT_500,
                 }}
               />
@@ -383,10 +400,15 @@ const PaymentInfo = () => {
     () => [
       {
         icon: QuestionMarkIcon,
-        onPress: () => console.log('Question mark pressed'),
+        onPress: () => {
+          navigate('Dashboard', {
+            screen: 'Account',
+            params: {screen: 'FAQScreen'},
+          });
+        },
         size: 24,
         color: ColorPalette.Black,
-        strokeWidth: 2,
+        strokeWidth: 1.5,
       },
     ],
     [],
@@ -396,7 +418,7 @@ const PaymentInfo = () => {
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <Header
         name="Payments"
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
         rightIcons={headerIcons}
@@ -411,12 +433,16 @@ const PaymentInfo = () => {
         {/* Stripe Connect Section */}
         <View style={styles.stripEditContainer}>
           <View style={styles.stripEditContainerOne}>
-            <BankOutlineIcon style={undefined} size={32} />
+            <PayPalIcon style={undefined} size={32} />
+            {/* <BankOutlineIcon style={undefined} size={32} /> */}
             <View style={styles.connectContainer}>
               <Typography
-                text="Stripe connect"
-                variant={TypographyVariant.LMEDIUM_BOLD}
-                customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+                text="PayPal"
+                variant={TypographyVariant.LMEDIUM_MEDIUM}
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_500,
+                  fontSize: getScreenWidth(3.3),
+                }}
               />
               <View style={styles.connectContainerOne}>
                 <Typography
@@ -437,7 +463,7 @@ const PaymentInfo = () => {
             variant={TypographyVariant.PMEDIUM_MEDIUM}
             underline
             customContainerStyles={styles.editButton}
-            customTextStyles={{color: ColorPalette.PURPLE_300}}
+            customTextStyles={{color: ColorPalette.ProgressLine}}
           />
         </View>
 
@@ -460,12 +486,13 @@ const PaymentInfo = () => {
               </View>
             </View>
             <Button
-              text="WITHDRAW"
+              text="Withdraw"
               onPress={navigateToWithdraw}
               variant={ButtonVariant.PRIMARY}
               size={ButtonSize.MEDIUM}
               state={ButtonState.DEFAULT}
               customStyles={styles.withdrawButton}
+              textVariant={TypographyVariant.LMEDIUM_BOLD}
               customTextStyles={styles.withdrawButtonText}
             />
           </View>

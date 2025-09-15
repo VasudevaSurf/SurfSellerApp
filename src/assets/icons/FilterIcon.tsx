@@ -1,47 +1,27 @@
 import React from 'react';
-import Svg, {Path} from 'react-native-svg';
-import {ColorPalette} from '../../config/colorPalette';
-import {TouchableOpacity} from 'react-native';
+import Svg, {Rect, Path} from 'react-native-svg';
 
-const FilterIcon = ({
-  size = 24,
-  color = ColorPalette.GREY_TEXT_400,
-  strokeWidth = 1.5,
-  style,
-  onPress,
+interface FilterIconProps {
+  width?: number;
+  height?: number;
+  color?: string;
+}
+
+const FilterIcon: React.FC<FilterIconProps> = ({
+  width = 24,
+  height = 24,
+  color = '#4A4A4A',
 }) => {
-  const scaleFactor = size / 20;
-
-  const pathData = `M6.85746 10.5061C4.36901 8.64561 2.59564 6.59915 1.62734 5.44867C1.3276 5.09253 1.22938 4.8319 1.17033 4.3728C0.968115 2.8008 0.867009 2.0148 1.32795 1.5074C1.7889 1 2.60404 1 4.23433 1H15.7657C17.396 1 18.2111 1 18.672 1.5074C19.133 2.0148 19.0319 2.8008 18.8297 4.37281C18.7706 4.83191 18.6724 5.09254 18.3726 5.44867C17.403 6.60062 15.6261 8.65071 13.1326 10.5135C12.907 10.6821 12.7583 10.9567 12.7307 11.2614C12.4837 13.992 12.2559 15.4876 12.1141 16.2442C11.8853 17.4657 10.1532 18.2006 9.22601 18.8563C8.67406 19.2466 8.0043 18.782 7.93278 18.1778C7.79643 17.0261 7.53961 14.6864 7.25927 11.2614C7.23409 10.9539 7.08486 10.6761 6.85746 10.5061Z`;
-
-  // Scale the path data
-  const scaledPathData = pathData.replace(/(\d+\.?\d*)/g, match => {
-    return (parseFloat(match) * scaleFactor).toString();
-  });
-
-  const Icon = (
-    <Svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      fill="none"
-      style={style}>
+  return (
+    <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path
-        d={scaledPathData}
+        d="M8.85746 12.5061C6.36901 10.6456 4.59564 8.59915 3.62734 7.44867C3.3276 7.09253 3.22938 6.8319 3.17033 6.3728C2.96811 4.8008 2.86701 4.0148 3.32795 3.5074C3.7889 3 4.60404 3 6.23433 3H17.7657C19.396 3 20.2111 3 20.672 3.5074C21.133 4.0148 21.0319 4.8008 20.8297 6.37281C20.7706 6.83191 20.6724 7.09254 20.3726 7.44867C19.403 8.60062 17.6261 10.6507 15.1326 12.5135C14.907 12.6821 14.7583 12.9567 14.7307 13.2614C14.4837 15.992 14.2559 17.4876 14.1141 18.2442C13.8853 19.4657 12.1532 20.2006 11.226 20.8563C10.6741 21.2466 10.0043 20.782 9.93278 20.1778C9.79643 19.0261 9.53961 16.6864 9.25927 13.2614C9.23409 12.9539 9.08486 12.6761 8.85746 12.5061Z"
         stroke={color}
-        strokeWidth={strokeWidth}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
     </Svg>
-  );
-
-  return onPress ? (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-      {Icon}
-    </TouchableOpacity>
-  ) : (
-    Icon
   );
 };
 
