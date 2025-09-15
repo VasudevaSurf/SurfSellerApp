@@ -19,7 +19,7 @@ import {Header} from '../../../components/UserComponents/Header/Header';
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {
   navigate,
   navigateToAuth,
@@ -28,6 +28,20 @@ import {logoutUser} from '../../../redux/slices/authSlice';
 import {fetchProfile} from '../../../redux/slices/profileSlice';
 import {styles} from './AccountScreen.styles';
 import {RootState, AppDispatch} from '../../../redux/store';
+import BusinessProfileIcon from '../../../assets/icons/BusinessProfileIcon';
+import {BorderRadius} from '../../../config/globalStyles';
+import BusinessAdministrationIcon from '../../../assets/icons/BusinessAdministratorsIcon';
+import BankDetailsIcon from '../../../assets/icons/BankDetailsIcon';
+import PaymentsIcon from '../../../assets/icons/PaymentsIcon';
+import MotivationIcon from '../../../assets/icons/MotivationIcon';
+import EuroIcon from '../../../assets/icons/EuroIcon';
+import BellIcon from '../../../assets/icons/BellIcon';
+import FaqIcon from '../../../assets/icons/FaqIcon';
+import PrivacyPolicyIcon from '../../../assets/icons/PrivacyPolicyIcon';
+import ShareAppIcon from '../../../assets/icons/ShareAppIcon';
+import ChatIcon from '../../../assets/icons/ChatIcon';
+import LogoutIcon from '../../../assets/icons/LogOutIcon';
+import {TrashIcon2} from '../../../assets/icons/NewProductIcons/TrashIcon2';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -70,19 +84,24 @@ const AccountScreen = () => {
 
   const headerIcons = useMemo(
     () => [
-      {
-        icon: LanguageIcon,
-        onPress: () => console.log('Language icon pressed'),
-        size: 24,
-        color: ColorPalette.Black,
-        strokeWidth: 2,
-      },
+      // {
+      //   icon: LanguageIcon,
+      //   onPress: () => console.log('Language icon pressed'),
+      //   size: 22,
+      //   color: ColorPalette.IconColor,
+      //   strokeWidth: 1.5,
+      // },
       {
         icon: QuestionMarkIcon,
-        onPress: () => console.log('Question mark pressed'),
+        onPress: () => {
+          navigate('Dashboard', {
+            screen: 'Account',
+            params: {screen: 'FAQScreen'},
+          });
+        },
         size: 24,
-        color: ColorPalette.Black,
-        strokeWidth: 2,
+        color: ColorPalette.IconColor,
+        strokeWidth: 1.5,
       },
     ],
     [],
@@ -141,93 +160,343 @@ const AccountScreen = () => {
     [],
   );
 
-  // Memoize menu items configuration
-  const menuItems = useMemo(
+  // Menu grouped config
+  const menuSections = useMemo(
     () => [
       {
-        label: 'Personal Info',
-        rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {
-          navigate('Dashboard', {
-            screen: 'Account',
-            params: {screen: 'PersonalInfo'},
-          });
-        },
+        heading: 'Account Details',
+        items: [
+          {
+            label: 'Business Profile',
+            leftIcon: (
+              <BusinessProfileIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'PersonalInfo'},
+              }),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+          },
+          {
+            label: 'Business Administrators',
+            leftIcon: (
+              <BusinessAdministrationIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'CompanyProfile'},
+              }),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+          },
+          {
+            label: 'Bank Details',
+            leftIcon: (
+              <BankDetailsIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'BankDetails'},
+              }),
+            leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+          },
+          {
+            label: 'Payments',
+            leftIcon: (
+              <PaymentsIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'PaymentInfo'},
+              }),
+            leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+          },
+          {
+            label: 'Motivation',
+            leftIcon: (
+              <MotivationIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => {},
+            leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+          },
+        ],
       },
       {
-        label: 'Company Profile',
-        rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {
-          navigate('Dashboard', {
-            screen: 'Account',
-            params: {screen: 'CompanyProfile'},
-          });
-        },
+        heading: 'Settings & Preferences',
+        items: [
+          {
+            label: 'Notification Controls',
+            leftIcon: (
+              <BellIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+                strokeWidth={2}
+              />
+            ),
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () =>
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'NotificationScreen'},
+              }),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+          },
+          {
+            label: 'Change Language',
+            leftIcon: (
+              <LanguageIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+                strokeWidth={2}
+              />
+            ),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => {},
+          },
+          {
+            label: 'Change Currency',
+            leftIcon: (
+              <EuroIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+                size={20}
+                strokeWidth={2}
+              />
+            ),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => {},
+          },
+        ],
       },
       {
-        label: 'Bank Details',
-        rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {
-          navigate('Dashboard', {
-            screen: 'Account',
-            params: {screen: 'BankDetails'},
-          });
-        },
+        heading: 'Support & Info',
+        items: [
+          {
+            label: 'Share the app',
+            leftIcon: (
+              <ShareAppIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => {},
+          },
+          {
+            label: 'Surf Chatbot',
+            leftIcon: (
+              <ChatIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+                strokeWidth={2}
+              />
+            ),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => {},
+          },
+          {
+            label: 'FAQ',
+            leftIcon: (
+              <FaqIcon style={undefined} color={ColorPalette.GREY_TEXT_100} />
+            ),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: {screen: 'FAQScreen'},
+              });
+            },
+          },
+          {
+            label: 'Privacy Policy',
+            leftIcon: (
+              <PrivacyPolicyIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+                size={25}
+              />
+            ),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => {},
+          },
+        ],
       },
       {
-        label: 'Payments',
-        rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {
-          navigate('Dashboard', {
-            screen: 'Account',
-            params: {screen: 'PaymentInfo'},
-          });
-        },
-      },
-      {
-        label: 'Strip Account',
-        rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {},
-      },
-      {
-        label: 'Notifications',
-        rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {
-          navigate('Dashboard', {
-            screen: 'Account',
-            params: {screen: 'NotificationScreen'},
-          });
-        },
-      },
-      {
-        label: 'Terms and Conditions',
-        rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {},
-      },
-      {
-        label: `FAQ'S`,
-        rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {
-          navigate('Dashboard', {
-            screen: 'Account',
-            params: {screen: 'FAQScreen'},
-          });
-        },
-      },
-      {
-        label: 'Privacy Policy',
-        rightIcon: <ArrowRightIcon style={undefined} />,
-        onPress: () => {},
-      },
-      {
-        label: 'Logout',
-        rightIcon: null,
-        onPress: () => setShowLogoutModal(true),
-      },
-      {
-        label: 'Delete Account',
-        rightIcon: null,
-        onPress: () => setShowDeleteModal(true),
+        heading: null,
+        items: [
+          {
+            label: 'Log out',
+            leftIcon: (
+              <LogoutIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+                strokeWidth={1.4}
+                size={21}
+              />
+            ),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => setShowLogoutModal(true),
+          },
+          {
+            label: 'Delete Account',
+            leftIcon: (
+              <TrashIcon2
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+                strokeWidth={2}
+                size={21}
+              />
+            ),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => setShowDeleteModal(true),
+          },
+        ],
       },
     ],
     [],
@@ -264,66 +533,119 @@ const AccountScreen = () => {
   );
 
   // Memoize the sales section
-  const SalesSection = useCallback(
-    () => (
-      <View style={styles.salesContainer}>
-        <View style={styles.twoContainer}>
-          <View style={styles.iconBack}>
-            <CircularEuroIcon style={undefined} />
-          </View>
-          <View style={styles.salesTwo}>
-            <Typography
-              variant={TypographyVariant.H5_SEMIBOLD}
-              text="€47,125.34"
-              customTextStyles={styles.countValue}
-            />
-            <Typography
-              variant={TypographyVariant.LSMALL_REGULAR}
-              text="Total Sales"
-              customTextStyles={styles.countCaption}
-            />
-          </View>
-        </View>
-        <View style={styles.twoContainer}>
-          <View style={styles.iconBackOne}>
-            <PackageIcon style={undefined} />
-          </View>
-          <View style={styles.salesTwo}>
-            <Typography
-              variant={TypographyVariant.H5_SEMIBOLD}
-              text="1529"
-              customTextStyles={styles.countValue}
-            />
-            <Typography
-              variant={TypographyVariant.LSMALL_REGULAR}
-              text="Total Orders"
-              customTextStyles={styles.countCaption}
-            />
-          </View>
-        </View>
-      </View>
-    ),
-    [],
-  );
+  // const SalesSection = useCallback(
+  //   () => (
+  //     <View style={styles.salesContainer}>
+  //       <View style={styles.twoContainer}>
+  //         <View style={styles.iconBack}>
+  //           <CircularEuroIcon style={undefined} />
+  //         </View>
+  //         <View style={styles.salesTwo}>
+  //           <Typography
+  //             variant={TypographyVariant.H5_SEMIBOLD}
+  //             text="€47,125.34"
+  //             customTextStyles={styles.countValue}
+  //           />
+  //           <Typography
+  //             variant={TypographyVariant.LSMALL_REGULAR}
+  //             text="Total Sales"
+  //             customTextStyles={styles.countCaption}
+  //           />
+  //         </View>
+  //       </View>
+  //       <View style={styles.twoContainer}>
+  //         <View style={styles.iconBackOne}>
+  //           <PackageIcon style={undefined} />
+  //         </View>
+  //         <View style={styles.salesTwo}>
+  //           <Typography
+  //             variant={TypographyVariant.H5_SEMIBOLD}
+  //             text="1529"
+  //             customTextStyles={styles.countValue}
+  //           />
+  //           <Typography
+  //             variant={TypographyVariant.LSMALL_REGULAR}
+  //             text="Total Orders"
+  //             customTextStyles={styles.countCaption}
+  //           />
+  //         </View>
+  //       </View>
+  //     </View>
+  //   ),
+  //   [],
+  // );
 
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: ColorPalette.SearchBack,
+      }}
+      edges={['bottom']}>
       <Header
         name="Account"
         variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
         rightIcons={headerIcons}
       />
-      <ProfileSection />
       <ScrollView
         style={styles.mainContainer}
         contentContainerStyle={[
           styles.scrollContent,
-          {paddingBottom: getScreenHeight(2)},
+          {paddingBottom: getScreenHeight(4)},
         ]}
         showsVerticalScrollIndicator={false}>
-        <SalesSection />
-        <View style={styles.profileOptionsContainer}>
+        <ProfileSection />
+        {/* <SalesSection /> */}
+
+        {menuSections.map((section, sectionIndex) => (
+          <View
+            key={sectionIndex}
+            style={{
+              marginTop: section.heading ? getScreenHeight(1) : 0,
+            }}>
+            {/* Section Heading */}
+            {section.heading && (
+              <Typography
+                variant={TypographyVariant.PMEDIUM_MEDIUM}
+                text={section.heading}
+                customTextStyles={{
+                  marginBottom: getScreenHeight(1),
+                  color: ColorPalette.GREY_TEXT_300,
+                  paddingLeft: getScreenWidth(3),
+                }}
+              />
+            )}
+
+            {/* Section Container */}
+            <View style={styles.containerStyle}>
+              {section.items.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  label={item.label}
+                  leftIcon={item.leftIcon}
+                  rightIcon={item.rightIcon}
+                  onPress={item.onPress}
+                  textStyle={{color: ColorPalette.GREY_TEXT_500}}
+                  variant={TypographyVariant.PMEDIUM_MEDIUM}
+                  containerStyle={styles.menuContainer}
+                  contentStyle={{gap: getScreenWidth(4)}}
+                  leftIconBackgroundColor={item.leftIconBackgroundColor}
+                  leftIconContainerStyle={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: BorderRadius.Full,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  showBottomBorder={true}
+                  isLastItem={index === section.items.length - 1}
+                />
+              ))}
+            </View>
+          </View>
+        ))}
+        {/* <View style={styles.profileOptionsContainer}>
           {menuItems.map((item, index) => (
             <MenuItem
               key={index}
@@ -335,7 +657,7 @@ const AccountScreen = () => {
               variant={TypographyVariant.LMEDIUM_MEDIUM}
             />
           ))}
-        </View>
+        </View> */}
 
         <AddModal
           isVisible={showLogoutModal}
