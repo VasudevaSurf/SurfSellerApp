@@ -4,15 +4,18 @@ export type OrderStatus =
   | 'All'
   | 'Pending'
   | 'Processing'
+  | 'Open'
   | 'Accepted'
+  | 'Paid'
+  | 'Declined'
+  | 'Failed'
+  | 'Backordered'
   | 'Shipped'
   | 'Delivered'
   | 'Completed'
   | 'Cancelled'
   | 'Returned'
-  | 'Exchanged'
-  | 'Failed'
-  | 'Declined';
+  | 'Exchanged';
 
 export interface OrderDetailParams {
   orderId: string;
