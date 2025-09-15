@@ -37,7 +37,7 @@ export const SlidingBar: React.FC<SlidingBarProps> = ({
               onPress={() => onOptionSelect(option)}
               activeOpacity={0.7}>
               <Typography
-                variant={TypographyVariant.LMEDIUM_REGULAR}
+                variant={TypographyVariant.LMEDIUM_MEDIUM}
                 text={option.label}
                 customTextStyles={[
                   slidingBarStyles.optionText,
