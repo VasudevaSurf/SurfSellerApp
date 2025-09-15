@@ -149,11 +149,6 @@ const AddProduct = () => {
         : [];
       setOriginalImages(originalImageList);
 
-      const originalImageList = Array.isArray(productData.images)
-        ? productData.images
-        : [];
-      setOriginalImages(originalImageList);
-
       setFormData(prevData => ({
         ...prevData,
         productId: productData.productId || productId || '',
