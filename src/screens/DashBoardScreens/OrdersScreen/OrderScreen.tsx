@@ -339,7 +339,7 @@ const OrderScreen = () => {
           },
           {
             icon: FilterIcon,
-            onPress: () => setShowFilterModal(prev => !prev),
+            onPress: () => setIsFilterModalVisible(true), // Change this
             size: 24,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,

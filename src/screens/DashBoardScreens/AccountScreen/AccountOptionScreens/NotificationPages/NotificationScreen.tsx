@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   Dimensions,
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
   View,
+  Animated,
 } from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
@@ -72,6 +73,9 @@ const NotificationScreen: React.FC = () => {
     NotificationItem[]
   >([]);
 
+  // Animation references for each notification
+  const animationRefs = useRef<{[key: string]: Animated.Value}>({});
+
   const [modalConfig, setModalConfig] = useState({
     isVisible: false,
     type: '', // 'delete' | 'clearAll'
@@ -79,6 +83,14 @@ const NotificationScreen: React.FC = () => {
     headerText: '',
     notificationId: '', // optional, single notification id
   });
+
+  // Initialize animation value for a notification
+  const getAnimationValue = (id: string) => {
+    if (!animationRefs.current[id]) {
+      animationRefs.current[id] = new Animated.Value(0);
+    }
+    return animationRefs.current[id];
+  };
 
   const openDeleteModal = (id: string) => {
     setModalConfig({
@@ -100,6 +112,83 @@ const NotificationScreen: React.FC = () => {
     });
   };
 
+  // Function to animate and remove a single notification
+  const animateAndRemoveNotification = (id: string, callback?: () => void) => {
+    const animValue = getAnimationValue(id);
+
+    Animated.timing(animValue, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      // Remove from state after animation completes
+      setAllNotifications(prev => prev.filter(item => item.id !== id));
+      setAdministrationNotification(prev =>
+        prev.filter(item => item.id !== id),
+      );
+      setProductNotifications(prev => prev.filter(item => item.id !== id));
+
+      // Clean up animation ref
+      delete animationRefs.current[id];
+
+      if (callback) callback();
+    });
+  };
+
+  // Function to animate and remove all notifications
+  const animateAndClearAllNotifications = () => {
+    const currentNotifications = getCurrentNotifications();
+
+    if (currentNotifications.length === 0) return;
+
+    // Start all animations simultaneously
+    const animations = currentNotifications.map((item, index) => {
+      const animValue = getAnimationValue(item.id);
+
+      return Animated.timing(animValue, {
+        toValue: 1,
+        duration: 300,
+        delay: index * 100, // Stagger the animations
+        useNativeDriver: true,
+      });
+    });
+
+    // Run all animations in parallel
+    Animated.parallel(animations).start(() => {
+      // Clear all notifications after animations complete
+      switch (index) {
+        case 0: // All
+          setAllNotifications([]);
+          break;
+        case 1: // Administrations
+          setAdministrationNotification([]);
+          break;
+        case 2: // Products
+          setProductNotifications([]);
+          break;
+      }
+
+      // Clean up all animation refs
+      currentNotifications.forEach(item => {
+        delete animationRefs.current[item.id];
+      });
+    });
+  };
+
+  // Get current notifications based on active tab
+  const getCurrentNotifications = () => {
+    switch (index) {
+      case 0:
+        return allNotifications;
+      case 1:
+        return administrationNotification;
+      case 2:
+        return productNotifications;
+      default:
+        return [];
+    }
+  };
+
   const renderNotificationSection = (
     title: string,
     data: NotificationItem[],
@@ -111,7 +200,6 @@ const NotificationScreen: React.FC = () => {
         contentContainerStyle={{flexGrow: 1}}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            {/* <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} /> */}
             <AnimatedLoader size={52} />
             <Typography
               text="Loading"
@@ -123,28 +211,56 @@ const NotificationScreen: React.FC = () => {
             />
           </View>
         ) : data.length > 0 ? (
-          data.map(item => (
-            <View key={item.id} style={styles.notificationCard}>
-              <View style={styles.notificationHeader}>
-                <Typography
-                  text={item.title}
-                  variant={TypographyVariant.PSMALL_MEDIUM}
-                  customTextStyles={styles.notificationTitle}
-                />
-                <Typography
-                  text={item.time}
-                  variant={TypographyVariant.LSMALL_REGULAR}
-                  customTextStyles={styles.notificationTime}
-                />
-              </View>
+          data.map(item => {
+            const animValue = getAnimationValue(item.id);
 
-              <Typography
-                text={item.description}
-                variant={TypographyVariant.LMEDIUM_REGULAR}
-                customTextStyles={styles.notificationDescription}
-              />
-            </View>
-          ))
+            // Animation styles
+            const animatedStyle = {
+              transform: [
+                {
+                  translateX: animValue.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, getScreenWidth(100)], // Slide to right
+                  }),
+                },
+                {
+                  scale: animValue.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 0.8], // Slightly scale down
+                  }),
+                },
+              ],
+              opacity: animValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 0], // Fade out
+              }),
+            };
+
+            return (
+              <Animated.View
+                key={item.id}
+                style={[styles.notificationCard, animatedStyle]}>
+                <View style={styles.notificationHeader}>
+                  <Typography
+                    text={item.title}
+                    variant={TypographyVariant.PSMALL_MEDIUM}
+                    customTextStyles={styles.notificationTitle}
+                  />
+                  <Typography
+                    text={item.time}
+                    variant={TypographyVariant.LSMALL_REGULAR}
+                    customTextStyles={styles.notificationTime}
+                  />
+                </View>
+
+                <Typography
+                  text={item.description}
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
+                  customTextStyles={styles.notificationDescription}
+                />
+              </Animated.View>
+            );
+          })
         ) : (
           <View style={styles.emptyStateContainer}>
             <View style={styles.emptyBox}>
@@ -154,7 +270,7 @@ const NotificationScreen: React.FC = () => {
                 customTextStyles={styles.emptyTitle}
               />
               <Typography
-                text="We’ll notify you when there’s something new."
+                text="We'll notify you when there's something new."
                 variant={TypographyVariant.PSMALL_REGULAR}
                 customTextStyles={styles.emptySubtitle}
               />
@@ -173,7 +289,6 @@ const NotificationScreen: React.FC = () => {
                   params: {screen: 'HomeScreen'},
                 })
               }
-              // bgColor={ColorPalette.PURPLE_300}
               customStyles={styles.emptyButton}
             />
           </View>
@@ -229,10 +344,12 @@ const NotificationScreen: React.FC = () => {
 
   const handleDeleteNotification = (id: string) => {
     console.log('Delete notification clicked with id:', id);
+    animateAndRemoveNotification(id);
   };
 
   const handleClearAllNotifications = () => {
     console.log('Clear all notifications clicked');
+    animateAndClearAllNotifications();
   };
 
   const getButtons = () => {
@@ -316,10 +433,7 @@ const NotificationScreen: React.FC = () => {
       <View style={styles.mainContainer}>
         <ScrollView
           style={styles.scrollViewContainer}
-          contentContainerStyle={[
-            styles.scrollContent,
-            // {paddingTop: getScreenHeight(2)},
-          ]}
+          contentContainerStyle={[styles.scrollContent]}
           showsVerticalScrollIndicator={false}>
           <TabView
             navigationState={{index, routes}}
@@ -350,139 +464,5 @@ const NotificationScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-// const NotificationScreen: React.FC = () => {
-//   const [autoAcceptOrders, setAutoAcceptOrders] = useState('yes');
-//   const [whatsappNotifications, setWhatsappNotifications] = useState(true);
-//   const trackWidth = getFigmaDimension(40);
-//   const trackHeight = getFigmaDimension(24);
-//   const thumbDiameter = getFigmaDimension(18);
-
-//   const handleAutoAcceptChange = (value: string) => {
-//     setAutoAcceptOrders(value);
-//     console.log(`Auto accept orders: ${value}`);
-//   };
-
-//   const handleWhatsappToggle = (value: boolean) => {
-//     setWhatsappNotifications(value);
-//     console.log(`WhatsApp notifications: ${value}`);
-//   };
-
-//   return (
-//     <SafeAreaView style={styles.container} edges={['bottom']}>
-//       <Header
-//         name="Notifications"
-//         variant={TypographyVariant.LMEDIUM_BOLD}
-//         textColor={ColorPalette.AgreeTerms}
-//         leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
-//         rightIcons={null}
-//       />
-//       <View style={styles.mainContainer}>
-//         <ScrollView
-//           style={styles.scrollViewContainer}
-//           contentContainerStyle={[
-//             styles.scrollContent,
-//             {paddingTop: getScreenHeight(2)},
-//           ]}
-//           showsVerticalScrollIndicator={false}>
-//           <View style={styles.sectionItem}>
-//             <View style={styles.textContainer}>
-//               <Typography
-//                 text="Auto accept orders"
-//                 variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
-//                 customTextStyles={styles.primaryText}
-//               />
-
-//               <ToggleButtons
-//                 leftButtonText="Yes"
-//                 rightButtonText="No"
-//                 leftButtonValue="yes"
-//                 rightButtonValue="no"
-//                 initialActiveButton={autoAcceptOrders}
-//                 onSelectionChange={handleAutoAcceptChange}
-//                 inactiveBackgroundColor="transparent"
-//                 activeBackgroundColor={ColorPalette.toggleColor}
-//                 inactiveTextColor={ColorPalette.GREY_TEXT_500}
-//                 activeTextColor={ColorPalette.White}
-//                 containerStyle={styles.toggleContainer}
-//                 buttonStyle={styles.toggleButton}
-//                 textStyle={styles.toggleButtonText}
-//                 typographyVariant={TypographyVariant.LSMALL_MEDIUM}
-//               />
-//             </View>
-//             <View
-//               style={{
-//                 width: getScreenWidth(50),
-//               }}>
-//               <Typography
-//                 text="(Mark orders as Accepted automatically for the desired payment modes)"
-//                 variant={TypographyVariant.LXSMALL_REGULAR}
-//                 customTextStyles={styles.secondaryText}
-//               />
-//             </View>
-//           </View>
-
-//           <View style={styles.sectionItem}>
-//             <View style={styles.textContainer}>
-//               <Typography
-//                 text="WhatsApp notifications"
-//                 variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
-//                 customTextStyles={styles.primaryText}
-//               />
-//               <ToggleSwitch
-//                 isOn={whatsappNotifications}
-//                 onToggle={handleWhatsappToggle}
-//                 onColor={ColorPalette.Success}
-//                 offColor={ColorPalette.Gray}
-//                 size="small"
-//                 thumbOnStyle={{
-//                   backgroundColor: ColorPalette.White,
-//                   elevation: 0,
-//                   shadowOpacity: 0,
-//                   shadowColor: 'transparent',
-//                   shadowOffset: {height: 0, width: 0},
-//                   shadowRadius: 0,
-//                   width: thumbDiameter,
-//                   height: thumbDiameter,
-//                   borderRadius: thumbDiameter / 2,
-//                   margin: (trackHeight - thumbDiameter) / 2,
-//                 }}
-//                 thumbOffStyle={{
-//                   backgroundColor: ColorPalette.White,
-//                   elevation: 0,
-//                   shadowOpacity: 0,
-//                   shadowColor: 'transparent',
-//                   shadowOffset: {height: 0, width: 0},
-//                   shadowRadius: 0,
-//                   width: thumbDiameter,
-//                   height: thumbDiameter,
-//                   borderRadius: thumbDiameter / 2,
-//                   margin: (trackHeight - thumbDiameter) / 2,
-//                 }}
-//                 trackOnStyle={{
-//                   width: trackWidth,
-//                   height: trackHeight,
-//                   borderRadius: trackHeight / 2,
-//                   padding: 0,
-//                 }}
-//                 trackOffStyle={{
-//                   width: trackWidth,
-//                   height: trackHeight,
-//                   borderRadius: trackHeight / 2,
-//                   padding: 0,
-//                 }}
-//               />
-//             </View>
-//             <Typography
-//               text="(Send order notifications to the WhatsApp directly)"
-//               variant={TypographyVariant.LXSMALL_REGULAR}
-//               customTextStyles={styles.secondaryText}
-//             />
-//           </View>
-//         </ScrollView>
-//       </View>
-//     </SafeAreaView>
-//   );
-// };
 
 export default NotificationScreen;

@@ -54,7 +54,7 @@ import {
 import {AppDispatch, RootState} from '../../../redux/store';
 import {styles} from './ProductScreen.styles';
 import FilterIcon from '../../../assets/icons/FilterIcon';
-import {PriceRangeModal} from '../../../components/MainComponents/PriceRangeModal';
+import {PriceRangeModal} from '../../../components/MainComponents/PriceRangeModal/PriceRangeModal.tsx';
 import EyeOpen from '../../../assets/icons/EyeOpen';
 import EmptyBox from '../../../assets/icons/EmptyBox.tsx';
 import LoaderIcon, {AnimatedLoader} from '../../../assets/icons/LoaderIcon.tsx';
@@ -779,7 +779,7 @@ const ProductScreen = () => {
           },
           {
             icon: FilterIcon,
-            onPress: () => setShowFilterModal(prev => !prev),
+            onPress: () => setIsPriceModalVisible(true), // Change this line
             size: 24,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,

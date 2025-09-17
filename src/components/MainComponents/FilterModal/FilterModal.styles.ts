@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
     padding: getFigmaDimension(16),
     gap: getFigmaDimension(8),
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between',ca
   },
   customButton: {
     width: getFigmaDimension(190),
