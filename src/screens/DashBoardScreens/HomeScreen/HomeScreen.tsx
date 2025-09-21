@@ -341,7 +341,7 @@ const HomeScreen = () => {
           />
         }>
         {/* Get Started Section */}
-        <View style={styles.verifyContainer}>
+        {/* <View style={styles.verifyContainer}>
           <View style={styles.textVerifyContainer}>
             <Typography
               variant={TypographyVariant.H6_BOLD}
@@ -357,7 +357,7 @@ const HomeScreen = () => {
             />
           </View>
           <View style={styles.verifyStepsContainer}></View>
-        </View>
+        </View> */}
 
         {/* Orders Menu */}
         <View style={styles.OrderContainer}>

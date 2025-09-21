@@ -431,10 +431,9 @@ const PaymentInfo = () => {
         ]}
         showsVerticalScrollIndicator={false}>
         {/* Stripe Connect Section */}
-        <View style={styles.stripEditContainer}>
+        {/* <View style={styles.stripEditContainer}>
           <View style={styles.stripEditContainerOne}>
             <PayPalIcon style={undefined} size={32} />
-            {/* <BankOutlineIcon style={undefined} size={32} /> */}
             <View style={styles.connectContainer}>
               <Typography
                 text="PayPal"
@@ -465,7 +464,7 @@ const PaymentInfo = () => {
             customContainerStyles={styles.editButton}
             customTextStyles={{color: ColorPalette.ProgressLine}}
           />
-        </View>
+        </View> */}
 
         {/* Balance Section */}
         <View style={styles.withdrawContainer}>
