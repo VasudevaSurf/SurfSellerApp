@@ -1,7 +1,7 @@
-import {StyleSheet} from 'react-native';
-import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
-import {ColorPalette} from '../../../config/colorPalette';
-import {BorderRadius, Spacing} from '../../../config/globalStyles';
+import { StyleSheet } from 'react-native';
+import { getScreenWidth, getScreenHeight } from '../../../helpers/screenSize';
+import { ColorPalette } from '../../../config/colorPalette';
+import { BorderRadius, Spacing } from '../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   // mainContainer: {
@@ -11,11 +11,11 @@ export const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     flexDirection: 'column',
-    paddingVertical: getScreenHeight(2),
+    paddingVertical: getScreenHeight(1.2),
     paddingHorizontal: getScreenHeight(2),
   },
   scrollContent: {
-    gap: getScreenWidth(4),
+    gap: getScreenHeight(1.2),
   },
   profileContainer: {
     display: 'flex',
