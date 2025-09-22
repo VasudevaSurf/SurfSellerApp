@@ -1,13 +1,13 @@
 // src/screens/DashBoardScreens/HomeScreen/HomeScreen.tsx
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ScrollView,
   View,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import BellIcon from '../../../assets/icons/BellIcon';
 import BookmarkNoteIcon from '../../../assets/icons/BookmarkNoteIcon';
@@ -19,22 +19,23 @@ import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
 import SearchIcon from '../../../assets/icons/SearchIcon';
 import TotalSalesIcon from '../../../assets/icons/TotalSalesIcon';
 import TrendIcon from '../../../assets/icons/TrendIcon';
-import {MenuItem} from '../../../components/MainComponents/MenuItem/MenuItem';
-import {RecentOrder} from '../../../components/MainComponents/RecentOrder/RecentOrder';
-import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
+import { MenuItem } from '../../../components/MainComponents/MenuItem/MenuItem';
+import { RecentOrder } from '../../../components/MainComponents/RecentOrder/RecentOrder';
+import { SlidingBar } from '../../../components/MainComponents/SlidingBar/SlidingBar';
 import ToggleButtons from '../../../components/MainComponents/ToggleButtons/ToggleButtons';
-import {Header} from '../../../components/UserComponents/Header/Header';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
-import {styles} from './HomeScreen.styles';
-import {navigate} from '../../../navigation/utils/navigationRef';
-import {RootState} from '../../../redux/store';
-import {useSelector} from 'react-redux';
+import { Header } from '../../../components/UserComponents/Header/Header';
+import { Typography } from '../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../config/colorPalette';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
+import { styles } from './HomeScreen.styles';
+import { navigate } from '../../../navigation/utils/navigationRef';
+import { RootState } from '../../../redux/store';
+import { useSelector } from 'react-redux';
 import ArrowRightStyle from '../../../assets/icons/ArrowRightStyle';
-import {useDashboard} from '../../../hooks/useDashboard';
+import { useDashboard } from '../../../hooks/useDashboard';
 import AnimatedLoader from '../../../assets/icons/LoaderIcon';
+import { Image } from 'react-native';
 
 const HomeScreen = () => {
   const userData = useSelector((state: RootState) => state.auth.userData);
@@ -129,9 +130,9 @@ const HomeScreen = () => {
   );
 
   const statusOptions = [
-    {id: 'pending', label: 'Pending'},
-    {id: 'accepted', label: 'Accepted'},
-    {id: 'cancelled', label: 'Cancelled'},
+    { id: 'pending', label: 'Pending' },
+    { id: 'accepted', label: 'Accepted' },
+    { id: 'cancelled', label: 'Cancelled' },
   ];
 
   const [selectedOption, setSelectedOption] = useState(statusOptions[0]);
@@ -169,8 +170,8 @@ const HomeScreen = () => {
 
   // Calculate percentage changes (mock data for now - you'd calculate these from historical data)
   const calculateTrend = () => ({
-    sales: '+12.8%',
-    orders: '+8.3%',
+    sales: '0%',
+    orders: '0%',
     products: '0%',
     income: '0%',
   });
@@ -179,28 +180,28 @@ const HomeScreen = () => {
 
   if (loading && !refreshing) {
     return (
-      <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
         <Header
           name={`Hello, ${userData?.firstname || 'User'}! 👋`}
-          image={{
-            source: require('../../../assets/images/placeholder-profile.png'),
-          }}
-          variant={TypographyVariant.H6_SMALL_SEMIBOLD}
+          // image={{
+          //   source: require('../../../assets/images/placeholder-profile.png'),
+          // }}
+          variant={TypographyVariant.PMEDIUM_SEMIBOLD}
           textColor={ColorPalette.GREY_TEXT_500}
           rightIcons={[
-            {
-              icon: SearchIcon,
-              onPress: () => console.log('Search pressed'),
-              size: 22,
-              color: ColorPalette.IconColor,
-              strokeWidth: 1.4,
-            },
+            // {
+            //   icon: SearchIcon,
+            //   onPress: () => console.log('Search pressed'),
+            //   size: 22,
+            //   color: ColorPalette.IconColor,
+            //   strokeWidth: 1.4,
+            // },
             {
               icon: BellIcon,
               onPress: () =>
                 navigate('Dashboard', {
                   screen: 'Account',
-                  params: {screen: 'NotificationScreen'},
+                  params: { screen: 'NotificationScreen' },
                 }),
               size: 22,
               color: ColorPalette.IconColor,
@@ -211,7 +212,7 @@ const HomeScreen = () => {
               onPress: () => {
                 navigate('Dashboard', {
                   screen: 'Account',
-                  params: {screen: 'FAQScreen'},
+                  params: { screen: 'FAQScreen' },
                 });
               },
               size: 24,
@@ -223,7 +224,7 @@ const HomeScreen = () => {
         <View
           style={[
             styles.mainContainer,
-            {justifyContent: 'center', alignItems: 'center'},
+            { justifyContent: 'center', alignItems: 'center' },
           ]}>
           <AnimatedLoader size={52} />
           <Typography
@@ -240,28 +241,28 @@ const HomeScreen = () => {
   }
 
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Header
         name={`Hello, ${userData?.firstname || 'User'}! 👋`}
-        image={{
-          source: require('../../../assets/images/placeholder-profile.png'),
-        }}
-        variant={TypographyVariant.H6_SMALL_SEMIBOLD}
+        // image={{
+        //   source: require('../../../assets/images/placeholder-profile.png'),
+        // }}
+        variant={TypographyVariant.PMEDIUM_SEMIBOLD}
         textColor={ColorPalette.GREY_TEXT_500}
         rightIcons={[
-          {
-            icon: SearchIcon,
-            onPress: () => console.log('Search pressed'),
-            size: 22,
-            color: ColorPalette.IconColor,
-            strokeWidth: 1.4,
-          },
+          // {
+          //   icon: SearchIcon,
+          //   onPress: () => console.log('Search pressed'),
+          //   size: 22,
+          //   color: ColorPalette.IconColor,
+          //   strokeWidth: 1.4,
+          // },
           {
             icon: BellIcon,
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'NotificationScreen'},
+                params: { screen: 'NotificationScreen' },
               }),
             size: 22,
             color: ColorPalette.IconColor,
@@ -272,7 +273,7 @@ const HomeScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'FAQScreen'},
+                params: { screen: 'FAQScreen' },
               });
             },
             size: 24,
@@ -285,7 +286,7 @@ const HomeScreen = () => {
         style={styles.mainContainer}
         contentContainerStyle={[
           styles.scrollContent,
-          {paddingBottom: getScreenHeight(4)},
+          { paddingBottom: getScreenHeight(4) },
         ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -296,7 +297,7 @@ const HomeScreen = () => {
             tintColor={ColorPalette.PURPLE_300}
           />
         }>
-        <View style={styles.verifyContainer}>
+        {/* <View style={styles.verifyContainer}>
           <View style={styles.textVerifyContainer}>
             <Typography
               variant={TypographyVariant.H6_BOLD}
@@ -314,7 +315,7 @@ const HomeScreen = () => {
             />
           </View>
           <View style={styles.verifyStepsContainer}></View>
-        </View>
+        </View> */}
 
         <View style={styles.OrderContainer}>
           {menuItems.map((item, index) => (
@@ -324,7 +325,7 @@ const HomeScreen = () => {
               leftIcon={item.leftIcon}
               rightIcon={item.rightIcon}
               onPress={item.onPress}
-              textStyle={{color: ColorPalette.GREY_TEXT_500}}
+              textStyle={{ color: ColorPalette.GREY_TEXT_500 }}
               variant={TypographyVariant.LMEDIUM_MEDIUM}
               containerStyle={styles.menuContainer}
               contentStyle={{
@@ -418,12 +419,23 @@ const HomeScreen = () => {
                     <BrainIcon style={undefined} />
                   </View>
                   <View style={styles.salesTwo}>
-                    <Typography
-                      variant={TypographyVariant.H4_BOLD}
-                      text={activeProducts}
-                      customTextStyles={styles.countValue}
-                      numberOfLines={1}
-                    />
+                    <View style={styles.rowSection}>
+                      <Typography
+                        variant={TypographyVariant.H4_BOLD}
+                        text={activeProducts}
+                        customTextStyles={styles.countValue}
+                        numberOfLines={1}
+                      />
+                      <View style={styles.countBlock}>
+                        <Typography
+                          variant={TypographyVariant.LSMALL_REGULAR}
+                          text={trends.products}
+                          customTextStyles={styles.countText}
+                          numberOfLines={1}
+                        />
+                        <TrendIcon size={16} style={undefined} />
+                      </View>
+                    </View>
                     <Typography
                       variant={TypographyVariant.LMEDIUM_REGULAR}
                       text="Active Products"
@@ -432,15 +444,7 @@ const HomeScreen = () => {
                     />
                   </View>
                 </View>
-                <View style={styles.countBlock}>
-                  <Typography
-                    variant={TypographyVariant.PXSMALL_REGULAR}
-                    text={trends.products}
-                    customTextStyles={styles.countText}
-                    numberOfLines={1}
-                  />
-                  <TrendIcon size={18} style={undefined} />
-                </View>
+
               </View>
 
               <View style={styles.activeProduct}>
@@ -449,13 +453,25 @@ const HomeScreen = () => {
                     <CurrencyIcon style={undefined} />
                   </View>
                   <View style={styles.salesTwo}>
-                    <Typography
-                      variant={TypographyVariant.H4_BOLD}
-                      text={income}
-                      customTextStyles={styles.countValue}
-                      numberOfLines={1}
-                      adjustsFontSizeToFit
-                    />
+                    <View style={styles.rowSection}>
+
+                      <Typography
+                        variant={TypographyVariant.H4_BOLD}
+                        text={income}
+                        customTextStyles={styles.countValue}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                      />
+                      <View style={styles.countBlock}>
+                        <Typography
+                          variant={TypographyVariant.LSMALL_REGULAR}
+                          text={trends.income}
+                          customTextStyles={styles.countText}
+                          numberOfLines={1}
+                        />
+                        <TrendIcon size={16} style={undefined} />
+                      </View>
+                    </View>
                     <Typography
                       variant={TypographyVariant.LMEDIUM_REGULAR}
                       text="Your income"
@@ -464,15 +480,7 @@ const HomeScreen = () => {
                     />
                   </View>
                 </View>
-                <View style={styles.countBlock}>
-                  <Typography
-                    variant={TypographyVariant.PXSMALL_REGULAR}
-                    text={trends.income}
-                    customTextStyles={styles.countText}
-                    numberOfLines={1}
-                  />
-                  <TrendIcon size={18} style={undefined} />
-                </View>
+
               </View>
             </View>
 
@@ -599,13 +607,44 @@ const HomeScreen = () => {
                 />
               ))
             ) : (
-              <View style={{padding: 20, alignItems: 'center'}}>
+              // <View style={{ padding: 20, alignItems: 'center' }}>
+              //   <Typography
+              //     variant={TypographyVariant.LMEDIUM_REGULAR}
+              //     text={`No ${selectedOption.label.toLowerCase()} orders`}
+              //     customTextStyles={{ color: ColorPalette.GREY_TEXT_300 }}
+              //   />
+              // </View>
+
+
+
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingBottom: getScreenHeight(4),
+                  
+                }}>
+                <Image
+                  source={require('../../../assets/images/emptyBox.png')}
+                  style={styles.emptyBoxPng}
+                />
                 <Typography
-                  variant={TypographyVariant.LMEDIUM_REGULAR}
-                  text={`No ${selectedOption.label.toLowerCase()} orders`}
-                  customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+                  text={`No recent orders`}
+                  variant={TypographyVariant.PMEDIUM_SEMIBOLD}
+                  customTextStyles={styles.emptyStateText}
+                />
+                <Typography
+                  variant={TypographyVariant.LSMALL_REGULAR}
+                  text={`We’ll notify you when a new one arrives.`}
+                  customTextStyles={{
+                    color: ColorPalette.GREY_TEXT_300,
+                    textAlign: 'center',
+                    lineHeight: 24,
+                  }}
                 />
               </View>
+
             )}
           </View>
         </View>
