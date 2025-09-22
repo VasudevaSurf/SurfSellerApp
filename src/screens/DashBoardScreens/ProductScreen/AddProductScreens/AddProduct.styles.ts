@@ -18,6 +18,6 @@ export const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'space-between',
-    paddingVertical: getScreenHeight(2),
+    paddingVertical: getScreenHeight(1.2),
   },
 });
