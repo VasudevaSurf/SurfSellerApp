@@ -1,18 +1,19 @@
 import React from 'react';
-import {StyleProp, ViewStyle} from 'react-native';
-import Svg, {Path} from 'react-native-svg';
+import { StyleProp, ViewStyle } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 interface ChatIconProps {
   size?: number;
   color?: string;
   style?: StyleProp<ViewStyle>;
+  strokeWidth?: number
 }
 
 const ChatIcon: React.FC<ChatIconProps> = ({
   size = 24,
   color = 'white',
   style,
-  strokeWidth = 1.5,
+  strokeWidth = 1.2,
 }) => {
   return (
     <Svg
