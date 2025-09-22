@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Dimensions,
   SafeAreaView,
@@ -9,21 +9,21 @@ import {
 import ToggleSwitch from 'toggle-switch-react-native';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
 import ToggleButtons from '../../../../../components/MainComponents/ToggleButtons/ToggleButtons';
-import {Header} from '../../../../../components/UserComponents/Header/Header';
-import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../config/colorPalette';
+import { Header } from '../../../../../components/UserComponents/Header/Header';
+import { Typography } from '../../../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../config/colorPalette';
 import {
   getFigmaDimension,
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
-import {BorderRadius} from '../../../../../config/globalStyles';
-import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
-import {styles} from './NotificationScreen.styles';
+import { BorderRadius } from '../../../../../config/globalStyles';
+import { goBack, navigate } from '../../../../../navigation/utils/navigationRef';
+import { styles } from './NotificationScreen.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
-import {TabView} from 'react-native-tab-view';
-import {AddModal} from '../../../../../components/MainComponents/AddModal/AddModal';
+import { TabView } from 'react-native-tab-view';
+import { AddModal } from '../../../../../components/MainComponents/AddModal/AddModal';
 import {
   Button,
   ButtonSize,
@@ -44,9 +44,9 @@ interface NotificationItem {
 const NotificationScreen: React.FC = () => {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    {key: 'all', title: 'All'},
-    {key: 'administrations', title: 'Administrations'},
-    {key: 'products', title: 'Products'},
+    { key: 'all', title: 'All' },
+    { key: 'administrations', title: 'Administrations' },
+    { key: 'products', title: 'Products' },
   ]);
   const [loading, setLoading] = useState(false);
   const [allNotifications, setAllNotifications] = useState<NotificationItem[]>([
@@ -107,8 +107,8 @@ const NotificationScreen: React.FC = () => {
   ) => {
     return (
       <ScrollView
-        style={{flex: 1, marginHorizontal: getScreenWidth(4)}}
-        contentContainerStyle={{flexGrow: 1}}>
+        style={{ flex: 1, marginHorizontal: getScreenWidth(4) }}
+        contentContainerStyle={{ flexGrow: 1 }}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
             {/* <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} /> */}
@@ -140,7 +140,7 @@ const NotificationScreen: React.FC = () => {
 
               <Typography
                 text={item.description}
-                variant={TypographyVariant.LMEDIUM_REGULAR}
+                variant={TypographyVariant.LSMALL_REGULAR}
                 customTextStyles={styles.notificationDescription}
               />
             </View>
@@ -170,7 +170,7 @@ const NotificationScreen: React.FC = () => {
               onPress={() =>
                 navigate('Dashboard', {
                   screen: 'Home',
-                  params: {screen: 'HomeScreen'},
+                  params: { screen: 'HomeScreen' },
                 })
               }
               // bgColor={ColorPalette.PURPLE_300}
@@ -182,7 +182,7 @@ const NotificationScreen: React.FC = () => {
     );
   };
 
-  const renderScene = ({route}) => {
+  const renderScene = ({ route }) => {
     switch (route.key) {
       case 'all':
         return renderNotificationSection('All', allNotifications, loading);
@@ -214,7 +214,7 @@ const NotificationScreen: React.FC = () => {
             style={[styles.tabButton, isFocused && styles.activeTabButton]}>
             <Typography
               text={route.title}
-              variant={TypographyVariant.PMEDIUM_MEDIUM}
+              variant={TypographyVariant.LMEDIUM_MEDIUM}
               customTextStyles={{
                 color: isFocused
                   ? ColorPalette.White
@@ -240,7 +240,7 @@ const NotificationScreen: React.FC = () => {
       return [
         {
           text: 'Cancel',
-          onPress: () => setModalConfig({...modalConfig, isVisible: false}),
+          onPress: () => setModalConfig({ ...modalConfig, isVisible: false }),
           variant: ButtonVariant.PRIMARY,
           type: ButtonType.OUTLINED,
           size: ButtonSize.MEDIUM,
@@ -253,7 +253,7 @@ const NotificationScreen: React.FC = () => {
             if (modalConfig.notificationId) {
               handleDeleteNotification(modalConfig.notificationId);
             }
-            setModalConfig({...modalConfig, isVisible: false});
+            setModalConfig({ ...modalConfig, isVisible: false });
           },
           variant: ButtonVariant.PRIMARY,
           type: ButtonType.PRIMARY,
@@ -268,7 +268,7 @@ const NotificationScreen: React.FC = () => {
       return [
         {
           text: 'Cancel',
-          onPress: () => setModalConfig({...modalConfig, isVisible: false}),
+          onPress: () => setModalConfig({ ...modalConfig, isVisible: false }),
           variant: ButtonVariant.PRIMARY,
           type: ButtonType.OUTLINED,
           size: ButtonSize.MEDIUM,
@@ -279,7 +279,7 @@ const NotificationScreen: React.FC = () => {
           text: 'Clear All',
           onPress: () => {
             handleClearAllNotifications();
-            setModalConfig({...modalConfig, isVisible: false});
+            setModalConfig({ ...modalConfig, isVisible: false });
           },
           variant: ButtonVariant.PRIMARY,
           type: ButtonType.PRIMARY,
@@ -306,7 +306,7 @@ const NotificationScreen: React.FC = () => {
               <Typography
                 text="Clear All"
                 variant={TypographyVariant.LMEDIUM_MEDIUM}
-                customTextStyles={{color: ColorPalette.RED_200, fontSize: 16}}
+                customTextStyles={{ color: ColorPalette.RED_200, fontSize: 16 }}
               />
             ),
             onPress: openClearAllModal,
@@ -322,10 +322,10 @@ const NotificationScreen: React.FC = () => {
           ]}
           showsVerticalScrollIndicator={false}>
           <TabView
-            navigationState={{index, routes}}
+            navigationState={{ index, routes }}
             renderScene={renderScene}
             onIndexChange={setIndex}
-            initialLayout={{width: Dimensions.get('window').width}}
+            initialLayout={{ width: Dimensions.get('window').width }}
             renderTabBar={renderTabBar}
             swipeEnabled={false}
           />
@@ -334,7 +334,7 @@ const NotificationScreen: React.FC = () => {
 
       <AddModal
         isVisible={modalConfig.isVisible}
-        onClose={() => setModalConfig({...modalConfig, isVisible: false})}
+        onClose={() => setModalConfig({ ...modalConfig, isVisible: false })}
         headerTitle={modalConfig.headerTitle}
         headerText={modalConfig.headerText}
         buttons={getButtons()}
