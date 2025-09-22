@@ -1,35 +1,35 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Image, ScrollView, View} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch, useSelector} from 'react-redux';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Image, ScrollView, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import CircularEuroIcon from '../../../assets/icons/CircularEuroIcon';
 import LanguageIcon from '../../../assets/icons/LanguageIcon';
 import PackageIcon from '../../../assets/icons/PackageIcon';
 import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
-import {AddModal} from '../../../components/MainComponents/AddModal/AddModal';
-import {MenuItem} from '../../../components/MainComponents/MenuItem/MenuItem';
+import { AddModal } from '../../../components/MainComponents/AddModal/AddModal';
+import { MenuItem } from '../../../components/MainComponents/MenuItem/MenuItem';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../../components/UserComponents/Button';
-import {Header} from '../../../components/UserComponents/Header/Header';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import { Header } from '../../../components/UserComponents/Header/Header';
+import { Typography } from '../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../config/colorPalette';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
 import {
   navigate,
   navigateToAuth,
 } from '../../../navigation/utils/navigationRef';
-import {logoutUser} from '../../../redux/slices/authSlice';
-import {fetchProfile} from '../../../redux/slices/profileSlice';
-import {styles} from './AccountScreen.styles';
-import {RootState, AppDispatch} from '../../../redux/store';
+import { logoutUser } from '../../../redux/slices/authSlice';
+import { fetchProfile } from '../../../redux/slices/profileSlice';
+import { styles } from './AccountScreen.styles';
+import { RootState, AppDispatch } from '../../../redux/store';
 import BusinessProfileIcon from '../../../assets/icons/BusinessProfileIcon';
-import {BorderRadius} from '../../../config/globalStyles';
+import { BorderRadius } from '../../../config/globalStyles';
 import BusinessAdministrationIcon from '../../../assets/icons/BusinessAdministratorsIcon';
 import BankDetailsIcon from '../../../assets/icons/BankDetailsIcon';
 import PaymentsIcon from '../../../assets/icons/PaymentsIcon';
@@ -41,14 +41,14 @@ import PrivacyPolicyIcon from '../../../assets/icons/PrivacyPolicyIcon';
 import ShareAppIcon from '../../../assets/icons/ShareAppIcon';
 import ChatIcon from '../../../assets/icons/ChatIcon';
 import LogoutIcon from '../../../assets/icons/LogOutIcon';
-import {TrashIcon2} from '../../../assets/icons/NewProductIcons/TrashIcon2';
+import { TrashIcon2 } from '../../../assets/icons/NewProductIcons/TrashIcon2';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const {profileData, loading, error} = useSelector(
+  const { profileData, loading, error } = useSelector(
     (state: RootState) => state.profile,
   );
 
@@ -96,7 +96,7 @@ const AccountScreen = () => {
         onPress: () => {
           navigate('Dashboard', {
             screen: 'Account',
-            params: {screen: 'FAQScreen'},
+            params: { screen: 'FAQScreen' },
           });
         },
         size: 24,
@@ -183,7 +183,7 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'PersonalInfo'},
+                params: { screen: 'PersonalInfo' },
               }),
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {
@@ -207,7 +207,7 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'CompanyProfile'},
+                params: { screen: 'CompanyProfile' },
               }),
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {
@@ -231,7 +231,7 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'BankDetails'},
+                params: { screen: 'BankDetails' },
               }),
             leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
             leftIconBackgroundColor: ColorPalette.SearchBack,
@@ -256,7 +256,7 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'PaymentInfo'},
+                params: { screen: 'PaymentInfo' },
               }),
             leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
             leftIconBackgroundColor: ColorPalette.SearchBack,
@@ -264,27 +264,27 @@ const AccountScreen = () => {
               borderRadius: BorderRadius.Full,
             },
           },
-          {
-            label: 'Motivation',
-            leftIcon: (
-              <MotivationIcon
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_100}
-              />
-            ),
-            rightIcon: (
-              <ArrowRightIcon
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_100}
-              />
-            ),
-            onPress: () => {},
-            leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
-            leftIconBackgroundColor: ColorPalette.SearchBack,
-            leftIconStyles: {
-              borderRadius: BorderRadius.Full,
-            },
-          },
+          // {
+          //   label: 'Motivation',
+          //   leftIcon: (
+          //     <MotivationIcon
+          //       style={undefined}
+          //       color={ColorPalette.GREY_TEXT_100}
+          //     />
+          //   ),
+          //   rightIcon: (
+          //     <ArrowRightIcon
+          //       style={undefined}
+          //       color={ColorPalette.GREY_TEXT_100}
+          //     />
+          //   ),
+          //   onPress: () => {},
+          //   leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
+          //   leftIconBackgroundColor: ColorPalette.SearchBack,
+          //   leftIconStyles: {
+          //     borderRadius: BorderRadius.Full,
+          //   },
+          // },
         ],
       },
       {
@@ -308,7 +308,7 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'NotificationScreen'},
+                params: { screen: 'NotificationScreen' },
               }),
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {
@@ -334,7 +334,7 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => {},
+            onPress: () => { },
           },
           {
             label: 'Change Currency',
@@ -356,7 +356,7 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => {},
+            onPress: () => { },
           },
         ],
       },
@@ -381,7 +381,7 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => {},
+            onPress: () => { },
           },
           {
             label: 'Surf Chatbot',
@@ -402,7 +402,7 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => {},
+            onPress: () => { },
           },
           {
             label: 'FAQ',
@@ -422,7 +422,7 @@ const AccountScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'FAQScreen'},
+                params: { screen: 'FAQScreen' },
               });
             },
           },
@@ -445,7 +445,7 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => {},
+            onPress: () => { },
           },
         ],
       },
@@ -592,7 +592,7 @@ const AccountScreen = () => {
         style={styles.mainContainer}
         contentContainerStyle={[
           styles.scrollContent,
-          {paddingBottom: getScreenHeight(4)},
+          { paddingBottom: getScreenHeight(4) },
         ]}
         showsVerticalScrollIndicator={false}>
         <ProfileSection />
@@ -626,10 +626,10 @@ const AccountScreen = () => {
                   leftIcon={item.leftIcon}
                   rightIcon={item.rightIcon}
                   onPress={item.onPress}
-                  textStyle={{color: ColorPalette.GREY_TEXT_500}}
+                  textStyle={{ color: ColorPalette.GREY_TEXT_500 }}
                   variant={TypographyVariant.PMEDIUM_MEDIUM}
                   containerStyle={styles.menuContainer}
-                  contentStyle={{gap: getScreenWidth(4)}}
+                  contentStyle={{ gap: getScreenWidth(4) }}
                   leftIconBackgroundColor={item.leftIconBackgroundColor}
                   leftIconContainerStyle={{
                     width: 44,
