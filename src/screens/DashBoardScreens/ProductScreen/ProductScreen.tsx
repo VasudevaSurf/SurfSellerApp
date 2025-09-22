@@ -1,7 +1,7 @@
 // src/screens/DashBoardScreens/ProductScreen/ProductScreen.tsx
 
 import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
@@ -11,8 +11,8 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch, useSelector} from 'react-redux';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
 import BellIcon from '../../../assets/icons/BellIcon';
 import PlusIcon from '../../../assets/icons/PlusIcon';
 import TrashIcon from '../../../assets/icons/NewProductIcons/TrashIcon';
@@ -21,8 +21,8 @@ import {
   AddModal,
   ButtonConfig,
 } from '../../../components/MainComponents/AddModal/AddModal';
-import {ProductInfo} from '../../../components/MainComponents/ProductInfo/ProductInfo';
-import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
+import { ProductInfo } from '../../../components/MainComponents/ProductInfo/ProductInfo';
+import { SlidingBar } from '../../../components/MainComponents/SlidingBar/SlidingBar';
 import {
   Button,
   ButtonSize,
@@ -30,13 +30,13 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../../components/UserComponents/Button';
-import {Header} from '../../../components/UserComponents/Header/Header';
-import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
-import {navigate} from '../../../navigation/utils/navigationRef';
+import { Header } from '../../../components/UserComponents/Header/Header';
+import { SearchBox } from '../../../components/UserComponents/SearchBox/SearchBox';
+import { Typography } from '../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../config/colorPalette';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
+import { navigate } from '../../../navigation/utils/navigationRef';
 import {
   fetchProducts,
   fetchProductsByStatus,
@@ -51,12 +51,12 @@ import {
   clearDeleteError,
   clearStatusUpdateError,
 } from '../../../redux/slices/productsSlice';
-import {AppDispatch, RootState} from '../../../redux/store';
-import {styles} from './ProductScreen.styles';
+import { AppDispatch, RootState } from '../../../redux/store';
+import { styles } from './ProductScreen.styles';
 import EyeOpen from '../../../assets/icons/EyeOpen';
 import EmptyBox from '../../../assets/icons/EmptyBox.tsx';
 import FilterIcon from '../../../assets/icons/FilterIcon.tsx';
-import LoaderIcon, {AnimatedLoader} from '../../../assets/icons/LoaderIcon.tsx';
+import LoaderIcon, { AnimatedLoader } from '../../../assets/icons/LoaderIcon.tsx';
 
 const ProductScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -97,34 +97,33 @@ const ProductScreen = () => {
     },
     {
       id: 'active',
-      label: `Active${
-        filterCounts.active > 0 ? ` ${filterCounts.active}` : ''
-      }`,
+      label: `Active${filterCounts.active > 0 ? ` ${filterCounts.active}` : ''
+        }`,
     },
     {
       id: 'lowStock',
-      label: `Low Stock${
-        filterCounts.lowStock > 0 ? ` ${filterCounts.lowStock}` : ''
-      }`,
+      label: `Low Stock${filterCounts.lowStock > 0 ? ` ${filterCounts.lowStock}` : ''
+        }`,
     },
     {
       id: 'pending',
-      label: `Pending${
-        filterCounts.pending > 0 ? ` ${filterCounts.pending}` : ''
-      }`,
+      label: `Pending${filterCounts.pending > 0 ? ` ${filterCounts.pending}` : ''
+        }`,
     },
     {
       id: 'disabled',
-      label: `Hidden${
-        filterCounts.disabled > 0 ? ` ${filterCounts.disabled}` : ''
-      }`,
+      label: `Hidden${filterCounts.disabled > 0 ? ` ${filterCounts.disabled}` : ''
+        }`,
     },
   ];
 
   const [selectedFilter, setSelectedFilter] = useState(
     filterOptions.find(option => option.id === currentFilter) ||
-      filterOptions[0],
+    filterOptions[0],
   );
+
+  console.log("selectedFilter", selectedFilter);
+
 
   // Update selected filter when currentFilter changes
   useEffect(() => {
@@ -159,7 +158,7 @@ const ProductScreen = () => {
 
     if (search.trim()) {
       // If there's a search term, use search API with filter
-      const statusMap: {[key: string]: 'A' | 'P' | 'D' | 'all'} = {
+      const statusMap: { [key: string]: 'A' | 'P' | 'D' | 'all' } = {
         all: 'all',
         active: 'A',
         pending: 'P',
@@ -182,20 +181,20 @@ const ProductScreen = () => {
       // No search term, use appropriate filter API
       switch (filterId) {
         case 'active':
-          dispatch(fetchProductsByStatus({userId, status: 'A'}));
+          dispatch(fetchProductsByStatus({ userId, status: 'A' }));
           break;
         case 'pending':
-          dispatch(fetchProductsByStatus({userId, status: 'P'}));
+          dispatch(fetchProductsByStatus({ userId, status: 'P' }));
           break;
         case 'disabled':
-          dispatch(fetchProductsByStatus({userId, status: 'D'}));
+          dispatch(fetchProductsByStatus({ userId, status: 'D' }));
           break;
         case 'lowStock':
-          dispatch(fetchLowStockProducts({userId, threshold: 2}));
+          dispatch(fetchLowStockProducts({ userId, threshold: 2 }));
           break;
         case 'all':
         default:
-          dispatch(fetchProducts({userId, filters: {status: 'all'}}));
+          dispatch(fetchProducts({ userId, filters: { status: 'all' } }));
           break;
       }
     }
@@ -204,7 +203,7 @@ const ProductScreen = () => {
   // Fetch filter counts on component mount
   useEffect(() => {
     if (userId) {
-      dispatch(fetchFilterCounts({userId}));
+      dispatch(fetchFilterCounts({ userId }));
     }
   }, [dispatch, userId]);
 
@@ -246,7 +245,7 @@ const ProductScreen = () => {
       if (userId) {
         // Refresh both products and filter counts
         await Promise.all([
-          dispatch(fetchFilterCounts({userId})),
+          dispatch(fetchFilterCounts({ userId })),
           fetchProductsForFilter(selectedFilter.id, searchText),
         ]);
       }
@@ -262,7 +261,7 @@ const ProductScreen = () => {
     setTimeout(() => {
       navigate('Dashboard', {
         screen: 'Product',
-        params: {screen: 'AddProduct'},
+        params: { screen: 'AddProduct' },
       });
     }, 300);
   };
@@ -343,17 +342,16 @@ const ProductScreen = () => {
       // Refresh filter counts after deletion
       setTimeout(() => {
         if (userId) {
-          dispatch(fetchFilterCounts({userId}));
+          dispatch(fetchFilterCounts({ userId }));
         }
       }, 500);
 
       // Show success message
       Alert.alert(
         'Success',
-        `${selectedProducts.length} product${
-          selectedProducts.length > 1 ? 's' : ''
+        `${selectedProducts.length} product${selectedProducts.length > 1 ? 's' : ''
         } deleted successfully`,
-        [{text: 'OK', style: 'default'}],
+        [{ text: 'OK', style: 'default' }],
       );
     } catch (error: any) {
       console.error('Failed to delete products:', error);
@@ -362,7 +360,7 @@ const ProductScreen = () => {
         'Delete Failed',
         error.message || 'Failed to delete products. Please try again.',
         [
-          {text: 'OK', style: 'default'},
+          { text: 'OK', style: 'default' },
           {
             text: 'Retry',
             onPress: () => confirmBulkDelete(),
@@ -406,13 +404,13 @@ const ProductScreen = () => {
       Alert.alert(
         'Success',
         `Product status updated to ${isActive ? 'Active' : 'Hidden'}`,
-        [{text: 'OK', style: 'default'}],
+        [{ text: 'OK', style: 'default' }],
       );
 
       // Refresh filter counts after status change
       setTimeout(() => {
         if (userId) {
-          dispatch(fetchFilterCounts({userId}));
+          dispatch(fetchFilterCounts({ userId }));
         }
       }, 500);
     } catch (error: any) {
@@ -453,11 +451,10 @@ const ProductScreen = () => {
 
     Alert.alert(
       'Update Status',
-      `Are you sure you want to change ${selectedProducts.length} product${
-        selectedProducts.length > 1 ? 's' : ''
+      `Are you sure you want to change ${selectedProducts.length} product${selectedProducts.length > 1 ? 's' : ''
       } to ${statusText}?`,
       [
-        {text: 'Cancel', style: 'cancel'},
+        { text: 'Cancel', style: 'cancel' },
         {
           text: 'Update',
           onPress: async () => {
@@ -477,17 +474,16 @@ const ProductScreen = () => {
               // Refresh filter counts after status change
               setTimeout(() => {
                 if (userId) {
-                  dispatch(fetchFilterCounts({userId}));
+                  dispatch(fetchFilterCounts({ userId }));
                 }
               }, 500);
 
               // Show success message
               Alert.alert(
                 'Success',
-                `${selectedProducts.length} product${
-                  selectedProducts.length > 1 ? 's' : ''
+                `${selectedProducts.length} product${selectedProducts.length > 1 ? 's' : ''
                 } updated to ${statusText}`,
-                [{text: 'OK', style: 'default'}],
+                [{ text: 'OK', style: 'default' }],
               );
             } catch (error: any) {
               console.error('Failed to update products status:', error);
@@ -496,7 +492,7 @@ const ProductScreen = () => {
                 'Update Failed',
                 error || 'Failed to update products status. Please try again.',
                 [
-                  {text: 'OK', style: 'default'},
+                  { text: 'OK', style: 'default' },
                   {
                     text: 'Retry',
                     onPress: () => handleBulkStatusUpdate(status),
@@ -527,7 +523,7 @@ const ProductScreen = () => {
       state: ButtonState.DEFAULT,
       type: ButtonType.OUTLINED,
       size: ButtonSize.MEDIUM,
-      customStyles: {borderWidth: 1},
+      customStyles: { borderWidth: 1 },
       textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
     },
   ];
@@ -535,14 +531,13 @@ const ProductScreen = () => {
   // Delete confirmation modal buttons
   const deleteConfirmButtons: ButtonConfig[] = [
     {
-      text: `Delete ${selectedProducts.length} Product${
-        selectedProducts.length > 1 ? 's' : ''
-      }`,
+      text: `Delete ${selectedProducts.length} Product${selectedProducts.length > 1 ? 's' : ''
+        }`,
       onPress: confirmBulkDelete,
       variant: ButtonVariant.PRIMARY,
       state: ButtonState.DEFAULT,
       size: ButtonSize.MEDIUM,
-      customStyles: {backgroundColor: ColorPalette.RED_100},
+      customStyles: { backgroundColor: ColorPalette.RED_100 },
       textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
     },
     {
@@ -552,7 +547,7 @@ const ProductScreen = () => {
       state: ButtonState.DEFAULT,
       type: ButtonType.OUTLINED,
       size: ButtonSize.MEDIUM,
-      customStyles: {borderWidth: 1},
+      customStyles: { borderWidth: 1 },
       textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
     },
   ];
@@ -565,7 +560,7 @@ const ProductScreen = () => {
       variant: ButtonVariant.PRIMARY,
       state: ButtonState.DEFAULT,
       size: ButtonSize.MEDIUM,
-      customStyles: {backgroundColor: ColorPalette.RED_100},
+      customStyles: { backgroundColor: ColorPalette.RED_100 },
       textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
     },
     {
@@ -575,7 +570,7 @@ const ProductScreen = () => {
       state: ButtonState.DEFAULT,
       type: ButtonType.OUTLINED,
       size: ButtonSize.MEDIUM,
-      customStyles: {borderWidth: 1},
+      customStyles: { borderWidth: 1 },
       textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
     },
   ];
@@ -654,11 +649,11 @@ const ProductScreen = () => {
                 variant={TypographyVariant.PMEDIUM_SEMIBOLD}
                 customTextStyles={styles.emptyStateText}
               />
-              <Typography
+              {/* <Typography
                 text="Add a product to start selling."
                 variant={TypographyVariant.LSMALL_REGULAR}
                 customTextStyles={styles.emptyStateText}
-              />
+              /> */}
             </View>
           </View>
         );
@@ -727,7 +722,7 @@ const ProductScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Header
         name={
           isMultiSelectMode ? `${selectedProducts.length} Selected` : 'Products'
@@ -740,7 +735,7 @@ const ProductScreen = () => {
               <Typography
                 text="Cancel"
                 variant={TypographyVariant.LMEDIUM_MEDIUM}
-                customTextStyles={{color: ColorPalette.PURPLE_300}}
+                customTextStyles={{ color: ColorPalette.PURPLE_300 }}
               />
             </TouchableOpacity>
           ) : undefined
@@ -751,7 +746,7 @@ const ProductScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'NotificationScreen'},
+                params: { screen: 'NotificationScreen' },
               }),
             size: 22,
             color: ColorPalette.IconColor,
@@ -780,7 +775,7 @@ const ProductScreen = () => {
 
         {
           isMultiSelectMode && (
-            <View style={{flexDirection: 'row', gap: getScreenWidth(2)}}>
+            <View style={{ flexDirection: 'row', gap: getScreenWidth(2) }}>
               {selectedProducts.length > 0 && (
                 <Button
                   text={`Delete (${selectedProducts.length})`}
@@ -940,7 +935,7 @@ const ProductScreen = () => {
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            {paddingBottom: getScreenHeight(4)},
+            { paddingBottom: getScreenHeight(4) },
           ]}
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -1001,7 +996,7 @@ const ProductScreen = () => {
                 };
 
                 return (
-                  <View key={product.product_id} style={{position: 'relative'}}>
+                  <View key={product.product_id} style={{ position: 'relative' }}>
                     {/* Multi-select overlay */}
                     {isMultiSelectMode && (
                       <TouchableOpacity
@@ -1023,7 +1018,7 @@ const ProductScreen = () => {
                           justifyContent: 'center',
                           alignItems: 'center',
                           shadowColor: '#000',
-                          shadowOffset: {width: 0, height: 2},
+                          shadowOffset: { width: 0, height: 2 },
                           shadowOpacity: 0.1,
                           shadowRadius: 4,
                           elevation: 3,
@@ -1058,14 +1053,14 @@ const ProductScreen = () => {
                       onLongPress={activateMultiSelectMode}
                       style={[
                         isUpdatingThisProduct || isBeingDeleted
-                          ? {opacity: 0.7}
+                          ? { opacity: 0.7 }
                           : undefined,
                         isSelected
                           ? {
-                              borderColor: ColorPalette.PURPLE_300,
-                              borderWidth: 2,
-                              marginHorizontal: getScreenWidth(1),
-                            }
+                            borderColor: ColorPalette.PURPLE_300,
+                            borderWidth: 2,
+                            marginHorizontal: getScreenWidth(1),
+                          }
                           : undefined,
                       ]}
                       disabled={isUpdatingThisProduct || isBeingDeleted}
@@ -1078,7 +1073,7 @@ const ProductScreen = () => {
                           position: 'absolute',
                           top: '50%',
                           left: '50%',
-                          transform: [{translateX: -12}, {translateY: -12}],
+                          transform: [{ translateX: -12 }, { translateY: -12 }],
                           zIndex: 5,
                         }}>
                         <ActivityIndicator
@@ -1141,7 +1136,7 @@ const ProductScreen = () => {
       />
 
       {/* Floating Add Button (hidden in multi-select mode) */}
-      {!isMultiSelectMode && products.length > 0 && (
+      {!isMultiSelectMode && (products.length > 0 || selectedFilter.id === 'active') && (
         <TouchableOpacity
           style={styles.floatingButtonWithText}
           onPress={() => setShowAddModal(true)}
@@ -1150,7 +1145,7 @@ const ProductScreen = () => {
             size={36}
             color={ColorPalette.White}
             strokeWidth={2.5}
-            style={{marginRight: 8}}
+          // style={{marginRight: 8}}
           />
           <Typography
             text="Add Product"
