@@ -21,8 +21,8 @@ export const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    gap: getScreenHeight(1.5),
-    marginTop: getScreenHeight(1.5),
+    gap: getScreenHeight(1.2),
+    marginTop: getScreenHeight(1.2),
     paddingBottom: getScreenHeight(5),
   },
   searchContainer: {

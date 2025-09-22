@@ -1,27 +1,27 @@
-import React, {useMemo, useState} from 'react';
-import {SafeAreaView, ScrollView, TouchableOpacity, View} from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { SafeAreaView, ScrollView, TouchableOpacity, View } from 'react-native';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
 import ArrowRightIcon from '../../../../../assets/icons/ArrowRightIcon';
 import MessageIcon from '../../../../../assets/icons/MessageIcon';
-import {MenuItem} from '../../../../../components/MainComponents/MenuItem/MenuItem';
-import {Header} from '../../../../../components/UserComponents/Header/Header';
-import {SearchBox} from '../../../../../components/UserComponents/SearchBox/SearchBox';
-import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../config/colorPalette';
+import { MenuItem } from '../../../../../components/MainComponents/MenuItem/MenuItem';
+import { Header } from '../../../../../components/UserComponents/Header/Header';
+import { SearchBox } from '../../../../../components/UserComponents/SearchBox/SearchBox';
+import { Typography } from '../../../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../config/colorPalette';
 import {
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
-import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
-import {styles} from './FAQScreen.styles';
+import { goBack, navigate } from '../../../../../navigation/utils/navigationRef';
+import { styles } from './FAQScreen.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
 import {
   BadgeType,
   BadgeVariant,
 } from '../../../../../components/UserComponents/Badges/Badge.types';
-import {BorderRadius, Spacing} from '../../../../../config/globalStyles';
+import { BorderRadius, Spacing } from '../../../../../config/globalStyles';
 import ChatIcon from '../../../../../assets/icons/ChatIcon';
 import BusinessProfileIcon from '../../../../../assets/icons/BusinessProfileIcon';
 
@@ -45,19 +45,19 @@ const FAQScreen = () => {
           label: 'How do I register as a seller on Surf?',
           id: 'seller_register',
         },
-        {label: 'What documents are required to register?', id: 'seller_docs'},
-        {label: 'Is there a registration fee?', id: 'seller_fee'},
+        { label: 'What documents are required to register?', id: 'seller_docs' },
+        { label: 'Is there a registration fee?', id: 'seller_fee' },
         {
           label: 'How long does the approval process take?',
           id: 'seller_approval',
         },
-        {label: 'Can I register without a VAT number?', id: 'seller_vat'},
+        { label: 'Can I register without a VAT number?', id: 'seller_vat' },
       ],
     },
     {
       heading: 'Product Listing Requirements',
       items: [
-        {label: 'How do I upload products?', id: 'product_upload'},
+        { label: 'How do I upload products?', id: 'product_upload' },
         {
           label: 'What categories of products can I sell on Surf?',
           id: 'product_categories',
@@ -76,12 +76,12 @@ const FAQScreen = () => {
             'What is the minimum quantity I need to start selling on Surf?',
           id: 'product_quantity',
         },
-        {label: 'What are the product listing rules?', id: 'product_rules'},
+        { label: 'What are the product listing rules?', id: 'product_rules' },
         {
           label: 'What if I get flagged for incorrect content?',
           id: 'product_flagged',
         },
-        {label: 'How can I avoid penalties?', id: 'product_penalties'},
+        { label: 'How can I avoid penalties?', id: 'product_penalties' },
       ],
     },
     {
@@ -95,7 +95,7 @@ const FAQScreen = () => {
     },
     {
       heading: 'Bulk Upload',
-      items: [{label: 'Is there a bulk upload option?', id: 'bulk_upload'}],
+      items: [{ label: 'Is there a bulk upload option?', id: 'bulk_upload' }],
     },
     {
       heading: 'Surf vs. Your Own Website',
@@ -109,24 +109,24 @@ const FAQScreen = () => {
     {
       heading: 'Orders, Delivery, and Notifications',
       items: [
-        {label: 'How do I get notified of an order?', id: 'order_notify'},
-        {label: 'How do pickups work?', id: 'order_pickup'},
-        {label: 'What if the buyer cancels the order?', id: 'order_cancel'},
+        { label: 'How do I get notified of an order?', id: 'order_notify' },
+        { label: 'How do pickups work?', id: 'order_pickup' },
+        { label: 'What if the buyer cancels the order?', id: 'order_cancel' },
       ],
     },
     {
       heading: 'Payments and Fees',
       items: [
-        {label: 'When do I get paid?', id: 'payment_time'},
-        {label: 'Are there any hidden charges?', id: 'payment_charges'},
-        {label: 'How do I update my bank details?', id: 'payment_bank'},
-        {label: 'Where can I view payment history?', id: 'payment_history'},
-        {label: 'What if there’s a payout delay?', id: 'payment_delay'},
+        { label: 'When do I get paid?', id: 'payment_time' },
+        { label: 'Are there any hidden charges?', id: 'payment_charges' },
+        { label: 'How do I update my bank details?', id: 'payment_bank' },
+        { label: 'Where can I view payment history?', id: 'payment_history' },
+        { label: 'What if there’s a payout delay?', id: 'payment_delay' },
       ],
     },
     {
       heading: 'Discounts and Promotions',
-      items: [{label: 'How do I run a discount?', id: 'discount_run'}],
+      items: [{ label: 'How do I run a discount?', id: 'discount_run' }],
     },
     {
       heading: 'Seller Dashboard & Support',
@@ -135,14 +135,14 @@ const FAQScreen = () => {
           label: 'Is there a seller dashboard help section?',
           id: 'dashboard_help',
         },
-        {label: 'Dashboard not loading?', id: 'dashboard_issue'},
-        {label: 'Error uploading images?', id: 'dashboard_upload_error'},
+        { label: 'Dashboard not loading?', id: 'dashboard_issue' },
+        { label: 'Error uploading images?', id: 'dashboard_upload_error' },
       ],
     },
     {
       heading: 'Contact Seller Support',
       items: [
-        {label: 'How do I contact seller support?', id: 'contact_support'},
+        { label: 'How do I contact seller support?', id: 'contact_support' },
       ],
     },
   ].map(section => ({
@@ -150,7 +150,7 @@ const FAQScreen = () => {
     items: section.items.map((item, index) => ({
       ...item,
       label: `${index + 1}. ${item.label}`,
-      onPress: () => navigate('FaqAnswer', {questionId: item.id}),
+      onPress: () => navigate('FaqAnswer', { questionId: item.id }),
     })),
   }));
 
@@ -213,7 +213,7 @@ const FAQScreen = () => {
   const handleChat = () => {
     navigate('Dashboard', {
       screen: 'Account',
-      params: {screen: 'ChatScreen'},
+      params: { screen: 'ChatScreen' },
     });
   };
 
@@ -233,7 +233,7 @@ const FAQScreen = () => {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
-        name="How can we help?"
+        name="FAQ"
         variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
@@ -246,7 +246,7 @@ const FAQScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'ChatScreen'},
+                params: { screen: 'ChatScreen' },
               });
             },
             customContainerStyle: {
@@ -254,15 +254,15 @@ const FAQScreen = () => {
               paddingVertical: getScreenHeight(1.5),
               paddingHorizontal: getScreenWidth(3),
               shadowColor: '#101828',
-              shadowOffset: {width: 0, height: 6},
+              shadowOffset: { width: 0, height: 6 },
               shadowOpacity: 0.08,
               shadowRadius: 15,
               elevation: 6,
             },
-            textVariant: TypographyVariant.H6_BOLD,
+            textVariant: TypographyVariant.PMEDIUM_SEMIBOLD,
             // customTextColor: ColorPalette.PURPLE_300,
             leftIcon: ChatIcon,
-            iconSize: 26,
+            iconSize: 25,
           },
         ]}
       />
@@ -306,7 +306,7 @@ const FAQScreen = () => {
                       fontSize: 16,
                     }}
                     variant={TypographyVariant.PMEDIUM_MEDIUM}
-                    contentStyle={{gap: getScreenWidth(4)}}
+                    contentStyle={{ gap: getScreenWidth(4) }}
                     showBottomBorder={true}
                     isLastItem={index === section.items.length - 1}
                   />
