@@ -1,23 +1,23 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Animated, Dimensions, Image, ScrollView, View} from 'react-native';
-import {Button} from '../../../components/UserComponents/Button/Button';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Image, ScrollView, View } from 'react-native';
+import { Button } from '../../../components/UserComponents/Button/Button';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../../components/UserComponents/Button/Button.types';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {STATIC_TEXT} from '../../../config/staticText';
-import {navigate} from '../../../navigation/utils/navigationRef';
-import {styles} from './WelcomeScreen.styles';
-import {ColorPalette} from '../../../config/colorPalette';
+import { Typography } from '../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
+import { STATIC_TEXT } from '../../../config/staticText';
+import { navigate } from '../../../navigation/utils/navigationRef';
+import { styles } from './WelcomeScreen.styles';
+import { ColorPalette } from '../../../config/colorPalette';
 
-const {createAccount, login} = STATIC_TEXT.screens.welcomeScreen;
+const { createAccount, login } = STATIC_TEXT.screens.welcomeScreen;
 
 // Separated pagination indicator component
-const AnimatedPaginationIndicator = ({scrollX, contentLength, width}) => {
+const AnimatedPaginationIndicator = ({ scrollX, contentLength, width }) => {
   // Constants for dot dimensions
   const defaultWidth = 10;
   const activeWidth = 35;
@@ -25,7 +25,7 @@ const AnimatedPaginationIndicator = ({scrollX, contentLength, width}) => {
   return (
     <View style={styles.paginationContainer}>
       <View style={styles.paginationTrack}>
-        {Array.from({length: contentLength}).map((_, i) => {
+        {Array.from({ length: contentLength }).map((_, i) => {
           // Calculate animated properties
           const animatedWidth = scrollX.interpolate({
             inputRange: [(i - 1) * width, i * width, (i + 1) * width],
@@ -130,7 +130,7 @@ const WelcomeScreen = () => {
 
   // Scroll event handler
   const handleScroll = Animated.event(
-    [{nativeEvent: {contentOffset: {x: scrollX}}}],
+    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
     {
       useNativeDriver: false,
       listener: event => {
@@ -150,9 +150,9 @@ const WelcomeScreen = () => {
   }, [currentIndex]);
 
   // Navigation handlers
-  const handleLogin = () => navigate('Auth', {screen: 'PhoneNumber'});
+  const handleLogin = () => navigate('Auth', { screen: 'EmailSignIn' });
   const handleCreateNewAccount = () =>
-    navigate('Create', {screen: 'CreateAccount'});
+    navigate('Create', { screen: 'CreateAccount' }); //navigate on website pending
 
   return (
     <View style={styles.mainContainer}>
@@ -174,7 +174,7 @@ const WelcomeScreen = () => {
               onScrollBeginDrag={stopAutoScroll}
               onScrollEndDrag={startAutoScroll}>
               {content.map((item, index) => (
-                <View key={index} style={[styles.slide, {width: screenWidth}]}>
+                <View key={index} style={[styles.slide, { width: screenWidth }]}>
                   <Image
                     source={item.image}
                     style={styles.image}
