@@ -13,6 +13,7 @@ import { STATIC_TEXT } from '../../../config/staticText';
 import { navigate } from '../../../navigation/utils/navigationRef';
 import { styles } from './WelcomeScreen.styles';
 import { ColorPalette } from '../../../config/colorPalette';
+import { Linking } from 'react-native';
 
 const { createAccount, login } = STATIC_TEXT.screens.welcomeScreen;
 
@@ -151,8 +152,9 @@ const WelcomeScreen = () => {
 
   // Navigation handlers
   const handleLogin = () => navigate('Auth', { screen: 'EmailSignIn' });
-  const handleCreateNewAccount = () =>
-    navigate('Create', { screen: 'CreateAccount' }); //navigate on website pending
+  const handleCreateNewAccount = () => {
+    Linking.openURL('https://sell.surf.mt/register');
+  };
 
   return (
     <View style={styles.mainContainer}>
