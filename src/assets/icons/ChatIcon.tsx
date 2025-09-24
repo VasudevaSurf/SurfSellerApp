@@ -13,7 +13,7 @@ const ChatIcon: React.FC<ChatIconProps> = ({
   size = 24,
   color = 'white',
   style,
-  strokeWidth = 1.2,
+  strokeWidth = 1.5,
 }) => {
   return (
     <Svg
