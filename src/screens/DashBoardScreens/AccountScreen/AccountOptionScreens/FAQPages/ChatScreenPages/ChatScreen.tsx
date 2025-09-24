@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -12,13 +12,12 @@ import {
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
 import ImageUploadIcon from '../../../../../../assets/icons/ImageUploadIcon';
 import SendIcon from '../../../../../../assets/icons/SendIcon';
-import {Header} from '../../../../../../components/UserComponents/Header/Header';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getScreenHeight} from '../../../../../../helpers/screenSize';
-import {goBack} from '../../../../../../navigation/utils/navigationRef';
-import {styles} from './ChatScreen.styles';
+import { Header } from '../../../../../../components/UserComponents/Header/Header';
+import { Typography } from '../../../../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../../config/colorPalette';
+import { styles } from './ChatScreen.styles';
+import { goBack } from '../../../../../../navigation/utils/navigationRef';
 
 const ChatScreen = () => {
   const [message, setMessage] = useState('');
@@ -42,17 +41,17 @@ const ChatScreen = () => {
   const [messages, setMessages] = useState(initialMessages);
 
   const quickReplies = [
-    {id: 1, text: 'Contact customer care'},
-    {id: 2, text: 'Payment issue'},
-    {id: 3, text: "Can't list my product"},
-    {id: 4, text: 'App not working?'},
-    {id: 5, text: 'Account suspended'},
+    { id: 1, text: 'Contact customer care' },
+    { id: 2, text: 'Payment issue' },
+    { id: 3, text: "Can't list my product" },
+    { id: 4, text: 'App not working?' },
+    { id: 5, text: 'Account suspended' },
   ];
 
   useEffect(() => {
     if (scrollViewRef.current) {
       setTimeout(() => {
-        scrollViewRef.current.scrollToEnd({animated: true});
+        scrollViewRef.current.scrollToEnd({ animated: true });
       }, 100);
     }
   }, [messages]);
@@ -73,9 +72,9 @@ const ChatScreen = () => {
     }
   };
 
-  const isSameSenderAsPrevious = index => {
-    if (index === 0) return false;
-    return messages[index].isUser === messages[index - 1].isUser;
+  const isFirstInGroup = (messages, index) => {
+    if (index === 0) return true;
+    return messages[index].isUser !== messages[index - 1].isUser;
   };
 
   const handleQuickReplyPress = replyText => {
@@ -88,9 +87,7 @@ const ChatScreen = () => {
         name="Surf Chatbot"
         variant={TypographyVariant.PMEDIUM_REGULAR}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={
-          <ArrowLeftIcon style={undefined} size={15} onPress={goBack} />
-        }
+        leftIcon={<ArrowLeftIcon size={15} onPress={goBack} />}
         rightIcons={null}
         subHeader
         subText="Active"
@@ -100,104 +97,105 @@ const ChatScreen = () => {
         <ScrollView
           ref={scrollViewRef}
           style={styles.scrollViewContainer}
-          contentContainerStyle={[
-            styles.scrollContent,
-            {paddingTop: getScreenHeight(2)},
-          ]}
-          showsVerticalScrollIndicator={false}>
-          {messages.map((msg, index) => (
-            <View
-              key={msg.id}
-              style={[
-                styles.messageRow,
-                msg.isUser ? styles.userMessageRow : styles.botMessageRow,
-              ]}>
-              {/* For bot messages */}
-              {!msg.isUser && !isSameSenderAsPrevious(index) && (
-                <Image
-                  source={require('../../../../../../assets/images/logo.png')}
-                  style={styles.avatarImage}
-                />
-              )}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {messages.map((msg, index) => {
+            const prevMsg = messages[index - 1];
+            const sameSenderAsPrev = prevMsg && prevMsg.isUser === msg.isUser;
+            const firstInGroup = isFirstInGroup(messages, index);
 
-              {!msg.isUser && isSameSenderAsPrevious(index) && (
-                <View style={styles.avatarPlaceholder} />
-              )}
-
-              {/* User message time (left side) */}
-              {msg.isUser && (
-                <Typography
-                  variant={TypographyVariant.PSMALL_MEDIUM}
-                  customTextStyles={[
-                    styles.messageTime,
-                    styles.userMessageTime,
-                  ]}
-                  text={msg.time}
-                />
-              )}
-
-              {/* Message bubble */}
+            return (
               <View
+                key={index}
                 style={[
-                  styles.messageBubble,
-                  msg.isUser
-                    ? styles.userMessageBubble
-                    : styles.botMessageBubble,
-                ]}>
-                <Typography
-                  variant={TypographyVariant.PSMALL_REGULAR}
-                  customTextStyles={[
-                    msg.isUser ? styles.userMessageText : styles.botMessageText,
-                  ]}
-                  text={msg.text}
-                />
-              </View>
+                  styles.messageRow,
+                  msg.isUser ? styles.userMessageRow : styles.botMessageRow,
+                  sameSenderAsPrev
+                    ? null
+                    : styles.diffSenderSpacing,
+                ]}
+              >
+                {firstInGroup ? (
+                  <Image
+                    source={
+                      msg.isUser
+                        ? require('../../../../../../assets/images/placeholder-profile.png')
+                        : require('../../../../../../assets/images/logo.png')
+                    }
+                    style={styles.avatarImage}
+                  />
+                ) : (
+                  <View style={styles.avatarPlaceholder} />
+                )}
 
-              {/* Bot message time (right side) */}
-              {!msg.isUser && (
+                <View
+                  style={[
+                    styles.messageBubble,
+                    msg.isUser
+                      ? styles.userMessageBubble
+                      : styles.botMessageBubble,
+                    firstInGroup &&
+                      (msg.isUser
+                        ? styles.userMessageFirstBubble
+                        : styles.botMessageFirstBubble),
+                  ]}
+                >
+                  <Typography
+                    variant={TypographyVariant.PSMALL_REGULAR}
+                    customTextStyles={
+                      msg.isUser
+                        ? styles.userMessageText
+                        : styles.botMessageText
+                    }
+                    text={msg.text}
+                  />
+                </View>
+
                 <Typography
                   variant={TypographyVariant.LXSMALL_REGULAR}
-                  customTextStyles={[styles.messageTime, styles.botMessageTime]}
+                  customTextStyles={[
+                    styles.messageTime,
+                    msg.isUser
+                      ? styles.userMessageTime
+                      : styles.botMessageTime,
+                  ]}
                   text={msg.time}
                 />
-              )}
+              </View>
+            );
+          })}
 
-              {/* For user messages */}
-              {msg.isUser && !isSameSenderAsPrevious(index) && (
-                <Image
-                  source={require('../../../../../../assets/images/placeholder-profile.png')}
-                  style={styles.avatarImage}
-                />
-              )}
-
-              {msg.isUser && isSameSenderAsPrevious(index) && (
-                <View style={styles.avatarPlaceholder} />
-              )}
+          <View style={styles.quickRepliesSection}>
+            <Image
+              source={require('../../../../../../assets/images/logo.png')}
+              style={styles.avatarImage}
+            />
+            <View style={styles.quickRepliesContainer}>
+              {quickReplies.map(reply => (
+                <TouchableOpacity
+                  key={reply.id}
+                  style={styles.quickReplyButton}
+                  onPress={() => handleQuickReplyPress(reply.text)}
+                >
+                  <Typography
+                    variant={TypographyVariant.PXSMALL_REGULAR}
+                    customTextStyles={styles.quickReplyText}
+                    text={reply.text}
+                  />
+                </TouchableOpacity>
+              ))}
             </View>
-          ))}
-
-          <View style={styles.quickRepliesContainer}>
-            {quickReplies.map(reply => (
-              <TouchableOpacity
-                key={reply.id}
-                style={styles.quickReplyButton}
-                onPress={() => handleQuickReplyPress(reply.text)}>
-                <Typography
-                  variant={TypographyVariant.PXSMALL_REGULAR}
-                  customTextStyles={styles.quickReplyText}
-                  text={reply.text}
-                />
-              </TouchableOpacity>
-            ))}
           </View>
         </ScrollView>
       </View>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.inputContainer}>
+        style={styles.inputContainer}
+      >
         <View style={styles.uploadContainer}>
-          <ImageUploadIcon style={undefined} />
+          <ImageUploadIcon />
         </View>
         <View style={styles.textInputContainer}>
           <TextInput
@@ -205,7 +203,7 @@ const ChatScreen = () => {
             placeholder="Write your message here..."
             value={message}
             onChangeText={setMessage}
-            multiline={true}
+            multiline
           />
           <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
             <SendIcon size={20} color="white" />
