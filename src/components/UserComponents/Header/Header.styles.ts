@@ -1,14 +1,14 @@
-import {StyleSheet} from 'react-native';
-import {BorderRadius, Spacing} from '../../../config/globalStyles';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenWidth} from '../../../helpers/screenSize';
+import { StyleSheet } from 'react-native';
+import { BorderRadius, Spacing } from '../../../config/globalStyles';
+import { ColorPalette } from '../../../config/colorPalette';
+import { getScreenWidth } from '../../../helpers/screenSize';
 
 export const headerStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.Medium,
+    paddingHorizontal: Spacing.Large,
     paddingVertical: Spacing.Small,
     backgroundColor: ColorPalette.White,
     width: '100%',
@@ -50,8 +50,9 @@ export const headerStyles = StyleSheet.create({
   badgeContainer: {
     backgroundColor: ColorPalette.Green_200,
     paddingVertical: getScreenWidth(1), //0.5 previously
-    paddingHorizontal: Spacing.XXSmall,
+    paddingHorizontal: getScreenWidth(1.2),
     minWidth: 0,
     alignSelf: 'flex-start',
+
   },
 });
