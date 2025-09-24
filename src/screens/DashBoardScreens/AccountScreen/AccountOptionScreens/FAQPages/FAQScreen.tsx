@@ -262,7 +262,7 @@ const FAQScreen = () => {
             textVariant: TypographyVariant.PMEDIUM_SEMIBOLD,
             // customTextColor: ColorPalette.PURPLE_300,
             leftIcon: ChatIcon,
-            iconSize: 25,
+            iconSize: 24,
           },
         ]}
       />
