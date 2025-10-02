@@ -99,29 +99,36 @@ export const styles = StyleSheet.create({
   },
   containerStyle: {
     backgroundColor: ColorPalette.SearchBack,
-    paddingVertical: getScreenHeight(0.75),
+    paddingVertical: getScreenHeight(0.8),
     paddingHorizontal: getScreenWidth(2),
     borderRadius: BorderRadius.XSmall,
   },
   textAreaContainer: {
-    borderRadius: BorderRadius.XSmall,
-    borderWidth: 1,
-    borderColor: ColorPalette.SearchBack,
-    paddingHorizontal: getScreenWidth(3),
-    paddingVertical: getScreenHeight(1),
-    minHeight: getScreenHeight(20),
+    paddingHorizontal: getScreenWidth(0.2),
+  
   },
   textAreaContainerFocused: {
     borderColor: ColorPalette.Primary,
   },
+  // textArea: {
+  //   flex: 1,
+  //   minHeight: getScreenHeight(12.5),
+  //   fontFamily: 'Inter-Regular',
+  //   fontSize: getScreenWidth(3.5), // Responsive font size
+  //   color: ColorPalette.GREY_TEXT_500,
+  //   padding: 0,
+  // },
   textArea: {
-    flex: 1,
-    minHeight: getScreenHeight(12.5),
-    fontFamily: 'Inter-Regular',
-    fontSize: getScreenWidth(3.5), // Responsive font size
-    color: ColorPalette.GREY_TEXT_500,
-    padding: 0,
-  },
+  // flex: 1,
+  // minHeight: getScreenHeight(12.5),
+  // fontFamily: 'Inter-Regular',
+  // fontSize: getScreenWidth(3.5),
+  color: ColorPalette.GREY_TEXT_500,
+  // paddingTop: getScreenHeight(2), // <-- add top padding
+  // paddingHorizontal: getScreenWidth(0.5),
+  textAlignVertical: 'top', // keep text starting from top
+},
+
   boldText: {
     fontFamily: 'Inter-Bold',
     fontWeight: 'bold',

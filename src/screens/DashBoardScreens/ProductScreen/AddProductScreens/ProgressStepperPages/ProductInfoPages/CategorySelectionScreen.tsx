@@ -1,6 +1,6 @@
 // Enhanced CategorySelectionScreen.tsx with multi-level navigation
 
-import React, {useState, useEffect, useCallback, useMemo} from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -12,17 +12,18 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
-import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
+import ArrowLeft from '../../../../../../assets/icons/ArrowLeft';
 import InfoIcon from '../../../../../../assets/icons/InfoIcon';
 import ArrowRightIcon from '../../../../../../assets/icons/ArrowRightIcon';
-import {MenuItem} from '../../../../../../components/MainComponents/MenuItem/MenuItem';
-import {Header} from '../../../../../../components/UserComponents/Header/Header';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {SearchBox} from '../../../../../../components/UserComponents/SearchBox/SearchBox';
+import { MenuItem } from '../../../../../../components/MainComponents/MenuItem/MenuItem';
+import { Header } from '../../../../../../components/UserComponents/Header/Header';
+import { Typography } from '../../../../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../../config/colorPalette';
+import { SearchBox } from '../../../../../../components/UserComponents/SearchBox/SearchBox';
 import {
   getFigmaDimension,
+  getScreenHeight,
   getScreenWidth,
 } from '../../../../../../helpers/screenSize';
 import {
@@ -31,7 +32,7 @@ import {
   SubCategory,
   UI_TEXT,
 } from './CategoryConstants';
-import {useCategories} from '../../../../../../hooks/useCategories';
+import { useCategories } from '../../../../../../hooks/useCategories';
 import {
   Button,
   ButtonSize,
@@ -39,16 +40,18 @@ import {
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button';
 import CheckIcon from '../../../../../../assets/icons/CheckIcon';
-import {BorderRadius, Spacing} from '../../../../../../config/globalStyles';
+import { BorderRadius, Spacing } from '../../../../../../config/globalStyles';
 import Accordion from 'react-native-collapsible/Accordion';
-import {ScrollView} from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
+import QuestionMarkIcon from '../../../../../../assets/icons/QuestionMarkIcon';
+import { goBack, navigate } from '../../../../../../navigation/utils/navigationRef';
+import ArrowDownIcon from '../../../../../../assets/icons/ArrowDownIcon';
 
 interface CategorySelectionScreenProps {
   route: {
     params?: {
-      onSelectCategory: (categories: {id: string; name: string}[]) => void;
-      initialCategory?: string[];
-      initialSubcategory?: string;
+      onSelectCategory: (categories: { id: string; name: string; path: string[] }[]) => void;
+      initialSelectedCategories?: { id: string; name: string; path: string[] }[];
       productId?: string;
     };
   };
@@ -56,11 +59,11 @@ interface CategorySelectionScreenProps {
 }
 
 // Category path type for navigation breadcrumbs
-interface CategoryPath {
-  id: string;
-  name: string;
-  level: number;
-}
+// interface CategoryPath {
+//   id: string;
+//   name: string;
+//   level: number;
+// }
 
 const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
   route,
@@ -68,636 +71,201 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
 }) => {
   const params = route?.params || {};
 
-  const {onSelectCategory, initialCategory, productId} = params;
+  const { onSelectCategory, initialSelectedCategories = [], productId } = params;
 
+  const { categories: apiCategories, loadCategories } = useCategories();
+
+  const rootCategories = useMemo(() => apiCategories?.length ? apiCategories : FALLBACK_CATEGORIES, [apiCategories]);
+
+  const [expandedMap, setExpandedMap] = useState<{ [id: string]: boolean }>({});
+  const [selectedMap, setSelectedMap] = useState<{ [id: string]: boolean }>({});
   const [searchText, setSearchText] = useState('');
-  const [categoryPath, setCategoryPath] = useState<CategoryPath[]>([]); // Navigation stack
+  const [currentCategories, setCurrentCategories] = useState<Category[]>([]);
 
-  const [currentCategories, setCurrentCategories] = useState<Category[]>([]); // Current level categories
-  const [expandedSubcategories, setExpandedSubcategories] = useState<{
-    [categoryId: string]: Category[];
-  }>({});
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<Set<string>>(
-    new Set(),
-  );
+
+  console.log('currentCategories', currentCategories)
+  console.log('initialSelectedCategories', initialSelectedCategories)
 
   useEffect(() => {
-    if (
-      initialCategory &&
-      Array.isArray(initialCategory) &&
-      initialCategory.length > 0
-    ) {
-      const idsSet = new Set(initialCategory.map(String));
-      console.log('idsSet:', Array.from(idsSet)); // good
-      setSelectedCategoryIds(idsSet);
-    }
-  }, [initialCategory]);
+    const initSelected: { [id: string]: boolean } = {};
+    const initExpanded: { [id: string]: boolean } = {};
 
-  // Use the categories hook
-  const {
-    categories: apiCategories,
-    loading: categoriesLoading,
-    error: categoriesError,
-    loadCategories,
-    refreshCategories,
-    clearError,
-  } = useCategories();
+    const markSelectedAndExpanded = (categories: Category[]) => {
+      categories.forEach(cat => {
+        if (initialSelectedCategories.find(sel => sel.id === cat.id)) {
+          initSelected[cat.id] = true;
+          // expand parents recursively
+          initExpanded[cat.id] = true;
+        }
+        if (cat.subcategories?.length) {
+          markSelectedAndExpanded(cat.subcategories);
+          // if any child is selected, expand this parent
+          if (cat.subcategories.some(sub => initSelected[sub.id])) {
+            initExpanded[cat.id] = true;
+          }
+        }
+      });
+    };
 
-  // Use API categories if available, otherwise fall back to static categories
-  const rootCategories = useMemo(() => {
-    if (apiCategories && apiCategories.length > 0) {
-      return apiCategories;
-    }
-    return FALLBACK_CATEGORIES;
-  }, [apiCategories]);
+    markSelectedAndExpanded(rootCategories);
+    setSelectedMap(initSelected);
+    setExpandedMap(initExpanded);
+  }, [rootCategories, initialSelectedCategories]);
+
+
 
   // Load categories when component mounts
   useEffect(() => {
     loadCategories(productId);
   }, [loadCategories, productId]);
 
-  // Initialize current categories with root level
+  // // Initialize current categories with root level
   useEffect(() => {
-    if (rootCategories.length > 0 && categoryPath.length === 0) {
+    if (rootCategories.length > 0) {
       setCurrentCategories(rootCategories);
     }
-  }, [rootCategories, categoryPath.length]);
+  }, [rootCategories]);
 
-  // Clear any existing errors when component mounts
-  useEffect(() => {
-    if (categoriesError) {
-      clearError();
-    }
-  }, [clearError, categoriesError]);
 
-  // Handle back navigation
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        if (categoryPath.length > 0) {
-          handleNavigateBack();
-          return true;
-        } else {
-          navigation.goBack();
-          return true;
-        }
-      },
-    );
-
-    return () => backHandler.remove();
-  }, [categoryPath, navigation]);
-
-  // Helper function to find category by path
-  const findCategoryByPath = useCallback(
-    (categories: Category[], pathIds: string[]): Category | null => {
-      if (pathIds.length === 0) return null;
-
-      let current = categories.find(cat => cat.id === pathIds[0]);
-      if (!current) return null;
-
-      for (let i = 1; i < pathIds.length; i++) {
-        if (!current.subcategories) return null;
-        current = current.subcategories.find(sub => sub.id === pathIds[i]);
-        if (!current) return null;
-      }
-
-      return current;
-    },
-    [],
-  );
-
-  // Filter categories based on search
-  const filteredCategories = useMemo(() => {
-    if (!searchText.trim()) return currentCategories;
-
-    const searchLower = searchText.toLowerCase();
-
-    const filterRecursive = (categories: Category[]): Category[] => {
-      return categories.filter(cat => {
-        if (cat.name.toLowerCase().includes(searchLower)) {
-          return true;
-        }
-
-        if (cat.subcategories) {
-          return filterRecursive(cat.subcategories).length > 0;
-        }
-
-        return false;
-      });
-    };
-
-    return filterRecursive(currentCategories);
-  }, [currentCategories, searchText]);
-
-  const toggleCategorySelection = (id: string) => {
-    setSelectedCategoryIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
+  const toggleSelect = (id: string) => {
+    setSelectedMap(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const [activeRootSections, setActiveRootSections] = useState<number[]>([]);
-  const [activeSubSectionsMap, setActiveSubSectionsMap] = useState<{
-    [key: string]: number[];
-  }>({});
-
-  console.log('activeRootSectionsactiveRootSections', activeSubSectionsMap);
-
-  const handleConfirmSelection = () => {
-    if (onSelectCategory) {
-      const selectedCategories: {id: string; name: string}[] = [];
-
-      const collectCategories = (categories: Category[]) => {
-        categories.forEach(cat => {
-          if (selectedCategoryIds.has(cat.id)) {
-            selectedCategories.push({id: cat.id, name: cat.name});
-          }
-          if (cat.subcategories) {
-            collectCategories(cat.subcategories);
-          }
-        });
-      };
-
-      collectCategories(rootCategories);
-
-      onSelectCategory(selectedCategories);
-    }
-    navigation.goBack();
+  const toggleExpand = (id: string) => {
+    setExpandedMap(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Navigate back one level
-  const handleNavigateBack = useCallback(() => {
-    if (categoryPath.length === 0) {
-      navigation.goBack();
-      return;
-    }
 
-    const newPath = categoryPath.slice(0, -1);
-    setCategoryPath(newPath);
-    setSearchText('');
 
-    if (newPath.length === 0) {
-      // Back to root
-      setCurrentCategories(rootCategories);
-    } else {
-      // Navigate to parent category
-      const pathIds = newPath.map(p => p.id);
-      const parentCategory = findCategoryByPath(rootCategories, pathIds);
-      if (parentCategory && parentCategory.subcategories) {
-        setCurrentCategories(parentCategory.subcategories);
-      }
-    }
-  }, [categoryPath, navigation, rootCategories, findCategoryByPath]);
-
-  const handleRetry = useCallback(() => {
-    refreshCategories(productId);
-  }, [refreshCategories, productId]);
-
-  // Get current header title
-  const getHeaderTitle = useCallback(() => {
-    if (categoryPath.length === 0) {
-      return UI_TEXT.SELECT_CATEGORY;
-    }
-    return `${categoryPath[categoryPath.length - 1].name}`;
-    // return `Select in ${categoryPath[categoryPath.length - 1].name}`;
-  }, [categoryPath]);
-
-  // Loading state
-  if (categoriesLoading && rootCategories.length === 0) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <Header
-          name={getHeaderTitle()}
-          leftIcon={
-            <ArrowLeftIcon
-              size={15}
-              onPress={() => navigation.goBack()}
-              style={undefined}
-            />
-          }
-          textColor={ColorPalette.AgreeTerms}
-          variant={TypographyVariant.LMEDIUM_BOLD}
-        />
-        <View style={styles.loadingContainer}>
-          <AnimatedLoader size={52} />
-          <Typography
-            text={UI_TEXT.LOADING_CATEGORIES}
-            variant={TypographyVariant.PSMALL_MEDIUM}
-            customTextStyles={{
-              color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
-              marginTop: getScreenHeight(1),
-            }}
-          />
-          {/* <Typography
-            variant={TypographyVariant.LMEDIUM_REGULAR}
-            text={UI_TEXT.LOADING_CATEGORIES}
-            customTextStyles={styles.loadingText}
-          /> */}
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // Error state (but show fallback categories)
-  const showErrorMessage = categoriesError && apiCategories.length === 0;
-
-  //accordion code
-
-  // Root Header
-  const renderRootHeader = (
-    section: Category,
-    index: number,
-    isActive: boolean,
-  ) => {
-    const isSelected = selectedCategoryIds.has(section.id);
-    const hasChildren = section.subcategories?.length > 0;
-
-    // Single handler for the entire row
-    const handlePress = () => {
-      toggleCategorySelection(section.id); // toggle checkbox
-
-      if (hasChildren) {
-        setActiveRootSections(prev => {
-          if (!isSelected) {
-            // if now checked, open accordion
-            return [...prev, index];
-          } else {
-            // if now unchecked, close accordion
-            return prev.filter(i => i !== index);
-          }
-        });
-
-        setExpandedSubcategories(prev => ({
-          ...prev,
-          [section.id]: !isSelected ? section.subcategories! : [],
-        }));
-      }
-    };
+  const renderCategory = (category: Category, isTopLevel: boolean = true) => {
+    const isSelected = !!selectedMap[category.id];
+    const hasChildren = !!category.subcategories?.length;
+    const isExpanded = !!expandedMap[category.id];
 
     return (
-      <TouchableOpacity
-        onPress={handlePress}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: 16,
-          backgroundColor: '#fff',
-          borderBottomWidth: 1,
-          borderColor: ColorPalette.GREY_100,
-        }}>
-        {/* Checkbox */}
-        <View
+      <View key={category.id} style={{
+        marginVertical: 4,
+
+      }}>
+        <TouchableOpacity
           style={{
-            width: 26,
-            height: 26,
-            borderRadius: 4,
-            borderWidth: 1,
-            borderColor: ColorPalette.GREY_400,
-            backgroundColor: isSelected
-              ? ColorPalette.PURPLE_300
-              : 'transparent',
-            justifyContent: 'center',
+            flexDirection: 'row',
             alignItems: 'center',
-            marginRight: 12,
-          }}>
-          {isSelected && (
-            <CheckIcon size={26} checkColor={ColorPalette.White} />
-          )}
-        </View>
-
-        {/* Label */}
-        <Typography
-          text={section.name}
-          variant={TypographyVariant.PMEDIUM_REGULAR}
-          customTextStyles={{flex: 1}}
-        />
-
-        {/* Arrow */}
-        {hasChildren && (
-          <ArrowRightIcon
-            color={ColorPalette.GREY_TEXT_500}
-            style={{transform: [{rotate: isActive ? '90deg' : '0deg'}]}}
+            padding: 16,
+            backgroundColor: '#fff',
+            borderBottomWidth: isTopLevel && !isExpanded ? 1 : 0,
+            borderColor: ColorPalette.GREY_100,
+          }}
+          onPress={() => {
+            toggleSelect(category.id);
+            if (hasChildren) toggleExpand(category.id);
+          }}
+        >
+          <View
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: 4,
+              borderWidth: 1,
+              borderColor: ColorPalette.GREY_400,
+              backgroundColor: isSelected ? ColorPalette.PURPLE_300 : 'transparent',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: 12,
+            }}
+          >
+            {isSelected && <CheckIcon size={26} checkColor={ColorPalette.White} />}
+          </View>
+          <Typography
+            text={category.name}
+            variant={TypographyVariant.PMEDIUM_REGULAR}
+            customTextStyles={{ flex: 1 }}
           />
+          {hasChildren && <ArrowDownIcon style={{ transform: [{ rotate: isExpanded ? '180deg' : '0deg' }] }} color={ColorPalette.GREY_TEXT_500} />}
+        </TouchableOpacity>
+
+        {hasChildren && isExpanded && (
+          <View style={{
+            marginHorizontal: getScreenWidth(4),
+            borderWidth: 1,
+            borderRadius: Spacing.Small,
+            padding: 4,
+            borderColor: ColorPalette.GREY_100
+            // paddingLeft: 8,
+          }}>
+            {category.subcategories!.map(sub =>
+              sub ? renderCategory(sub, false) : null
+            )}
+          </View>
         )}
-      </TouchableOpacity>
-    );
-  };
-
-  // Root Content (load only that category’s subcategories accordion)
-  const renderRootContent = (category: Category) => {
-    const subcategories = expandedSubcategories[category.id];
-    if (!subcategories || subcategories.length === 0) return null;
-
-    return (
-      <View
-        style={{
-          borderWidth: 1,
-          borderColor: ColorPalette.GREY_100,
-          borderRadius: BorderRadius.Small,
-          marginHorizontal: getScreenWidth(3),
-          marginBottom: getScreenWidth(3),
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          backgroundColor: '#fff',
-        }}>
-        {subcategories.map(sub => {
-          const isSelected = selectedCategoryIds.has(sub.id);
-          const hasChildren = sub.subcategories && sub.subcategories.length > 0;
-          const activeSubSections = activeSubSectionsMap[sub.id] || [];
-
-          const handlePress = () => {
-            toggleCategorySelection(sub.id);
-
-            if (hasChildren) {
-              setActiveSubSectionsMap(prev => ({
-                ...prev,
-                [sub.id]: isSelected ? [] : [0], // open if checked, close if unchecked
-              }));
-
-              setExpandedSubcategories(prev => ({
-                ...prev,
-                [sub.id]: !isSelected ? sub.subcategories! : [],
-              }));
-            }
-          };
-
-          return (
-            <Accordion
-              key={sub.id}
-              sections={[sub]}
-              activeSections={activeSubSections}
-              expandMultiple
-              underlayColor="transparent"
-              renderHeader={(_, __, isActive) => (
-                <TouchableOpacity
-                  onPress={handlePress}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingVertical: 10,
-                    paddingHorizontal: 12,
-                  }}>
-                  {/* Checkbox */}
-                  <View
-                    style={{
-                      width: 26,
-                      height: 26,
-                      borderRadius: 4,
-                      borderWidth: 1,
-                      borderColor: '#aaa',
-                      backgroundColor: isSelected ? '#6c5ce7' : 'transparent',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginRight: 12,
-                    }}>
-                    {isSelected && <CheckIcon size={26} checkColor="#fff" />}
-                  </View>
-
-                  {/* Label */}
-                  <Typography
-                    text={sub.name}
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                    customTextStyles={{flex: 1}}
-                  />
-
-                  {/* Arrow */}
-                  {hasChildren && (
-                    <ArrowRightIcon
-                      color="#888"
-                      style={{
-                        transform: [{rotate: isActive ? '90deg' : '0deg'}],
-                      }}
-                    />
-                  )}
-                </TouchableOpacity>
-              )}
-              renderContent={() => {
-                if (!hasChildren) return null;
-                return renderRootContent(sub); // recursion for deeper levels
-              }}
-              onChange={newActive =>
-                setActiveSubSectionsMap(prev => ({
-                  ...prev,
-                  [sub.id]: newActive,
-                }))
-              }
-            />
-          );
-        })}
       </View>
     );
   };
 
-  // expand parents when initialCategory pre-fills - encountering a small issue in opening sub/sub cat accordion.
-  useEffect(() => {
-    if (rootCategories.length > 0 && selectedCategoryIds.size > 0) {
-      const expandParents = (
-        categories: Category[],
-        parentIndex?: number,
-        parentId?: string,
-      ): boolean => {
-        let found = false;
+  const handleConfirmSelection = () => {
+    const selectedCategories: { id: string; name: string; path: string[] }[] = [];
 
-        categories.forEach((cat, index) => {
-          if (selectedCategoryIds.has(cat.id)) {
-            found = true;
-          }
+    const collectSelected = (categories: Category[], path: string[] = []) => {
+      categories.forEach(cat => {
+        const newPath = [...path, cat.name];
+        if (selectedMap[cat.id]) {
+          selectedCategories.push({ id: cat.id, name: cat.name, path: newPath });
+        }
+        if (cat.subcategories?.length) collectSelected(cat.subcategories, newPath);
+      });
+    };
 
-          if (cat.subcategories && cat.subcategories.length > 0) {
-            const childHasSelected = expandParents(
-              cat.subcategories,
-              index,
-              cat.id,
-            );
-            if (childHasSelected) {
-              found = true;
+    collectSelected(rootCategories);
+    onSelectCategory?.(selectedCategories);
+    navigation.goBack();
+  };
 
-              // open this accordion section
-              if (parentId) {
-                // it's a sub accordion
-                setActiveSubSectionsMap(prev => ({
-                  ...prev,
-                  [parentId]: [0], // expand this parent
-                }));
-                setExpandedSubcategories(prev => ({
-                  ...prev,
-                  [parentId]: cat.subcategories!,
-                }));
-              } else {
-                // it's a root accordion
-                setActiveRootSections(prev => [...new Set([...prev, index])]);
-                setExpandedSubcategories(prev => ({
-                  ...prev,
-                  [cat.id]: cat.subcategories!,
-                }));
-              }
-            }
-          }
-        });
 
-        return found;
-      };
-
-      expandParents(rootCategories);
-    }
-  }, [rootCategories, selectedCategoryIds]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <Header
-        name={getHeaderTitle()}
+        name={UI_TEXT.SELECT_CATEGORY}
         leftIcon={
-          <ArrowLeftIcon
-            size={15}
-            onPress={handleNavigateBack}
-            style={undefined}
+          <ArrowLeft
+            size={22}
+            onPress={goBack} style={undefined}
           />
         }
         textColor={ColorPalette.AgreeTerms}
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_BOLD}
         rightIcons={[
           {
-            icon: InfoIcon,
-            onPress: () => console.log('Info icon pressed'),
+            icon: QuestionMarkIcon,
+            onPress: () => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: { screen: 'FAQScreen' },
+              });
+            },
             size: 24,
             color: ColorPalette.IconColor,
-            strokeWidth: 2,
+            strokeWidth: 1.5,
           },
         ]}
       />
 
-      {showErrorMessage && (
-        <View style={styles.errorContainer}>
-          <Typography
-            variant={TypographyVariant.PMEDIUM_REGULAR}
-            text={UI_TEXT.ERROR_LOADING_CATEGORIES}
-            customTextStyles={styles.errorText}
-          />
-          <Button
-            text="Retry"
-            variant={ButtonVariant.PRIMARY}
-            state={ButtonState.DEFAULT}
-            size={ButtonSize.SMALL}
-            onPress={handleRetry}
-            customStyles={styles.retryButton}
-          />
-        </View>
-      )}
+
 
       <View style={styles.searchContainer}>
         <SearchBox
           value={searchText}
           onChangeText={setSearchText}
-          placeholder={`Search ${
-            categoryPath.length > 0 ? 'subcategories' : 'categories'
-          }...`}
+          placeholder={`Search Categories`}
         />
       </View>
 
       {/* {renderBreadcrumb()} commented out after discussion */}
 
-      <View style={{flex: 1}}>
-        {filteredCategories.length > 0 ? (
-          // <FlatList
-          //   data={filteredCategories}
-          //   keyExtractor={item => item.id}
-          //   ItemSeparatorComponent={() => (
-          //     <View
-          //       style={{height: 1, backgroundColor: ColorPalette.GREY_100}}
-          //     />
-          //   )}
-          //   renderItem={({item, index}) => {
-          //     const isLastLevel =
-          //       !item.subcategories || item.subcategories.length === 0;
-          //     const isRootLevel = categoryPath.length === 0;
-
-          //     const isSelected = selectedCategories.includes(item.id);
-          //     return (
-          //       <MenuItem
-          //         label={item.name}
-          //         leftIcon={
-          //           isLastLevel &&
-          //           !isRootLevel && (
-          //             <View
-          //               style={[
-          //                 styles.checkbox,
-          //                 isSelected && styles.checkboxSelected,
-          //               ]}>
-          //               {isSelected && (
-          //                 <CheckIcon
-          //                   size={24}
-          //                   backgroundColor="transparent"
-          //                   checkColor={ColorPalette.White}
-          //                 />
-          //               )}
-          //             </View>
-          //           )
-          //         }
-          //         leftIconContainerStyle={{marginRight: getScreenWidth(-4)}}
-          //         onPress={() => {
-          //           if (!isLastLevel) {
-          //             handleCategoryPress(item);
-          //           } else if (!isRootLevel) {
-          //             toggleCategorySelection(item.id);
-          //           } else {
-          //             handleCategoryPress(item);
-          //           }
-          //         }}
-          //         variant={TypographyVariant.LMEDIUM_MEDIUM}
-          //         containerStyle={styles.categoryItem}
-          //         rightIcon={
-          //           !isLastLevel ? (
-          //             <ArrowRightIcon
-          //               style={undefined}
-          //               color={ColorPalette.GREY_TEXT_500}
-          //             />
-          //           ) : null
-          //         }
-          //         showBottomBorder
-          //         textStyle={styles.menuItemText}
-          //         isLastItem={index === filteredCategories.length - 1}
-          //       />
-          //     );
-          //   }}
-          //   refreshControl={
-          //     <RefreshControl
-          //       refreshing={categoriesLoading}
-          //       onRefresh={() => refreshCategories(productId)}
-          //       colors={[ColorPalette.PURPLE_300]}
-          //       tintColor={ColorPalette.PURPLE_300}
-          //     />
-          //   }
-          //   contentContainerStyle={styles.listContent}
-          // />
-
-          <ScrollView>
-            {filteredCategories.map((category, index) => (
-              <Accordion
-                key={category.id}
-                sections={[category]}
-                activeSections={activeRootSections.includes(index) ? [0] : []}
-                renderHeader={(section, _, isActive) =>
-                  renderRootHeader(section, index, isActive)
-                }
-                renderContent={renderRootContent}
-                onChange={newActive =>
-                  setActiveRootSections(
-                    prev =>
-                      newActive.length > 0
-                        ? [...prev, index] // expand
-                        : prev.filter(i => i !== index), // collapse
-                  )
-                }
-                expandMultiple={false}
-                underlayColor="transparent"
-              />
-            ))}
+      <View style={{ flex: 1 }}>
+        {currentCategories.length > 0 ? (
+          <ScrollView style={{ flex: 1, paddingHorizontal: 8 }}>
+            {rootCategories.map(cat => renderCategory(cat))}
           </ScrollView>
         ) : (
           <View style={styles.emptyStateContainer}>
@@ -724,10 +292,10 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
             state={ButtonState.DEFAULT}
             size={ButtonSize.MEDIUM}
             withShadow
-            // disabled={selectedCategories.length === 0}
-            // customStyles={{
-            //   opacity: selectedCategories.length === 0 ? 0.6 : 1,
-            // }}
+          // disabled={selectedCategories.length === 0}
+          // customStyles={{
+          //   opacity: selectedCategories.length === 0 ? 0.6 : 1,
+          // }}
           />
         </View>
         {/* )} */}
