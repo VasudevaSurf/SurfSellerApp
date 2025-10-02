@@ -30,4 +30,16 @@ export const styles = StyleSheet.create({
   addButtonText: {
     color: ColorPalette.PURPLE_300,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: getScreenWidth(5),
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: getScreenWidth(5),
+  },
 });

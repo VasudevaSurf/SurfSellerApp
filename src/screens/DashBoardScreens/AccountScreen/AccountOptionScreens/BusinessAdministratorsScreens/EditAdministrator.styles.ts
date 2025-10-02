@@ -17,6 +17,18 @@ export const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: getScreenHeight(15),
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.Medium,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.Medium,
+  },
   section: {
     paddingVertical: getScreenHeight(2),
     paddingHorizontal: Spacing.Medium,
