@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
     right: 20,
     backgroundColor: ColorPalette.PURPLE_300,
     width: getScreenWidth(48),
-    height: getScreenHeight(6),
+    height: getScreenHeight(7),
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
