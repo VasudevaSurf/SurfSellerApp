@@ -297,9 +297,9 @@ const NotificationScreen: React.FC = () => {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name="Notifications"
-        variant={TypographyVariant.H5_BOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={<ArrowLeft style={undefined} size={24} onPress={goBack} />}
+        leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
         rightIcons={[
           {
             icon: () => (
