@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { ColorPalette } from '../../../config/colorPalette';
 import { BorderRadius } from '../../../config/globalStyles';
-import { getScreenWidth } from '../../../helpers/screenSize';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
 import { BadgeType, BadgeVariant } from './Badge.types';
 
 const getBackgroundColor = (type: BadgeType, variant: BadgeVariant) => {
@@ -84,6 +84,7 @@ export const createBadgeStyles = (
     text: {
       color: getTextColor(type, variant, customTextColor),
       marginHorizontal: getScreenWidth(0.5), // Changed from Spacing.XXSmall
+      paddingVertical: getScreenHeight(0.1),
     },
     icon: {
       marginHorizontal: getScreenWidth(1), // Changed from Spacing.XXSmall
