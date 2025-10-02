@@ -18,15 +18,18 @@ export const styles = StyleSheet.create({
   headerSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: Spacing.Medium,
     paddingBottom: Spacing.Medium,
     borderBottomWidth: 1,
-    borderBottomColor: ColorPalette.GREY_100,
+    borderBottomColor: ColorPalette.SearchBack,
+    paddingVertical: getScreenHeight(0.75),
   },
   roleContainer: {
     flex: 1,
-    gap: Spacing.XSmall,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.Small,
   },
   nameText: {
     color: ColorPalette.GREY_TEXT_500,
@@ -43,7 +46,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   labelText: {
-    color: ColorPalette.GREY_TEXT_300,
+    color: ColorPalette.GREY_TEXT_100,
     flex: 1,
   },
   valueText: {

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
 import {Header} from '../../../../../components/UserComponents/Header/Header';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
@@ -18,6 +18,7 @@ import {
   ButtonVariant,
 } from '../../../../../components/UserComponents/Button';
 import PlusIcon from '../../../../../assets/icons/PlusIcon';
+import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
 
 const BusinessAdministrators = () => {
   // Mock data - replace with actual data from Redux/API
@@ -69,14 +70,31 @@ const BusinessAdministrators = () => {
     });
   };
 
+  const headerIcons = useMemo(
+    () => [
+      {
+        icon: QuestionMarkIcon,
+        onPress: () => {
+          navigate('Dashboard', {
+            screen: 'Account',
+            params: {screen: 'FAQScreen'},
+          });
+        },
+        size: 24,
+        color: ColorPalette.IconColor,
+        strokeWidth: 1.5,
+      },
+    ],
+    [],
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name="Business Administrators"
         variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
-        rightIcons={null}
+        rightIcons={headerIcons}
       />
       <ScrollView
         style={styles.mainContainer}
@@ -89,28 +107,28 @@ const BusinessAdministrators = () => {
             onEdit={handleEditAdministrator}
           />
         ))}
-      </ScrollView>
 
-      {/* Add Administrator Button */}
-      <View style={styles.buttonContainer}>
-        <Button
-          text="Add Administrator"
-          variant={ButtonVariant.PRIMARY}
-          state={ButtonState.DEFAULT}
-          size={ButtonSize.LARGE}
-          type={ButtonType.OUTLINED}
-          onPress={handleAddAdministrator}
-          IconComponent={PlusIcon}
-          iconPosition="left"
-          customStyles={styles.addButton}
-          customTextStyles={styles.addButtonText}
-          textVariant={TypographyVariant.H6_BOLD}
-          iconProps={{
-            size: 24,
-            color: ColorPalette.PURPLE_300,
-          }}
-        />
-      </View>
+        {/* Add Administrator Button */}
+        <View style={styles.buttonContainer}>
+          <Button
+            text="Add Administrator"
+            variant={ButtonVariant.PRIMARY}
+            state={ButtonState.DEFAULT}
+            size={ButtonSize.LARGE}
+            type={ButtonType.OUTLINED}
+            onPress={handleAddAdministrator}
+            IconComponent={PlusIcon}
+            iconPosition="left"
+            customStyles={styles.addButton}
+            customTextStyles={styles.addButtonText}
+            textVariant={TypographyVariant.H6_BOLD}
+            iconProps={{
+              size: 24,
+              color: ColorPalette.PURPLE_300,
+            }}
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

@@ -7,6 +7,7 @@ import {Badge} from '../../UserComponents/Badges/Badge';
 import {BadgeType, BadgeVariant} from '../../UserComponents/Badges/Badge.types';
 import {styles} from './AdministratorCard.styles';
 import EditIcon from '../../../assets/icons/FlowBite';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 
 export interface Administrator {
   id: string;
@@ -49,8 +50,9 @@ export const AdministratorCard: React.FC<AdministratorCardProps> = ({
             variant={BadgeVariant.FILLED}
             customContainerStyle={{
               backgroundColor: getRoleBackgroundColor(administrator.role),
-              paddingVertical: 6,
-              paddingHorizontal: 12,
+              paddingVertical: getScreenHeight(1),
+              paddingHorizontal: getScreenWidth(3),
+              alignSelf: 'flex-start',
             }}
             textVariant={TypographyVariant.LSMALL_BOLD}
             customTextColor={
@@ -61,7 +63,7 @@ export const AdministratorCard: React.FC<AdministratorCardProps> = ({
           />
           <Typography
             text={administrator.name}
-            variant={TypographyVariant.H5_BOLD}
+            variant={TypographyVariant.H6_SEMIBOLD}
             customTextStyles={styles.nameText}
           />
         </View>
