@@ -74,10 +74,8 @@ const HomeScreen = () => {
 
   const handleViewAllPress = () => {
     navigate('Dashboard', {
-      screen: 'Orders',
-      params: {
-        screen: 'OrderPage',
-      },
+      screen: 'MainTabs',
+      params: { screen: 'Orders' },
     });
   };
 
@@ -186,7 +184,7 @@ const HomeScreen = () => {
           // image={{
           //   source: require('../../../assets/images/placeholder-profile.png'),
           // }}
-          variant={TypographyVariant.PMEDIUM_SEMIBOLD}
+          variant={TypographyVariant.LMEDIUM_EXTRABOLD}
           textColor={ColorPalette.GREY_TEXT_500}
           rightIcons={[
             // {
@@ -247,7 +245,7 @@ const HomeScreen = () => {
         // image={{
         //   source: require('../../../assets/images/placeholder-profile.png'),
         // }}
-        variant={TypographyVariant.PMEDIUM_SEMIBOLD}
+        variant={TypographyVariant.LMEDIUM_EXTRABOLD}
         textColor={ColorPalette.GREY_TEXT_500}
         rightIcons={[
           // {
@@ -623,7 +621,7 @@ const HomeScreen = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   paddingBottom: getScreenHeight(4),
-                  
+
                 }}>
                 <Image
                   source={require('../../../assets/images/emptyBox.png')}
