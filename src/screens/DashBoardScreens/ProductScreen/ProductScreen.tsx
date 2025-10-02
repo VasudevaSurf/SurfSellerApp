@@ -122,9 +122,6 @@ const ProductScreen = () => {
     filterOptions[0],
   );
 
-  console.log("selectedFilter", selectedFilter);
-
-
   // Update selected filter when currentFilter changes
   useEffect(() => {
     const newSelectedFilter = filterOptions.find(
@@ -666,7 +663,7 @@ const ProductScreen = () => {
             />
             <Typography
               text="No low stocks products found"
-              variant={TypographyVariant.LSMALL_REGULAR}
+              variant={TypographyVariant.PMEDIUM_SEMIBOLD}
               customTextStyles={styles.emptyStateText}
             />
           </View>
@@ -680,7 +677,7 @@ const ProductScreen = () => {
             />
             <Typography
               text="No pending products found"
-              variant={TypographyVariant.LSMALL_REGULAR}
+              variant={TypographyVariant.PMEDIUM_SEMIBOLD}
               customTextStyles={styles.emptyStateText}
             />
           </View>
@@ -694,7 +691,7 @@ const ProductScreen = () => {
             />
             <Typography
               text="No hidden products found"
-              variant={TypographyVariant.LSMALL_REGULAR}
+              variant={TypographyVariant.PMEDIUM_SEMIBOLD}
               customTextStyles={styles.emptyStateText}
             />
           </View>
@@ -709,7 +706,7 @@ const ProductScreen = () => {
             />
             <Typography
               text="No products found"
-              variant={TypographyVariant.LSMALL_REGULAR}
+              variant={TypographyVariant.PMEDIUM_SEMIBOLD}
               customTextStyles={styles.emptyStateText}
             />
           </View>
@@ -935,7 +932,7 @@ const ProductScreen = () => {
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: getScreenHeight(4) },
+            { paddingBottom: getScreenHeight(12) },
           ]}
           showsVerticalScrollIndicator={false}
           refreshControl={
