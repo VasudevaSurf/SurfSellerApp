@@ -11,6 +11,8 @@ import PersonalInfo from '../../screens/DashBoardScreens/AccountScreen/AccountOp
 import AccountScreen from '../../screens/DashBoardScreens/AccountScreen/AccountScreen';
 import {AccountSettingsStackParamList} from '../../types/navigation';
 import ChatScreen from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/FAQPages/ChatScreenPages/ChatScreen';
+import BusinessAdministrators from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BusinessAdministratorsScreens/BusinessAdministrators';
+import EditAdministrator from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BusinessAdministratorsScreens/EditAdministrator';
 
 const Stack = createStackNavigator<AccountSettingsStackParamList>();
 
@@ -30,6 +32,11 @@ export const AccountSettingsNavigator = () => {
       <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
       <Stack.Screen name="FAQScreen" component={FAQScreen} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
+      <Stack.Screen
+        name="BusinessAdministrators"
+        component={BusinessAdministrators}
+      />
+      <Stack.Screen name="EditAdministrator" component={EditAdministrator} />
     </Stack.Navigator>
   );
 };

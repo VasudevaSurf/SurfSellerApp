@@ -57,6 +57,10 @@ export type AccountSettingsStackParamList = {
   ChatScreen: undefined;
   TermsAndConditions: undefined;
   PrivacyPolicy: undefined;
+  BusinessAdministrators: undefined;
+  EditAdministrator: {
+    administrator: Administrator | null;
+  };
 };
 
 export type OrderNavigator = {

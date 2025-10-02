@@ -42,6 +42,8 @@ import ShareAppIcon from '../../../assets/icons/ShareAppIcon';
 import ChatIcon from '../../../assets/icons/ChatIcon';
 import LogoutIcon from '../../../assets/icons/LogOutIcon';
 import {TrashIcon2} from '../../../assets/icons/NewProductIcons/TrashIcon2';
+import BusinessAdministrators from './AccountOptionScreens/BusinessAdministratorsScreens/BusinessAdministrators';
+import EditAdministrator from './AccountOptionScreens/BusinessAdministratorsScreens/EditAdministrator';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -207,7 +209,7 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'CompanyProfile'},
+                params: {screen: 'BusinessAdministrators'},
               }),
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {
