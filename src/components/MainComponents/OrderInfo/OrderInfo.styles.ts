@@ -1,7 +1,7 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../config/colorPalette';
-import {Spacing} from '../../../config/globalStyles';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../config/colorPalette';
+import { Spacing } from '../../../config/globalStyles';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
@@ -74,5 +74,6 @@ export const styles = StyleSheet.create({
   statusBadge: {
     borderRadius: Spacing.XSmall,
     paddingVertical: getScreenHeight(1.5),
+    paddingHorizontal: getScreenWidth(3)
   },
 });
