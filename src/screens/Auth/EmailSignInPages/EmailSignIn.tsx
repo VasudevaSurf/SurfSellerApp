@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Alert, ScrollView } from 'react-native';
+import { SafeAreaView, View, Alert, ScrollView, Linking } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { MainBanner } from '../../../components/MainComponents/MainBanner/MainBanner';
 import { Button } from '../../../components/UserComponents/Button/Button';
@@ -61,7 +61,7 @@ const EmailSignIn = ({ navigation }) => {
   };
 
   const handleCreateAccount = () => {
-    navigation.navigate('PhoneNumber');
+    Linking.openURL('https://sell.surf.mt/register');
   };
 
   const handleSignIn = async () => {
