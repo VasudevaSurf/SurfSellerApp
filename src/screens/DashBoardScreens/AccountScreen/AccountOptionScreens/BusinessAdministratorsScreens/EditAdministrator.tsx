@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import {useRoute} from '@react-navigation/native';
+import {useRoute, useFocusEffect} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {Header} from '../../../../../components/UserComponents/Header/Header';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
@@ -24,20 +24,11 @@ import {
 import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
 import {Administrator} from '../../../../../components/MainComponents/AdministratorCard/AdministratorCard';
 import {TrashIcon2} from '../../../../../assets/icons/NewProductIcons/TrashIcon2';
-import CloseCircleIcon from '../../../../../assets/icons/CloseCircleIcon';
 import {RootState, AppDispatch} from '../../../../../redux/store';
-import {
-  fetchProfile,
-  updateProfile,
-} from '../../../../../redux/slices/profileSlice';
-import {
-  updateProfileApi,
-  UserProfile,
-  ProfileField,
-  fetchProfileApi,
-} from '../../../../../services/apiService';
+import {fetchProfile} from '../../../../../redux/slices/profileSlice';
 import {styles} from './EditAdministrator.styles';
 import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
+import LockIcon from '../../../../../assets/icons/LockIcon';
 
 const INITIAL_COUNTRY_CODE = '+356';
 const MALTA_FLAG_URL =
@@ -47,6 +38,14 @@ interface RouteParams {
   administrator: Administrator | null;
   isCurrentUser?: boolean;
 }
+
+const InfoIcon = () => (
+  <Typography
+    text="ⓘ"
+    variant={TypographyVariant.PMEDIUM_REGULAR}
+    customTextStyles={{color: ColorPalette.GREY_TEXT_400, fontSize: 20}}
+  />
+);
 
 const EditAdministrator = () => {
   const route = useRoute();
@@ -66,230 +65,272 @@ const EditAdministrator = () => {
 
   // Form state
   const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [streetName, setStreetName] = useState('');
   const [cityName, setCityName] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('Malta');
 
-  // Field edit states
-  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Error states
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState('');
-  const [firstNameError, setFirstNameError] = useState('');
-  const [lastNameError, setLastNameError] = useState('');
-  const [phoneError, setPhoneError] = useState('');
-
-  // Fetch profile data on mount
-  useEffect(() => {
-    const loadProfileData = async () => {
-      if (!userData?.user_id) {
-        setFetchError('User ID not found');
-        setInitialLoading(false);
-        return;
-      }
-
-      try {
-        setInitialLoading(true);
-        setFetchError('');
-
-        // Fetch profile data using API
-        const response = await fetchProfileApi(userData.user_id);
-
-        if (response.result && response.sections) {
-          // Parse profile sections to extract field values
-          const profileFields: {[key: string]: string} = {};
-
-          response.sections.forEach(section => {
-            section.blocks.forEach(block => {
-              block.fields.forEach((field: ProfileField) => {
-                profileFields[field.field_name] = field.value || '';
-              });
-            });
-          });
-
-          // Populate form fields
-          setEmail(profileFields.email || administrator?.email || '');
-          setFirstName(
-            profileFields.firstname ||
-              administrator?.fullName?.split(' ')[0] ||
-              '',
-          );
-          setLastName(
-            profileFields.lastname ||
-              administrator?.fullName?.split(' ')[1] ||
-              '',
-          );
-          setPhoneNumber(
-            profileFields.phone?.replace('+356 ', '') ||
-              administrator?.phone?.replace('+356 ', '') ||
-              '',
-          );
-          setStreetName(profileFields.s_address || '');
-          setCityName(profileFields.s_city || '');
-          setPostalCode(profileFields.s_zipcode || '');
-          setCountry(profileFields.s_country || 'Malta');
-        }
-      } catch (error: any) {
-        console.error('Error loading profile:', error);
-        setFetchError(error.message || 'Failed to load profile data');
-      } finally {
-        setInitialLoading(false);
-      }
-    };
-
-    loadProfileData();
-  }, [userData?.user_id, administrator]);
-
-  // Email validation
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim()) {
-      setEmailError('Email is required');
-      return false;
-    }
-    if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address');
-      return false;
-    }
-    setEmailError('');
-    return true;
-  };
-
-  // Password validation
-  const validatePassword = (): boolean => {
-    if (!isEditMode && !password.trim()) {
-      setPasswordError('Password is required');
-      return false;
-    }
-    if (password && password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-      return false;
-    }
-    if (password && password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match');
-      return false;
-    }
-    setPasswordError('');
-    setConfirmPasswordError('');
-    return true;
-  };
-
-  // Name validation
-  const validateNames = (): boolean => {
-    let isValid = true;
-
-    if (!firstName.trim()) {
-      setFirstNameError('First name is required');
-      isValid = false;
-    } else {
-      setFirstNameError('');
-    }
-
-    if (!lastName.trim()) {
-      setLastNameError('Last name is required');
-      isValid = false;
-    } else {
-      setLastNameError('');
-    }
-
-    return isValid;
-  };
-
-  // Phone validation
-  const validatePhone = (): boolean => {
-    if (!phoneNumber.trim()) {
-      setPhoneError('Phone number is required');
-      return false;
-    }
-    setPhoneError('');
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    // Validate all fields
-    const isEmailValid = validateEmail(email);
-    const isPasswordValid = validatePassword();
-    const areNamesValid = validateNames();
-    const isPhoneValid = validatePhone();
-
-    if (!isEmailValid || !isPasswordValid || !areNamesValid || !isPhoneValid) {
-      return;
-    }
-
-    if (!userData?.user_id) {
-      Alert.alert('Error', 'User ID not found');
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      // Prepare update data
-      const updateData: Partial<UserProfile> = {
-        email: email.trim(),
-        firstname: firstName.trim(),
-        lastname: lastName.trim(),
-        phone: `+356 ${phoneNumber.trim()}`,
-      };
-
-      // Add address fields if provided
-      if (streetName.trim()) {
-        updateData.street = streetName.trim();
-      }
-      if (cityName.trim()) {
-        updateData.city = cityName.trim();
-      }
-      if (postalCode.trim()) {
-        updateData.postal_code = postalCode.trim();
-      }
-      if (country.trim()) {
-        updateData.country = country.trim();
-      }
-
-      console.log('Updating profile with data:', updateData);
-
-      // Call update API
-      const response = await updateProfileApi(userData.user_id, updateData);
-
-      if (response.result) {
-        // Update Redux store
+  // Fetch profile data on mount and when returning from EditFieldScreen
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userData?.user_id && isCurrentUser) {
         dispatch(fetchProfile(userData.user_id));
+      }
+    }, [dispatch, userData?.user_id, isCurrentUser]),
+  );
 
-        Alert.alert(
-          'Success',
-          isEditMode
-            ? 'Administrator updated successfully'
-            : 'Administrator created successfully',
-          [
+  // Update state when profile data changes or route params change
+  useEffect(() => {
+    if (isCurrentUser && profileData) {
+      // Use profile data for current user
+      const firstName = profileData.firstname || '';
+      const lastName = profileData.lastname || '';
+      const constructedFullName = `${firstName} ${lastName}`.trim();
+
+      setFullName(constructedFullName || '');
+      setEmail(profileData.email || '');
+      setPhoneNumber(profileData.phone?.replace('+356 ', '') || '');
+      setStreetName(profileData.street || '');
+      setCityName(profileData.city || '');
+      setPostalCode(profileData.postal_code || '');
+      setCountry(profileData.country || 'Malta');
+      setInitialLoading(false);
+    } else if (administrator) {
+      // Use administrator data for other admins
+      setFullName(administrator.fullName || '');
+      setEmail(administrator.email || '');
+      setPhoneNumber(administrator.phone?.replace('+356 ', '') || '');
+      setStreetName('');
+      setCityName('');
+      setPostalCode('');
+      setCountry('Malta');
+      setInitialLoading(false);
+    }
+  }, [profileData, administrator, isCurrentUser]);
+
+  // Handle updates from route params (when returning from EditFieldScreen)
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params) {
+        const {
+          updatedName,
+          updatedEmail,
+          updatedPhone,
+          updatedStreet,
+          updatedCity,
+          updatedPostal,
+          updatedCountry,
+        } = route.params;
+
+        if (updatedName) setFullName(updatedName);
+        if (updatedEmail) setEmail(updatedEmail);
+        if (updatedPhone) setPhoneNumber(updatedPhone);
+        if (updatedStreet) setStreetName(updatedStreet);
+        if (updatedCity) setCityName(updatedCity);
+        if (updatedPostal) setPostalCode(updatedPostal);
+        if (updatedCountry) setCountry(updatedCountry);
+      }
+    }, [route.params]),
+  );
+
+  const handleEditName = () => {
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'name',
+          multipleFields: true,
+          initialValues: {
+            firstName,
+            lastName,
+          },
+          headerTitle: 'Update name',
+          description:
+            'Please enter the name exactly as it appears on the ID or passport.',
+          fields: [
             {
-              text: 'OK',
-              onPress: () => goBack(),
+              key: 'firstName',
+              label: 'First name',
+              keyboardType: 'default',
+              required: true,
+              validationType: 'firstName',
+            },
+            {
+              key: 'lastName',
+              label: 'Last name',
+              keyboardType: 'default',
+              required: false,
+              validationType: 'lastName',
             },
           ],
-        );
-      } else {
-        Alert.alert(
-          'Error',
-          response.message || 'Failed to update administrator',
-        );
-      }
-    } catch (error: any) {
-      console.error('Error updating administrator:', error);
-      Alert.alert(
-        'Error',
-        error.message || 'An error occurred while updating administrator',
-      );
-    } finally {
-      setLoading(false);
-    }
+          onSubmitActionType: 'updateName',
+          originScreen: 'EditAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditEmail = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'email',
+          initialValue: email,
+          headerTitle: 'Update email',
+          label: 'Email ID',
+          description:
+            'Please update the email ID to receive important updates and notifications.',
+          keyboardType: 'email-address',
+          validationType: 'email',
+          onSubmitActionType: 'updateEmail',
+          captionText: 'Email verified',
+          iconImage: require('../../../../../assets/images/elements.png'),
+
+          size: 24,
+          originScreen: 'EditAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditPassword = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'password',
+          multipleFields: true,
+          initialValues: {
+            password: '',
+            confirmPassword: '',
+          },
+          headerTitle: 'Update password',
+          description:
+            'Please enter a new password. Password must be at least 6 characters long.',
+          fields: [
+            {
+              key: 'password',
+              label: 'New Password',
+              keyboardType: 'default',
+              required: true,
+              validationType: 'password',
+            },
+            {
+              key: 'confirmPassword',
+              label: 'Confirm New Password',
+              keyboardType: 'default',
+              required: true,
+              validationType: 'password',
+            },
+          ],
+          onSubmitActionType: 'updatePassword',
+          originScreen: 'EditAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditPhone = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'phone',
+          initialValue: phoneNumber,
+          headerTitle: 'Update phone number',
+          label: 'WhatsApp number',
+          description:
+            'Please update the WhatsApp number to get all updates and order details.',
+          keyboardType: 'phone-pad',
+          showCountrySection: true,
+          countryCode: INITIAL_COUNTRY_CODE,
+          countryFlag: MALTA_FLAG_URL,
+          validationType: 'phone',
+          onSubmitActionType: 'updatePhone',
+          captionText: 'WhatsApp number verified',
+          iconImage: require('../../../../../assets/images/elements.png'),
+
+          size: 24,
+          originScreen: 'EditAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditStreet = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'streetName',
+          initialValue: streetName,
+          headerTitle: 'Update street name and number',
+          label: 'Street name and number',
+          description:
+            'Please update the street name and number for better experience.',
+          keyboardType: 'default',
+          validationType: 'streetName',
+          onSubmitActionType: 'updateStreetName',
+          originScreen: 'EditAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditCity = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'cityName',
+          initialValue: cityName,
+          headerTitle: 'Update city name',
+          label: 'City',
+          description: 'Please update the city name for better experience.',
+          keyboardType: 'default',
+          validationType: 'cityName',
+          onSubmitActionType: 'updateCityName',
+          originScreen: 'EditAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditPostalCode = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'postalCode',
+          initialValue: postalCode,
+          headerTitle: 'Update postal code',
+          label: 'Postal code',
+          description: 'Please enter a valid postal code.',
+          keyboardType: 'default',
+          validationType: 'postalCode',
+          onSubmitActionType: 'updatePostalCode',
+          originScreen: 'EditAdministrator',
+        },
+      },
+    });
   };
 
   const handleDelete = () => {
@@ -305,29 +346,13 @@ const EditAdministrator = () => {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            // TODO: Implement delete API call
             console.log('Delete administrator:', administrator?.id);
             Alert.alert('Info', 'Delete functionality will be implemented');
+            goBack();
           },
         },
       ],
     );
-  };
-
-  const handleEditEmail = () => {
-    setIsEditingEmail(true);
-  };
-
-  const handleCancelEditEmail = () => {
-    setIsEditingEmail(false);
-    setEmail(profileData?.email || administrator?.email || '');
-    setEmailError('');
-  };
-
-  const handleSaveEmail = () => {
-    if (validateEmail(email)) {
-      setIsEditingEmail(false);
-    }
   };
 
   const handleBack = () => {
@@ -369,6 +394,17 @@ const EditAdministrator = () => {
           }
           rightIcons={headerIcons}
         />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+          <Typography
+            text="Loading administrator data..."
+            variant={TypographyVariant.PMEDIUM_REGULAR}
+            customTextStyles={{
+              marginTop: 16,
+              color: ColorPalette.GREY_TEXT_400,
+            }}
+          />
+        </View>
       </SafeAreaView>
     );
   }
@@ -427,121 +463,56 @@ const EditAdministrator = () => {
               customTextStyles={styles.sectionTitle}
             />
             <TouchableOpacity>
-              <Typography
-                text="ⓘ"
-                variant={TypographyVariant.PMEDIUM_REGULAR}
-                customTextStyles={styles.infoIcon}
-              />
+              <InfoIcon />
             </TouchableOpacity>
           </View>
 
           <View style={styles.inputsContainer}>
-            {isCurrentUser && !isEditingEmail ? (
-              <AnimatedTextInput
-                label="Email ID"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-                customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
-                rightText="Edit"
-                onRightTextPress={handleEditEmail}
-                customBorderColor={ColorPalette.GREY_TEXT_400}
-                customBorderWidth={1}
-                disabled={true}
-                customTextColor={ColorPalette.GREY_TEXT_500}
-              />
-            ) : (
-              <AnimatedTextInput
-                label="Email ID"
-                value={email}
-                onChangeText={text => {
-                  setEmail(text);
-                  setEmailError('');
-                }}
-                keyboardType="email-address"
-                customLabelColorFocused={ColorPalette.PURPLE_300}
-                customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-                customBorderColor={
-                  emailError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
-                }
-                customFocusedBorderColor={ColorPalette.PURPLE_300}
-                customBorderWidth={1}
-                customFocusedBorderWidth={2}
-                error={emailError}
-                customTextColor={ColorPalette.GREY_TEXT_500}
-                rightIcons={
-                  isEditingEmail
-                    ? [
-                        {
-                          icon: <CloseCircleIcon style={undefined} />,
-                          onPress: handleCancelEditEmail,
-                        },
-                      ]
-                    : [
-                        {
-                          icon: <CloseCircleIcon style={undefined} />,
-                          onPress: () => setEmail(''),
-                        },
-                      ]
-                }
-              />
-            )}
-
             <AnimatedTextInput
-              label="Password"
-              value={password}
-              onChangeText={text => {
-                setPassword(text);
-                setPasswordError('');
-              }}
-              keyboardType="default"
-              type="password"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-              customBorderColor={
-                passwordError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
-              }
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
+              label="Email ID"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditEmail}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
-              error={passwordError}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setPassword(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
-              label="Confirm password"
-              value={confirmPassword}
-              onChangeText={text => {
-                setConfirmPassword(text);
-                setConfirmPasswordError('');
-              }}
+              label="Password"
+              value="••••••••"
+              onChangeText={() => {}}
               keyboardType="default"
-              type="password"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-              customBorderColor={
-                confirmPasswordError
-                  ? ColorPalette.RED
-                  : ColorPalette.GREY_TEXT_400
-              }
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
+              secureTextEntry={true}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditPassword}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
-              error={confirmPasswordError}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setConfirmPassword(''),
-                },
-              ]}
+            />
+
+            <AnimatedTextInput
+              label="Confirm Password"
+              value="••••••••"
+              onChangeText={() => {}}
+              keyboardType="default"
+              secureTextEntry={true}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditPassword}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
+              customBorderWidth={1}
+              disabled={true}
+              customTextColor={ColorPalette.GREY_TEXT_500}
             />
           </View>
         </View>
@@ -555,95 +526,43 @@ const EditAdministrator = () => {
               customTextStyles={styles.sectionTitle}
             />
             <TouchableOpacity>
-              <Typography
-                text="ⓘ"
-                variant={TypographyVariant.PMEDIUM_REGULAR}
-                customTextStyles={styles.infoIcon}
-              />
+              <InfoIcon />
             </TouchableOpacity>
           </View>
 
           <View style={styles.inputsContainer}>
             <AnimatedTextInput
-              label="First name"
-              value={firstName}
-              onChangeText={text => {
-                setFirstName(text);
-                setFirstNameError('');
-              }}
+              label="Full name"
+              value={fullName}
+              onChangeText={setFullName}
               keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-              customBorderColor={
-                firstNameError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
-              }
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditName}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
-              error={firstNameError}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setFirstName(''),
-                },
-              ]}
-            />
-
-            <AnimatedTextInput
-              label="Last name"
-              value={lastName}
-              onChangeText={text => {
-                setLastName(text);
-                setLastNameError('');
-              }}
-              keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-              customBorderColor={
-                lastNameError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
-              }
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
-              customBorderWidth={1}
-              customFocusedBorderWidth={2}
-              error={lastNameError}
-              customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setLastName(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
               label="Phone Number"
               value={phoneNumber}
-              onChangeText={text => {
-                setPhoneNumber(text);
-                setPhoneError('');
-              }}
+              onChangeText={setPhoneNumber}
               keyboardType="phone-pad"
               showCountrySection
               countryCode={INITIAL_COUNTRY_CODE}
               countryFlag={MALTA_FLAG_URL}
               onCountryPress={() => {}}
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-              customBorderColor={
-                phoneError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
-              }
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditPhone}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
-              error={phoneError}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setPhoneNumber(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
@@ -651,19 +570,14 @@ const EditAdministrator = () => {
               value={streetName}
               onChangeText={setStreetName}
               keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditStreet}
               customBorderColor={ColorPalette.GREY_TEXT_400}
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setStreetName(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
@@ -671,19 +585,14 @@ const EditAdministrator = () => {
               value={cityName}
               onChangeText={setCityName}
               keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditCity}
               customBorderColor={ColorPalette.GREY_TEXT_400}
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setCityName(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
@@ -691,40 +600,37 @@ const EditAdministrator = () => {
               value={postalCode}
               onChangeText={setPostalCode}
               keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditPostalCode}
               customBorderColor={ColorPalette.GREY_TEXT_400}
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setPostalCode(''),
-                },
-              ]}
             />
 
             {/* Country Badge */}
-            <View style={styles.countryContainer}>
-              <View style={styles.countryBadge}>
-                <View style={styles.countryContent}>
-                  <Typography text="🇲🇹" variant={TypographyVariant.H6_BOLD} />
-                  <Typography
-                    text={country}
-                    variant={TypographyVariant.LMEDIUM_MEDIUM}
-                    customTextStyles={styles.countryText}
-                  />
-                </View>
-                <TouchableOpacity style={styles.lockIcon}>
-                  <Typography
-                    text="🔒"
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <AnimatedTextInput
+              label="Country"
+              value={country}
+              onChangeText={setCountry}
+              keyboardType="default"
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              showCountrySection
+              countryFlag={MALTA_FLAG_URL}
+              onCountryPress={() => {}}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
+              customBorderWidth={1}
+              disabled={true}
+              rightIcons={[
+                {
+                  icon: <LockIcon size={20} color="#4A4A4A" />,
+                  onPress: () => {},
+                },
+              ]}
+            />
           </View>
         </View>
 
@@ -748,17 +654,15 @@ const EditAdministrator = () => {
           </View>
         )}
       </ScrollView>
-
-      {/* Save Button */}
       <View style={styles.buttonContainer}>
         <Button
-          text={loading ? 'SAVING...' : 'SAVE'}
+          text={isSubmitting ? 'UPDATING...' : 'SUBMIT'}
           variant={ButtonVariant.PRIMARY}
-          state={loading ? ButtonState.DISABLED : ButtonState.DEFAULT}
-          size={ButtonSize.LARGE}
-          onPress={handleSubmit}
-          textVariant={TypographyVariant.H6_BOLD}
-          disabled={loading}
+          state={ButtonState.DEFAULT}
+          size={ButtonSize.MEDIUM}
+          onPress={() => {}}
+          loading={isSubmitting}
+          // disabled={isSubmitDisabled()}
         />
       </View>
     </SafeAreaView>
