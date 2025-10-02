@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
   productContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getScreenWidth(4),
+    gap: getScreenHeight(1.2),
   },
   emptyMessageContainer: {
     flex: 1,
