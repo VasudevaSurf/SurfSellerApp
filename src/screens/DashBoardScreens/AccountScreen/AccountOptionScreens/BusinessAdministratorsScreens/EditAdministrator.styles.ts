@@ -18,6 +18,7 @@ export const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: getScreenHeight(2),
     gap: Spacing.Small,
+    paddingBottom: getScreenHeight(4),
   },
   loadingContainer: {
     flex: 1,
@@ -33,7 +34,6 @@ export const styles = StyleSheet.create({
   },
   section: {
     backgroundColor: ColorPalette.White,
-    marginBottom: getScreenHeight(3),
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -52,9 +52,7 @@ export const styles = StyleSheet.create({
   inputsContainer: {
     display: 'flex',
     flexDirection: 'column',
-    // Using Spacing for gap
     gap: Spacing.Medium,
-    // Using getScreenHeight for vertical padding
     backgroundColor: ColorPalette.White,
     paddingVertical: getScreenHeight(2),
   },
@@ -64,5 +62,49 @@ export const styles = StyleSheet.create({
     paddingHorizontal: getScreenWidth(4),
     borderTopStartRadius: BorderRadius.Small,
     borderTopEndRadius: BorderRadius.Small,
+  },
+  // Role Section
+  roleContainer: {
+    paddingHorizontal: getScreenHeight(2),
+    paddingVertical: getScreenHeight(2),
+    backgroundColor: ColorPalette.White,
+  },
+  slidingBarContainer: {
+    backgroundColor: 'transparent',
+  },
+  // Permissions Section
+  permissionsContainer: {
+    paddingHorizontal: getScreenHeight(2),
+    paddingVertical: getScreenHeight(2),
+    backgroundColor: ColorPalette.White,
+    gap: Spacing.Medium,
+  },
+  permissionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: getScreenHeight(1),
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderColor: ColorPalette.GREY_TEXT_400,
+    borderRadius: 4,
+    marginRight: Spacing.Medium,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: ColorPalette.White,
+  },
+  checkboxChecked: {
+    backgroundColor: '#8B5CF6',
+    borderColor: '#8B5CF6',
+  },
+  checkmark: {
+    color: ColorPalette.White,
+    fontSize: 16,
+  },
+  permissionLabel: {
+    color: ColorPalette.GREY_TEXT_500,
+    flex: 1,
   },
 });

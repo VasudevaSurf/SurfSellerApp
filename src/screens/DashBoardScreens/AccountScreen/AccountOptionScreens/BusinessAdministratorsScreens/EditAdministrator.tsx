@@ -462,9 +462,9 @@ const EditAdministrator = () => {
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
               customTextStyles={styles.sectionTitle}
             />
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <InfoIcon />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           <View style={styles.inputsContainer}>
@@ -525,9 +525,9 @@ const EditAdministrator = () => {
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
               customTextStyles={styles.sectionTitle}
             />
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <InfoIcon />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           <View style={styles.inputsContainer}>

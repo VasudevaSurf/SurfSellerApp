@@ -1,9 +1,15 @@
 import React, {useState} from 'react';
-import {SafeAreaView, ScrollView, View, TouchableOpacity} from 'react-native';
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import {Header} from '../../../../../components/UserComponents/Header/Header';
 import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../../../config/colorPalette';
-import {goBack} from '../../../../../navigation/utils/navigationRef';
+import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
 import {
@@ -16,6 +22,9 @@ import {Typography} from '../../../../../components/UserComponents/Typography/Ty
 import {getScreenHeight} from '../../../../../helpers/screenSize';
 import CloseCircleIcon from '../../../../../assets/icons/CloseCircleIcon';
 import {styles} from './EditAdministrator.styles';
+import LockIcon from '../../../../../assets/icons/LockIcon';
+import {SlidingBar} from '../../../../../components/MainComponents/SlidingBar/SlidingBar';
+import {SlidingBarOption} from '../../../../../components/MainComponents/SlidingBar/SlidingBar.types';
 
 const INITIAL_COUNTRY_CODE = '+356';
 const MALTA_FLAG_URL =
@@ -29,55 +38,287 @@ const InfoIcon = () => (
   />
 );
 
+// Role options
+const roleOptions: SlidingBarOption[] = [
+  {id: 'admin', label: 'Admin'},
+  {id: 'guest', label: 'Guest'},
+  {id: 'owner', label: 'Owner'},
+];
+
+// Permission options
+const permissionOptions = [
+  {id: 'viewDashboard', label: 'View Dashboard'},
+  {id: 'manageInventory', label: 'Manage Inventory'},
+  {id: 'editStoreSettings', label: 'Edit Store Settings'},
+  {id: 'accessPayoutReports', label: 'Access Payout Reports'},
+  {id: 'addEditDiscounts', label: 'Add/Edit Discounts'},
+  {id: 'addRemoveUsers', label: 'Add/Remove Users'},
+];
+
 const AddAdministrator = () => {
+  // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [streetName, setStreetName] = useState('');
   const [cityName, setCityName] = useState('');
   const [postalCode, setPostalCode] = useState('');
+  const [country, setCountry] = useState('Malta');
 
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  // Role and Permissions state
+  const [selectedRole, setSelectedRole] = useState<SlidingBarOption>(
+    roleOptions[0],
+  );
+  const [permissions, setPermissions] = useState<{[key: string]: boolean}>({
+    viewDashboard: true,
+    manageInventory: true,
+    editStoreSettings: true,
+    accessPayoutReports: false,
+    addEditDiscounts: true,
+    addRemoveUsers: false,
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const togglePermission = (permissionId: string) => {
+    setPermissions(prev => ({
+      ...prev,
+      [permissionId]: !prev[permissionId],
+    }));
+  };
+
+  const handleEditName = () => {
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'name',
+          multipleFields: true,
+          initialValues: {
+            firstName,
+            lastName,
+          },
+          headerTitle: 'Update name',
+          description:
+            'Please enter the name exactly as it appears on the ID or passport.',
+          fields: [
+            {
+              key: 'firstName',
+              label: 'First name',
+              keyboardType: 'default',
+              required: true,
+              validationType: 'firstName',
+            },
+            {
+              key: 'lastName',
+              label: 'Last name',
+              keyboardType: 'default',
+              required: false,
+              validationType: 'lastName',
+            },
+          ],
+          onSubmitActionType: 'updateName',
+          originScreen: 'AddAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditEmail = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'email',
+          initialValue: email,
+          headerTitle: 'Update email',
+          label: 'Email ID',
+          description:
+            'Please update the email ID to receive important updates and notifications.',
+          keyboardType: 'email-address',
+          validationType: 'email',
+          onSubmitActionType: 'updateEmail',
+          captionText: 'Email verified',
+          iconImage: require('../../../../../assets/images/elements.png'),
+          size: 24,
+          originScreen: 'AddAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditPassword = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'password',
+          multipleFields: true,
+          initialValues: {
+            password: '',
+            confirmPassword: '',
+          },
+          headerTitle: 'Update password',
+          description:
+            'Please enter a new password. Password must be at least 6 characters long.',
+          fields: [
+            {
+              key: 'password',
+              label: 'New Password',
+              keyboardType: 'default',
+              required: true,
+              validationType: 'password',
+            },
+            {
+              key: 'confirmPassword',
+              label: 'Confirm New Password',
+              keyboardType: 'default',
+              required: true,
+              validationType: 'password',
+            },
+          ],
+          onSubmitActionType: 'updatePassword',
+          originScreen: 'AddAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditPhone = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'phone',
+          initialValue: phoneNumber,
+          headerTitle: 'Update phone number',
+          label: 'WhatsApp number',
+          description:
+            'Please update the WhatsApp number to get all updates and order details.',
+          keyboardType: 'phone-pad',
+          showCountrySection: true,
+          countryCode: INITIAL_COUNTRY_CODE,
+          countryFlag: MALTA_FLAG_URL,
+          validationType: 'phone',
+          onSubmitActionType: 'updatePhone',
+          captionText: 'WhatsApp number verified',
+          iconImage: require('../../../../../assets/images/elements.png'),
+          size: 24,
+          originScreen: 'AddAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditStreet = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'streetName',
+          initialValue: streetName,
+          headerTitle: 'Update street name and number',
+          label: 'Street name and number',
+          description:
+            'Please update the street name and number for better experience.',
+          keyboardType: 'default',
+          validationType: 'streetName',
+          onSubmitActionType: 'updateStreetName',
+          originScreen: 'AddAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditCity = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'cityName',
+          initialValue: cityName,
+          headerTitle: 'Update city name',
+          label: 'City',
+          description: 'Please update the city name for better experience.',
+          keyboardType: 'default',
+          validationType: 'cityName',
+          onSubmitActionType: 'updateCityName',
+          originScreen: 'AddAdministrator',
+        },
+      },
+    });
+  };
+
+  const handleEditPostalCode = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'postalCode',
+          initialValue: postalCode,
+          headerTitle: 'Update postal code',
+          label: 'Postal code',
+          description: 'Please enter a valid postal code.',
+          keyboardType: 'default',
+          validationType: 'postalCode',
+          onSubmitActionType: 'updatePostalCode',
+          originScreen: 'AddAdministrator',
+        },
+      },
+    });
+  };
 
   const handleSubmit = () => {
-    let hasErrors = false;
-
-    if (!email.trim()) {
-      setEmailError('Email is required');
-      hasErrors = true;
-    }
-
-    if (!password.trim()) {
-      setPasswordError('Password is required');
-      hasErrors = true;
-    }
-
-    if (password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match');
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
+    // Simple validation
+    if (!email || !password || !confirmPassword || !fullName) {
+      Alert.alert(
+        'Required Fields',
+        'Please fill in all required fields (Email, Password, Confirm Password, and Full Name).',
+        [{text: 'OK'}],
+      );
       return;
     }
 
-    console.log('Creating administrator:', {
-      email,
-      password,
-      firstName,
-      lastName,
-      phoneNumber,
-      streetName,
-      cityName,
-      postalCode,
-    });
+    if (password !== confirmPassword) {
+      Alert.alert(
+        'Password Mismatch',
+        'Password and Confirm Password do not match.',
+        [{text: 'OK'}],
+      );
+      return;
+    }
 
-    goBack();
+    // Show success message and navigate back
+    Alert.alert(
+      'Success',
+      `Administrator details saved successfully!\nRole: ${
+        selectedRole.label
+      }\nPermissions: ${
+        Object.keys(permissions).filter(k => permissions[k]).length
+      } enabled`,
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            goBack();
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   return (
@@ -89,7 +330,6 @@ const AddAdministrator = () => {
         leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
         rightIcons={null}
       />
-
       <ScrollView
         style={styles.mainContainer}
         contentContainerStyle={styles.scrollContent}
@@ -102,92 +342,57 @@ const AddAdministrator = () => {
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
               customTextStyles={styles.sectionTitle}
             />
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <InfoIcon />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           <View style={styles.inputsContainer}>
             <AnimatedTextInput
               label="Email ID"
               value={email}
-              onChangeText={text => {
-                setEmail(text);
-                setEmailError('');
-              }}
+              onChangeText={setEmail}
               keyboardType="email-address"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-              customBorderColor={
-                emailError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
-              }
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditEmail}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
-              error={emailError}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setEmail(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
               label="Password"
               value={password}
-              onChangeText={text => {
-                setPassword(text);
-                setPasswordError('');
-              }}
+              onChangeText={setPassword}
               keyboardType="default"
               type="password"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-              customBorderColor={
-                passwordError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
-              }
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditPassword}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
-              error={passwordError}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setPassword(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
-              label="Confirm password"
+              label="Confirm Password"
               value={confirmPassword}
-              onChangeText={text => {
-                setConfirmPassword(text);
-                setConfirmPasswordError('');
-              }}
+              onChangeText={setConfirmPassword}
               keyboardType="default"
               type="password"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-              customBorderColor={
-                confirmPasswordError
-                  ? ColorPalette.RED
-                  : ColorPalette.GREY_TEXT_400
-              }
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditPassword}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
-              error={confirmPasswordError}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setConfirmPassword(''),
-                },
-              ]}
             />
           </View>
         </View>
@@ -200,50 +405,25 @@ const AddAdministrator = () => {
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
               customTextStyles={styles.sectionTitle}
             />
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <InfoIcon />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           <View style={styles.inputsContainer}>
             <AnimatedTextInput
-              label="First name"
-              value={firstName}
-              onChangeText={setFirstName}
+              label="Full name"
+              value={fullName}
+              onChangeText={setFullName}
               keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditName}
               customBorderColor={ColorPalette.GREY_TEXT_400}
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setFirstName(''),
-                },
-              ]}
-            />
-
-            <AnimatedTextInput
-              label="Last name"
-              value={lastName}
-              onChangeText={setLastName}
-              keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-              customBorderColor={ColorPalette.GREY_TEXT_400}
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
-              customBorderWidth={1}
-              customFocusedBorderWidth={2}
-              customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setLastName(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
@@ -255,19 +435,14 @@ const AddAdministrator = () => {
               countryCode={INITIAL_COUNTRY_CODE}
               countryFlag={MALTA_FLAG_URL}
               onCountryPress={() => {}}
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditPhone}
               customBorderColor={ColorPalette.GREY_TEXT_400}
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setPhoneNumber(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
@@ -275,19 +450,14 @@ const AddAdministrator = () => {
               value={streetName}
               onChangeText={setStreetName}
               keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditStreet}
               customBorderColor={ColorPalette.GREY_TEXT_400}
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setStreetName(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
@@ -295,19 +465,14 @@ const AddAdministrator = () => {
               value={cityName}
               onChangeText={setCityName}
               keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditCity}
               customBorderColor={ColorPalette.GREY_TEXT_400}
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-              rightIcons={[
-                {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setCityName(''),
-                },
-              ]}
             />
 
             <AnimatedTextInput
@@ -315,52 +480,115 @@ const AddAdministrator = () => {
               value={postalCode}
               onChangeText={setPostalCode}
               keyboardType="default"
-              customLabelColorFocused={ColorPalette.PURPLE_300}
-              customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              rightText="Edit"
+              onRightTextPress={handleEditPostalCode}
               customBorderColor={ColorPalette.GREY_TEXT_400}
-              customFocusedBorderColor={ColorPalette.PURPLE_300}
               customBorderWidth={1}
-              customFocusedBorderWidth={2}
+              disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
+            />
+
+            <AnimatedTextInput
+              label="Country"
+              value={country}
+              onChangeText={setCountry}
+              keyboardType="default"
+              customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+              customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+              showCountrySection
+              countryFlag={MALTA_FLAG_URL}
+              onCountryPress={() => {}}
+              customBorderColor={ColorPalette.GREY_TEXT_400}
+              customBorderWidth={1}
+              disabled={true}
               rightIcons={[
                 {
-                  icon: <CloseCircleIcon style={undefined} />,
-                  onPress: () => setPostalCode(''),
+                  icon: <LockIcon size={20} color="#4A4A4A" />,
+                  onPress: () => {},
                 },
               ]}
             />
+          </View>
+        </View>
 
-            {/* Country Badge */}
-            <View style={styles.countryContainer}>
-              <View style={styles.countryBadge}>
-                <View style={styles.countryContent}>
-                  <Typography text="🇲🇹" variant={TypographyVariant.H6_BOLD} />
-                  <Typography
-                    text="Malta"
-                    variant={TypographyVariant.LMEDIUM_MEDIUM}
-                    customTextStyles={styles.countryText}
-                  />
+        {/* Role Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Typography
+              text="Role"
+              variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+              customTextStyles={styles.sectionTitle}
+            />
+            {/* <TouchableOpacity>
+              <InfoIcon />
+            </TouchableOpacity> */}
+          </View>
+
+          <View style={styles.roleContainer}>
+            <SlidingBar
+              options={roleOptions}
+              selectedOption={selectedRole}
+              onOptionSelect={setSelectedRole}
+              customContainerStyle={styles.slidingBarContainer}
+            />
+          </View>
+        </View>
+
+        {/* Permissions Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Typography
+              text="Permissions"
+              variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+              customTextStyles={styles.sectionTitle}
+            />
+            {/* <TouchableOpacity>
+              <InfoIcon />
+            </TouchableOpacity> */}
+          </View>
+
+          <View style={styles.permissionsContainer}>
+            {permissionOptions.map(permission => (
+              <TouchableOpacity
+                key={permission.id}
+                style={styles.permissionItem}
+                onPress={() => togglePermission(permission.id)}
+                activeOpacity={0.7}>
+                <View
+                  style={[
+                    styles.checkbox,
+                    permissions[permission.id] && styles.checkboxChecked,
+                  ]}>
+                  {permissions[permission.id] && (
+                    <Typography
+                      text="✓"
+                      variant={TypographyVariant.LMEDIUM_BOLD}
+                      customTextStyles={styles.checkmark}
+                    />
+                  )}
                 </View>
-                <TouchableOpacity style={styles.lockIcon}>
-                  <Typography
-                    text="🔒"
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+                <Typography
+                  text={permission.label}
+                  variant={TypographyVariant.LMEDIUM_REGULAR}
+                  customTextStyles={styles.permissionLabel}
+                />
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
       </ScrollView>
 
-      {/* Save Button */}
+      {/* Submit Button */}
       <View style={styles.buttonContainer}>
         <Button
-          text="ADD ADMINISTRATOR"
+          text={isSubmitting ? 'ADDING...' : 'ADD ADMINISTRATOR'}
           variant={ButtonVariant.PRIMARY}
           state={ButtonState.DEFAULT}
-          size={ButtonSize.LARGE}
+          size={ButtonSize.MEDIUM}
           onPress={handleSubmit}
+          loading={isSubmitting}
           textVariant={TypographyVariant.H6_BOLD}
         />
       </View>
