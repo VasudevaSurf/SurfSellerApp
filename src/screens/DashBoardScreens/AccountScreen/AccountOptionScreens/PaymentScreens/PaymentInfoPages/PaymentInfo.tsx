@@ -419,14 +419,14 @@ const PaymentInfo = () => {
         name="Payments"
         variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+        leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
         rightIcons={headerIcons}
       />
       <ScrollView
         style={styles.mainContainer}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: getScreenHeight(2) },
+          { paddingTop: getScreenHeight(1.2) },
         ]}
         showsVerticalScrollIndicator={false}>
         {/* Stripe Connect Section */}

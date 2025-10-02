@@ -1,10 +1,10 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 import {
   getScreenWidth,
   getScreenHeight,
 } from '../../../../../../helpers/screenSize';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {BorderRadius} from '../../../../../../config/globalStyles';
+import { ColorPalette } from '../../../../../../config/colorPalette';
+import { BorderRadius } from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    gap: getScreenWidth(4),
+    gap: getScreenHeight(1.2),
     flexGrow: 1,
   },
   // Stripe Connect Section
@@ -142,7 +142,7 @@ export const styles = StyleSheet.create({
 
   // Tab Content
   divider: {
-    height: getScreenHeight(2),
+    height: getScreenHeight(1.2),
     backgroundColor: ColorPalette.SearchBack,
     marginTop: getScreenHeight(1),
   },
@@ -206,5 +206,6 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: getScreenWidth(5),
+    // marginTop: getScreenHeight(14),
   },
 });
