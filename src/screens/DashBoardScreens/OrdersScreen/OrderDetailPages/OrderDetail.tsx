@@ -536,7 +536,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ route }) => {
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingTop: getScreenHeight(2) },
+            { paddingTop: getScreenHeight(1.2) },
           ]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.orderCard}>
