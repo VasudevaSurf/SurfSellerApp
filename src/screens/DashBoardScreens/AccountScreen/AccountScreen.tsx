@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Image, ScrollView, View } from 'react-native';
+import { Alert, Image, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
-import CircularEuroIcon from '../../../assets/icons/CircularEuroIcon';
-import LanguageIcon from '../../../assets/icons/LanguageIcon';
-import PackageIcon from '../../../assets/icons/PackageIcon';
 import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
 import { AddModal } from '../../../components/MainComponents/AddModal/AddModal';
 import { MenuItem } from '../../../components/MainComponents/MenuItem/MenuItem';
@@ -33,8 +30,6 @@ import { BorderRadius } from '../../../config/globalStyles';
 import BusinessAdministrationIcon from '../../../assets/icons/BusinessAdministratorsIcon';
 import BankDetailsIcon from '../../../assets/icons/BankDetailsIcon';
 import PaymentsIcon from '../../../assets/icons/PaymentsIcon';
-import MotivationIcon from '../../../assets/icons/MotivationIcon';
-import EuroIcon from '../../../assets/icons/EuroIcon';
 import BellIcon from '../../../assets/icons/BellIcon';
 import FaqIcon from '../../../assets/icons/FaqIcon';
 import PrivacyPolicyIcon from '../../../assets/icons/PrivacyPolicyIcon';
@@ -42,6 +37,7 @@ import ShareAppIcon from '../../../assets/icons/ShareAppIcon';
 import ChatIcon from '../../../assets/icons/ChatIcon';
 import LogoutIcon from '../../../assets/icons/LogOutIcon';
 import { TrashIcon2 } from '../../../assets/icons/NewProductIcons/TrashIcon2';
+import TermsConditionsIcon from '../../../assets/icons/TermsAndConditionIcon';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -159,6 +155,28 @@ const AccountScreen = () => {
     ],
     [],
   );
+
+  // Share the app using inbuilt React Native Share
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        // title: 'Surf Seller App', - only supported if we use react-native-share library
+        message: `Manage your business anytime, anywhere with the Surf Seller App. \nDownload now and start selling smarter with Surf.`,
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log('Shared with activity type:', result.activityType);
+        } else {
+          console.log('App link shared successfully!');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log('Share dismissed by user');
+      }
+    } catch (error: any) {
+      console.log('Share error:', error.message);
+    }
+  };
 
   // Menu grouped config
   const menuSections = useMemo(
@@ -315,49 +333,49 @@ const AccountScreen = () => {
               borderRadius: BorderRadius.Full,
             },
           },
-          {
-            label: 'Change Language',
-            leftIcon: (
-              <LanguageIcon
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_100}
-                strokeWidth={2}
-              />
-            ),
-            leftIconBackgroundColor: ColorPalette.SearchBack,
-            leftIconStyles: {
-              borderRadius: BorderRadius.Full,
-            },
-            rightIcon: (
-              <ArrowRightIcon
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_100}
-              />
-            ),
-            onPress: () => { },
-          },
-          {
-            label: 'Change Currency',
-            leftIcon: (
-              <EuroIcon
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_100}
-                size={20}
-                strokeWidth={2}
-              />
-            ),
-            leftIconBackgroundColor: ColorPalette.SearchBack,
-            leftIconStyles: {
-              borderRadius: BorderRadius.Full,
-            },
-            rightIcon: (
-              <ArrowRightIcon
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_100}
-              />
-            ),
-            onPress: () => { },
-          },
+          // {
+          //   label: 'Change Language',
+          //   leftIcon: (
+          //     <LanguageIcon
+          //       style={undefined}
+          //       color={ColorPalette.GREY_TEXT_100}
+          //       strokeWidth={2}
+          //     />
+          //   ),
+          //   leftIconBackgroundColor: ColorPalette.SearchBack,
+          //   leftIconStyles: {
+          //     borderRadius: BorderRadius.Full,
+          //   },
+          //   rightIcon: (
+          //     <ArrowRightIcon
+          //       style={undefined}
+          //       color={ColorPalette.GREY_TEXT_100}
+          //     />
+          //   ),
+          //   onPress: () => { },
+          // },
+          // {
+          //   label: 'Change Currency',
+          //   leftIcon: (
+          //     <EuroIcon
+          //       style={undefined}
+          //       color={ColorPalette.GREY_TEXT_100}
+          //       size={20}
+          //       strokeWidth={2}
+          //     />
+          //   ),
+          //   leftIconBackgroundColor: ColorPalette.SearchBack,
+          //   leftIconStyles: {
+          //     borderRadius: BorderRadius.Full,
+          //   },
+          //   rightIcon: (
+          //     <ArrowRightIcon
+          //       style={undefined}
+          //       color={ColorPalette.GREY_TEXT_100}
+          //     />
+          //   ),
+          //   onPress: () => { },
+          // },
         ],
       },
       {
@@ -381,7 +399,7 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => { },
+            onPress: onShare
           },
           {
             label: 'Surf Chatbot',
@@ -433,6 +451,27 @@ const AccountScreen = () => {
                 style={undefined}
                 color={ColorPalette.GREY_TEXT_100}
                 size={25}
+              />
+            ),
+            leftIconBackgroundColor: ColorPalette.SearchBack,
+            leftIconStyles: {
+              borderRadius: BorderRadius.Full,
+            },
+            rightIcon: (
+              <ArrowRightIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+              />
+            ),
+            onPress: () => { },
+          },
+          {
+            label: 'Terms & Conditions',
+            leftIcon: (
+              <TermsConditionsIcon
+                style={undefined}
+                color={ColorPalette.GREY_TEXT_100}
+                size={24}
               />
             ),
             leftIconBackgroundColor: ColorPalette.SearchBack,
