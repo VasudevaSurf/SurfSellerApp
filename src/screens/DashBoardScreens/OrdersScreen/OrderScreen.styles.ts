@@ -46,7 +46,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: getScreenHeight(20),
-    marginTop: getScreenHeight(18),
+    // height: getScreenHeight(20),
+    marginTop: getScreenHeight(12),
+  },
+  emptyBoxPng: {
+    width: getScreenWidth(45),
+    height: getScreenWidth(45),
+    resizeMode: 'contain',
   },
 });
