@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
     borderTopLeftRadius: BorderRadius.XSmall, // Using enum instead of getFigmaDimension(8)
     borderTopRightRadius: BorderRadius.XSmall, // Using enum instead of getFigmaDimension(8)
-    height:getScreenHeight(90)
+    height:getScreenHeight(91)
   },
   searchContainer: {
     padding: getScreenWidth(4), // Already using getScreenWidth
