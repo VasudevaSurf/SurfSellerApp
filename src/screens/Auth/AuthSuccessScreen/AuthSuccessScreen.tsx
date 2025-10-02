@@ -1,16 +1,17 @@
-import React, {useEffect} from 'react';
-import {Animated, SafeAreaView, View, ScrollView} from 'react-native';
-import {useDispatch} from 'react-redux';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {globalStyles} from '../../../config/globalStyles';
-import {STATIC_TEXT} from '../../../config/staticText';
-import {styles} from './AuthSuccessScreen.styles';
-import {CommonActions} from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { Animated, SafeAreaView, View, ScrollView } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { Typography } from '../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
+import { globalStyles } from '../../../config/globalStyles';
+import { STATIC_TEXT } from '../../../config/staticText';
+import { styles } from './AuthSuccessScreen.styles';
+import { CommonActions } from '@react-navigation/native';
+import SuccessTickIcon from '../../../assets/icons/SuccessTickIcon';
 
 const successTitle = STATIC_TEXT.screens.authSuccess.successTitle;
 
-const AuthSuccessScreen = ({navigation}) => {
+const AuthSuccessScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const scaleValue = new Animated.Value(0);
   const opacityValue = new Animated.Value(0);
@@ -32,14 +33,14 @@ const AuthSuccessScreen = ({navigation}) => {
       // Complete the animation and then update login status
       setTimeout(() => {
         // Update the login status in redux
-        dispatch({type: 'auth/completeLogin'});
+        dispatch({ type: 'auth/completeLogin' });
 
         // Navigate to Dashboard using reset to clear history
         setTimeout(() => {
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
-              routes: [{name: 'Dashboard'}],
+              routes: [{ name: 'Dashboard' }],
             }),
           );
         }, 500);
@@ -48,7 +49,7 @@ const AuthSuccessScreen = ({navigation}) => {
   }, [dispatch, navigation]);
 
   const animatedStyle = {
-    transform: [{scale: scaleValue}],
+    transform: [{ scale: scaleValue }],
     opacity: opacityValue,
   };
 
@@ -58,16 +59,24 @@ const AuthSuccessScreen = ({navigation}) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         bounces={false}>
-        <Animated.Image
+        {/* <Animated.Image
           source={require('../../../assets/images/success.png')}
           style={[styles.successImage, animatedStyle]}
           resizeMode="contain"
-        />
+        /> */}
+        <Animated.View style={[animatedStyle]}>
+          <SuccessTickIcon size={120} />
+        </Animated.View>
         <View style={styles.textContainer}>
           <Typography
             variant={TypographyVariant.H6_BOLD}
             text={successTitle}
             customTextStyles={styles.title}
+          />
+          <Typography
+            variant={TypographyVariant.PSMALL_REGULAR}
+            text={'Welcome back — we’re setting things up for you.'}
+            customTextStyles={styles.desc}
           />
         </View>
       </ScrollView>

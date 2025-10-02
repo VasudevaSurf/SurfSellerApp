@@ -1,8 +1,8 @@
 import React from 'react';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
-import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../config/colorPalette';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Typography } from '../../../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../config/colorPalette';
 import {
   getScreenHeight,
   getScreenWidth,
@@ -69,26 +69,26 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
                   isPassed
                     ? styles.passedCircle
                     : isActive
-                    ? styles.activeCircle
-                    : styles.inactiveCircle,
+                      ? styles.activeCircle
+                      : styles.inactiveCircle,
                 ]}>
                 <Typography
-                  variant={TypographyVariant.PSMALL_REGULAR}
+                  variant={TypographyVariant.LXSMALL_REGULAR}
                   text={String(step.id).padStart(2, '0')}
                   customTextStyles={[
                     styles.stepNumber,
                     isPassed
                       ? styles.passedStepNumber
                       : isActive
-                      ? styles.activeStepNumber
-                      : styles.inactiveStepNumber,
+                        ? styles.activeStepNumber
+                        : styles.inactiveStepNumber,
                   ]}
                 />
               </View>
             </View>
 
             <Typography
-              variant={TypographyVariant.LMEDIUM_SEMIBOLD}
+              variant={TypographyVariant.LXSMALL_MEDIUM}
               text={step.label}
               customTextStyles={[
                 styles.stepLabel,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
     flex: 1,
     display: 'flex',
-    gap: getScreenWidth(2),
+    gap: getScreenWidth(1),
   },
   circleWrapper: {
     position: 'relative',

@@ -1,8 +1,8 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../config/colorPalette';
-import {BorderRadius} from '../../../config/globalStyles';
-import {getScreenWidth} from '../../../helpers/screenSize';
-import {BadgeType, BadgeVariant} from './Badge.types';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../config/colorPalette';
+import { BorderRadius } from '../../../config/globalStyles';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
+import { BadgeType, BadgeVariant } from './Badge.types';
 
 const getBackgroundColor = (type: BadgeType, variant: BadgeVariant) => {
   if (variant === BadgeVariant.GHOST) {
@@ -71,8 +71,8 @@ export const createBadgeStyles = (
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: getScreenWidth(4), // Changed from Spacing.Medium
-      paddingVertical: getScreenWidth(1), // Changed from Spacing.XXSmall
+      // paddingHorizontal: getScreenWidth(4), // Changed from Spacing.Medium
+      // paddingVertical: getScreenWidth(1), // Changed from Spacing.XXSmall
       borderRadius: BorderRadius.Small,
       backgroundColor: getBackgroundColor(type, variant),
       borderWidth: variant === BadgeVariant.OUTLINE ? 1 : 0,
@@ -83,7 +83,8 @@ export const createBadgeStyles = (
     },
     text: {
       color: getTextColor(type, variant, customTextColor),
-      marginHorizontal: getScreenWidth(1), // Changed from Spacing.XXSmall
+      marginHorizontal: getScreenWidth(0.5), // Changed from Spacing.XXSmall
+      paddingVertical: getScreenHeight(0.1),
     },
     icon: {
       marginHorizontal: getScreenWidth(1), // Changed from Spacing.XXSmall

@@ -1,10 +1,10 @@
 // Updated AddProduct.tsx with proper user ID and product ID passing
 
-import React, {useState, useEffect} from 'react';
-import {ScrollView, View, Alert} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useRoute, RouteProp} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, View, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 import ArrowLeftIcon from '../../../../assets/icons/ArrowLeftIcon';
 import {
   Button,
@@ -12,31 +12,31 @@ import {
   ButtonState,
   ButtonVariant,
 } from '../../../../components/UserComponents/Button';
-import {Header} from '../../../../components/UserComponents/Header/Header';
-import {TypographyVariant} from '../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../config/colorPalette';
-import {getScreenHeight} from '../../../../helpers/screenSize';
-import {goBack} from '../../../../navigation/utils/navigationRef';
-import {styles} from './AddProduct.styles';
+import { Header } from '../../../../components/UserComponents/Header/Header';
+import { TypographyVariant } from '../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../config/colorPalette';
+import { getScreenHeight } from '../../../../helpers/screenSize';
+import { goBack } from '../../../../navigation/utils/navigationRef';
+import { styles } from './AddProduct.styles';
 import FeaturesStep from './ProgressStepperPages/FeaturesStepPages/FeaturesStep';
 import InventoryStep from './ProgressStepperPages/InventoryStepPages/InventoryStep';
 import ProductInfoStep from './ProgressStepperPages/ProductInfoPages/ProductInfoStep';
 import ProgressStepper from './ProgressStepperPages/ProgressStepper';
 import UploadMediaStep from './ProgressStepperPages/UploadMediaPages/UploadMediaStep';
 import ArrowLeft from '../../../../assets/icons/ArrowLeft';
-import {RootState} from '../../../../redux/store';
+import { RootState } from '../../../../redux/store';
 import {
   createProductApi,
   updateProductApi,
   transformFormDataToApiFormat,
 } from '../../../../services/apiService';
-import {useCategories} from '../../../../hooks/useCategories';
+import { useCategories } from '../../../../hooks/useCategories';
 
 const STEPS = [
-  {id: 1, label: 'Product Info'},
-  {id: 2, label: 'Upload Media'},
-  {id: 3, label: 'Inventory'},
-  {id: 4, label: 'Variant(s)'},
+  { id: 1, label: 'Product Info' },
+  { id: 2, label: 'Upload Media' },
+  { id: 3, label: 'Inventory' },
+  { id: 4, label: 'Variant(s)' },
 ];
 
 interface RouteParams {
@@ -65,10 +65,14 @@ interface RouteParams {
     countryOfOrigin: string;
     status?: string;
     categoryPath?: string[];
+    category_listing?: {
+      id: number;
+      name: string
+    }
   };
 }
 
-type AddProductRouteProp = RouteProp<{AddProduct: RouteParams}, 'AddProduct'>;
+type AddProductRouteProp = RouteProp<{ AddProduct: RouteParams }, 'AddProduct'>;
 
 interface FormData {
   productId: string;
@@ -95,11 +99,18 @@ interface FormData {
   categoryDisplay?: string;
   // NEW: Add user and product context for image operations
   userId?: string;
+  category_listing: {
+    id: number;
+    name: string;
+  }
+  selectedCategories: { id: string; name: string; path: string[] }[];
 }
 
 const AddProduct = () => {
   const route = useRoute<AddProductRouteProp>();
-  const {productId, editMode = false, productData} = route.params || {};
+  const { productId, editMode = false, productData } = route.params || {};
+  console.log("AddProduct route params:", productData);
+
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,7 +122,7 @@ const AddProduct = () => {
   );
 
   // Use categories hook to get available categories
-  const {categories} = useCategories();
+  const { categories } = useCategories();
 
   // Initialize formData with all required fields and proper defaults
   const [formData, setFormData] = useState<FormData>({
@@ -139,6 +150,11 @@ const AddProduct = () => {
     categoryDisplay: '',
     // NEW: Pass user context for image operations
     userId: userId,
+    category_listing: {
+      id: 0,
+      name: ''
+    },
+    selectedCategories: [] as { id: string; name: string; path: string[] }[],
   });
 
   // Pre-fill form data if in edit mode
@@ -148,6 +164,8 @@ const AddProduct = () => {
         ? productData.images
         : [];
       setOriginalImages(originalImageList);
+
+
 
       setFormData(prevData => ({
         ...prevData,
@@ -181,9 +199,13 @@ const AddProduct = () => {
           : '',
         // NEW: Ensure user context is passed
         userId: userId,
+        category_listing: productData.category_listing || { id: 0, name: '' },
       }));
     }
   }, [editMode, productData, productId, userId]);
+
+  console.log("formData on edit screen", formData);
+
 
   // Update user context when userId changes
   useEffect(() => {
@@ -216,58 +238,59 @@ const AddProduct = () => {
     });
   };
 
-  // const debugImageState = () => {
-  //   console.log('🔍 DEBUG: Current image state before API call:', {
-  //     editMode,
-  //     productId: formData.productId,
-  //     userId: formData.userId,
+  const debugImageState = () => {
+    console.log('🔍 DEBUG: Current image state before API call:', {
+      editMode,
+      productId: formData.productId,
+      userId: formData.userId,
 
-  //     // Original images (what we started with)
-  //     originalImages: {
-  //       count: originalImages.length,
-  //       list: originalImages,
-  //     },
+      // Original images (what we started with)
+      originalImages: {
+        count: originalImages.length,
+        list: originalImages,
+      },
 
-  //     // Current form data images (what's currently shown in UI)
-  //     formDataImages: {
-  //       count: formData.images?.length || 0,
-  //       list: formData.images || [],
-  //     },
+      // Current form data images (what's currently shown in UI)
+      formDataImages: {
+        count: formData.images?.length || 0,
+        list: formData.images || [],
+      },
 
-  //     // Uploaded image paths (new images that were uploaded)
-  //     imageRelativePaths: {
-  //       count: formData.imageRelativePaths?.length || 0,
-  //       list: formData.imageRelativePaths || [],
-  //     },
+      // Uploaded image paths (new images that were uploaded)
+      imageRelativePaths: {
+        count: formData.imageRelativePaths?.length || 0,
+        list: formData.imageRelativePaths || [],
+      },
 
-  //     // What should be sent to API
-  //     shouldSendToAPI: {
-  //       existingImages:
-  //         formData.images?.filter((img: string) => img.startsWith('http')) ||
-  //         [],
-  //       newImages:
-  //         formData.imageRelativePaths?.filter(
-  //           (path: string) => path && !path.startsWith('http'),
-  //         ) || [],
-  //     },
-  //   });
-  // };
+      // What should be sent to API
+      shouldSendToAPI: {
+        existingImages:
+          formData.images?.filter((img: string) => img.startsWith('http')) ||
+          [],
+        newImages:
+          formData.imageRelativePaths?.filter(
+            (path: string) => path && !path.startsWith('http'),
+          ) || [],
+      },
+    });
+  };
 
   const handleSubmit = async () => {
     // Add debug logging
-    // debugImageState();
+    debugImageState();
 
-    // console.log('🚀 Form submitted:', {
-    //   editMode,
-    //   productId: formData.productId,
-    //   userId: formData.userId,
-    //   formData: {
-    //     productName: formData.productName,
-    //     price: formData.price,
-    //     currentImages: formData.images?.length || 0,
-    //     imageRelativePaths: formData.imageRelativePaths?.length || 0,
-    //   },
-    // });
+    console.log('🚀 Form submitted:', {
+      editMode,
+      productId: formData.productId,
+      userId: formData.userId,
+      // formData: {
+      //   productName: formData.productName,
+      //   price: formData.price,
+      //   currentImages: formData.images?.length || 0,
+      //   imageRelativePaths: formData.imageRelativePaths?.length || 0,
+      // },
+      formData
+    });
 
     // Validate required fields
     const requiredFields = ['productName', 'price'];
@@ -316,13 +339,13 @@ const AddProduct = () => {
         originalImages,
       );
 
-      // console.log('🎯 Final API call:', {
-      //   method: editMode ? 'UPDATE' : 'CREATE',
-      //   productId: apiData.product_id,
-      //   productName: apiData.product_data.product,
-      //   imageCount: apiData.image_pair_positon?.length || 0,
-      //   imagePaths: apiData.image_pair_positon || [],
-      // });
+      console.log('🎯 Final API call:', {
+        method: editMode ? 'UPDATE' : 'CREATE',
+        productId: apiData.product_id,
+        productName: apiData.product_data.product,
+        imageCount: apiData.image_pair_positon?.length || 0,
+        imagePaths: apiData.image_pair_positon || [],
+      });
 
       let result;
       if (editMode) {
@@ -352,11 +375,10 @@ const AddProduct = () => {
       Alert.alert(
         editMode ? 'Update Failed' : 'Creation Failed',
         error.message ||
-          `Failed to ${
-            editMode ? 'update' : 'create'
-          } product. Please try again.`,
+        `Failed to ${editMode ? 'update' : 'create'
+        } product. Please try again.`,
         [
-          {text: 'OK', style: 'default'},
+          { text: 'OK', style: 'default' },
           {
             text: 'Retry',
             onPress: () => handleSubmit(),
@@ -485,7 +507,7 @@ const AddProduct = () => {
         leftIcon={
           <ArrowLeft
             style={undefined}
-            size={15}
+            size={22}
             onPress={handleBack}
             color={ColorPalette.GREY_TEXT_400}
           />
@@ -498,7 +520,7 @@ const AddProduct = () => {
         onStepPress={handleStepPress}
       />
 
-      <View style={[styles.mainContainer, {paddingBottom: getScreenHeight(7)}]}>
+      <View style={[styles.mainContainer, { paddingBottom: getScreenHeight(7) }]}>
         <ScrollView
           style={styles.mainContainer}
           contentContainerStyle={[styles.scrollContent]}

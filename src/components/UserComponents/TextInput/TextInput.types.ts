@@ -1,4 +1,4 @@
-import {TextStyle, ViewStyle} from 'react-native';
+import { TextStyle, ViewStyle } from 'react-native';
 
 export interface IconConfig {
   id?: string; // Add this new property
@@ -22,13 +22,13 @@ export interface TextInputProps {
   error?: string;
   secureTextEntry?: boolean;
   keyboardType?:
-    | 'default'
-    | 'number-pad'
-    | 'email-address'
-    | 'phone-pad'
-    | 'password';
+  | 'default'
+  | 'number-pad'
+  | 'email-address'
+  | 'phone-pad'
+  | 'password';
   showCountrySection?: boolean;
-countryCode?: string | React.ReactNode;
+  countryCode?: string | React.ReactNode;
   countryFlag?: string;
   onCountryPress?: () => void;
   type?: 'email' | 'phone' | 'password' | 'default';
@@ -47,5 +47,7 @@ countryCode?: string | React.ReactNode;
   customErrorBorderWidth?: number;
   disabled?: boolean;
   validationEnabled?: boolean; // New prop to control validation
-  required?:boolean // added new prop for optional fields
+  required?: boolean // added new prop for optional fields
+  multiline?: boolean, //new
+  numberOfLines?: number //new
 }

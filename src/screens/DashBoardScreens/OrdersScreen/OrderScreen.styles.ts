@@ -1,6 +1,6 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../config/colorPalette';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   searchContainer: {
@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: getScreenWidth(4),
     paddingVertical: getScreenHeight(1),
-    marginTop: getScreenHeight(1),
+    marginTop: getScreenHeight(0.2),
   },
   scrollContent: {
     gap: getScreenWidth(4),
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
   productContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getScreenWidth(4),
+    gap: getScreenHeight(1.2),
   },
   loadingContainer: {
     flex: 1,
@@ -46,6 +46,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: getScreenHeight(20),
+    // height: getScreenHeight(20),
+    marginTop: getScreenHeight(12),
+  },
+  emptyBoxPng: {
+    width: getScreenWidth(45),
+    height: getScreenWidth(45),
+    resizeMode: 'contain',
   },
 });

@@ -51,12 +51,12 @@ import {
   clearDeleteError,
   clearStatusUpdateError,
 } from '../../../redux/slices/productsSlice';
+import {PriceRangeModal} from '../../../components/MainComponents/PriceRangeModal/PriceRangeModal.tsx';
 import {AppDispatch, RootState} from '../../../redux/store';
 import {styles} from './ProductScreen.styles';
-import FilterIcon from '../../../assets/icons/FilterIcon';
-import {PriceRangeModal} from '../../../components/MainComponents/PriceRangeModal/PriceRangeModal.tsx';
 import EyeOpen from '../../../assets/icons/EyeOpen';
 import EmptyBox from '../../../assets/icons/EmptyBox.tsx';
+import FilterIcon from '../../../assets/icons/FilterIcon.tsx';
 import LoaderIcon, {AnimatedLoader} from '../../../assets/icons/LoaderIcon.tsx';
 
 const ProductScreen = () => {
@@ -665,11 +665,11 @@ const ProductScreen = () => {
                 variant={TypographyVariant.PMEDIUM_SEMIBOLD}
                 customTextStyles={styles.emptyStateText}
               />
-              <Typography
+              {/* <Typography
                 text="Add a product to start selling."
                 variant={TypographyVariant.LSMALL_REGULAR}
                 customTextStyles={styles.emptyStateText}
-              />
+              /> */}
             </View>
           </View>
         );
@@ -682,7 +682,7 @@ const ProductScreen = () => {
             />
             <Typography
               text="No low stocks products found"
-              variant={TypographyVariant.LSMALL_REGULAR}
+              variant={TypographyVariant.PMEDIUM_SEMIBOLD}
               customTextStyles={styles.emptyStateText}
             />
           </View>
@@ -696,7 +696,7 @@ const ProductScreen = () => {
             />
             <Typography
               text="No pending products found"
-              variant={TypographyVariant.LSMALL_REGULAR}
+              variant={TypographyVariant.PMEDIUM_SEMIBOLD}
               customTextStyles={styles.emptyStateText}
             />
           </View>
@@ -710,7 +710,7 @@ const ProductScreen = () => {
             />
             <Typography
               text="No hidden products found"
-              variant={TypographyVariant.LSMALL_REGULAR}
+              variant={TypographyVariant.PMEDIUM_SEMIBOLD}
               customTextStyles={styles.emptyStateText}
             />
           </View>
@@ -725,7 +725,7 @@ const ProductScreen = () => {
             />
             <Typography
               text="No products found"
-              variant={TypographyVariant.LSMALL_REGULAR}
+              variant={TypographyVariant.PMEDIUM_SEMIBOLD}
               customTextStyles={styles.emptyStateText}
             />
           </View>
@@ -960,7 +960,7 @@ const ProductScreen = () => {
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            {paddingBottom: getScreenHeight(4)},
+            {paddingBottom: getScreenHeight(12)},
           ]}
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -1166,24 +1166,25 @@ const ProductScreen = () => {
       />
 
       {/* Floating Add Button (hidden in multi-select mode) */}
-      {!isMultiSelectMode && products.length > 0 && (
-        <TouchableOpacity
-          style={styles.floatingButtonWithText}
-          onPress={() => setShowAddModal(true)}
-          activeOpacity={0.8}>
-          <PlusIcon
-            size={36}
-            color={ColorPalette.White}
-            strokeWidth={2.5}
-            style={{marginRight: 8}}
-          />
-          <Typography
-            text="Add Product"
-            variant={TypographyVariant.LMEDIUM_BOLD}
-            customTextStyles={styles.addProductText}
-          />
-        </TouchableOpacity>
-      )}
+      {!isMultiSelectMode &&
+        (products.length > 0 || selectedFilter.id === 'active') && (
+          <TouchableOpacity
+            style={styles.floatingButtonWithText}
+            onPress={() => setShowAddModal(true)}
+            activeOpacity={0.8}>
+            <PlusIcon
+              size={36}
+              color={ColorPalette.White}
+              strokeWidth={2.5}
+              // style={{marginRight: 8}}
+            />
+            <Typography
+              text="Add Product"
+              variant={TypographyVariant.LMEDIUM_BOLD}
+              customTextStyles={styles.addProductText}
+            />
+          </TouchableOpacity>
+        )}
     </SafeAreaView>
   );
 };

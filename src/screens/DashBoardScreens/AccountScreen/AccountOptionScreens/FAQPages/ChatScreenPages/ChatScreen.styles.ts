@@ -1,10 +1,10 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../../../../config/colorPalette';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../../../../config/colorPalette';
 import {
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../../helpers/screenSize';
-import {BorderRadius} from '../../../../../../config/globalStyles';
+import { BorderRadius } from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -18,28 +18,25 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    gap: getScreenHeight(1.2),
+    gap: getScreenHeight(1),
     paddingHorizontal: getScreenWidth(4),
-  },
-  searchContainer: {
-    padding: getScreenWidth(4),
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: ColorPalette.White,
   },
   messageRow: {
     flexDirection: 'row',
-    gap: getScreenWidth(1.5), // Consistent gap for both user and bot messages
-    position: 'relative',
-    paddingVertical: getScreenHeight(0.5),
+    gap: getScreenWidth(1.5),
+    alignItems: 'flex-end',
+  },
+  diffSenderSpacing: {
+    marginTop: getScreenHeight(2),
   },
   userMessageRow: {
-    justifyContent: 'flex-end',
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-start',
   },
   botMessageRow: {
+    flexDirection: 'row',
     justifyContent: 'flex-start',
   },
   avatarImage: {
@@ -56,19 +53,22 @@ export const styles = StyleSheet.create({
     padding: getScreenHeight(1.5),
     borderRadius: BorderRadius.Medium,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
   },
   botMessageBubble: {
     backgroundColor: ColorPalette.White,
+    borderRadius: BorderRadius.Medium,
+  },
+  botMessageFirstBubble: {
     borderTopLeftRadius: getScreenWidth(1),
   },
   userMessageBubble: {
     backgroundColor: ColorPalette.PURPLE_300,
+    borderRadius: BorderRadius.Medium,
+  },
+  userMessageFirstBubble: {
     borderTopRightRadius: getScreenWidth(1),
   },
   botMessageText: {
@@ -121,14 +121,13 @@ export const styles = StyleSheet.create({
   quickRepliesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingVertical: getScreenHeight(1),
     gap: getScreenWidth(2),
-    paddingLeft: getScreenWidth(9.5),
+    alignItems: 'flex-start',
   },
   quickReplyButton: {
     borderColor: ColorPalette.RED_100,
     borderWidth: 1,
-    borderRadius: BorderRadius.Small,
+    borderRadius: BorderRadius.Full,
     borderStyle: 'dashed',
     paddingHorizontal: getScreenWidth(3),
     paddingVertical: getScreenHeight(1),
@@ -137,17 +136,18 @@ export const styles = StyleSheet.create({
     color: ColorPalette.RED_100,
     textAlign: 'center',
   },
-  userMessageContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
   uploadContainer: {
-    width: getScreenWidth(10),
-    height: getScreenWidth(10),
+    width: getScreenWidth(11),
+    height: getScreenWidth(11),
     borderRadius: BorderRadius.Full,
     backgroundColor: ColorPalette.SearchBack,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  quickRepliesSection: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: getScreenWidth(1.5),
+    marginTop: getScreenHeight(2.2),
   },
 });

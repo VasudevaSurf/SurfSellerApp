@@ -1,6 +1,6 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../config/colorPalette';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
 
 export const slidingBarStyles = StyleSheet.create({
   containerWrapper: {
@@ -23,6 +23,7 @@ export const slidingBarStyles = StyleSheet.create({
   },
   optionText: {
     color: ColorPalette.Black,
+    paddingVertical: getScreenHeight(0.2)
   },
   selectedOptionText: {
     color: ColorPalette.White,

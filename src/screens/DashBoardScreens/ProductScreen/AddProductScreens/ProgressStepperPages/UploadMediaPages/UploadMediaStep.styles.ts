@@ -1,15 +1,15 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 import {
   getScreenWidth,
   getScreenHeight,
 } from '../../../../../../helpers/screenSize';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {BorderRadius} from '../../../../../../config/globalStyles';
+import { ColorPalette } from '../../../../../../config/colorPalette';
+import { BorderRadius } from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: getScreenHeight(2.5),
+    // gap: getScreenHeight(1.2),
     marginBottom: getScreenHeight(2),
     backgroundColor: ColorPalette.SearchBack,
   },
@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingVertical: getScreenHeight(1.5),
     paddingHorizontal: getScreenWidth(4),
-    gap: getScreenWidth(4),
+    gap: getScreenHeight(1.2),
     backgroundColor: ColorPalette.White,
   },
   headerContainer: {

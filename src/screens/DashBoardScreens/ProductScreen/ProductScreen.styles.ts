@@ -1,8 +1,8 @@
 // src/screens/DashBoardScreens/ProductScreen/ProductScreen.styles.ts
 
-import {StyleSheet} from 'react-native';
-import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
-import {ColorPalette} from '../../../config/colorPalette';
+import { StyleSheet } from 'react-native';
+import { getScreenWidth, getScreenHeight } from '../../../helpers/screenSize';
+import { ColorPalette } from '../../../config/colorPalette';
 
 export const styles = StyleSheet.create({
   searchContainer: {
@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingVertical: getScreenHeight(1),
     paddingHorizontal: getScreenWidth(4),
-    marginTop: getScreenHeight(1.5),
+    // marginTop: getScreenHeight(1.2),
   },
   scrollContent: {
     gap: getScreenWidth(4),
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
   ProductContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: getScreenWidth(4),
+    gap: getScreenHeight(1.2),
   },
   modalContainer: {
     marginTop: 'auto',
@@ -49,8 +49,8 @@ export const styles = StyleSheet.create({
     bottom: 20,
     right: 20,
     backgroundColor: ColorPalette.PURPLE_300,
-    width: getScreenWidth(40),
-    height: getScreenHeight(6),
+    width: getScreenWidth(48),
+    height: getScreenHeight(7),
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -64,6 +64,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+    gap: getScreenWidth(1)
   },
   floatingButtonIconOnly: {
     position: 'absolute',
@@ -108,7 +109,7 @@ export const styles = StyleSheet.create({
   emptyStateText: {
     color: ColorPalette.GREY_TEXT_300,
     textAlign: 'center',
-    lineHeight:20
+    lineHeight: 20
   },
   retryButton: {
     marginTop: getScreenHeight(2),
@@ -122,6 +123,7 @@ export const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: getScreenHeight(8),
     // gap: getScreenHeight(2),
   },
   textContainer: {

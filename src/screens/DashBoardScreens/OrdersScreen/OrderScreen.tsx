@@ -1,21 +1,21 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {ScrollView, View, ActivityIndicator} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ScrollView, View, ActivityIndicator, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import BellIcon from '../../../assets/icons/BellIcon';
 import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
-import {OrderInfo} from '../../../components/MainComponents/OrderInfo/OrderInfo';
-import {OrderStatus} from '../../../components/MainComponents/OrderInfo/OrderInfo.types';
-import {Header} from '../../../components/UserComponents/Header/Header';
-import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight} from '../../../helpers/screenSize';
-import {navigate} from '../../../navigation/utils/navigationRef';
-import {styles} from './OrderScreen.styles';
-import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState, AppDispatch} from '../../../redux/store';
+import { OrderInfo } from '../../../components/MainComponents/OrderInfo/OrderInfo';
+import { OrderStatus } from '../../../components/MainComponents/OrderInfo/OrderInfo.types';
+import { Header } from '../../../components/UserComponents/Header/Header';
+import { SearchBox } from '../../../components/UserComponents/SearchBox/SearchBox';
+import { Typography } from '../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../config/colorPalette';
+import { getScreenHeight } from '../../../helpers/screenSize';
+import { navigate } from '../../../navigation/utils/navigationRef';
+import { styles } from './OrderScreen.styles';
+import { SlidingBar } from '../../../components/MainComponents/SlidingBar/SlidingBar';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../../../redux/store';
 import {
   fetchOrders,
   searchOrders,
@@ -33,7 +33,7 @@ import AnimatedLoader from '../../../assets/icons/LoaderIcon';
 
 // Map API status codes to display status
 const convertOrderStatus = (apiStatus: string): OrderStatus => {
-  const statusMap: {[key: string]: OrderStatus} = {
+  const statusMap: { [key: string]: OrderStatus } = {
     O: 'Pending',
     P: 'Processing',
     C: 'Completed',
@@ -50,7 +50,7 @@ const convertOrderStatus = (apiStatus: string): OrderStatus => {
 
 // Map display status back to API status codes
 const convertStatusToApi = (displayStatus: OrderStatus): string => {
-  const statusMap: {[key: string]: string} = {
+  const statusMap: { [key: string]: string } = {
     Pending: 'O',
     Processing: 'P',
     Completed: 'C',
@@ -67,7 +67,7 @@ const convertStatusToApi = (displayStatus: OrderStatus): string => {
 const getApiStatusFromFilter = (filterId: string): string | undefined => {
   if (filterId === 'all') return undefined;
 
-  const filterToApiMap: {[key: string]: string} = {
+  const filterToApiMap: { [key: string]: string } = {
     pending: 'O',
     processing: 'P',
     completed: 'C',
@@ -128,20 +128,20 @@ const OrderScreen = () => {
   const [showFilterModal, setShowFilterModal] = useState(false); // added for filter icon
 
   // Debugging: Log userId and orders
-  // useEffect(() => {
-  //   console.log('OrderScreen - userId:', userId);
-  //   console.log('OrderScreen - Orders received:', orders?.length || 0);
+  useEffect(() => {
+    console.log('OrderScreen - userId:', userId);
+    console.log('OrderScreen - Orders received:', orders?.length || 0);
 
-  //   if (orders && orders.length > 0) {
-  //     console.log('OrderScreen - First order:', orders[0]);
-  //   }
-  // }, [userId, orders]);
+    if (orders && orders.length > 0) {
+      console.log('OrderScreen - First order:', orders[0]);
+    }
+  }, [userId, orders]);
 
   // Initialize orders fetch
   useEffect(() => {
     if (userId) {
       const apiStatus = getApiStatusFromFilter(statusFilter);
-      dispatch(fetchOrders({userId, status: apiStatus}));
+      dispatch(fetchOrders({ userId, status: apiStatus }));
     }
   }, [dispatch, userId]);
 
@@ -178,19 +178,31 @@ const OrderScreen = () => {
 
   // Define filter options
   const filterOptions = [
-    {id: 'all', label: 'All'},
-    {id: 'pending', label: 'Pending'},
-    {id: 'processing', label: 'Processing'},
-    {id: 'completed', label: 'Completed'},
-    {id: 'shipped', label: 'Shipped'},
-    {id: 'cancelled', label: 'Cancelled'},
-    {id: 'failed', label: 'Failed'},
-    {id: 'declined', label: 'Declined'},
+    { id: 'all', label: 'All' },
+    { id: 'pending', label: 'Pending' },
+    { id: 'processing', label: 'Processing' },
+    { id: 'completed', label: 'Completed' },
+    { id: 'shipped', label: 'Shipped' },
+    { id: 'cancelled', label: 'Cancelled' },
+    { id: 'failed', label: 'Failed' },
+    { id: 'declined', label: 'Declined' },
   ];
 
-  const selectedFilter =
+  const [selectedFilter, setSelectedFilter] = useState(
     filterOptions.find(option => option.id === statusFilter) ||
-    filterOptions[0];
+    filterOptions[0],
+  );
+
+
+  // Update selected filter when statusFilter changes
+  useEffect(() => {
+    const newSelectedFilter = filterOptions.find(
+      option => option.id === statusFilter,
+    );
+    if (newSelectedFilter) {
+      setSelectedFilter(newSelectedFilter);
+    }
+  }, [statusFilter]);
 
   // Handle search with debouncing
   const handleSearchTextChange = useCallback(
@@ -206,12 +218,12 @@ const OrderScreen = () => {
       const timeoutId = setTimeout(() => {
         if (userId) {
           if (text.trim()) {
-            dispatch(searchOrders({userId, searchTerm: text}));
+            dispatch(searchOrders({ userId, searchTerm: text }));
           } else {
             // Clear search, fetch with current filter
             const apiStatus = getApiStatusFromFilter(statusFilter);
 
-            dispatch(fetchOrders({userId, status: apiStatus}));
+            dispatch(fetchOrders({ userId, status: apiStatus }));
           }
         }
       }, 500); // 500ms debounce
@@ -225,11 +237,11 @@ const OrderScreen = () => {
   const handleSearch = useCallback(() => {
     if (userId) {
       if (searchText.trim()) {
-        dispatch(searchOrders({userId, searchTerm: searchText}));
+        dispatch(searchOrders({ userId, searchTerm: searchText }));
       } else {
         const apiStatus = getApiStatusFromFilter(statusFilter);
 
-        dispatch(fetchOrders({userId, status: apiStatus}));
+        dispatch(fetchOrders({ userId, status: apiStatus }));
       }
     }
   }, [dispatch, userId, searchText, statusFilter]);
@@ -245,13 +257,13 @@ const OrderScreen = () => {
 
         const apiStatus = convertStatusToApi(newStatus);
         await dispatch(
-          updateOrderStatus({userId, orderId, status: apiStatus}),
+          updateOrderStatus({ userId, orderId, status: apiStatus }),
         ).unwrap();
 
         // Refresh orders list after successful update
         setTimeout(() => {
           const currentApiStatus = getApiStatusFromFilter(statusFilter);
-          dispatch(fetchOrders({userId: userId!, status: currentApiStatus}));
+          dispatch(fetchOrders({ userId: userId!, status: currentApiStatus }));
         }, 1000);
       } catch (error: any) {
         console.error('Failed to update order status:', error);
@@ -263,13 +275,13 @@ const OrderScreen = () => {
 
   // Handle filter selection
   const handleFilterSelect = useCallback(
-    (filter: {id: string; label: string}) => {
+    (filter: { id: string; label: string }) => {
       dispatch(setStatusFilter(filter.id));
 
       if (userId) {
         const apiStatus = getApiStatusFromFilter(filter.id);
 
-        dispatch(fetchOrders({userId, status: apiStatus}));
+        dispatch(fetchOrders({ userId, status: apiStatus }));
       }
     },
     [dispatch, userId],
@@ -320,7 +332,7 @@ const OrderScreen = () => {
   );
 
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Header
         name="Orders"
         variant={TypographyVariant.H6_BOLD}
@@ -331,7 +343,7 @@ const OrderScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'NotificationScreen'},
+                params: { screen: 'NotificationScreen' },
               }),
             size: 22,
             color: ColorPalette.IconColor,
@@ -377,7 +389,7 @@ const OrderScreen = () => {
           <Typography
             text={`Error updating status: ${statusUpdateError}`}
             variant={TypographyVariant.PSMALL_MEDIUM}
-            customTextStyles={{color: '#C62828'}}
+            customTextStyles={{ color: '#C62828' }}
           />
         </View>
       )}
@@ -399,7 +411,7 @@ const OrderScreen = () => {
           <Typography
             text={`Error: ${error}`}
             variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{color: ColorPalette.RED_200}}
+            customTextStyles={{ color: ColorPalette.RED_200 }}
           />
         </View>
       ) : (
@@ -407,7 +419,7 @@ const OrderScreen = () => {
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            {paddingBottom: getScreenHeight(4)},
+            { paddingBottom: getScreenHeight(4) },
           ]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.productContainer}>
@@ -434,10 +446,14 @@ const OrderScreen = () => {
               ))
             ) : (
               <View style={styles.emptyContainer}>
+                <Image
+                  source={require('../../../assets/images/emptyBox.png')}
+                  style={styles.emptyBoxPng}
+                />
                 <Typography
                   text="No orders found"
-                  variant={TypographyVariant.PMEDIUM_REGULAR}
-                  customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
+                  variant={TypographyVariant.PMEDIUM_SEMIBOLD}
+                  customTextStyles={{ color: ColorPalette.GREY_TEXT_400 }}
                 />
                 {searchText.trim() && (
                   <Typography

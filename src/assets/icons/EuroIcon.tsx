@@ -10,7 +10,7 @@ type EuroIconProps = {
 };
 
 const EuroIcon: React.FC<EuroIconProps> = ({
-  size = 24,
+  size = 16,
   style,
   color = ColorPalette.GREY_TEXT_400,
   strokeWidth = 1.5,

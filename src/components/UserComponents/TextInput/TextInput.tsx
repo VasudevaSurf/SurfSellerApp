@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -9,14 +9,14 @@ import {
   View,
 } from 'react-native';
 import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
-import {ColorPalette} from '../../../config/colorPalette';
-import {Spacing} from '../../../config/globalStyles';
-import {getScreenHeight} from '../../../helpers/screenSize';
-import {Typography} from '../Typography/Typography';
-import {TypographyVariant} from '../Typography/Typography.types';
-import {createStyles} from './TextInput.styles';
-import {TextInputProps} from './TextInput.types';
-import {validateInput} from './TextInput.utils';
+import { ColorPalette } from '../../../config/colorPalette';
+import { Spacing } from '../../../config/globalStyles';
+import { getScreenHeight } from '../../../helpers/screenSize';
+import { Typography } from '../Typography/Typography';
+import { TypographyVariant } from '../Typography/Typography.types';
+import { createStyles } from './TextInput.styles';
+import { TextInputProps } from './TextInput.types';
+import { validateInput } from './TextInput.utils';
 import EyeClose from '../../../assets/icons/EyeClose';
 import EyeOpen from '../../../assets/icons/EyeOpen';
 import EuroIcon from '../../../assets/icons/EuroIcon';
@@ -84,6 +84,9 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   disabled = false,
   validationEnabled = true, // New prop with default value true
   required = true, //
+  required = true, //new 
+  multiline = false, //new 
+  numberOfLines = 1 //new 
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -148,7 +151,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
   };
 
   const handleCountrySectionLayout = (event: LayoutChangeEvent) => {
-    const {width} = event.nativeEvent.layout;
+    const { width } = event.nativeEvent.layout;
     setCountrySectionWidth(width);
   };
 
@@ -264,7 +267,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
             {countryFlag && (
               <>
                 <Image
-                  source={{uri: countryFlag}}
+                  source={{ uri: countryFlag }}
                   style={styles.countryFlag}
                   resizeMode="contain"
                 />
@@ -307,7 +310,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
               disabled={!iconConfig.onPress}>
               {typeof iconConfig.icon === 'string' ? (
                 <Image
-                  source={{uri: iconConfig.icon}}
+                  source={{ uri: iconConfig.icon }}
                   style={styles.iconSize}
                   resizeMode="contain"
                 />
@@ -374,7 +377,7 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
               disabled={!iconConfig.onPress}>
               {typeof iconConfig.icon === 'string' ? (
                 <Image
-                  source={{uri: iconConfig.icon}}
+                  source={{ uri: iconConfig.icon }}
                   style={styles.iconSize}
                   resizeMode="contain"
                 />
@@ -411,16 +414,18 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
         style={[
           getInputContainerStyle(),
           {
-            borderColor: shouldShowError
-              ? customErrorBorderColor || ColorPalette.RED_100
-              : isFocused
-              ? customFocusedBorderColor || ColorPalette.GREY_TEXT_400
-              : customBorderColor || ColorPalette.GREY_100,
-            borderWidth: shouldShowError
-              ? customErrorBorderWidth
-              : isFocused
-              ? customFocusedBorderWidth
-              : customBorderWidth,
+            borderColor:
+              error || localError
+                ? customErrorBorderColor || ColorPalette.RED_100
+                : isFocused
+                  ? customFocusedBorderColor || ColorPalette.GREY_TEXT_400
+                  : customBorderColor || ColorPalette.GREY_100,
+            borderWidth:
+              error || localError
+                ? customErrorBorderWidth
+                : isFocused
+                  ? customFocusedBorderWidth
+                  : customBorderWidth,
           },
         ]}>
         {renderLeftSection()}
@@ -437,6 +442,8 @@ const AnimatedTextInput: React.FC<TextInputProps> = ({
             keyboardType={keyboardType}
             placeholder={isFocused || value ? placeholder : ''}
             editable={!disabled}
+            multiline={multiline}
+            numberOfLines={numberOfLines}
           />
         </View>
         {renderRightSection()}

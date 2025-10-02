@@ -1,4 +1,4 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
   fetchProductsApi,
   fetchProductDetailsApi,
@@ -81,17 +81,18 @@ export const fetchProducts = createAsyncThunk(
       userId: string;
       filters?: ProductFilters;
     },
-    {rejectWithValue},
+    { rejectWithValue },
   ) => {
     try {
-      console.log('fetchProducts thunk called with:', {userId, filters});
       const response = await fetchProductsApi(userId, filters);
+
       return {
         products: response.products,
         totalItems: parseInt(response.total_items),
         page: filters?.page || 1,
         filter: filters?.status || 'all',
       };
+
     } catch (error: any) {
       console.error('fetchProducts thunk error:', error);
       return rejectWithValue(error.message || 'Failed to fetch products');
@@ -112,7 +113,7 @@ export const fetchProductsByStatus = createAsyncThunk(
       status: 'A' | 'P' | 'D';
       page?: number;
     },
-    {rejectWithValue},
+    { rejectWithValue },
   ) => {
     try {
       console.log('fetchProductsByStatus thunk called with:', {
@@ -149,7 +150,7 @@ export const fetchLowStockProducts = createAsyncThunk(
       threshold?: number;
       page?: number;
     },
-    {rejectWithValue},
+    { rejectWithValue },
   ) => {
     try {
       console.log('fetchLowStockProducts thunk called with:', {
@@ -186,7 +187,7 @@ export const searchProducts = createAsyncThunk(
       searchTerm: string;
       filters?: ProductFilters;
     },
-    {rejectWithValue},
+    { rejectWithValue },
   ) => {
     try {
       console.log('searchProducts thunk called with:', {
@@ -212,9 +213,9 @@ export const searchProducts = createAsyncThunk(
 // Thunk to fetch filter counts
 export const fetchFilterCounts = createAsyncThunk(
   'products/fetchFilterCounts',
-  async ({userId}: {userId: string}, {rejectWithValue}) => {
+  async ({ userId }: { userId: string }, { rejectWithValue }) => {
     try {
-      console.log('fetchFilterCounts thunk called with:', {userId});
+      console.log('fetchFilterCounts thunk called with:', { userId });
 
       // Fetch counts for each filter in parallel
       const [
@@ -224,7 +225,7 @@ export const fetchFilterCounts = createAsyncThunk(
         disabledResponse,
         lowStockResponse,
       ] = await Promise.allSettled([
-        fetchProductsApi(userId, {status: 'all', page: 1, itemsPerPage: 1}),
+        fetchProductsApi(userId, { status: 'all', page: 1, itemsPerPage: 1 }),
         fetchProductsByStatusApi(userId, 'A', 1, 1),
         fetchProductsByStatusApi(userId, 'P', 1, 1),
         fetchProductsByStatusApi(userId, 'D', 1, 1),
@@ -258,8 +259,8 @@ export const fetchFilterCounts = createAsyncThunk(
 export const fetchProductDetails = createAsyncThunk(
   'products/fetchProductDetails',
   async (
-    {userId, productId}: {userId: string; productId: string},
-    {rejectWithValue},
+    { userId, productId }: { userId: string; productId: string },
+    { rejectWithValue },
   ) => {
     try {
       console.log('🔍 Fetching product details for editing:', {
@@ -376,7 +377,7 @@ export const updateProductStatus = createAsyncThunk(
       productId: string;
       isActive: boolean;
     },
-    {rejectWithValue},
+    { rejectWithValue },
   ) => {
     try {
       console.log('updateProductStatus thunk called with:', {
@@ -422,7 +423,7 @@ export const updateMultipleProductsStatus = createAsyncThunk(
       productIds: string[];
       status: 'A' | 'D' | 'H' | 'X';
     },
-    {rejectWithValue},
+    { rejectWithValue },
   ) => {
     try {
       console.log('updateMultipleProductsStatus thunk called with:', {
@@ -466,10 +467,10 @@ export const deleteProduct = createAsyncThunk(
       userId: string;
       productIds: string | string[];
     },
-    {rejectWithValue},
+    { rejectWithValue },
   ) => {
     try {
-      console.log('deleteProduct thunk called with:', {userId, productIds});
+      console.log('deleteProduct thunk called with:', { userId, productIds });
 
       const response = await deleteProductApi(userId, productIds);
 
@@ -501,7 +502,7 @@ export const deleteMultipleProducts = createAsyncThunk(
       userId: string;
       productIds: string[];
     },
-    {rejectWithValue},
+    { rejectWithValue },
   ) => {
     try {
       console.log('deleteMultipleProducts thunk called with:', {
@@ -556,7 +557,7 @@ const productsSlice = createSlice({
     },
     // Local status update for optimistic UI
     updateProductStatusLocal: (state, action) => {
-      const {productId, status} = action.payload;
+      const { productId, status } = action.payload;
       const productIndex = state.products.findIndex(
         p => p.product_id === productId,
       );
@@ -715,7 +716,7 @@ const productsSlice = createSlice({
       // Update Product Status Cases
       .addCase(updateProductStatus.pending, (state, action) => {
         console.log('updateProductStatus.pending');
-        const {productId} = action.meta.arg;
+        const { productId } = action.meta.arg;
 
         // Add product to updating list
         if (!state.updatingStatus.includes(productId)) {
@@ -726,7 +727,7 @@ const productsSlice = createSlice({
       .addCase(updateProductStatus.fulfilled, (state, action) => {
         console.log('updateProductStatus.fulfilled with:', action.payload);
 
-        const {productId, newStatus} = action.payload;
+        const { productId, newStatus } = action.payload;
 
         // Update product status in local state
         const productIndex = state.products.findIndex(
@@ -746,7 +747,7 @@ const productsSlice = createSlice({
       .addCase(updateProductStatus.rejected, (state, action) => {
         console.log('updateProductStatus.rejected with:', action.payload);
 
-        const {productId} = action.meta.arg;
+        const { productId } = action.meta.arg;
 
         // Remove from updating list
         state.updatingStatus = state.updatingStatus.filter(
@@ -759,7 +760,7 @@ const productsSlice = createSlice({
       // Update Multiple Products Status Cases
       .addCase(updateMultipleProductsStatus.pending, (state, action) => {
         console.log('updateMultipleProductsStatus.pending');
-        const {productIds} = action.meta.arg;
+        const { productIds } = action.meta.arg;
 
         // Add products to updating list
         productIds.forEach(id => {
@@ -775,7 +776,7 @@ const productsSlice = createSlice({
           action.payload,
         );
 
-        const {productIds, newStatus} = action.payload;
+        const { productIds, newStatus } = action.payload;
 
         // Update products status in local state
         productIds.forEach(productId => {
@@ -800,7 +801,7 @@ const productsSlice = createSlice({
           action.payload,
         );
 
-        const {productIds} = action.meta.arg;
+        const { productIds } = action.meta.arg;
 
         // Remove from updating list
         state.updatingStatus = state.updatingStatus.filter(
@@ -824,7 +825,7 @@ const productsSlice = createSlice({
       .addCase(deleteProduct.fulfilled, (state, action) => {
         console.log('deleteProduct.fulfilled with:', action.payload);
 
-        const {deletedProductIds} = action.payload;
+        const { deletedProductIds } = action.payload;
 
         // Remove products from local state
         state.products = state.products.filter(
@@ -862,7 +863,7 @@ const productsSlice = createSlice({
       // Delete Multiple Products Cases
       .addCase(deleteMultipleProducts.pending, (state, action) => {
         console.log('deleteMultipleProducts.pending');
-        const {productIds} = action.meta.arg;
+        const { productIds } = action.meta.arg;
 
         // Add products to deleting list
         state.deletingProducts = [...state.deletingProducts, ...productIds];
@@ -871,7 +872,7 @@ const productsSlice = createSlice({
       .addCase(deleteMultipleProducts.fulfilled, (state, action) => {
         console.log('deleteMultipleProducts.fulfilled with:', action.payload);
 
-        const {deletedProductIds} = action.payload;
+        const { deletedProductIds } = action.payload;
 
         // Remove products from local state
         state.products = state.products.filter(
@@ -895,7 +896,7 @@ const productsSlice = createSlice({
         console.log('deleteMultipleProducts.rejected with:', action.payload);
 
         // Remove from deleting list on error
-        const {productIds} = action.meta.arg;
+        const { productIds } = action.meta.arg;
         state.deletingProducts = state.deletingProducts.filter(
           id => !productIds.includes(id),
         );

@@ -1,6 +1,6 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenWidth, getScreenHeight} from '../../../helpers/screenSize';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../config/colorPalette';
+import { getScreenWidth, getScreenHeight } from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
@@ -36,6 +36,7 @@ export const styles = StyleSheet.create({
   productNameText: {
     color: ColorPalette.GREY_TEXT_300,
     flexShrink: 1,
+    paddingVertical: getScreenHeight(0.2)
   },
   iconContainer: {
     flexDirection: 'row',

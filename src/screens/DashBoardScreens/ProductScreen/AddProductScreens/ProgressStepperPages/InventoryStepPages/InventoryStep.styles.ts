@@ -1,15 +1,15 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../../../../config/colorPalette';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../../../../config/colorPalette';
 import {
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../../helpers/screenSize';
-import {BorderRadius, Spacing} from '../../../../../../config/globalStyles';
+import { BorderRadius, Spacing } from '../../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
     display: 'flex',
-    gap: Spacing.Small,
+    gap: getScreenHeight(1.2),
     marginBottom: Spacing.Medium,
     backgroundColor: ColorPalette.SearchBack,
     paddingBottom: getScreenHeight(8),
@@ -58,7 +58,7 @@ export const styles = StyleSheet.create({
     marginRight: Spacing.Medium,
   },
   toggleContainer: {
-    height: getScreenHeight(4),
+    height: getScreenHeight(7),
     backgroundColor: ColorPalette.White,
     borderRadius: BorderRadius.Medium,
     gap: Spacing.XSmall,
@@ -66,8 +66,8 @@ export const styles = StyleSheet.create({
   },
   toggleButton: {
     borderRadius: BorderRadius.Full,
-    paddingVertical: Spacing.XSmall,
-    paddingHorizontal: Spacing.XXLarge,
+    paddingVertical: Spacing.Medium,
+    paddingHorizontal: Spacing.XXXLarge,
     borderWidth: 1,
     borderColor: ColorPalette.GREY_TEXT_100,
   },

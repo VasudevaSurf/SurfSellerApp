@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, {Path, G, Defs, ClipPath, Rect} from 'react-native-svg';
 
 const ImageUploadIcon = ({
-  size = 16,
+  size = 24,
   color = '#606060',
   strokeWidth = 1,
   style,

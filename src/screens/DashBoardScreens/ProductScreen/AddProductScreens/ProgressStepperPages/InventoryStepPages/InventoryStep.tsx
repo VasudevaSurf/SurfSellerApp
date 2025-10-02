@@ -1,13 +1,13 @@
-import React, {useState, useEffect, useMemo} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import CheckIcon from '../../../../../../assets/icons/CheckIcon';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import ToggleButtons from '../../../../../../components/MainComponents/ToggleButtons/ToggleButtons';
 import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {styles} from './InventoryStep.styles';
+import { Typography } from '../../../../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../../config/colorPalette';
+import { styles } from './InventoryStep.styles';
 import {
   Button,
   ButtonSize,
@@ -16,7 +16,7 @@ import {
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button';
 import PlusIcon from '../../../../../../assets/icons/PlusIcon';
-import {BorderRadius, Spacing} from '../../../../../../config/globalStyles';
+import { BorderRadius, Spacing } from '../../../../../../config/globalStyles';
 import {
   getScreenHeight,
   getScreenWidth,
@@ -25,9 +25,9 @@ import {
   BadgeType,
   BadgeVariant,
 } from '../../../../../../components/UserComponents/Badges/Badge.types';
-import {Badge} from '../../../../../../components/UserComponents/Badges/Badge';
-import {TrashIcon2} from '../../../../../../assets/icons/NewProductIcons/TrashIcon2';
-import {AddModal} from '../../../../../../components/MainComponents/AddModal/AddModal';
+import { Badge } from '../../../../../../components/UserComponents/Badges/Badge';
+import { TrashIcon2 } from '../../../../../../assets/icons/NewProductIcons/TrashIcon2';
+import { AddModal } from '../../../../../../components/MainComponents/AddModal/AddModal';
 import Dropdown from '../../../../../../components/MainComponents/DropdownModal/Dropdown';
 
 interface InventoryStepProps {
@@ -80,37 +80,37 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
   // Update form data when values change
   const handleProductCodeChange = (text: string) => {
     setProductCode(text);
-    updateFormData({productCode: text});
+    updateFormData({ productCode: text });
   };
 
   const handleQualityStockChange = (text: string) => {
     setQualityStock(text);
-    updateFormData({quantity: text});
+    updateFormData({ quantity: text });
   };
 
   const handleMinQuantityChange = (text: string) => {
     setMinQuantity(text);
-    updateFormData({minQuantity: text});
+    updateFormData({ minQuantity: text });
   };
 
   const handleMaxQuantityChange = (text: string) => {
     setMaxQuantity(text);
-    updateFormData({maxQuantity: text});
+    updateFormData({ maxQuantity: text });
   };
 
   const handleAvailableQuantityChange = (text: string) => {
     setAvailableQuantity(text);
-    updateFormData({availableQuantity: text});
+    updateFormData({ availableQuantity: text });
   };
 
   const handleTrackInventoryChange = (value: string) => {
     setTrackInventory(value);
-    updateFormData({trackInventory: value === 'yes'});
+    updateFormData({ trackInventory: value === 'yes' });
   };
 
   const handleVatChange = (checked: boolean) => {
     setVatChecked(checked);
-    updateFormData({taxType: checked ? 'VAT' : ''});
+    updateFormData({ taxType: checked ? 'VAT' : '' });
   };
 
   const handleAddDiscount = () => {
@@ -133,7 +133,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
     value: string,
   ) => {
     setDiscounts(prev =>
-      prev.map(item => (item.id === id ? {...item, [field]: value} : item)),
+      prev.map(item => (item.id === id ? { ...item, [field]: value } : item)),
     );
   };
 
@@ -147,7 +147,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
     value: 'Percentage' | 'Absolute',
   ) => {
     setDiscounts(prev =>
-      prev.map(d => (d.id === id ? {...d, discountType: value} : d)),
+      prev.map(d => (d.id === id ? { ...d, discountType: value } : d)),
     );
   };
 
@@ -189,8 +189,8 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
   );
 
   const DISCOUNT_TYPE_OPTIONS = [
-    {value: 'Percentage', label: 'Percentage (%)'},
-    {value: 'Absolute', label: 'Absolute (€)'},
+    { value: 'Percentage', label: 'Percentage (%)' },
+    { value: 'Absolute', label: 'Absolute (€)' },
   ];
 
   return (
@@ -200,7 +200,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
           <Typography
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
             text="Inventory"
-            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
           <InfoIconPay
             size={22}
@@ -277,7 +277,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
         <Typography
           text="Tax"
           variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-          customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+          customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
         />
         <View style={styles.checkBoxContainer}>
           <TouchableOpacity
@@ -299,7 +299,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
             <Typography
               text="VAT"
               variant={TypographyVariant.PMEDIUM_REGULAR}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
             />
           </TouchableOpacity>
         </View>
@@ -318,7 +318,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
             <Typography
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
               text="Quantity Discount"
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
             />
             <InfoIconPay
               size={22}
@@ -331,26 +331,40 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
             textVariant={TypographyVariant.H6_MEDIUM}
             customTextStyles={{
               color: ColorPalette.GREY_TEXT_500,
-              paddingLeft: 16,
+              // paddingLeft: 16,
+              // width:
+              //   discounts.length === 0
+              //     ? getScreenWidth(20)
+              //     : getScreenWidth(30),
             }}
             onPress={handleAddDiscount}
             activeOpacity={0.7}
             type={ButtonType.OUTLINED}
             customStyles={{
-              width:
-                discounts.length === 0
-                  ? getScreenWidth(30)
-                  : getScreenWidth(38),
-              height: getScreenWidth(10),
+              // width:
+              //   discounts.length === 0
+              //     ? getScreenWidth(36)
+              //     : getScreenWidth(46),
+              height: getScreenWidth(12),
               borderRadius: BorderRadius.Small,
-              justifyContent: 'center',
-              alignItems: 'center',
+              // justifyContent: 'center',
+              // alignItems: 'center',
               borderWidth: 1,
               borderColor: ColorPalette.GREY_TEXT_500,
+              ...(discounts.length === 0
+                ? {
+                  paddingLeft: getScreenWidth(8),
+                  paddingRight: getScreenWidth(6),
+                }
+                : {
+                  paddingLeft: getScreenWidth(6),
+                  paddingRight: getScreenWidth(4),
+                }),
+
             }}
             IconComponent={PlusIcon}
             iconProps={{
-              size: 30,
+              size: 28,
               color: ColorPalette.GREY_TEXT_400,
               strokeWidth: 1.5,
             }}

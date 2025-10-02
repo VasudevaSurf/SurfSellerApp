@@ -1,17 +1,17 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../config/colorPalette';
-import {Spacing} from '../../../config/globalStyles';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../config/colorPalette';
+import { Spacing } from '../../../config/globalStyles';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     flexDirection: 'column',
-    paddingVertical: getScreenHeight(2),
+    paddingVertical: getScreenHeight(1.2),
     paddingHorizontal: getScreenHeight(2),
   },
   scrollContent: {
-    gap: getScreenHeight(2),
+    gap: getScreenHeight(1.2),
   },
   verifyContainer: {
     flexDirection: 'column',
@@ -109,6 +109,11 @@ export const styles = StyleSheet.create({
   salesTwo: {
     flexDirection: 'column',
     flexShrink: 1, // Allow content to shrink
+  },
+  rowSection: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   iconBack: {
     borderRadius: getScreenWidth(2),
@@ -258,7 +263,7 @@ export const styles = StyleSheet.create({
   },
   twoContainer: {
     flexDirection: 'row',
-    gap: getScreenWidth(3), // Reduced gap
+    gap: getScreenWidth(2.2), // Reduced gap
     alignItems: 'center',
     justifyContent: 'flex-start', // Changed to flex-start for better alignment
     flexShrink: 1, // Allow content to shrink
@@ -280,5 +285,15 @@ export const styles = StyleSheet.create({
   },
   buttonStyles: {
     borderRadius: Spacing.XLarge,
+  },
+  emptyBoxPng: {
+    width: getScreenWidth(45),
+    height: getScreenWidth(45),
+    resizeMode: 'contain',
+    marginBottom: getScreenHeight(-1)
+  },
+  emptyStateText: {
+    // color: ColorPalette.GREY_TEXT_300,
+    textAlign: 'center',
   },
 });

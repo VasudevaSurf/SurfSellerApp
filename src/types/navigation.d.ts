@@ -33,6 +33,7 @@ export type DashboardStackParamList = {
     screen?: string;
     params?: object;
   };
+  MainTabs: undefined;
 };
 
 export type RootStackParamList = {
@@ -72,7 +73,7 @@ export type ProductNavigator = {
   ProductsPage: undefined;
   AddProduct: undefined;
   CategoryScreen: undefined;
-  ProductDetails: {productId: string};
+  ProductDetails: { productId: string };
 };
 
 export type HomeNavigator = {
@@ -84,6 +85,6 @@ export type HomeNavigator = {
 
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
+    interface RootParamList extends RootStackParamList { }
   }
 }

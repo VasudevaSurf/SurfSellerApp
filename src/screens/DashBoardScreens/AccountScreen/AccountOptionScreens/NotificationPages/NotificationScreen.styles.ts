@@ -1,10 +1,10 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../../../config/colorPalette';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../../../config/colorPalette';
 import {
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
-import {BorderRadius, Spacing} from '../../../../../config/globalStyles';
+import { BorderRadius, Spacing } from '../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    gap: getScreenHeight(1.5),
+    gap: getScreenHeight(1.2),
     paddingBottom: getScreenHeight(2),
   },
 
@@ -79,6 +79,7 @@ export const styles = StyleSheet.create({
   // ==========================================================
   // 🔹 Tab Bar as segmented buttons
   tabBarContainer: {
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: ColorPalette.White,
@@ -88,14 +89,16 @@ export const styles = StyleSheet.create({
     paddingHorizontal: getScreenWidth(4),
     marginBottom: getScreenHeight(1.8),
     marginTop: getScreenWidth(0),
-    gap: Spacing.XSmall,
+    gap: Spacing.XXSmall,
   },
   tabButton: {
-    flex: 1,
+    // flex: 1,
+    paddingHorizontal: getScreenWidth(6),
     alignItems: 'center',
-    paddingVertical: getScreenHeight(1.2),
+    paddingVertical: getScreenHeight(2),
     borderRadius: BorderRadius.Small,
     backgroundColor: ColorPalette.SearchBack,
+    // minWidth: getScreenWidth(20),
   },
   activeTabButton: {
     backgroundColor: ColorPalette.Black,
@@ -109,7 +112,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: getScreenWidth(4),
     marginBottom: getScreenHeight(1.5),
     shadowColor: 'rgba(16, 24, 40, 0.08)',
-    shadowOffset: {width: 0, height: 6},
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 1,
     shadowRadius: BorderRadius.Medium,
     elevation: 12,
@@ -197,3 +200,4 @@ export const styles = StyleSheet.create({
     padding: getScreenWidth(5),
   },
 });
+

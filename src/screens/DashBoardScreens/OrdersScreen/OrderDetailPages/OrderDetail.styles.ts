@@ -1,7 +1,7 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../../config/colorPalette';
-import {BorderRadius, Spacing} from '../../../../config/globalStyles';
-import {getScreenHeight, getScreenWidth} from '../../../../helpers/screenSize';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../../config/colorPalette';
+import { BorderRadius, Spacing } from '../../../../config/globalStyles';
+import { getScreenHeight, getScreenWidth } from '../../../../helpers/screenSize';
 
 export const styles = StyleSheet.create({
   container: {
@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    gap: Spacing.Medium,
+    gap: getScreenHeight(1.2),
     paddingBottom: getScreenHeight(18),
     paddingHorizontal: getScreenWidth(4), // Add padding to ensure content doesn't get hidden behind the button
   },
