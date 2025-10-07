@@ -11,6 +11,7 @@ import PersonalInfo from '../../screens/DashBoardScreens/AccountScreen/AccountOp
 import AccountScreen from '../../screens/DashBoardScreens/AccountScreen/AccountScreen';
 import {AccountSettingsStackParamList} from '../../types/navigation';
 import ChatScreen from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/FAQPages/ChatScreenPages/ChatScreen';
+import { FaqNavigator } from './FaqNavigator';
 
 const Stack = createStackNavigator<AccountSettingsStackParamList>();
 
@@ -28,7 +29,7 @@ export const AccountSettingsNavigator = () => {
       <Stack.Screen name="PaymentInfo" component={PaymentInfo} />
       <Stack.Screen name="WithdrawScreen" component={WithdrawScreen} />
       <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
-      <Stack.Screen name="FAQScreen" component={FAQScreen} />
+      <Stack.Screen name="FAQ" component={FaqNavigator} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
     </Stack.Navigator>
   );
