@@ -420,7 +420,12 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => { },
+            onPress: () => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: { screen: 'ChatScreen' },
+              });
+            },
           },
           {
             label: 'FAQ',
@@ -440,7 +445,7 @@ const AccountScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'FAQScreen' },
+                params: { screen: 'FAQ' },
               });
             },
           },
