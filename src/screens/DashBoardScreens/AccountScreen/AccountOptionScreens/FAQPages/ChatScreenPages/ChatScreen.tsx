@@ -26,13 +26,19 @@ const ChatScreen = () => {
   const initialMessages = [
     {
       id: 1,
-      text: 'Hello Aditya, welcome to the Surf chatbot!',
+      text: 'Hi there! I’m Lucy from Surf.',
       time: '2:30 pm',
       isUser: false,
     },
     {
       id: 2,
-      text: 'How can we help you today?',
+      text: 'I’m here to help you with seller registration, account setup, or any questions about selling on Surf.',
+      time: '2:30 pm',
+      isUser: false,
+    },
+    {
+      id: 2,
+      text: 'How can I assist you today?',
       time: '2:30 pm',
       isUser: false,
     },
