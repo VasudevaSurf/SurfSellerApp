@@ -24,146 +24,138 @@ import {
 import { BorderRadius, Spacing } from '../../../../../config/globalStyles';
 import ChatIcon from '../../../../../assets/icons/ChatIcon';
 import BusinessProfileIcon from '../../../../../assets/icons/BusinessProfileIcon';
+import { TextButton } from '../../../../../components/UserComponents/TextButton';
+import { Fonts } from '../../../../../config/fonts';
+
+export const faqData = [
+  // --- Answer 1: What is Surf... ---
+  {
+    id: 1,
+    question: 'What is Surf and What Are the Benefits of Selling on It?',
+    answer: [
+      {
+        type: 'text',
+        content:
+          "Surf is an eCommerce platform built specifically for Malta, designed to help local businesses sell their products online with ease. Whether you're a small business, independent seller, or a retail brand, Surf provides everything you need to start selling online—without the need for technical expertise or expensive setup.",
+      },
+      {
+        type: 'group', // New group type
+        content: [
+          {
+            type: 'sub_question',
+            title: 'Why Sell on Surf? – Key Benefits for Sellers',
+            content:
+              'Surf is designed to make online selling simple, fair, and accessible for businesses in Malta. Here’s how Surf supports you as a seller:',
+          },
+          {
+            type: 'bullet_list',
+            items: [
+              {
+                title: 'No Upfront Costs:',
+                content:
+                  'There are no listing fees. You can add your products to Surf completely free of charge.',
+              },
+              {
+                title: 'Instant Local Exposure:',
+                content:
+                  'Get immediate access to a growing customer base across Malta.',
+              },
+              {
+                title: 'Easy Order Management:',
+                content:
+                  'From orders and payments to customer communication, everything is handled through one simple dashboard.',
+              },
+              {
+                title: 'Marketing Support:',
+                content:
+                  'Surf actively promotes sellers through social media, and influencers marketing—so you get discovered faster.',
+              },
+              {
+                title: 'Fair Competition:',
+                content:
+                  'The platform levels the playing field, giving small and independent businesses the same visibility as larger sellers.',
+              },
+              {
+                title: 'Transparent Pricing:',
+                content:
+                  'No hidden fees. You only pay a fixed low commission when you make a sale.',
+              },
+            ],
+          },
+          {
+            type: 'link',
+            text: 'Refer to our pricing plans here',
+            url: 'https://sell.surf.mt/pricing',
+          },
+        ],
+      },
+    ],
+  },
+
+  // --- Answer 2: How do I register... ---
+  {
+    id: 2,
+    question: 'How do I register as a seller on Surf?',
+    answer: [
+      {
+        type: 'text_with_inline_link',
+        content:
+          'You can register by %LINK% and filling in a simple form with your business details. Once submitted, our team will review your application and get in touch for the next steps.',
+        linkText: 'Clicking Here',
+        url: 'https://sell.surf.mt/register',
+      },
+    ],
+  },
+
+  // --- Answer 3: What information is required... ---
+  {
+    id: 3,
+    question: 'What information is required to register?',
+    answer: [
+      {
+        type: 'group',
+        content: [
+          {
+            type: 'text',
+            content:
+              'To register as a seller on Surf, you must provide the following information:',
+          },
+          {
+            type: 'bullet_list',
+            items: [
+              'First Name',
+              'Last Name',
+              'Business Name',
+              'Email Address',
+              'VAT Number',
+              'Store Address',
+              'City',
+              'WhatsApp Number (used for seller communication and order coordination)',
+            ],
+          },
+          {
+            type: 'text',
+            content:
+              'To successfully create a seller account with Surf, you must provide a valid VAT number. This can be either a **Self-Employed VAT** or a **Business VAT**. Supplying this information ensures compliance with local regulations and enables us to verify your business for payments and invoicing purposes.',
+          },
+        ],
+      },
+    ],
+  },
+];
+
+
+
 
 const FAQScreen = () => {
   const [searchText, setSearchText] = useState('');
 
-  const faqCategories = [
-    {
-      heading: 'About Surf',
-      items: [
-        {
-          label: 'What is Surf and What Are the Benefits of Selling on It?',
-          id: 'about_surf',
-        },
-      ],
-    },
-    {
-      heading: 'Seller Registration',
-      items: [
-        {
-          label: 'How do I register as a seller on Surf?',
-          id: 'seller_register',
-        },
-        { label: 'What documents are required to register?', id: 'seller_docs' },
-        { label: 'Is there a registration fee?', id: 'seller_fee' },
-        {
-          label: 'How long does the approval process take?',
-          id: 'seller_approval',
-        },
-        { label: 'Can I register without a VAT number?', id: 'seller_vat' },
-      ],
-    },
-    {
-      heading: 'Product Listing Requirements',
-      items: [
-        { label: 'How do I upload products?', id: 'product_upload' },
-        {
-          label: 'What categories of products can I sell on Surf?',
-          id: 'product_categories',
-        },
-        {
-          label: 'Can I sell thrifted or second-hand items on Surf?',
-          id: 'product_thrift',
-        },
-        {
-          label:
-            'I am a Maltese artisan. Can I list and sell my products made in Malta? How will my products be differentiated?',
-          id: 'product_madeinmalta',
-        },
-        {
-          label:
-            'What is the minimum quantity I need to start selling on Surf?',
-          id: 'product_quantity',
-        },
-        { label: 'What are the product listing rules?', id: 'product_rules' },
-        {
-          label: 'What if I get flagged for incorrect content?',
-          id: 'product_flagged',
-        },
-        { label: 'How can I avoid penalties?', id: 'product_penalties' },
-      ],
-    },
-    {
-      heading: 'Image and Description Requirements',
-      items: [
-        {
-          label: 'What are the image and description requirements?',
-          id: 'image_requirements',
-        },
-      ],
-    },
-    {
-      heading: 'Bulk Upload',
-      items: [{ label: 'Is there a bulk upload option?', id: 'bulk_upload' }],
-    },
-    {
-      heading: 'Surf vs. Your Own Website',
-      items: [
-        {
-          label: 'I already have a website, so why should I join Surf?',
-          id: 'why_surf',
-        },
-      ],
-    },
-    {
-      heading: 'Orders, Delivery, and Notifications',
-      items: [
-        { label: 'How do I get notified of an order?', id: 'order_notify' },
-        { label: 'How do pickups work?', id: 'order_pickup' },
-        { label: 'What if the buyer cancels the order?', id: 'order_cancel' },
-      ],
-    },
-    {
-      heading: 'Payments and Fees',
-      items: [
-        { label: 'When do I get paid?', id: 'payment_time' },
-        { label: 'Are there any hidden charges?', id: 'payment_charges' },
-        { label: 'How do I update my bank details?', id: 'payment_bank' },
-        { label: 'Where can I view payment history?', id: 'payment_history' },
-        { label: 'What if there’s a payout delay?', id: 'payment_delay' },
-      ],
-    },
-    {
-      heading: 'Discounts and Promotions',
-      items: [{ label: 'How do I run a discount?', id: 'discount_run' }],
-    },
-    {
-      heading: 'Seller Dashboard & Support',
-      items: [
-        {
-          label: 'Is there a seller dashboard help section?',
-          id: 'dashboard_help',
-        },
-        { label: 'Dashboard not loading?', id: 'dashboard_issue' },
-        { label: 'Error uploading images?', id: 'dashboard_upload_error' },
-      ],
-    },
-    {
-      heading: 'Contact Seller Support',
-      items: [
-        { label: 'How do I contact seller support?', id: 'contact_support' },
-      ],
-    },
-  ].map(section => ({
-    ...section,
-    items: section.items.map((item, index) => ({
-      ...item,
-      label: `${index + 1}. ${item.label}`,
-      onPress: () => navigate('FaqAnswer', { questionId: item.id }),
-    })),
-  }));
+  const filteredCategories = faqData
+    .filter(q =>
+      q.question.toLowerCase().includes(searchText.toLowerCase()),
+    )
+    .filter(q => q.question.length > 0);
 
-  const filteredCategories = faqCategories
-    .map(section => ({
-      ...section,
-      items: section.items.filter(item =>
-        item.label.toLowerCase().includes(searchText.toLowerCase()),
-      ),
-    }))
-    .filter(section => section.items.length > 0);
-
-  // const faqCategories = [
   //   {
   //     id: 1,
   //     title: 'Product Listing & Requirements',
@@ -217,19 +209,6 @@ const FAQScreen = () => {
     });
   };
 
-  const headerIcons = useMemo(
-    () => [
-      {
-        icon: QuestionMarkIcon,
-        onPress: () => console.log('Question mark pressed'),
-        size: 24,
-        color: ColorPalette.Black,
-        strokeWidth: 2,
-      },
-    ],
-    [],
-  );
-
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
@@ -243,15 +222,10 @@ const FAQScreen = () => {
             text: 'Chat With Us',
             badgeType: BadgeType.PRIMARY,
             badgeVariant: BadgeVariant.FILLED,
-            onPress: () => {
-              navigate('Dashboard', {
-                screen: 'Account',
-                params: { screen: 'ChatScreen' },
-              });
-            },
+            onPress: handleChat,
             customContainerStyle: {
               borderRadius: Spacing.Small,
-              paddingVertical: getScreenHeight(1.5),
+              paddingVertical: getScreenHeight(1.2),
               paddingHorizontal: getScreenWidth(3),
               shadowColor: '#101828',
               shadowOffset: { width: 0, height: 6 },
@@ -270,7 +244,7 @@ const FAQScreen = () => {
         <SearchBox
           value={searchText}
           onChangeText={setSearchText}
-          placeholder="Search your queries"
+          placeholder="Search Queries"
         />
       </View>
       <View style={styles.mainContainer}>
@@ -278,79 +252,48 @@ const FAQScreen = () => {
           style={styles.scrollViewContainer}
           contentContainerStyle={[styles.scrollContent]}
           showsVerticalScrollIndicator={false}>
-          {filteredCategories.map((section, sectionIndex) => (
-            <View key={sectionIndex} style={styles.containerStyle}>
-              {/* Section Heading */}
-              {section.heading && (
-                <Typography
-                  variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-                  text={section.heading}
-                  customTextStyles={{
-                    marginBottom: getScreenHeight(1),
-                    paddingLeft: getScreenWidth(3),
+          <View style={styles.containerStyle}>
+            {filteredCategories.map((q) => (
+              <View key={q.id} >
+                <MenuItem
+                  key={q.id}
+                  label={q.question}
+                  onPress={() => navigate('FAQAnswer', { questionId: q.id })}
+                  textStyle={{
+                    color: ColorPalette.GREY_TEXT_500,
                   }}
-                />
-              )}
-
-              {/* Section Container */}
-              <View style={styles.menuContainer}>
-                {section.items.map((item, index) => (
-                  <MenuItem
-                    key={index}
-                    label={item.label}
-                    // leftIcon={item.leftIcon}
-                    // rightIcon={item.rightIcon}
-                    onPress={item.onPress}
-                    textStyle={{
-                      color: ColorPalette.GREY_TEXT_500,
-                      fontSize: 16,
-                    }}
-                    variant={TypographyVariant.PMEDIUM_MEDIUM}
-                    contentStyle={{ gap: getScreenWidth(4) }}
-                    showBottomBorder={true}
-                    isLastItem={index === section.items.length - 1}
-                  />
-                ))}
-              </View>
-            </View>
-          ))}
-
-          {/* {faqCategories.map(category => (
-            <View key={category.id} style={styles.categoryContainer}>
-              <View style={styles.titleContainer}>
-                <Typography
-                  variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-                  text={category.title}
-                  customTextStyles={styles.categoryTitle}
+                  variant={TypographyVariant.PSMALL_REGULAR}
+                  contentStyle={{ gap: getScreenWidth(4) }}
+                // showBottomBorder={true}
                 />
               </View>
-              <View style={styles.faqItemsContainer}>
-                {category.items.map((item, index) => (
-                  <MenuItem
-                    key={item.id}
-                    label={item.label}
-                    onPress={() => {}}
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                    showBottomBorder
-                    containerStyle={styles.menuItemContainer}
-                    textStyle={styles.menuItemText}
-                    rightIcon={
-                      <ArrowRightIcon
-                        style={undefined}
-                        color={ColorPalette.GREY_TEXT_500}
-                      />
-                    }
-                  />
-                ))}
-              </View>
-            </View>
-          ))} */}
+            ))}
+          </View>
+
+
         </ScrollView>
+        <View style={styles.ChatWithUsContainer}>
+          <Typography
+            text="Need more info?"
+            variant={TypographyVariant.LMEDIUM_REGULAR}
+            customTextStyles={styles.captionTwo}
+          />
+          <TextButton
+            text="Chat with us now!"
+            onPress={handleChat}
+            variant={TypographyVariant.PMEDIUM_SEMIBOLD}
+            underline
+            customTextStyles={{
+              color: ColorPalette.ProgressLine,
+              fontFamily: Fonts.POPPINS_BOLD,
+            }}
+          />
+        </View>
       </View>
 
-      <TouchableOpacity style={styles.floatingChatButton} onPress={handleChat}>
+      {/* <TouchableOpacity style={styles.floatingChatButton} onPress={handleChat}>
         <MessageIcon size={24} style={undefined} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </SafeAreaView>
   );
 };
