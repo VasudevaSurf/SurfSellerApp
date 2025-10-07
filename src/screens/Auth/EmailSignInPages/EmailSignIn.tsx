@@ -170,7 +170,7 @@ const EmailSignIn = ({ navigation }) => {
     <>
       <View style={styles.mainContainerTwo}>
         <Button
-          text={isLoading ? 'Signing In...' : 'Sign In'}
+          text={isLoading ? 'Logging In...' : 'Log In'}
           onPress={handleSignIn}
           variant={ButtonVariant.PRIMARY}
           state={buttonState}
