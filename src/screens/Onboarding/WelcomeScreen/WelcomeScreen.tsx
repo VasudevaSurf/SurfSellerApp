@@ -91,8 +91,8 @@ const WelcomeScreen = () => {
   const content = [
     {
       image: require('../../../assets/images/welcomeBanner2.jpg'),
-      title: 'Zero Commission, Zero Worries: Maximize Your Profit!',
-      subtitle: 'Enjoy zero commission on all sales for greater earnings.',
+      title: 'Low Commission, Zero Worries: Maximize Your Profit!',
+      subtitle: 'Enjoy low commission on all sales for greater earnings.',
     },
     {
       image: require('../../../assets/images/welcomeBanner3.jpg'),
