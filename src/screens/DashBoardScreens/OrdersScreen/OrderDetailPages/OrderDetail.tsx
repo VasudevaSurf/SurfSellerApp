@@ -424,7 +424,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ route }) => {
               },
               customContainerStyle: {
                 borderRadius: Spacing.Small,
-                paddingVertical: getScreenHeight(1.5),
+                paddingVertical: getScreenHeight(1.2),
                 paddingHorizontal: getScreenWidth(3),
                 shadowColor: '#101828',
                 shadowOffset: { width: 0, height: 6 },
