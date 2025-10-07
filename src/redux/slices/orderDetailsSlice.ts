@@ -135,6 +135,30 @@ export const fetchOrderDetails = createAsyncThunk(
         subtotal: orderInfo.subtotal || orderInfo.total || '0.00',
         formattedDate: timeInfo.date,
         formattedTime: timeInfo.time,
+
+        // ✅ ADD THESE NEW FIELDS FOR SHIPPING
+        shipping_name: orderInfo.shipping_name,
+        shipping: orderInfo.shipping,
+        customer_address: orderInfo.customer_address,
+        s_address: orderInfo.s_address,
+        s_address_2: orderInfo.s_address_2,
+        s_city: orderInfo.s_city,
+        s_zipcode: orderInfo.s_zipcode,
+        s_country_descr: orderInfo.s_country_descr,
+        s_country: orderInfo.s_country,
+
+        // ✅ ADD THESE NEW FIELDS FOR PAYMENT
+        payment_name: orderInfo.payment_name,
+        payment_method: orderInfo.payment_method,
+
+        // ✅ OPTIONAL: ADD BILLING ADDRESS TOO
+        billing_address: orderInfo.billing_address,
+        b_address: orderInfo.b_address,
+        b_address_2: orderInfo.b_address_2,
+        b_city: orderInfo.b_city,
+        b_zipcode: orderInfo.b_zipcode,
+        b_country_descr: orderInfo.b_country_descr,
+        b_phone: orderInfo.b_phone,
       };
 
       console.log('Transformed order data:', orderData);

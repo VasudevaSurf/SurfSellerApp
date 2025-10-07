@@ -163,6 +163,49 @@ export interface Order {
   subtotal?: string;
   formattedDate?: string;
   formattedTime?: string;
+
+  // ✅ ADD THESE NEW FIELDS
+  shipping_name?: string;
+  shipping?: Array<{
+    shipping_id: string;
+    shipping: string;
+    delivery_time?: string;
+    rate?: number;
+    [key: string]: any;
+  }>;
+  customer_address?: {
+    name?: string;
+    line_1?: string;
+    line_2?: string;
+    line_3?: string;
+    line_4?: string;
+  };
+  s_address?: string;
+  s_address_2?: string;
+  s_city?: string;
+  s_zipcode?: string;
+  s_country_descr?: string;
+  s_country?: string;
+  payment_name?: string;
+  payment_method?: {
+    payment_id: string;
+    payment: string;
+    description?: string;
+    [key: string]: any;
+  };
+  billing_address?: {
+    name?: string;
+    line_1?: string;
+    line_2?: string;
+    line_3?: string;
+    line_4?: string;
+  };
+  b_address?: string;
+  b_address_2?: string;
+  b_city?: string;
+  b_zipcode?: string;
+  b_country_descr?: string;
+  b_phone?: string;
 }
 
 export interface OrdersResponse {
