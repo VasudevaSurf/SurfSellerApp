@@ -1,10 +1,14 @@
+// src/screens/DashBoardScreens/OrdersScreen/OrderDetailPages/OrderDetail.tsx
+// SELF-CONTAINED VERSION - No external imports needed!
+
 import React, {useState, useEffect} from 'react';
 import {
   Image,
   SafeAreaView,
   ScrollView,
   View,
-  ActivityIndicator,
+  Alert,
+  Share,
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import ChevronDownIcon from '../../../../assets/icons/ArrowDownIcon';
@@ -74,6 +78,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
   const dispatch = useDispatch<AppDispatch>();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeSections, setActiveSections] = useState([]);
+  const [printingInvoice, setPrintingInvoice] = useState(false);
 
   const [shippingInfo, setShippingInfo] = useState({
     method: 'N/A',
@@ -127,8 +132,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     shipping: '€0.00',
   });
 
-  console.log('orderDetails orderDetails orderDetails', orderDetails);
-
   // Reset state when component mounts
   useEffect(() => {
     dispatch(resetOrderDetails());
@@ -145,28 +148,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
   // Update local state when orderDetails changes
   useEffect(() => {
     if (orderDetails) {
-      console.log('==========================================');
-      console.log('COMPLETE ORDER DETAILS OBJECT:');
-      console.log(JSON.stringify(orderDetails, null, 2));
-      console.log('==========================================');
-      console.log('SHIPPING INFO:');
-      console.log('shipping_name:', orderDetails.shipping_name);
-      console.log('shipping array:', orderDetails.shipping);
-      console.log('customer_address:', orderDetails.customer_address);
-      console.log('s_address:', orderDetails.s_address);
-      console.log('s_city:', orderDetails.s_city);
-      console.log('s_zipcode:', orderDetails.s_zipcode);
-      console.log('s_country_descr:', orderDetails.s_country_descr);
-      console.log('==========================================');
-      console.log('PAYMENT INFO:');
-      console.log('payment_name:', orderDetails.payment_name);
-      console.log('payment_method:', orderDetails.payment_method);
-      console.log(
-        'payment_method.payment:',
-        orderDetails.payment_method?.payment,
-      );
-      console.log('==========================================');
-
       // Get the first product information if available
       const firstProduct =
         orderDetails.products && orderDetails.products.length > 0
@@ -247,12 +228,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
       let shippingMethod = 'N/A';
       let shippingAddress = 'N/A';
 
-      console.log('Shipping data check:', {
-        shipping_name: orderDetails.shipping_name,
-        shipping_array: orderDetails.shipping,
-        customer_address: orderDetails.customer_address,
-      });
-
       // Get shipping method
       if (orderDetails.shipping_name) {
         shippingMethod = orderDetails.shipping_name;
@@ -268,7 +243,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         }
       }
 
-      // Get shipping address from customer_address object if available
+      // Get shipping address
       if (orderDetails.customer_address) {
         const addressLines = [
           orderDetails.customer_address.line_1,
@@ -281,7 +256,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
           shippingAddress = addressLines.join('\n');
         }
       } else {
-        // Fallback: Build from individual fields
         const addressParts = [];
         if (orderDetails.s_address) addressParts.push(orderDetails.s_address);
         if (orderDetails.s_address_2)
@@ -296,11 +270,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         }
       }
 
-      console.log('Extracted shipping info:', {
-        shippingMethod,
-        shippingAddress,
-      });
-
       setShippingInfo({
         method: shippingMethod,
         address: shippingAddress,
@@ -309,13 +278,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
       // Extract payment information
       let paymentMethod = 'N/A';
 
-      console.log('Payment data check:', {
-        payment_name: orderDetails.payment_name,
-        payment_method: orderDetails.payment_method,
-      });
-
       if (orderDetails.payment_name) {
-        // Clean up payment name (remove .tpl extension if present)
         paymentMethod = orderDetails.payment_name
           .replace('.tpl', '')
           .replace(/_/g, ' ')
@@ -329,8 +292,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
           .replace(/_/g, ' ')
           .toUpperCase();
       }
-
-      console.log('Extracted payment method:', paymentMethod);
 
       setPaymentInfo({
         method: paymentMethod,
@@ -377,14 +338,111 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
       console.log('OrderDetail - Status updated successfully');
     } catch (error: any) {
       console.error('OrderDetail - Failed to update status:', error);
-      // Error handling is managed by Redux state
     }
   };
 
-  // Handle print invoice action
-  const handlePrintInvoice = () => {
-    console.log('OrderDetail - Print invoice clicked');
-    // Add your print functionality here
+  // SELF-CONTAINED INVOICE FUNCTION - No external dependencies!
+  const handlePrintInvoice = async () => {
+    console.log('Print Invoice button pressed');
+
+    // Validate data
+    if (!orderData.orderNumber || orderData.orderNumber === 'N/A') {
+      Alert.alert(
+        'Error',
+        'Order information is not available yet. Please wait.',
+        [{text: 'OK'}],
+      );
+      return;
+    }
+
+    setPrintingInvoice(true);
+
+    try {
+      // Create invoice text - Simple format without special characters
+      const invoiceText = `
+========================================
+         INVOICE - SELLER HUB
+========================================
+
+Order Number: ${orderData.orderNumber}
+Date: ${orderData.orderDate}
+Time: ${orderData.orderTime}
+
+========================================
+CUSTOMER DETAILS
+========================================
+
+Name: ${customerInfo.name}
+Email: ${customerInfo.email}
+Phone: ${customerInfo.phone}
+
+========================================
+SHIPPING DETAILS
+========================================
+
+Method: ${shippingInfo.method}
+Address: ${shippingInfo.address}
+
+========================================
+ORDER ITEMS
+========================================
+
+Product: ${productInfo.name}
+Quantity: ${productInfo.quantity}
+Unit Price: ${priceInfo.subtotal}
+
+========================================
+PAYMENT SUMMARY
+========================================
+
+Subtotal:          ${priceInfo.subtotal}
+Shipping:          ${priceInfo.shipping}
+Order Discount:    EUR 0.00
+VAT (12%):         EUR 0.00
+Payment Surcharge: EUR 0.00
+
+----------------------------------------
+TOTAL:             ${priceInfo.total}
+========================================
+
+PAYMENT METHOD
+${paymentInfo.method}
+
+========================================
+
+Thank you for your business!
+
+Surf Seller Hub
+Made in Malta
+Copyright ${new Date().getFullYear()}
+
+For queries: support@surf.mt
+Phone: +356 9282 9128
+
+========================================
+      `.trim();
+
+      console.log('Invoice text prepared');
+
+      // Show share dialog
+      await Share.share({
+        title: `Invoice ${orderData.orderNumber}`,
+        message: invoiceText,
+      });
+
+      console.log('Share completed');
+    } catch (error: any) {
+      console.error('Error sharing invoice:', error);
+
+      // Only show error if user didn't cancel
+      if (error.message && !error.message.toLowerCase().includes('cancel')) {
+        Alert.alert('Error', 'Failed to share invoice. Please try again.', [
+          {text: 'OK'},
+        ]);
+      }
+    } finally {
+      setPrintingInvoice(false);
+    }
   };
 
   // Define accordion sections data
@@ -508,11 +566,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
             }}
           />
         )}
-        <View
-          style={[
-            styles.accordionHeader,
-            // isActive && styles.accordionHeaderActive, // override padding when open
-          ]}>
+        <View style={styles.accordionHeader}>
           <Typography
             text={section.title}
             variant={TypographyVariant.LMEDIUM_BOLD}
@@ -551,8 +605,8 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     return statusColorMap[status] || ColorPalette.PURPLE_300;
   };
 
-  // Show loading spinner while initial data fetching completes
-  if (loading && orderData.orderNumber) {
+  // Show loading spinner
+  if (loading && !orderData.orderNumber) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <Header
@@ -583,7 +637,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
                 elevation: 6,
               },
               textVariant: TypographyVariant.PMEDIUM_SEMIBOLD,
-              // customTextColor: ColorPalette.PURPLE_300,
               leftIcon: ChatIcon,
               iconSize: 24,
             },
@@ -596,7 +649,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
           ]}>
           <AnimatedLoader size={52} />
           <Typography
-            text="Loading"
+            text="Loading Order Details..."
             variant={TypographyVariant.PSMALL_MEDIUM}
             customTextStyles={{
               color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
@@ -638,14 +691,12 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
               elevation: 6,
             },
             textVariant: TypographyVariant.PMEDIUM_SEMIBOLD,
-            // customTextColor: ColorPalette.PURPLE_300,
             leftIcon: ChatIcon,
             iconSize: 24,
           },
         ]}
       />
 
-      {/* Show warning for API errors while still displaying data */}
       {error && (
         <View
           style={{
@@ -663,7 +714,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         </View>
       )}
 
-      {/* Show status update error if any */}
       {statusUpdateError && (
         <View
           style={{
@@ -876,23 +926,19 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         </ScrollView>
 
         <View style={styles.buttonContainer}>
-          {/* <Typography
-            text="Order Status:"
-            variant={TypographyVariant.PSMALL_MEDIUM}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
-          /> */}
-
           <Badge
-            text="Print Invoice"
+            text={printingInvoice ? 'Generating...' : 'Print Invoice'}
             type={BadgeType.PRIMARY}
             variant={BadgeVariant.OUTLINE}
             onPress={handlePrintInvoice}
+            disabled={printingInvoice}
             customContainerStyle={{
               borderColor: ColorPalette.ProgressLine,
               borderRadius: Spacing.XSmall,
               paddingVertical: getScreenHeight(2),
               paddingHorizontal: getScreenWidth(3),
               width: '100%',
+              opacity: printingInvoice ? 0.6 : 1,
             }}
             textVariant={TypographyVariant.LMEDIUM_MEDIUM}
             customTextColor={ColorPalette.ProgressLine}
