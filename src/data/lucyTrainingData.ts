@@ -164,48 +164,104 @@ export const LUCY_KNOWLEDGE_BASE = {
       {
         topic: 'Seller Registration',
         title: 'How to Register as a Seller on Surf',
-        when_to_share: 'User asks about creating account or registration',
+        url: 'https://www.youtube.com/@SurfSellerHub',
+        when_to_share: [
+          'registration',
+          'register',
+          'sign up',
+          'create account',
+          'how to register',
+          'how do I register',
+        ],
       },
       {
         topic: 'Uploading Products (Manual)',
         title: 'How to Upload a Product on Surf Seller Dashboard',
-        when_to_share: 'User asks how to list or upload products manually',
+        url: 'https://www.youtube.com/@SurfSellerHub',
+        when_to_share: [
+          'upload product',
+          'list product',
+          'add product',
+          'how to upload',
+          'upload manually',
+        ],
       },
       {
         topic: 'Bulk Product Upload',
         title: 'Bulk Upload Products on Surf Dashboard',
-        when_to_share:
-          'User asks about uploading multiple products at once or CSV upload',
+        url: 'https://www.youtube.com/@SurfSellerHub',
+        when_to_share: [
+          'bulk upload',
+          'multiple products',
+          'csv upload',
+          'upload many products',
+          'batch upload',
+        ],
       },
       {
         topic: 'WooCommerce Integration',
         title: 'How to Link Your WooCommerce Website to Surf',
-        when_to_share: 'User asks about connecting WooCommerce store',
+        url: 'https://www.youtube.com/@SurfSellerHub',
+        when_to_share: [
+          'woocommerce',
+          'connect woocommerce',
+          'link woocommerce',
+          'integrate woocommerce',
+        ],
       },
       {
         topic: 'Shopify Integration',
         title: 'How to Link Shopify to Surf',
-        when_to_share: 'User asks about connecting Shopify store',
+        url: 'https://www.youtube.com/@SurfSellerHub',
+        when_to_share: [
+          'shopify',
+          'connect shopify',
+          'link shopify',
+          'integrate shopify',
+        ],
       },
       {
         topic: 'PayPal Setup',
         title: 'How to Link Your PayPal Account to Surf',
-        when_to_share: 'User asks about payouts or linking payment account',
+        url: 'https://www.youtube.com/@SurfSellerHub',
+        when_to_share: [
+          'paypal',
+          'link paypal',
+          'connect paypal',
+          'setup paypal',
+          'payouts',
+          'payment setup',
+        ],
       },
       {
         topic: 'Managing Orders',
         title: 'How to View and Manage Orders on Surf Seller Dashboard',
-        when_to_share: 'User asks about order management',
+        url: 'https://www.youtube.com/@SurfSellerHub',
+        when_to_share: [
+          'manage orders',
+          'view orders',
+          'order management',
+          'see orders',
+          'handle orders',
+        ],
       },
       {
         topic: 'Marketing Tools',
         title: "How to Use Surf's Marketing Features",
-        when_to_share: 'User asks about promoting products or marketing',
+        url: 'https://www.youtube.com/@SurfSellerHub',
+        when_to_share: [
+          'marketing',
+          'promote products',
+          'banners',
+          'marketing tools',
+          'promote my products',
+        ],
       },
     ],
     usage_guidelines: [
       'Provide brief summary of solution first',
-      'Share relevant video link directly with emoji (🎥 or 🔗 or 💡)',
+      'Share relevant video link directly with emoji (🎥)',
+      'Always include the full clickable URL',
       "End with: 'If you need more help, I can connect you with our support team.'",
       'Never provide third-party video links',
     ],
@@ -331,15 +387,65 @@ Product image requirements: ${kb.products.compliance.image_requirements}
 Compliance requirements:
 ${kb.products.compliance.requirements.map(req => `- ${req}`).join('\n')}
 
-YOUTUBE TUTORIALS:
-Channel: ${kb.youtube_tutorials.channel_url}
-When users ask "How do I..." questions, always share the relevant video from this list:
+YOUTUBE TUTORIALS - CRITICAL INSTRUCTIONS:
+Main Channel: ${kb.youtube_tutorials.channel_url}
+
+WHEN A USER ASKS "HOW TO" QUESTIONS, YOU MUST ALWAYS INCLUDE THE RELEVANT VIDEO LINK.
+
+Available video tutorials with their EXACT URLs:
 ${kb.youtube_tutorials.videos
-  .map(video => `- ${video.title} (for: ${video.when_to_share})`)
+  .map(
+    video => `
+Topic: ${video.topic}
+Title: ${video.title}
+URL: ${video.url}
+Triggers: ${video.when_to_share.join(', ')}
+`,
+  )
   .join('\n')}
 
-Format video links with emoji: 🎥 [Video Title]
-Always end with: "If you need more help, I can connect you with our support team."
+HOW TO SHARE VIDEO LINKS:
+1. First, give a brief 1-2 sentence answer
+2. Then say "Here's a step-by-step video guide:" or similar
+3. Share the video link in this EXACT format:
+   🎥 [Video Title]
+   ${kb.youtube_tutorials.channel_url}
+
+EXAMPLE RESPONSES WITH VIDEOS:
+
+User: "How do I register as a seller?"
+You: "You can register easily through the Surf Seller Portal or App. You'll need your business details, VAT number, and at least one product.
+
+Here's a step-by-step video guide:
+🎥 How to Register as a Seller on Surf
+${kb.youtube_tutorials.channel_url}
+
+If you need more help, I can connect you with our support team."
+
+User: "How do I upload products?"
+You: "You can upload products manually, in bulk via CSV, or by integrating your existing website.
+
+Here's a quick tutorial:
+🎥 How to Upload a Product on Surf Seller Dashboard
+${kb.youtube_tutorials.channel_url}
+
+If you need more help, I can connect you with our support team."
+
+User: "How do I link PayPal?"
+You: "You can link your PayPal account by going to: Account → Company Profile → Connect PayPal
+
+Here's a video showing the process:
+🎥 How to Link Your PayPal Account to Surf
+${kb.youtube_tutorials.channel_url}
+
+If you need more help, I can connect you with our support team."
+
+IMPORTANT VIDEO RULES:
+- ALWAYS include video URLs when user asks "how to" questions
+- Use the 🎥 emoji before video title
+- Include the full clickable URL on a new line
+- End with support offer
+- Match video topics to user questions based on trigger words
 
 SUPPORT CONTACTS:
 📧 Email: ${kb.support_contacts.email}
@@ -348,12 +454,15 @@ SUPPORT CONTACTS:
 IMPORTANT RULES:
 - Only provide information from this knowledge base
 - Never guess or make up information
+- ALWAYS include video URLs when relevant to the question
+- For "how to" questions, ALWAYS share the tutorial video link
 - For out-of-scope questions, use one of these fallback responses:
 ${kb.fallback_responses.map((resp, i) => `  ${i + 1}. "${resp}"`).join('\n')}
 
 - When unable to help, always redirect to support team
 - Keep responses concise and helpful
-- Use emojis sparingly and appropriately (🎥 for videos, 📧 for email, 💬 for WhatsApp)`;
+- Use emojis appropriately (🎥 for videos, 📧 for email, 💬 for WhatsApp)
+- Always provide complete, clickable URLs for videos`;
 };
 
 export default LUCY_KNOWLEDGE_BASE;

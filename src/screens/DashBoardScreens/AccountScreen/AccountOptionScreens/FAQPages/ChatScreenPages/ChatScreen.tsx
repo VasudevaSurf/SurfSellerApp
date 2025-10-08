@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
+  Linking,
+  Text,
 } from 'react-native';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
 import ImageUploadIcon from '../../../../../../assets/icons/ImageUploadIcon';
@@ -23,6 +25,83 @@ import geminiService, {Message} from '../../../../../../services/geminiService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEY = '@lucy_chat_history';
+
+// Custom component to render text with clickable links and markdown formatting
+const MessageText = ({text, isUser}: {text: string; isUser: boolean}) => {
+  const handleLinkPress = (url: string) => {
+    Linking.openURL(url).catch(err => console.error('Error opening URL:', err));
+  };
+
+  // Parse text for both URLs and markdown bold
+  const parseText = (inputText: string) => {
+    const elements: JSX.Element[] = [];
+    let currentIndex = 0;
+
+    // Combined regex for URLs and bold markdown
+    const combinedRegex = /(https?:\/\/[^\s]+)|(\*\*[^*]+\*\*)/g;
+    let match;
+
+    while ((match = combinedRegex.exec(inputText)) !== null) {
+      // Add text before the match
+      if (match.index > currentIndex) {
+        elements.push(
+          <Text key={`text-${currentIndex}`}>
+            {inputText.substring(currentIndex, match.index)}
+          </Text>,
+        );
+      }
+
+      // Check if it's a URL or bold text
+      if (match[1]) {
+        // It's a URL
+        const url = match[1];
+        elements.push(
+          <Text
+            key={`link-${match.index}`}
+            style={{
+              color: isUser ? '#FFFFFF' : ColorPalette.PURPLE_300,
+              textDecorationLine: 'underline',
+              fontWeight: '600',
+            }}
+            onPress={() => handleLinkPress(url)}>
+            {url}
+          </Text>,
+        );
+      } else if (match[2]) {
+        // It's bold text (remove the ** markers)
+        const boldText = match[2].replace(/\*\*/g, '');
+        elements.push(
+          <Text key={`bold-${match.index}`} style={{fontWeight: 'bold'}}>
+            {boldText}
+          </Text>,
+        );
+      }
+
+      currentIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (currentIndex < inputText.length) {
+      elements.push(
+        <Text key={`text-${currentIndex}`}>
+          {inputText.substring(currentIndex)}
+        </Text>,
+      );
+    }
+
+    return elements;
+  };
+
+  return (
+    <Text
+      style={[
+        isUser ? styles.userMessageText : styles.botMessageText,
+        {fontSize: 14, lineHeight: 20},
+      ]}>
+      {parseText(text)}
+    </Text>
+  );
+};
 
 const ChatScreen = () => {
   const [message, setMessage] = useState('');
@@ -267,15 +346,7 @@ const ChatScreen = () => {
                           ? styles.userMessageFirstBubble
                           : styles.botMessageFirstBubble),
                     ]}>
-                    <Typography
-                      variant={TypographyVariant.PSMALL_REGULAR}
-                      customTextStyles={
-                        msg.isUser
-                          ? styles.userMessageText
-                          : styles.botMessageText
-                      }
-                      text={msg.text}
-                    />
+                    <MessageText text={msg.text} isUser={msg.isUser} />
                   </View>
 
                   <Typography
