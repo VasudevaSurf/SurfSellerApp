@@ -271,7 +271,7 @@ const HomeScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'FAQScreen' },
+                params: { screen: 'FAQ' },
               });
             },
             size: 24,
