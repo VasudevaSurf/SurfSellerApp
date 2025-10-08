@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+// src/redux/slices/productsSlice.ts
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {
   fetchProductsApi,
   fetchProductDetailsApi,
@@ -18,8 +19,7 @@ import {
 // Define the ProductDetail interface
 export interface ProductDetail extends Product {
   full_description?: string;
-  images?: string[]; // Add images array
-  // Add any additional fields that might be in the product details response
+  images?: string[];
 }
 
 interface ProductsState {
@@ -38,12 +38,15 @@ interface ProductsState {
     lowStock: number;
   };
   searchTerm: string;
-  // Deletion state
-  deletingProducts: string[]; // Array of product IDs being deleted
+  deletingProducts: string[];
   deleteError: string | null;
-  // Status update state
-  updatingStatus: string[]; // Array of product IDs being updated
+  updatingStatus: string[];
   statusUpdateError: string | null;
+  // NEW: Add price filter state
+  priceFilter: {
+    minPrice: number;
+    maxPrice: number;
+  } | null;
 }
 
 const initialState: ProductsState = {
@@ -62,15 +65,14 @@ const initialState: ProductsState = {
     lowStock: 0,
   },
   searchTerm: '',
-  // Initialize deletion state
   deletingProducts: [],
   deleteError: null,
-  // Initialize status update state
   updatingStatus: [],
   statusUpdateError: null,
+  priceFilter: null, // NEW: Initialize price filter
 };
 
-// Enhanced fetchProducts with filters
+// Enhanced fetchProducts with filters including price
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async (
@@ -81,18 +83,29 @@ export const fetchProducts = createAsyncThunk(
       userId: string;
       filters?: ProductFilters;
     },
-    { rejectWithValue },
+    {rejectWithValue},
   ) => {
     try {
       const response = await fetchProductsApi(userId, filters);
 
+      // NEW: Apply client-side price filtering if price range is set
+      let filteredProducts = response.products;
+
+      if (filters?.minPrice !== undefined || filters?.maxPrice !== undefined) {
+        filteredProducts = response.products.filter(product => {
+          const price = parseFloat(product.price);
+          const minPrice = filters.minPrice || 0;
+          const maxPrice = filters.maxPrice || Infinity;
+          return price >= minPrice && price <= maxPrice;
+        });
+      }
+
       return {
-        products: response.products,
-        totalItems: parseInt(response.total_items),
+        products: filteredProducts,
+        totalItems: filteredProducts.length,
         page: filters?.page || 1,
         filter: filters?.status || 'all',
       };
-
     } catch (error: any) {
       console.error('fetchProducts thunk error:', error);
       return rejectWithValue(error.message || 'Failed to fetch products');
@@ -113,7 +126,7 @@ export const fetchProductsByStatus = createAsyncThunk(
       status: 'A' | 'P' | 'D';
       page?: number;
     },
-    { rejectWithValue },
+    {rejectWithValue},
   ) => {
     try {
       console.log('fetchProductsByStatus thunk called with:', {
@@ -150,7 +163,7 @@ export const fetchLowStockProducts = createAsyncThunk(
       threshold?: number;
       page?: number;
     },
-    { rejectWithValue },
+    {rejectWithValue},
   ) => {
     try {
       console.log('fetchLowStockProducts thunk called with:', {
@@ -187,7 +200,7 @@ export const searchProducts = createAsyncThunk(
       searchTerm: string;
       filters?: ProductFilters;
     },
-    { rejectWithValue },
+    {rejectWithValue},
   ) => {
     try {
       console.log('searchProducts thunk called with:', {
@@ -196,9 +209,22 @@ export const searchProducts = createAsyncThunk(
         filters,
       });
       const response = await searchProductsApi(userId, searchTerm, filters);
+
+      // NEW: Apply client-side price filtering for search results
+      let filteredProducts = response.products;
+
+      if (filters?.minPrice !== undefined || filters?.maxPrice !== undefined) {
+        filteredProducts = response.products.filter(product => {
+          const price = parseFloat(product.price);
+          const minPrice = filters.minPrice || 0;
+          const maxPrice = filters.maxPrice || Infinity;
+          return price >= minPrice && price <= maxPrice;
+        });
+      }
+
       return {
-        products: response.products,
-        totalItems: parseInt(response.total_items),
+        products: filteredProducts,
+        totalItems: filteredProducts.length,
         page: filters?.page || 1,
         searchTerm,
         filter: filters?.status || 'all',
@@ -213,11 +239,10 @@ export const searchProducts = createAsyncThunk(
 // Thunk to fetch filter counts
 export const fetchFilterCounts = createAsyncThunk(
   'products/fetchFilterCounts',
-  async ({ userId }: { userId: string }, { rejectWithValue }) => {
+  async ({userId}: {userId: string}, {rejectWithValue}) => {
     try {
-      console.log('fetchFilterCounts thunk called with:', { userId });
+      console.log('fetchFilterCounts thunk called with:', {userId});
 
-      // Fetch counts for each filter in parallel
       const [
         allResponse,
         activeResponse,
@@ -225,7 +250,7 @@ export const fetchFilterCounts = createAsyncThunk(
         disabledResponse,
         lowStockResponse,
       ] = await Promise.allSettled([
-        fetchProductsApi(userId, { status: 'all', page: 1, itemsPerPage: 1 }),
+        fetchProductsApi(userId, {status: 'all', page: 1, itemsPerPage: 1}),
         fetchProductsByStatusApi(userId, 'A', 1, 1),
         fetchProductsByStatusApi(userId, 'P', 1, 1),
         fetchProductsByStatusApi(userId, 'D', 1, 1),
@@ -259,8 +284,8 @@ export const fetchFilterCounts = createAsyncThunk(
 export const fetchProductDetails = createAsyncThunk(
   'products/fetchProductDetails',
   async (
-    { userId, productId }: { userId: string; productId: string },
-    { rejectWithValue },
+    {userId, productId}: {userId: string; productId: string},
+    {rejectWithValue},
   ) => {
     try {
       console.log('🔍 Fetching product details for editing:', {
@@ -272,12 +297,9 @@ export const fetchProductDetails = createAsyncThunk(
 
       console.log('📦 Raw product details response:', response);
 
-      // Enhanced product details extraction
       const enhancedResponse = {
         ...response,
-        // Ensure images array is properly formatted
         images: extractImagesFromResponse(response),
-        // Add any additional processing needed
         productData: response.product_data || response,
       };
 
@@ -297,13 +319,11 @@ const extractImagesFromResponse = (response: any): string[] => {
   try {
     const images: string[] = [];
 
-    // Method 1: Direct images array
     if (response.images && Array.isArray(response.images)) {
       response.images.forEach((img: any) => {
         if (typeof img === 'string') {
           images.push(img);
         } else if (img && typeof img === 'object') {
-          // Handle various image object formats
           const imageUrl = img.image || img.view_url || img.url || img.path;
           if (imageUrl) {
             images.push(imageUrl);
@@ -312,7 +332,6 @@ const extractImagesFromResponse = (response: any): string[] => {
       });
     }
 
-    // Method 2: Check in sections (if your API uses this structure)
     if (response.sections && Array.isArray(response.sections)) {
       response.sections.forEach((section: any) => {
         if (section.images && Array.isArray(section.images)) {
@@ -327,7 +346,6 @@ const extractImagesFromResponse = (response: any): string[] => {
       });
     }
 
-    // Method 3: Check in product_data
     if (response.product_data && response.product_data.images) {
       const productImages = response.product_data.images;
       if (Array.isArray(productImages)) {
@@ -341,7 +359,6 @@ const extractImagesFromResponse = (response: any): string[] => {
       }
     }
 
-    // Method 4: Check for image_pairs or similar fields
     if (response.image_pairs && Array.isArray(response.image_pairs)) {
       response.image_pairs.forEach((pair: any) => {
         if (pair.detailed && pair.detailed.image_path) {
@@ -350,7 +367,6 @@ const extractImagesFromResponse = (response: any): string[] => {
       });
     }
 
-    // Remove duplicates and filter valid URLs
     const uniqueImages = [...new Set(images)].filter(
       img => img && typeof img === 'string' && img.trim() !== '',
     );
@@ -364,7 +380,7 @@ const extractImagesFromResponse = (response: any): string[] => {
   }
 };
 
-// NEW: Product Status Update Thunk
+// Product Status Update Thunk
 export const updateProductStatus = createAsyncThunk(
   'products/updateProductStatus',
   async (
@@ -377,7 +393,7 @@ export const updateProductStatus = createAsyncThunk(
       productId: string;
       isActive: boolean;
     },
-    { rejectWithValue },
+    {rejectWithValue},
   ) => {
     try {
       console.log('updateProductStatus thunk called with:', {
@@ -410,7 +426,7 @@ export const updateProductStatus = createAsyncThunk(
   },
 );
 
-// NEW: Bulk Status Update Thunk
+// Bulk Status Update Thunk
 export const updateMultipleProductsStatus = createAsyncThunk(
   'products/updateMultipleProductsStatus',
   async (
@@ -423,7 +439,7 @@ export const updateMultipleProductsStatus = createAsyncThunk(
       productIds: string[];
       status: 'A' | 'D' | 'H' | 'X';
     },
-    { rejectWithValue },
+    {rejectWithValue},
   ) => {
     try {
       console.log('updateMultipleProductsStatus thunk called with:', {
@@ -467,10 +483,10 @@ export const deleteProduct = createAsyncThunk(
       userId: string;
       productIds: string | string[];
     },
-    { rejectWithValue },
+    {rejectWithValue},
   ) => {
     try {
-      console.log('deleteProduct thunk called with:', { userId, productIds });
+      console.log('deleteProduct thunk called with:', {userId, productIds});
 
       const response = await deleteProductApi(userId, productIds);
 
@@ -502,7 +518,7 @@ export const deleteMultipleProducts = createAsyncThunk(
       userId: string;
       productIds: string[];
     },
-    { rejectWithValue },
+    {rejectWithValue},
   ) => {
     try {
       console.log('deleteMultipleProducts thunk called with:', {
@@ -538,12 +554,12 @@ const productsSlice = createSlice({
     setCurrentFilter: (state, action) => {
       console.log('setCurrentFilter called with:', action.payload);
       state.currentFilter = action.payload;
-      state.currentPage = 1; // Reset page when changing filter
+      state.currentPage = 1;
     },
     setSearchTerm: (state, action) => {
       console.log('setSearchTerm called with:', action.payload);
       state.searchTerm = action.payload;
-      state.currentPage = 1; // Reset page when searching
+      state.currentPage = 1;
     },
     clearProducts: state => {
       console.log('clearProducts called');
@@ -555,9 +571,8 @@ const productsSlice = createSlice({
       console.log('resetProductsState called');
       return initialState;
     },
-    // Local status update for optimistic UI
     updateProductStatusLocal: (state, action) => {
-      const { productId, status } = action.payload;
+      const {productId, status} = action.payload;
       const productIndex = state.products.findIndex(
         p => p.product_id === productId,
       );
@@ -565,7 +580,6 @@ const productsSlice = createSlice({
         state.products[productIndex].status = status;
       }
     },
-    // Clear errors
     clearDeleteError: state => {
       console.log('clearDeleteError called');
       state.deleteError = null;
@@ -574,14 +588,12 @@ const productsSlice = createSlice({
       console.log('clearStatusUpdateError called');
       state.statusUpdateError = null;
     },
-    // Remove product from local state (optimistic update)
     removeProductFromState: (state, action) => {
       const productId = action.payload;
       console.log('removeProductFromState called with:', productId);
       state.products = state.products.filter(p => p.product_id !== productId);
       state.totalItems = Math.max(0, state.totalItems - 1);
     },
-    // Remove multiple products from local state
     removeMultipleProductsFromState: (state, action) => {
       const productIds = action.payload;
       console.log('removeMultipleProductsFromState called with:', productIds);
@@ -589,6 +601,16 @@ const productsSlice = createSlice({
         p => !productIds.includes(p.product_id),
       );
       state.totalItems = Math.max(0, state.totalItems - productIds.length);
+    },
+    // NEW: Price filter actions
+    setPriceFilter: (state, action) => {
+      console.log('setPriceFilter called with:', action.payload);
+      state.priceFilter = action.payload;
+      state.currentPage = 1;
+    },
+    clearPriceFilter: state => {
+      console.log('clearPriceFilter called');
+      state.priceFilter = null;
     },
   },
   extraReducers: builder => {
@@ -677,7 +699,6 @@ const productsSlice = createSlice({
       // Fetch Filter Counts
       .addCase(fetchFilterCounts.pending, state => {
         console.log('fetchFilterCounts.pending');
-        // Don't set loading for filter counts as it's background operation
       })
       .addCase(fetchFilterCounts.fulfilled, (state, action) => {
         console.log('fetchFilterCounts.fulfilled with:', action.payload);
@@ -688,7 +709,7 @@ const productsSlice = createSlice({
         console.error('Failed to fetch filter counts:', action.payload);
       })
 
-      // FIXED: Fetch Product Details - Only ONE case now
+      // Fetch Product Details
       .addCase(fetchProductDetails.pending, state => {
         console.log('fetchProductDetails.pending');
         state.loading = true;
@@ -702,7 +723,6 @@ const productsSlice = createSlice({
         state.loading = false;
         state.productDetails = {
           ...action.payload,
-          // Ensure images are properly set
           images: action.payload.images || [],
         };
         state.error = null;
@@ -716,9 +736,8 @@ const productsSlice = createSlice({
       // Update Product Status Cases
       .addCase(updateProductStatus.pending, (state, action) => {
         console.log('updateProductStatus.pending');
-        const { productId } = action.meta.arg;
+        const {productId} = action.meta.arg;
 
-        // Add product to updating list
         if (!state.updatingStatus.includes(productId)) {
           state.updatingStatus.push(productId);
         }
@@ -727,9 +746,8 @@ const productsSlice = createSlice({
       .addCase(updateProductStatus.fulfilled, (state, action) => {
         console.log('updateProductStatus.fulfilled with:', action.payload);
 
-        const { productId, newStatus } = action.payload;
+        const {productId, newStatus} = action.payload;
 
-        // Update product status in local state
         const productIndex = state.products.findIndex(
           p => p.product_id === productId,
         );
@@ -737,7 +755,6 @@ const productsSlice = createSlice({
           state.products[productIndex].status = newStatus;
         }
 
-        // Remove from updating list
         state.updatingStatus = state.updatingStatus.filter(
           id => id !== productId,
         );
@@ -747,9 +764,8 @@ const productsSlice = createSlice({
       .addCase(updateProductStatus.rejected, (state, action) => {
         console.log('updateProductStatus.rejected with:', action.payload);
 
-        const { productId } = action.meta.arg;
+        const {productId} = action.meta.arg;
 
-        // Remove from updating list
         state.updatingStatus = state.updatingStatus.filter(
           id => id !== productId,
         );
@@ -760,9 +776,8 @@ const productsSlice = createSlice({
       // Update Multiple Products Status Cases
       .addCase(updateMultipleProductsStatus.pending, (state, action) => {
         console.log('updateMultipleProductsStatus.pending');
-        const { productIds } = action.meta.arg;
+        const {productIds} = action.meta.arg;
 
-        // Add products to updating list
         productIds.forEach(id => {
           if (!state.updatingStatus.includes(id)) {
             state.updatingStatus.push(id);
@@ -776,9 +791,8 @@ const productsSlice = createSlice({
           action.payload,
         );
 
-        const { productIds, newStatus } = action.payload;
+        const {productIds, newStatus} = action.payload;
 
-        // Update products status in local state
         productIds.forEach(productId => {
           const productIndex = state.products.findIndex(
             p => p.product_id === productId,
@@ -788,7 +802,6 @@ const productsSlice = createSlice({
           }
         });
 
-        // Remove from updating list
         state.updatingStatus = state.updatingStatus.filter(
           id => !productIds.includes(id),
         );
@@ -801,9 +814,8 @@ const productsSlice = createSlice({
           action.payload,
         );
 
-        const { productIds } = action.meta.arg;
+        const {productIds} = action.meta.arg;
 
-        // Remove from updating list
         state.updatingStatus = state.updatingStatus.filter(
           id => !productIds.includes(id),
         );
@@ -818,27 +830,23 @@ const productsSlice = createSlice({
           ? action.meta.arg.productIds
           : [action.meta.arg.productIds];
 
-        // Add products to deleting list
         state.deletingProducts = [...state.deletingProducts, ...productIds];
         state.deleteError = null;
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
         console.log('deleteProduct.fulfilled with:', action.payload);
 
-        const { deletedProductIds } = action.payload;
+        const {deletedProductIds} = action.payload;
 
-        // Remove products from local state
         state.products = state.products.filter(
           product => !deletedProductIds.includes(product.product_id),
         );
 
-        // Update total items count
         state.totalItems = Math.max(
           0,
           state.totalItems - deletedProductIds.length,
         );
 
-        // Remove from deleting list
         state.deletingProducts = state.deletingProducts.filter(
           id => !deletedProductIds.includes(id),
         );
@@ -848,7 +856,6 @@ const productsSlice = createSlice({
       .addCase(deleteProduct.rejected, (state, action) => {
         console.log('deleteProduct.rejected with:', action.payload);
 
-        // Remove from deleting list on error
         const productIds = Array.isArray(action.meta.arg.productIds)
           ? action.meta.arg.productIds
           : [action.meta.arg.productIds];
@@ -863,29 +870,25 @@ const productsSlice = createSlice({
       // Delete Multiple Products Cases
       .addCase(deleteMultipleProducts.pending, (state, action) => {
         console.log('deleteMultipleProducts.pending');
-        const { productIds } = action.meta.arg;
+        const {productIds} = action.meta.arg;
 
-        // Add products to deleting list
         state.deletingProducts = [...state.deletingProducts, ...productIds];
         state.deleteError = null;
       })
       .addCase(deleteMultipleProducts.fulfilled, (state, action) => {
         console.log('deleteMultipleProducts.fulfilled with:', action.payload);
 
-        const { deletedProductIds } = action.payload;
+        const {deletedProductIds} = action.payload;
 
-        // Remove products from local state
         state.products = state.products.filter(
           product => !deletedProductIds.includes(product.product_id),
         );
 
-        // Update total items count
         state.totalItems = Math.max(
           0,
           state.totalItems - deletedProductIds.length,
         );
 
-        // Remove from deleting list
         state.deletingProducts = state.deletingProducts.filter(
           id => !deletedProductIds.includes(id),
         );
@@ -895,8 +898,7 @@ const productsSlice = createSlice({
       .addCase(deleteMultipleProducts.rejected, (state, action) => {
         console.log('deleteMultipleProducts.rejected with:', action.payload);
 
-        // Remove from deleting list on error
-        const { productIds } = action.meta.arg;
+        const {productIds} = action.meta.arg;
         state.deletingProducts = state.deletingProducts.filter(
           id => !productIds.includes(id),
         );
@@ -916,6 +918,8 @@ export const {
   clearStatusUpdateError,
   removeProductFromState,
   removeMultipleProductsFromState,
+  setPriceFilter,
+  clearPriceFilter,
 } = productsSlice.actions;
 
 export default productsSlice.reducer;

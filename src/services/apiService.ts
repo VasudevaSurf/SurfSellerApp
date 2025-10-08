@@ -367,6 +367,8 @@ export interface ProductFilters {
   lowStockThreshold?: number;
   page?: number;
   itemsPerPage?: number;
+  minPrice?: number; // NEW
+  maxPrice?: number; // NEW
 }
 
 export interface DeleteProductResponse {

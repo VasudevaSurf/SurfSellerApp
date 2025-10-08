@@ -1,5 +1,12 @@
+// src/screens/DashBoardScreens/OrdersScreen/OrderScreen.tsx
 import React, {useState, useEffect, useCallback} from 'react';
-import {ScrollView, View, ActivityIndicator, Image} from 'react-native';
+import {
+  ScrollView,
+  View,
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BellIcon from '../../../assets/icons/BellIcon';
 import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
@@ -10,7 +17,7 @@ import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox'
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './OrderScreen.styles';
 import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
@@ -23,12 +30,13 @@ import {
   setSearchTerm,
   updateOrderStatus,
   clearStatusUpdateError,
+  fetchFilteredOrders,
+  setActiveFilters,
+  clearActiveFilters,
+  OrderFilters,
 } from '../../../redux/slices/ordersSlice';
 import FilterIcon from '../../../assets/icons/FilterIcon';
-import {
-  FilterOrdersModal,
-  FilterOrdersData,
-} from '../../../components/MainComponents/FilterOrdersModal';
+import {FilterOrdersModal} from '../../../components/MainComponents/FilterOrdersModal';
 import AnimatedLoader from '../../../assets/icons/LoaderIcon';
 
 // Map API status codes to display status
@@ -77,7 +85,6 @@ const getApiStatusFromFilter = (filterId: string): string | undefined => {
     shipped: 'B',
   };
 
-  // Check if it's already an API status code
   if (['O', 'P', 'C', 'F', 'I', 'D', 'B', 'Y', 'A'].includes(filterId)) {
     return filterId;
   }
@@ -101,31 +108,25 @@ const OrderScreen = () => {
     totalItems,
     updatingStatus,
     statusUpdateError,
+    activeFilters,
   } = useSelector((state: RootState) => state.orders);
+
+  // State for filter modal
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
-  const [currentFilters, setCurrentFilters] = useState<OrderFilters>({});
-
-  const handleApplyFilters = (filters: OrderFilters) => {
-    console.log('Applied filters:', filters);
-    setCurrentFilters(filters);
-
-    // Apply your filtering logic here
-    // For example, update your orders list based on filters
-    // fetchFilteredOrders(filters);
-  };
-
-  const openFilterModal = () => {
-    setIsFilterModalVisible(true);
-  };
-
-  const closeFilterModal = () => {
-    setIsFilterModalVisible(false);
-  };
+  const [currentFilters, setCurrentFilters] = useState<OrderFilters>(
+    activeFilters || {},
+  );
 
   const [searchText, setSearchText] = useState('');
   const [searchTimeoutRef, setSearchTimeoutRef] =
     useState<NodeJS.Timeout | null>(null);
-  const [showFilterModal, setShowFilterModal] = useState(false); // added for filter icon
+
+  // Sync local filters with Redux state
+  useEffect(() => {
+    if (activeFilters) {
+      setCurrentFilters(activeFilters);
+    }
+  }, [activeFilters]);
 
   // Debugging: Log userId and orders
   useEffect(() => {
@@ -148,13 +149,11 @@ const OrderScreen = () => {
   // Format orders for display
   const formattedOrders =
     orders?.map(order => {
-      // Extract customer name from order data
       const customerName =
         order.customer?.name ||
         `${order.firstname || ''} ${order.lastname || ''}`.trim() ||
         'Customer';
 
-      // Extract product info (use first product if multiple)
       const firstProduct =
         order.products && order.products.length > 0 ? order.products[0] : null;
       const productName = firstProduct?.product || customerName;
@@ -208,24 +207,20 @@ const OrderScreen = () => {
     (text: string) => {
       setSearchText(text);
 
-      // Clear existing timeout
       if (searchTimeoutRef) {
         clearTimeout(searchTimeoutRef);
       }
 
-      // Set new timeout for debounced search
       const timeoutId = setTimeout(() => {
         if (userId) {
           if (text.trim()) {
             dispatch(searchOrders({userId, searchTerm: text}));
           } else {
-            // Clear search, fetch with current filter
             const apiStatus = getApiStatusFromFilter(statusFilter);
-
             dispatch(fetchOrders({userId, status: apiStatus}));
           }
         }
-      }, 500); // 500ms debounce
+      }, 500);
 
       setSearchTimeoutRef(timeoutId);
     },
@@ -239,7 +234,6 @@ const OrderScreen = () => {
         dispatch(searchOrders({userId, searchTerm: searchText}));
       } else {
         const apiStatus = getApiStatusFromFilter(statusFilter);
-
         dispatch(fetchOrders({userId, status: apiStatus}));
       }
     }
@@ -259,14 +253,12 @@ const OrderScreen = () => {
           updateOrderStatus({userId, orderId, status: apiStatus}),
         ).unwrap();
 
-        // Refresh orders list after successful update
         setTimeout(() => {
           const currentApiStatus = getApiStatusFromFilter(statusFilter);
           dispatch(fetchOrders({userId: userId!, status: currentApiStatus}));
         }, 1000);
       } catch (error: any) {
         console.error('Failed to update order status:', error);
-        // Error handling is managed by the Redux state
       }
     },
     [dispatch, userId, statusFilter],
@@ -280,11 +272,80 @@ const OrderScreen = () => {
       if (userId) {
         const apiStatus = getApiStatusFromFilter(filter.id);
 
-        dispatch(fetchOrders({userId, status: apiStatus}));
+        // If there are active filters, apply them with the new status filter
+        if (hasActiveFilters()) {
+          const updatedFilters = {
+            ...currentFilters,
+            orderStatus: filter.id,
+          };
+          dispatch(
+            fetchFilteredOrders({
+              userId,
+              filters: updatedFilters,
+            }),
+          );
+        } else {
+          dispatch(fetchOrders({userId, status: apiStatus}));
+        }
       }
     },
-    [dispatch, userId],
+    [dispatch, userId, currentFilters],
   );
+
+  // NEW: Handle apply filters
+  const handleApplyFilters = (filters: OrderFilters) => {
+    console.log('Applying order filters:', filters);
+
+    setCurrentFilters(filters);
+
+    dispatch(setActiveFilters(filters));
+
+    if (userId) {
+      dispatch(
+        fetchFilteredOrders({
+          userId,
+          filters,
+          page: 1,
+        }),
+      );
+    }
+
+    setIsFilterModalVisible(false);
+  };
+
+  // NEW: Handle clear filters
+  const handleClearFilters = () => {
+    console.log('Clearing order filters');
+
+    setCurrentFilters({});
+
+    dispatch(clearActiveFilters());
+
+    if (userId) {
+      const apiStatus = getApiStatusFromFilter(statusFilter);
+      dispatch(fetchOrders({userId, status: apiStatus}));
+    }
+  };
+
+  // NEW: Check if any filters are active
+  const hasActiveFilters = (): boolean => {
+    return (
+      Object.keys(currentFilters).length > 0 &&
+      Object.values(currentFilters).some(value => value && value !== 'all')
+    );
+  };
+
+  // NEW: Count active filters
+  const getActiveFilterCount = (): number => {
+    let count = 0;
+    if (currentFilters.customerName) count++;
+    if (currentFilters.email) count++;
+    if (currentFilters.phoneNumber) count++;
+    if (currentFilters.minOrderValue || currentFilters.maxOrderValue) count++;
+    if (currentFilters.orderStatus && currentFilters.orderStatus !== 'all')
+      count++;
+    return count;
+  };
 
   // Handle card press to navigate to order details
   const handleCardPress = useCallback((params: any) => {
@@ -350,9 +411,11 @@ const OrderScreen = () => {
           },
           {
             icon: FilterIcon,
-            onPress: () => setIsFilterModalVisible(true), // Change this
+            onPress: () => setIsFilterModalVisible(true),
             size: 24,
-            color: ColorPalette.IconColor,
+            color: hasActiveFilters()
+              ? ColorPalette.PURPLE_300
+              : ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
         ]}
@@ -367,6 +430,80 @@ const OrderScreen = () => {
         />
       </View>
 
+      {/* NEW: Active filters indicator */}
+      {hasActiveFilters() && (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: getScreenWidth(4),
+            paddingVertical: getScreenHeight(1),
+            backgroundColor: '#F3E8FF',
+            borderBottomWidth: 1,
+            borderBottomColor: ColorPalette.GREY_100,
+          }}>
+          <View style={{flex: 1}}>
+            <Typography
+              text={`${getActiveFilterCount()} filter${
+                getActiveFilterCount() > 1 ? 's' : ''
+              } applied`}
+              variant={TypographyVariant.PSMALL_MEDIUM}
+              customTextStyles={{color: ColorPalette.PURPLE_300}}
+            />
+            {currentFilters.customerName && (
+              <Typography
+                text={`• Name: ${currentFilters.customerName}`}
+                variant={TypographyVariant.PXSMALL_REGULAR}
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_400,
+                  marginTop: 2,
+                }}
+              />
+            )}
+            {currentFilters.email && (
+              <Typography
+                text={`• Email: ${currentFilters.email}`}
+                variant={TypographyVariant.PXSMALL_REGULAR}
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_400,
+                  marginTop: 2,
+                }}
+              />
+            )}
+            {currentFilters.phoneNumber && (
+              <Typography
+                text={`• Phone: ${currentFilters.phoneNumber}`}
+                variant={TypographyVariant.PXSMALL_REGULAR}
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_400,
+                  marginTop: 2,
+                }}
+              />
+            )}
+            {(currentFilters.minOrderValue || currentFilters.maxOrderValue) && (
+              <Typography
+                text={`• Value: €${currentFilters.minOrderValue || '0'} - €${
+                  currentFilters.maxOrderValue || '∞'
+                }`}
+                variant={TypographyVariant.PXSMALL_REGULAR}
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_400,
+                  marginTop: 2,
+                }}
+              />
+            )}
+          </View>
+          <TouchableOpacity onPress={handleClearFilters}>
+            <Typography
+              text="Clear All"
+              variant={TypographyVariant.PSMALL_SEMIBOLD}
+              customTextStyles={{color: ColorPalette.RED_100}}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+
       <View style={styles.slidingBarsContainer}>
         <SlidingBar
           options={filterOptions}
@@ -375,7 +512,6 @@ const OrderScreen = () => {
         />
       </View>
 
-      {/* Show status update error if any */}
       {statusUpdateError && (
         <View
           style={{
@@ -450,29 +586,43 @@ const OrderScreen = () => {
                   style={styles.emptyBoxPng}
                 />
                 <Typography
-                  text="No orders found"
+                  text={
+                    hasActiveFilters()
+                      ? 'No orders match your filters'
+                      : searchText.trim()
+                      ? `No orders found for "${searchText}"`
+                      : 'No orders found'
+                  }
                   variant={TypographyVariant.PMEDIUM_SEMIBOLD}
                   customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
                 />
-                {searchText.trim() && (
-                  <Typography
-                    text={`Try searching for different terms or clear the search`}
-                    variant={TypographyVariant.PSMALL_REGULAR}
-                    customTextStyles={{
-                      color: ColorPalette.GREY_TEXT_300,
-                      marginTop: 8,
-                      textAlign: 'center',
+                {(searchText.trim() || hasActiveFilters()) && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSearchText('');
+                      handleClearFilters();
                     }}
-                  />
+                    style={{marginTop: getScreenHeight(1)}}>
+                    <Typography
+                      text="Clear search and filters"
+                      variant={TypographyVariant.PSMALL_MEDIUM}
+                      customTextStyles={{
+                        color: ColorPalette.PURPLE_300,
+                        textDecorationLine: 'underline',
+                      }}
+                    />
+                  </TouchableOpacity>
                 )}
               </View>
             )}
           </View>
         </ScrollView>
       )}
+
+      {/* NEW: FilterOrdersModal */}
       <FilterOrdersModal
         isVisible={isFilterModalVisible}
-        onClose={closeFilterModal}
+        onClose={() => setIsFilterModalVisible(false)}
         onApply={handleApplyFilters}
         initialFilters={currentFilters}
       />

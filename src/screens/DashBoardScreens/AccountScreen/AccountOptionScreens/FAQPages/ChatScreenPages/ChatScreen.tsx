@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
 import ImageUploadIcon from '../../../../../../assets/icons/ImageUploadIcon';
@@ -30,6 +29,7 @@ const ChatScreen = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
 
   const initialGreeting: Message = {
@@ -84,13 +84,19 @@ const ChatScreen = () => {
       if (storedMessages) {
         const parsedMessages: Message[] = JSON.parse(storedMessages);
         setMessages(parsedMessages);
+        // Hide quick replies if there are existing messages (user has interacted before)
+        if (parsedMessages.length > 2) {
+          setShowQuickReplies(false);
+        }
       } else {
         // First time - show initial messages
         setMessages([initialGreeting, initialMessage]);
+        setShowQuickReplies(true);
       }
     } catch (error) {
       console.error('Error loading chat history:', error);
       setMessages([initialGreeting, initialMessage]);
+      setShowQuickReplies(true);
     } finally {
       setIsLoading(false);
     }
@@ -104,13 +110,18 @@ const ChatScreen = () => {
     }
   };
 
-  const sendMessage = async () => {
-    const trimmedMessage = message.trim();
-    if (!trimmedMessage || isSending) return;
+  const sendMessage = async (messageText?: string) => {
+    const textToSend = messageText || message.trim();
+    if (!textToSend || isSending) return;
+
+    // Hide quick replies after first message
+    if (showQuickReplies) {
+      setShowQuickReplies(false);
+    }
 
     const userMessage: Message = {
       id: `user_${Date.now()}`,
-      text: trimmedMessage,
+      text: textToSend,
       time: new Date().toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
@@ -127,7 +138,7 @@ const ChatScreen = () => {
 
     try {
       // Get response from Gemini
-      const response = await geminiService.sendMessage(trimmedMessage);
+      const response = await geminiService.sendMessage(textToSend);
 
       const botMessage: Message = {
         id: `bot_${Date.now()}`,
@@ -171,10 +182,11 @@ const ChatScreen = () => {
   };
 
   const handleQuickReplyPress = (replyText: string) => {
-    setMessage(replyText);
+    // Directly send the message instead of just filling the input
+    sendMessage(replyText);
   };
 
-  // Render content - ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  // Render content
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -214,14 +226,32 @@ const ChatScreen = () => {
                     sameSenderAsPrev ? null : styles.diffSenderSpacing,
                   ]}>
                   {firstInGroup ? (
-                    <Image
-                      source={
-                        msg.isUser
-                          ? require('../../../../../../assets/images/placeholder-profile.png')
-                          : require('../../../../../../assets/images/logo.png')
-                      }
-                      style={styles.avatarImage}
-                    />
+                    msg.isUser ? (
+                      <View
+                        style={[
+                          styles.avatarImage,
+                          {
+                            backgroundColor: ColorPalette.PURPLE_300,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 100,
+                          },
+                        ]}>
+                        <Typography
+                          variant={TypographyVariant.PMEDIUM_BOLD}
+                          text="👤"
+                          customTextStyles={{
+                            fontSize: 20,
+                            color: ColorPalette.White,
+                          }}
+                        />
+                      </View>
+                    ) : (
+                      <Image
+                        source={require('../../../../../../assets/images/logo.png')}
+                        style={styles.avatarImage}
+                      />
+                    )
                   ) : (
                     <View style={styles.avatarPlaceholder} />
                   )}
@@ -283,27 +313,30 @@ const ChatScreen = () => {
               </View>
             )}
 
-            <View style={styles.quickRepliesSection}>
-              <Image
-                source={require('../../../../../../assets/images/logo.png')}
-                style={styles.avatarImage}
-              />
-              <View style={styles.quickRepliesContainer}>
-                {quickReplies.map(reply => (
-                  <TouchableOpacity
-                    key={reply.id}
-                    style={styles.quickReplyButton}
-                    onPress={() => handleQuickReplyPress(reply.text)}
-                    disabled={isSending}>
-                    <Typography
-                      variant={TypographyVariant.PXSMALL_REGULAR}
-                      customTextStyles={styles.quickReplyText}
-                      text={reply.text}
-                    />
-                  </TouchableOpacity>
-                ))}
+            {/* Only show quick replies initially or when showQuickReplies is true */}
+            {showQuickReplies && !isSending && (
+              <View style={styles.quickRepliesSection}>
+                <Image
+                  source={require('../../../../../../assets/images/logo.png')}
+                  style={styles.avatarImage}
+                />
+                <View style={styles.quickRepliesContainer}>
+                  {quickReplies.map(reply => (
+                    <TouchableOpacity
+                      key={reply.id}
+                      style={styles.quickReplyButton}
+                      onPress={() => handleQuickReplyPress(reply.text)}
+                      disabled={isSending}>
+                      <Typography
+                        variant={TypographyVariant.PXSMALL_REGULAR}
+                        customTextStyles={styles.quickReplyText}
+                        text={reply.text}
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
-            </View>
+            )}
           </ScrollView>
         </View>
 
@@ -321,13 +354,18 @@ const ChatScreen = () => {
               onChangeText={setMessage}
               multiline
               editable={!isSending}
+              onSubmitEditing={() => {
+                if (message.trim() && !isSending) {
+                  sendMessage();
+                }
+              }}
             />
             <TouchableOpacity
               style={[
                 styles.sendButton,
                 (!message.trim() || isSending) && {opacity: 0.5},
               ]}
-              onPress={sendMessage}
+              onPress={() => sendMessage()}
               disabled={!message.trim() || isSending}>
               {isSending ? (
                 <ActivityIndicator size="small" color="white" />
