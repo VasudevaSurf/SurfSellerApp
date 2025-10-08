@@ -10,6 +10,7 @@ import profileReducer from './slices/profileSlice';
 import initializerReducer from './slices/initializerSlice';
 import categoriesReducer from './slices/categoriesSlice';
 import dashboardReducer from './slices/dashboardSlice'; // Add this line
+import withdrawalReducer from './slices/withdrawalSlice';
 
 const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ const store = configureStore({
     initializer: initializerReducer,
     categories: categoriesReducer,
     dashboard: dashboardReducer, // Add this line
+    withdrawal: withdrawalReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

@@ -487,6 +487,19 @@ export interface FileUploadResponse {
   };
 }
 
+export interface WithdrawalRequest {
+  amount: number;
+  user_id: string;
+  comments?: string;
+}
+
+export interface WithdrawalResponse {
+  result: boolean;
+  message: string;
+  withdrawal_id?: string;
+  new_balance?: string;
+}
+
 // Create the API client with the correct base URL and authorization
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -627,6 +640,47 @@ export const uploadProductImageApi = async (
       success: false,
       error: error.message || 'Network error during upload',
     };
+  }
+};
+
+export const createWithdrawalApi = async (
+  userId: string,
+  amount: number,
+  comments?: string,
+): Promise<WithdrawalResponse> => {
+  try {
+    console.log('Creating withdrawal:', {userId, amount, comments});
+
+    const response = await axios({
+      method: 'POST',
+      url: `${API_BASE_URL}/api.php?_d=NtSeBalanceApi&user_id=${userId}`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        amount: amount,
+        user_id: parseInt(userId),
+        comments: comments || 'Withdrawal',
+      },
+    });
+
+    console.log('Withdrawal API response:', response.data);
+    return response.data as WithdrawalResponse;
+  } catch (error: any) {
+    console.error('Create Withdrawal API error:', error);
+
+    if (error.response?.status === 400) {
+      throw new Error('Invalid withdrawal amount or insufficient balance');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to make withdrawals');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error. Please try again later.');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to process withdrawal',
+      );
+    }
   }
 };
 
