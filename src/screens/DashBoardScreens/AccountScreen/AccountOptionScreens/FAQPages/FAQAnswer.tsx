@@ -29,7 +29,7 @@ const FAQAnswer = ({ route }) => {
     if (!faqItem) {
         return (
             <SafeAreaView style={styles.container}>
-                <Typography text="FAQ not found." customTextStyles={styles.errorText} variant={TypographyVariant.PSMALL_REGULAR}/>
+                <Typography text="FAQ not found." customTextStyles={styles.errorText} variant={TypographyVariant.PSMALL_REGULAR} />
             </SafeAreaView>
         );
     }
@@ -137,8 +137,11 @@ const FAQAnswer = ({ route }) => {
         return (
             <View style={styles.card}>
                 <Typography text={question} variant={TypographyVariant.LMEDIUM_BOLD} customTextStyles={styles.questionTitle} />
-                {answer.map((section, index) => renderContent(section, index))}
-            </View>
+                {answer.map((section, index) => (
+                    <View key={index}>
+                        {renderContent(section, index)}
+                    </View>
+                ))}            </View>
         );
     };
 
@@ -191,10 +194,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: getScreenWidth(4),
         paddingVertical: getScreenHeight(2),
     },
-    questionTitle: { marginBottom: getScreenHeight(1.5),
+    questionTitle: {
+        marginBottom: getScreenHeight(1.5),
 
-        lineHeight:24
-     },
+        lineHeight: 24
+    },
     sectionTitle: {
         marginBottom: 8,
     },
