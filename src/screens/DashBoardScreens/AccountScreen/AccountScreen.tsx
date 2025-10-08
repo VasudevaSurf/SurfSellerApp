@@ -80,31 +80,6 @@ const AccountScreen = () => {
     }
   }, [dispatch]);
 
-  const headerIcons = useMemo(
-    () => [
-      // {
-      //   icon: LanguageIcon,
-      //   onPress: () => console.log('Language icon pressed'),
-      //   size: 22,
-      //   color: ColorPalette.IconColor,
-      //   strokeWidth: 1.5,
-      // },
-      {
-        icon: QuestionMarkIcon,
-        onPress: () => {
-          navigate('Dashboard', {
-            screen: 'Account',
-            params: { screen: 'FAQScreen' },
-          });
-        },
-        size: 24,
-        color: ColorPalette.IconColor,
-        strokeWidth: 1.5,
-      },
-    ],
-    [],
-  );
-
   // Memoize modal buttons with updated logout functionality
   const logoutButtons = useMemo(
     () => [
@@ -422,7 +397,12 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => { },
+            onPress: () => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: { screen: 'ChatScreen' },
+              });
+            },
           },
           {
             label: 'FAQ',
@@ -442,7 +422,7 @@ const AccountScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'FAQScreen' },
+                params: { screen: 'FAQ' },
               });
             },
           },
@@ -627,8 +607,20 @@ const AccountScreen = () => {
         name="Account"
         variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        rightIcons={headerIcons}
-      />
+        rightIcons={[
+          {
+            icon: QuestionMarkIcon,
+            onPress: () => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: { screen: 'FAQ' },
+              });
+            },
+            size: 24,
+            color: ColorPalette.IconColor,
+            strokeWidth: 1.5,
+          },
+        ]} />
       <ScrollView
         style={styles.mainContainer}
         contentContainerStyle={[

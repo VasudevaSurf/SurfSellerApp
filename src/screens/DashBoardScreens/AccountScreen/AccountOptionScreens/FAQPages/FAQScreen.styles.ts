@@ -1,10 +1,10 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../../../config/colorPalette';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../../../config/colorPalette';
 import {
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
-import {BorderRadius, Spacing} from '../../../../../config/globalStyles';
+import { BorderRadius, Spacing } from '../../../../../config/globalStyles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -21,9 +21,9 @@ export const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    gap: getScreenHeight(1.2),
-    marginTop: getScreenHeight(1.2),
-    paddingBottom: getScreenHeight(5),
+    // gap: getScreenHeight(1.2),
+    // marginTop: getScreenHeight(1.2),
+    // paddingBottom: getScreenHeight(5),
   },
   searchContainer: {
     padding: getScreenWidth(4),
@@ -70,11 +70,23 @@ export const styles = StyleSheet.create({
   containerStyle: {
     paddingHorizontal: getScreenWidth(1),
     backgroundColor: ColorPalette.White,
-    paddingTop: getScreenHeight(2.5),
+    paddingTop: getScreenHeight(2),
+    paddingBottom: getScreenHeight(1),
     gap: getScreenHeight(1),
   },
   menuContainer: {
     width: '100%',
     gap: getScreenHeight(1),
+  },
+  ChatWithUsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: getScreenWidth(1),
+    marginBottom: getScreenHeight(4)
+  },
+  captionTwo: {
+    color: ColorPalette.GREY_TEXT_500,
+    textAlign: 'center',
   },
 });

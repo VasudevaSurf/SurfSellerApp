@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    marginLeft: getScreenWidth(3),
+    marginLeft: getScreenWidth(2),
     color: ColorPalette.Black,
     fontFamily: 'Poppins-Regular',
     fontSize: getFigmaDimension(14),

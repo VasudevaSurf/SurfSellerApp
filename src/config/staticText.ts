@@ -5,8 +5,8 @@ export const STATIC_TEXT = {
       surfCaption: `Made in Malta`,
     },
     welcomeScreen: {
-      createAccount: `Register on Surf`,
-      login: `Log in with Email`,
+      createAccount: `Create New Account`,
+      login: `Login`,
     },
     phoneNumberScreen: {
       loginText: `Login to your seller account`,

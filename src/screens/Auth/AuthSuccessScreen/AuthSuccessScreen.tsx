@@ -75,7 +75,7 @@ const AuthSuccessScreen = ({ navigation }) => {
           />
           <Typography
             variant={TypographyVariant.PSMALL_REGULAR}
-            text={'Welcome back — we’re setting things up for you.'}
+            text={`Welcome back ! We're setting things up for you.`}
             customTextStyles={styles.desc}
           />
         </View>

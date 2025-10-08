@@ -14,6 +14,7 @@ import ChatScreen from '../../screens/DashBoardScreens/AccountScreen/AccountOpti
 import BusinessAdministrators from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BusinessAdministratorsScreens/BusinessAdministrators';
 import EditAdministrator from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BusinessAdministratorsScreens/EditAdministrator';
 import AddAdministrator from '../../screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BusinessAdministratorsScreens/AddAdministrator';
+import { FaqNavigator } from './FaqNavigator';
 
 const Stack = createStackNavigator<AccountSettingsStackParamList>();
 
@@ -31,7 +32,7 @@ export const AccountSettingsNavigator = () => {
       <Stack.Screen name="PaymentInfo" component={PaymentInfo} />
       <Stack.Screen name="WithdrawScreen" component={WithdrawScreen} />
       <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
-      <Stack.Screen name="FAQScreen" component={FAQScreen} />
+      <Stack.Screen name="FAQ" component={FaqNavigator} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
       <Stack.Screen
         name="BusinessAdministrators"
