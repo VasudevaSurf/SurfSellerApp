@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react';
-import {Alert, Image, TouchableOpacity, View} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Alert, Image, TouchableOpacity, View } from 'react-native';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import CircleOutlineClose from '../../../../../../assets/icons/NewProductIcons/CircleOutlineClose';
 import CloudManIcon from '../../../../../../assets/icons/NewProductIcons/CloudManIcon';
 import CrossArrowsIcon from '../../../../../../assets/icons/NewProductIcons/CrossArrowsIcon';
-import {AddModal} from '../../../../../../components/MainComponents/AddModal/AddModal';
+import { AddModal } from '../../../../../../components/MainComponents/AddModal/AddModal';
 import FileItem from '../../../../../../components/MainComponents/FileItem/FileItem';
 import {
   Button,
@@ -13,15 +13,15 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../../config/colorPalette';
+import { Typography } from '../../../../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../../config/colorPalette';
 import {
   getFigmaDimension,
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../../helpers/screenSize';
-import {styles} from './UploadMediaStep.styles';
+import { styles } from './UploadMediaStep.styles';
 import {
   pickImagesFromGallery,
   takePhotoWithCamera,
@@ -35,7 +35,7 @@ import {
   extractRelativePathFromUrl,
   UploadedImageData,
 } from '../../../../../../services/imageService';
-import {Spacing} from '../../../../../../config/globalStyles';
+import { Spacing } from '../../../../../../config/globalStyles';
 
 interface FileData {
   id: string;
@@ -67,7 +67,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [currentUpload, setCurrentUpload] = useState({current: 0, total: 0});
+  const [currentUpload, setCurrentUpload] = useState({ current: 0, total: 0 });
   const [files, setFiles] = useState<FileData[]>([]);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
 
@@ -96,15 +96,15 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             fileExtension === 'jpg' || fileExtension === 'jpeg'
               ? '180 KB'
               : fileExtension === 'png'
-              ? '250 KB'
-              : '200 KB';
+                ? '250 KB'
+                : '200 KB';
 
           return {
             id: `prefilled-${index}-${Date.now()}`,
             name: filename,
             size: estimatedSize,
             date: 'Uploaded',
-            thumbnailSource: {uri: imageUrl},
+            thumbnailSource: { uri: imageUrl },
             isExisting: true,
             originalUrl: imageUrl,
             viewUrl: imageUrl,
@@ -300,7 +300,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
           setUploadStatus('uploading');
           setUploadProgress(0);
-          setCurrentUpload({current: 0, total: validImages.length});
+          setCurrentUpload({ current: 0, total: validImages.length });
 
           try {
             // Upload images using the dedicated image service
@@ -313,7 +313,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               })),
               (current, total, fileName) => {
                 console.log(`Uploading ${current}/${total}: ${fileName}`);
-                setCurrentUpload({current, total});
+                setCurrentUpload({ current, total });
                 const progress = total > 0 ? (current / total) * 100 : 0;
                 setUploadProgress(progress);
               },
@@ -338,7 +338,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                   name: image.fileName,
                   size: formatFileSize(image.fileSize),
                   date: new Date().toLocaleDateString(),
-                  thumbnailSource: {uri: image.viewUrl || image.uri},
+                  thumbnailSource: { uri: image.viewUrl || image.uri },
                   uri: image.uri,
                   relativePath: image.relativePath,
                   viewUrl: image.viewUrl,
@@ -414,14 +414,14 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       Alert.alert('Selection Error', 'Failed to select images');
     } finally {
       setIsUploading(false);
-      setCurrentUpload({current: 0, total: 0});
+      setCurrentUpload({ current: 0, total: 0 });
     }
   };
 
   const handleCancelUpload = () => {
     setUploadStatus(files.length > 0 ? 'completed' : 'initial');
     setUploadProgress(0);
-    setCurrentUpload({current: 0, total: 0});
+    setCurrentUpload({ current: 0, total: 0 });
     setIsUploading(false);
   };
 
@@ -445,16 +445,16 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       customStyles: styles.customButton,
       disabled: isUploading,
     },
-    {
-      text: 'Select from Drive',
-      onPress: () => handleUploadStart('drive'),
-      variant: ButtonVariant.PRIMARY,
-      state: ButtonState.DEFAULT,
-      type: ButtonType.OUTLINED,
-      size: ButtonSize.MEDIUM,
-      customTextStyles: styles.customText,
-      disabled: isUploading,
-    },
+    // {
+    //   text: 'Select from Drive',
+    //   onPress: () => handleUploadStart('drive'),
+    //   variant: ButtonVariant.PRIMARY,
+    //   state: ButtonState.DEFAULT,
+    //   type: ButtonType.OUTLINED,
+    //   size: ButtonSize.MEDIUM,
+    //   customTextStyles: styles.customText,
+    //   disabled: isUploading,
+    // },
   ];
 
   const getHeaderText = () => {
@@ -478,7 +478,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           <Typography
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
             text={getHeaderText()}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
           <InfoIconPay
             size={22}
@@ -506,7 +506,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             <Typography
               variant={TypographyVariant.LMEDIUM_REGULAR}
               text="PNG, JPG, GIF up to 10MB"
-              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
             />
           </View>
         )}
@@ -537,7 +537,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 state={ButtonState.FILEUPLOAD}
                 size={ButtonSize.SMALL}
                 type={ButtonType.PRIMARY}
-                onPress={handleBrowseFiles} 
+                onPress={handleBrowseFiles}
                 withShadow
                 textVariant={TypographyVariant.PSMALL_MEDIUM}
                 disabled={isUploading}
@@ -550,7 +550,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             <Typography
               variant={TypographyVariant.LMEDIUM_REGULAR}
               text="PNG, JPG, GIF up to 10MB"
-              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
             />
           </View>
         )}
@@ -561,8 +561,8 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
         onClose={() => setIsAddModalVisible(false)}
         buttons={modalButtons}
         showCloseIcon={true}
-        containerStyle={{paddingVertical: 16}}
-        footerStyle={{flexDirection: 'column', gap: 12}}
+        containerStyle={{ paddingVertical: 16 }}
+        footerStyle={{ flexDirection: 'column', gap: 12 }}
       />
 
       {uploadStatus === 'uploading' && (
@@ -572,7 +572,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               <Typography
                 text={`Uploading ${currentUpload.current}/${currentUpload.total} images`}
                 variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-                customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
+                customTextStyles={{ color: ColorPalette.GREY_TEXT_400 }}
               />
               <CrossArrowsIcon style={undefined} size={18} />
             </View>
@@ -587,12 +587,12 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             </View>
           </View>
           <View
-            style={[styles.progressLine, {width: `${uploadProgress}%`}]}></View>
+            style={[styles.progressLine, { width: `${uploadProgress}%` }]}></View>
           <View style={styles.progressPercent}>
             <Typography
               text={`${Math.round(uploadProgress)}% uploading`}
               variant={TypographyVariant.LMEDIUM_REGULAR}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
             />
             <TouchableOpacity onPress={handleCancelUpload}>
               <CircleOutlineClose style={undefined} />
@@ -607,15 +607,15 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             <Typography
               text={editMode ? 'Product Images' : 'Recent Uploaded'}
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
             />
             <Typography
               text={`${files.length} items`}
               variant={TypographyVariant.PSMALL_MEDIUM}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
             />
           </View>
-          <View style={{gap: getFigmaDimension(4)}}>
+          <View style={{ gap: getFigmaDimension(4) }}>
             {files.map(file => (
               <FileItem
                 key={file.id}
