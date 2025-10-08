@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: Spacing.Medium,
   },
   scrollContent: {
-    paddingTop: getScreenHeight(2),
+    paddingTop: getScreenHeight(1.2),
     paddingBottom: getScreenHeight(4),
   },
   buttonContainer: {
