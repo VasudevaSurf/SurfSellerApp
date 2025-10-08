@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -8,89 +8,343 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
 import ImageUploadIcon from '../../../../../../assets/icons/ImageUploadIcon';
 import SendIcon from '../../../../../../assets/icons/SendIcon';
-import { Header } from '../../../../../../components/UserComponents/Header/Header';
-import { Typography } from '../../../../../../components/UserComponents/Typography/Typography';
-import { TypographyVariant } from '../../../../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../../../../config/colorPalette';
-import { styles } from './ChatScreen.styles';
-import { goBack } from '../../../../../../navigation/utils/navigationRef';
+import {Header} from '../../../../../../components/UserComponents/Header/Header';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
+import {styles} from './ChatScreen.styles';
+import {goBack} from '../../../../../../navigation/utils/navigationRef';
+import geminiService, {Message} from '../../../../../../services/geminiService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const STORAGE_KEY = '@lucy_chat_history';
 
 const ChatScreen = () => {
   const [message, setMessage] = useState('');
-  const scrollViewRef = useRef(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
 
-  const initialMessages = [
-    {
-      id: 1,
-      text: 'Hi there! I’m Lucy from Surf.',
-      time: '2:30 pm',
-      isUser: false,
-    },
-    {
-      id: 2,
-      text: 'I’m here to help you with seller registration, account setup, or any questions about selling on Surf.',
-      time: '2:30 pm',
-      isUser: false,
-    },
-    {
-      id: 2,
-      text: 'How can I assist you today?',
-      time: '2:30 pm',
-      isUser: false,
-    },
-  ];
+  const initialGreeting: Message = {
+    id: '0',
+    text: "Hi there! I'm Lucy from Surf.",
+    time: new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+    isUser: false,
+    timestamp: Date.now(),
+  };
 
-  const [messages, setMessages] = useState(initialMessages);
+  const initialMessage: Message = {
+    id: '1',
+    text: "I'm here to help you with seller registration, account setup, or any questions about selling on Surf. How can I assist you today?",
+    time: new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+    isUser: false,
+    timestamp: Date.now(),
+  };
 
   const quickReplies = [
-    { id: 1, text: 'Contact customer care' },
-    { id: 2, text: 'Payment issue' },
-    { id: 3, text: "Can't list my product" },
-    { id: 4, text: 'App not working?' },
-    { id: 5, text: 'Account suspended' },
+    {id: 1, text: 'How do I register as a seller?'},
+    {id: 2, text: 'What commission does Surf charge?'},
+    {id: 3, text: 'How do I upload products?'},
+    {id: 4, text: 'When will I receive payouts?'},
+    {id: 5, text: 'Contact support'},
   ];
 
+  // Load chat history on mount
   useEffect(() => {
-    if (scrollViewRef.current) {
+    loadChatHistory();
+  }, []);
+
+  // Auto-scroll when messages change
+  useEffect(() => {
+    if (scrollViewRef.current && messages.length > 0) {
       setTimeout(() => {
-        scrollViewRef.current.scrollToEnd({ animated: true });
+        scrollViewRef.current?.scrollToEnd({animated: true});
       }, 100);
     }
   }, [messages]);
 
-  const sendMessage = () => {
-    if (message.trim()) {
-      const newMessage = {
-        id: messages.length + 1,
-        text: message,
+  const loadChatHistory = async () => {
+    try {
+      setIsLoading(true);
+      const storedMessages = await AsyncStorage.getItem(STORAGE_KEY);
+
+      if (storedMessages) {
+        const parsedMessages: Message[] = JSON.parse(storedMessages);
+        setMessages(parsedMessages);
+      } else {
+        // First time - show initial messages
+        setMessages([initialGreeting, initialMessage]);
+      }
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+      setMessages([initialGreeting, initialMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const saveChatHistory = async (updatedMessages: Message[]) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedMessages));
+    } catch (error) {
+      console.error('Error saving chat history:', error);
+    }
+  };
+
+  const sendMessage = async () => {
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage || isSending) return;
+
+    const userMessage: Message = {
+      id: `user_${Date.now()}`,
+      text: trimmedMessage,
+      time: new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      isUser: true,
+      timestamp: Date.now(),
+    };
+
+    // Add user message immediately
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setMessage('');
+    setIsSending(true);
+
+    try {
+      // Get response from Gemini
+      const response = await geminiService.sendMessage(trimmedMessage);
+
+      const botMessage: Message = {
+        id: `bot_${Date.now()}`,
+        text: response,
         time: new Date().toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit',
         }),
-        isUser: true,
+        isUser: false,
+        timestamp: Date.now(),
       };
-      setMessages([...messages, newMessage]);
-      setMessage('');
+
+      const finalMessages = [...updatedMessages, botMessage];
+      setMessages(finalMessages);
+      await saveChatHistory(finalMessages);
+    } catch (error) {
+      console.error('Error sending message:', error);
+
+      const errorMessage: Message = {
+        id: `error_${Date.now()}`,
+        text: "I'm sorry, I'm having trouble connecting right now. Please try again or contact our support team at sales@surf.mt or WhatsApp: +356 7965 0714",
+        time: new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        isUser: false,
+        timestamp: Date.now(),
+      };
+
+      const finalMessages = [...updatedMessages, errorMessage];
+      setMessages(finalMessages);
+      await saveChatHistory(finalMessages);
+    } finally {
+      setIsSending(false);
     }
   };
 
-  const isFirstInGroup = (messages, index) => {
+  const isFirstInGroup = (index: number) => {
     if (index === 0) return true;
     return messages[index].isUser !== messages[index - 1].isUser;
   };
 
-  const handleQuickReplyPress = replyText => {
+  const handleQuickReplyPress = (replyText: string) => {
     setMessage(replyText);
+  };
+
+  // Render content - ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+          <Typography
+            variant={TypographyVariant.PSMALL_REGULAR}
+            text="Loading chat..."
+            customTextStyles={{
+              marginTop: 10,
+              color: ColorPalette.GREY_TEXT_500,
+            }}
+          />
+        </View>
+      );
+    }
+
+    return (
+      <>
+        <View style={styles.mainContainer}>
+          <ScrollView
+            ref={scrollViewRef}
+            style={styles.scrollViewContainer}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}>
+            {messages.map((msg, index) => {
+              const prevMsg = messages[index - 1];
+              const sameSenderAsPrev = prevMsg && prevMsg.isUser === msg.isUser;
+              const firstInGroup = isFirstInGroup(index);
+
+              return (
+                <View
+                  key={msg.id}
+                  style={[
+                    styles.messageRow,
+                    msg.isUser ? styles.userMessageRow : styles.botMessageRow,
+                    sameSenderAsPrev ? null : styles.diffSenderSpacing,
+                  ]}>
+                  {firstInGroup ? (
+                    <Image
+                      source={
+                        msg.isUser
+                          ? require('../../../../../../assets/images/placeholder-profile.png')
+                          : require('../../../../../../assets/images/logo.png')
+                      }
+                      style={styles.avatarImage}
+                    />
+                  ) : (
+                    <View style={styles.avatarPlaceholder} />
+                  )}
+
+                  <View
+                    style={[
+                      styles.messageBubble,
+                      msg.isUser
+                        ? styles.userMessageBubble
+                        : styles.botMessageBubble,
+                      firstInGroup &&
+                        (msg.isUser
+                          ? styles.userMessageFirstBubble
+                          : styles.botMessageFirstBubble),
+                    ]}>
+                    <Typography
+                      variant={TypographyVariant.PSMALL_REGULAR}
+                      customTextStyles={
+                        msg.isUser
+                          ? styles.userMessageText
+                          : styles.botMessageText
+                      }
+                      text={msg.text}
+                    />
+                  </View>
+
+                  <Typography
+                    variant={TypographyVariant.LXSMALL_REGULAR}
+                    customTextStyles={[
+                      styles.messageTime,
+                      msg.isUser
+                        ? styles.userMessageTime
+                        : styles.botMessageTime,
+                    ]}
+                    text={msg.time}
+                  />
+                </View>
+              );
+            })}
+
+            {isSending && (
+              <View
+                style={[
+                  styles.messageRow,
+                  styles.botMessageRow,
+                  styles.diffSenderSpacing,
+                ]}>
+                <Image
+                  source={require('../../../../../../assets/images/logo.png')}
+                  style={styles.avatarImage}
+                />
+                <View style={[styles.messageBubble, styles.botMessageBubble]}>
+                  <ActivityIndicator
+                    size="small"
+                    color={ColorPalette.PURPLE_300}
+                  />
+                </View>
+                <View style={styles.avatarPlaceholder} />
+              </View>
+            )}
+
+            <View style={styles.quickRepliesSection}>
+              <Image
+                source={require('../../../../../../assets/images/logo.png')}
+                style={styles.avatarImage}
+              />
+              <View style={styles.quickRepliesContainer}>
+                {quickReplies.map(reply => (
+                  <TouchableOpacity
+                    key={reply.id}
+                    style={styles.quickReplyButton}
+                    onPress={() => handleQuickReplyPress(reply.text)}
+                    disabled={isSending}>
+                    <Typography
+                      variant={TypographyVariant.PXSMALL_REGULAR}
+                      customTextStyles={styles.quickReplyText}
+                      text={reply.text}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.inputContainer}>
+          <View style={styles.uploadContainer}>
+            <ImageUploadIcon />
+          </View>
+          <View style={styles.textInputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Write your message here..."
+              value={message}
+              onChangeText={setMessage}
+              multiline
+              editable={!isSending}
+            />
+            <TouchableOpacity
+              style={[
+                styles.sendButton,
+                (!message.trim() || isSending) && {opacity: 0.5},
+              ]}
+              onPress={sendMessage}
+              disabled={!message.trim() || isSending}>
+              {isSending ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <SendIcon size={20} color="white" />
+              )}
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </>
+    );
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
-        name="Surf Chatbot"
+        name="Lucy - Surf Assistant"
         variant={TypographyVariant.PMEDIUM_REGULAR}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={<ArrowLeftIcon size={15} onPress={goBack} />}
@@ -98,124 +352,7 @@ const ChatScreen = () => {
         subHeader
         subText="Active"
       />
-
-      <View style={styles.mainContainer}>
-        <ScrollView
-          ref={scrollViewRef}
-          style={styles.scrollViewContainer}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {messages.map((msg, index) => {
-            const prevMsg = messages[index - 1];
-            const sameSenderAsPrev = prevMsg && prevMsg.isUser === msg.isUser;
-            const firstInGroup = isFirstInGroup(messages, index);
-
-            return (
-              <View
-                key={index}
-                style={[
-                  styles.messageRow,
-                  msg.isUser ? styles.userMessageRow : styles.botMessageRow,
-                  sameSenderAsPrev
-                    ? null
-                    : styles.diffSenderSpacing,
-                ]}
-              >
-                {firstInGroup ? (
-                  <Image
-                    source={
-                      msg.isUser
-                        ? require('../../../../../../assets/images/placeholder-profile.png')
-                        : require('../../../../../../assets/images/logo.png')
-                    }
-                    style={styles.avatarImage}
-                  />
-                ) : (
-                  <View style={styles.avatarPlaceholder} />
-                )}
-
-                <View
-                  style={[
-                    styles.messageBubble,
-                    msg.isUser
-                      ? styles.userMessageBubble
-                      : styles.botMessageBubble,
-                    firstInGroup &&
-                      (msg.isUser
-                        ? styles.userMessageFirstBubble
-                        : styles.botMessageFirstBubble),
-                  ]}
-                >
-                  <Typography
-                    variant={TypographyVariant.PSMALL_REGULAR}
-                    customTextStyles={
-                      msg.isUser
-                        ? styles.userMessageText
-                        : styles.botMessageText
-                    }
-                    text={msg.text}
-                  />
-                </View>
-
-                <Typography
-                  variant={TypographyVariant.LXSMALL_REGULAR}
-                  customTextStyles={[
-                    styles.messageTime,
-                    msg.isUser
-                      ? styles.userMessageTime
-                      : styles.botMessageTime,
-                  ]}
-                  text={msg.time}
-                />
-              </View>
-            );
-          })}
-
-          <View style={styles.quickRepliesSection}>
-            <Image
-              source={require('../../../../../../assets/images/logo.png')}
-              style={styles.avatarImage}
-            />
-            <View style={styles.quickRepliesContainer}>
-              {quickReplies.map(reply => (
-                <TouchableOpacity
-                  key={reply.id}
-                  style={styles.quickReplyButton}
-                  onPress={() => handleQuickReplyPress(reply.text)}
-                >
-                  <Typography
-                    variant={TypographyVariant.PXSMALL_REGULAR}
-                    customTextStyles={styles.quickReplyText}
-                    text={reply.text}
-                  />
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        </ScrollView>
-      </View>
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.inputContainer}
-      >
-        <View style={styles.uploadContainer}>
-          <ImageUploadIcon />
-        </View>
-        <View style={styles.textInputContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Write your message here..."
-            value={message}
-            onChangeText={setMessage}
-            multiline
-          />
-          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-            <SendIcon size={20} color="white" />
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+      {renderContent()}
     </SafeAreaView>
   );
 };
