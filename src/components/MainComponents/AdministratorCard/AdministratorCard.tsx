@@ -67,7 +67,7 @@ export const AdministratorCard: React.FC<AdministratorCardProps> = ({
 
   const getRoleBackgroundColor = (role: string): string => {
     return role === 'Owner'
-      ? 'rgba(145, 1, 207, 0.10)'
+      ? 'rgba(58, 90, 254, 0.1)'
       : 'rgba(255, 50, 106, 0.10)';
   };
 
@@ -89,7 +89,7 @@ export const AdministratorCard: React.FC<AdministratorCardProps> = ({
             textVariant={TypographyVariant.LSMALL_BOLD}
             customTextColor={
               displayData.role === 'Owner'
-                ? ColorPalette.PURPLE_300
+                ? ColorPalette.ProgressLine
                 : ColorPalette.PURPLE_ROSE_300
             }
           />
@@ -102,7 +102,7 @@ export const AdministratorCard: React.FC<AdministratorCardProps> = ({
         <TouchableOpacity
           style={styles.editButton}
           onPress={() => onEdit(displayData)}>
-          <EditIcon size={20} color={ColorPalette.PURPLE_300} />
+          <EditIcon size={20} color={ColorPalette.ProgressLine} />
         </TouchableOpacity>
       </View>
 
