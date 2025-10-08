@@ -1,32 +1,43 @@
-import {useFocusEffect, useRoute} from '@react-navigation/native';
-import React, {useState} from 'react';
-import {SafeAreaView, ScrollView, View} from 'react-native';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { SafeAreaView, ScrollView, View } from 'react-native';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
-import {Header} from '../../../../../components/UserComponents/Header/Header';
+import { Header } from '../../../../../components/UserComponents/Header/Header';
 import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
-import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../config/colorPalette';
-import {getScreenHeight} from '../../../../../helpers/screenSize';
-import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
-import {styles} from './BankDetails.styles';
+import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../config/colorPalette';
+import { getScreenHeight } from '../../../../../helpers/screenSize';
+import { goBack, navigate } from '../../../../../navigation/utils/navigationRef';
+import { styles } from './BankDetails.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
+import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
 
 const BankDetails = () => {
   const route = useRoute();
   const [accountName, setAccountName] = useState('Annie Flora');
-  const [accountNumber, setAccountNumber] = useState('MT84APSB1234567890');
+  const [IBAN, setIBAN] = useState('MT84');
   const [bicCode, setBicCode] = useState('APSBMTMT123');
+  const [bankName, setBankName] = useState('Malta Bank');
+  const [accountType, setAccountType] = useState('Business');
 
   useFocusEffect(
     React.useCallback(() => {
       if (route.params) {
-        const {updatedAccountName, updatedAccountNumber, updatedBicCode} =
-          route.params;
+        const {
+          updatedAccountName,
+          updatedIBAN,
+          updatedBicCode,
+          updatedBankName,
+          updatedAccountType,
+        } = route.params;
+
         if (updatedAccountName) setAccountName(updatedAccountName);
-        if (updatedAccountNumber) setAccountNumber(updatedAccountNumber);
+        if (updatedIBAN) setIBAN(updatedIBAN);
         if (updatedBicCode) setBicCode(updatedBicCode);
+        if (updatedBankName) setBankName(updatedBankName);
+        if (updatedAccountType) setAccountType(updatedAccountType);
       }
-    }, [route.params]),
+    }, [route.params])
   );
 
   const handleEditAccountName = () => {
@@ -37,10 +48,10 @@ const BankDetails = () => {
         params: {
           fieldType: 'accountName',
           initialValue: accountName,
-          headerTitle: 'Update your account holder name',
-          label: 'Account holder name',
+          headerTitle: 'Update your full name',
+          label: 'Account holder full name',
           description:
-            'Please update your account holder name as it appears on your passbook for accuracy.',
+            'Please update your account holder full name as it appears on your bank records for accuracy.',
           keyboardType: 'default',
           validationType: 'accountName',
           onSubmitActionType: 'updateAccountName',
@@ -50,21 +61,21 @@ const BankDetails = () => {
     });
   };
 
-  const handleEditAccountNumber = () => {
+  const handleEditIBAN = () => {
     navigate('Dashboard', {
       screen: 'Account',
       params: {
         screen: 'EditField',
         params: {
-          fieldType: 'accountNumber',
-          initialValue: accountNumber,
-          headerTitle: 'Update your account number',
-          label: 'Account number',
+          fieldType: 'IBAN',
+          initialValue: IBAN,
+          headerTitle: 'Update your IBAN',
+          label: 'IBAN',
           description:
-            'Please update your account number for accurate transaction processing.',
+            'Please enter your IBAN exactly as shown in your bank records to ensure successful transactions.',
           keyboardType: 'default',
-          validationType: 'accountNumber',
-          onSubmitActionType: 'updateAccountNumber',
+          validationType: 'IBAN',
+          onSubmitActionType: 'updateIBAN',
           size: 24,
           originScreen: 'BankDetails',
         },
@@ -81,7 +92,7 @@ const BankDetails = () => {
           fieldType: 'bicCode',
           initialValue: bicCode,
           headerTitle: 'Update your SWIFT/BIC code',
-          label: 'SWIFT/BIC code',
+          label: 'Swift/BIC code',
           description:
             'Please update your SWIFT/BIC code for accurate transaction processing.',
           keyboardType: 'default',
@@ -94,25 +105,82 @@ const BankDetails = () => {
     });
   };
 
+  const handleEditBankName = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'bankName',
+          initialValue: bankName,
+          headerTitle: 'Update your bank name',
+          label: 'Bank name',
+          description:
+            'Please provide the full name of your bank as registered on your account.',
+          keyboardType: 'default',
+          validationType: 'bankName',
+          onSubmitActionType: 'updateBankName',
+          size: 24,
+          originScreen: 'BankDetails',
+        },
+      },
+    });
+  };
+
+  const handleEditAccountType = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'accountType',
+          initialValue: accountType,
+          headerTitle: 'Update your account type',
+          label: 'Bank name',
+          description:
+            'Please select the type of account you hold with your bank.',
+          keyboardType: 'default',
+          validationType: 'accountType',
+          onSubmitActionType: 'updateAccountType',
+          size: 24,
+          originScreen: 'BankDetails',
+        },
+      },
+    });
+  };
+
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Header
         name="Bank Details"
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
-        rightIcons={null}
+        leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
+        rightIcons={[
+          {
+            icon: QuestionMarkIcon,
+            onPress: () => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: { screen: 'FAQScreen' },
+              });
+            },
+            size: 24,
+            color: ColorPalette.IconColor,
+            strokeWidth: 1.5,
+          },
+        ]}
       />
       <ScrollView
         style={styles.mainContainer}
         contentContainerStyle={[
           styles.scrollContent,
-          {paddingTop: getScreenHeight(2)},
+          { paddingTop: getScreenHeight(1.2) },
         ]}
         showsVerticalScrollIndicator={false}>
         <View style={styles.mainContainerTwo}>
           <AnimatedTextInput
-            label="Account holder name"
+            label="Account holder full name"
             value={accountName}
             onChangeText={setAccountName}
             keyboardType="default"
@@ -125,20 +193,20 @@ const BankDetails = () => {
             disabled={true}
           />
           <AnimatedTextInput
-            label="Account number"
-            value={accountNumber}
-            onChangeText={setAccountNumber}
-            keyboardType="numeric"
+            label="IBAN"
+            value={IBAN}
+            onChangeText={setIBAN}
+            keyboardType="default"
             customLabelColorFocused={ColorPalette.GREY_TEXT_400}
             customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
-            onRightTextPress={handleEditAccountNumber}
+            onRightTextPress={handleEditIBAN}
             customBorderColor={ColorPalette.GREY_TEXT_400}
             customBorderWidth={1}
             disabled={true}
           />
           <AnimatedTextInput
-            label="SWIFT/BIC code"
+            label="Swift/BIC code"
             value={bicCode}
             onChangeText={setBicCode}
             keyboardType="default"
@@ -146,6 +214,30 @@ const BankDetails = () => {
             customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
             rightText="Edit"
             onRightTextPress={handleEditBicCode}
+            customBorderColor={ColorPalette.GREY_TEXT_400}
+            customBorderWidth={1}
+            disabled={true}
+          />
+          <AnimatedTextInput
+            label="Bank name"
+            value={bankName}
+            onChangeText={setBankName}
+            customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+            rightText="Edit"
+            onRightTextPress={handleEditBankName}
+            customBorderColor={ColorPalette.GREY_TEXT_400}
+            customBorderWidth={1}
+            disabled={true}
+          />
+          <AnimatedTextInput
+            label="Account Type"
+            value={accountType}
+            onChangeText={setAccountType}
+            customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+            rightText="Edit"
+            onRightTextPress={handleEditAccountType}
             customBorderColor={ColorPalette.GREY_TEXT_400}
             customBorderWidth={1}
             disabled={true}

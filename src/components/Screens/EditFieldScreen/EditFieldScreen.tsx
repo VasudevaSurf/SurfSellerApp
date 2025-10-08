@@ -1,6 +1,6 @@
-import React, {useCallback, useState} from 'react';
-import {Image, SafeAreaView, ScrollView, View, Alert} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Image, SafeAreaView, ScrollView, View, Alert } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeftIcon from '../../../assets/icons/ArrowLeftIcon';
 import CloseCircleIcon from '../../../assets/icons/CloseCircleIcon';
 import {
@@ -9,25 +9,27 @@ import {
   ButtonState,
   ButtonVariant,
 } from '../../../components/UserComponents/Button';
-import {Header} from '../../../components/UserComponents/Header/Header';
+import { Header } from '../../../components/UserComponents/Header/Header';
 import AnimatedTextInput from '../../../components/UserComponents/TextInput/TextInput';
-import {Typography} from '../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
-import {goBack, navigate} from '../../../navigation/utils/navigationRef';
+import { Typography } from '../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../config/colorPalette';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
+import { goBack, navigate } from '../../../navigation/utils/navigationRef';
 import {
   updateProfile,
   clearUpdateSuccess,
 } from '../../../redux/slices/profileSlice';
-import {styles} from './EditFieldScreen.styles';
+import { styles } from './EditFieldScreen.styles';
 import {
   EditFieldParams,
   ErrorValues,
   FieldValues,
 } from './EditFieldScreen.types';
 import ArrowLeft from '../../../assets/icons/ArrowLeft';
-import {RootState, AppDispatch} from '../../../redux/store';
+import { RootState, AppDispatch } from '../../../redux/store';
+import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
+import Dropdown from '../../MainComponents/DropdownModal/Dropdown';
 
 type ValidationFunction = (value: string) => string | true;
 
@@ -119,7 +121,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const {updating, updateError, updateSuccess} = useSelector(
+  const { updating, updateError, updateSuccess } = useSelector(
     (state: RootState) => state.profile,
   );
 
@@ -150,6 +152,14 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
   const [fieldValues, setFieldValues] = useState<FieldValues>(initialValues);
   const [errors, setErrors] = useState<ErrorValues>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  const ACCOUNT_TYPE_OPTIONS = [
+    { value: 'Checking', label: 'Checking' },
+    { value: 'Savings', label: 'Savings' },
+    { value: 'Business', label: 'Business' },
+    { value: 'Other', label: 'Other' },
+  ];
 
   const renderIconOrImage = () => {
     if (iconComponent) {
@@ -158,12 +168,12 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     if (iconImage) {
       const imageSource =
         typeof iconImage === 'string' && iconImage.startsWith('http')
-          ? {uri: iconImage}
+          ? { uri: iconImage }
           : iconImage;
       return (
         <Image
           source={imageSource}
-          style={{width: size, height: size, resizeMode: 'contain'}}
+          style={{ width: size, height: size, resizeMode: 'contain' }}
         />
       );
     }
@@ -221,9 +231,20 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
   };
 
   const handleMultiFieldChange = (field: string, text: string): void => {
-    setFieldValues(prev => ({...prev, [field]: text}));
-    setErrors(prev => ({...prev, [field]: ''}));
+    setFieldValues(prev => ({ ...prev, [field]: text }));
+    setErrors(prev => ({ ...prev, [field]: '' }));
   };
+
+  const handleDropdownChange = (value: string) => {
+    setFieldValue(value);
+    setError('');
+    setActiveDropdown(null);
+  };
+
+  const handleDropdownToggle = (key: string, isOpen: boolean) => {
+    setActiveDropdown(isOpen ? key : null);
+  };
+
 
   const navigateBack = (updatedData: any) => {
     // Show success message
@@ -238,7 +259,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
 
             // Navigate to appropriate screen
             if (originScreen === 'CompanyProfile') {
-              navigation.navigate('CompanyProfile', updatedData);
+              navigation.navigate('PersonalInfo', updatedData);
             } else if (originScreen === 'BankDetails') {
               navigation.navigate('BankDetails', updatedData);
             } else {
@@ -247,7 +268,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           },
         },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   };
 
@@ -288,15 +309,14 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
         );
 
         const fullName = fieldValues.firstName
-          ? `${fieldValues.firstName || ''} ${
-              fieldValues.lastName || ''
+          ? `${fieldValues.firstName || ''} ${fieldValues.lastName || ''
             }`.trim()
           : fieldValues;
 
         navigateBack(
           originScreen === 'CompanyProfile'
             ? fieldValues
-            : {updatedName: fullName},
+            : { updatedName: fullName },
         );
       } else {
         const validationFn = getValidationForType(validationType || fieldType);
@@ -321,7 +341,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
             params: {
               phoneNumber: `${countryCode} ${fieldValue}`,
               flow: 'update',
-              returnData: {updatedPhone: fieldValue},
+              returnData: { updatedPhone: fieldValue },
               returnScreen: originScreen,
               returnStack: 'Account',
             },
@@ -330,28 +350,28 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           let updatedData = {};
           switch (fieldType) {
             case 'email':
-              updatedData = {updatedEmail: fieldValue};
+              updatedData = { updatedEmail: fieldValue };
               break;
             case 'businessName':
-              updatedData = {updatedName: fieldValue};
+              updatedData = { updatedName: fieldValue };
               break;
             case 'vatNumber':
-              updatedData = {updatedVat: fieldValue};
+              updatedData = { updatedVat: fieldValue };
               break;
             case 'streetName':
-              updatedData = {updatedStreet: fieldValue};
+              updatedData = { updatedStreet: fieldValue };
               break;
             case 'cityName':
-              updatedData = {updatedCity: fieldValue};
+              updatedData = { updatedCity: fieldValue };
               break;
             case 'postalCode':
-              updatedData = {updatedPostal: fieldValue};
+              updatedData = { updatedPostal: fieldValue };
               break;
             case 'country':
-              updatedData = {updatedCountry: fieldValue};
+              updatedData = { updatedCountry: fieldValue };
               break;
             default:
-              updatedData = {updatedName: fieldValue};
+              updatedData = { updatedName: fieldValue };
           }
           navigateBack(updatedData);
         }
@@ -361,10 +381,10 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
       Alert.alert(
         'Update Failed',
         error.message || 'Failed to update profile. Please try again.',
-        [{text: 'OK'}],
+        [{ text: 'OK' }],
       );
       if (multipleFields) {
-        setErrors({general: error.message || 'Update failed'});
+        setErrors({ general: error.message || 'Update failed' });
       } else {
         setError(error.message || 'Update failed');
       }
@@ -420,31 +440,44 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name={headerTitle || `Update your ${fieldType}`}
-        variant={TypographyVariant.LMEDIUM_BOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
-        rightIcons={null}
+        leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
+        rightIcons={[
+          {
+            icon: QuestionMarkIcon,
+            onPress: () => {
+              navigate('Dashboard', {
+                screen: 'Account',
+                params: { screen: 'FAQScreen' },
+              });
+            },
+            size: 24,
+            color: ColorPalette.IconColor,
+            strokeWidth: 1.5,
+          },
+        ]}
       />
       <View style={styles.mainContainer}>
         <ScrollView
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            {paddingTop: getScreenHeight(2)},
+            { paddingTop: getScreenHeight(1.2) },
           ]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.mainContainerTwo}>
             {description && (
-              <View style={{paddingHorizontal: getScreenWidth(4)}}>
+              <View style={{ paddingHorizontal: getScreenWidth(4) }}>
                 <Typography
                   variant={TypographyVariant.PSMALL_REGULAR}
                   text={description}
                 />
               </View>
             )}
-            <View style={{flexDirection: 'column', gap: getScreenHeight(1)}}>
+            <View style={{ flexDirection: 'column', gap: getScreenHeight(1) }}>
               {multipleFields ? (
-                <View style={{gap: getScreenHeight(2)}}>
+                <View style={{ gap: getScreenHeight(2) }}>
                   {fields.map(field => (
                     <AnimatedTextInput
                       key={field.key}
@@ -476,44 +509,63 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                     />
                   ))}
                   {errors.general && (
-                    <View style={{paddingHorizontal: getScreenWidth(4)}}>
+                    <View style={{ paddingHorizontal: getScreenWidth(4) }}>
                       <Typography
                         variant={TypographyVariant.PSMALL_REGULAR}
                         text={errors.general}
-                        customTextStyles={{color: ColorPalette.RED}}
+                        customTextStyles={{ color: ColorPalette.RED }}
                       />
                     </View>
                   )}
                 </View>
+
               ) : (
-                <AnimatedTextInput
-                  label={label || fieldType}
-                  value={fieldValue}
-                  onChangeText={handleSingleFieldChange}
-                  keyboardType={keyboardType}
-                  customLabelColorFocused={ColorPalette.PURPLE_300}
-                  customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
-                  customBorderColor={
-                    displayError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
-                  }
-                  customFocusedBorderColor={ColorPalette.PURPLE_300}
-                  customBorderWidth={1}
-                  customFocusedBorderWidth={2}
-                  customErrorBorderWidth={2}
-                  error={displayError}
-                  customTextColor={ColorPalette.GREY_TEXT_500}
-                  showCountrySection={showCountrySection}
-                  countryCode={countryCode}
-                  countryFlag={countryFlag}
-                  onCountryPress={() => {}}
-                  rightIcons={[
-                    {
-                      icon: <CloseCircleIcon style={undefined} />,
-                      onPress: () => handleSingleFieldChange(''),
-                    },
-                  ]}
-                />
-              )}
+                fieldType === 'accountType' ? (
+                  <View style={{ flex: 1, zIndex: activeDropdown === 'accountType' ? 3 : 1, paddingHorizontal: getScreenWidth(4) }}>
+                    <Dropdown
+                      options={ACCOUNT_TYPE_OPTIONS}
+                      selectedValue={fieldValue}
+                      onSelect={handleDropdownChange}
+                      placeholder="Select account type"
+                      showSearch={false}
+                      selectionType="radio"
+                      onDropdownToggle={isOpen =>
+                        handleDropdownToggle('accountType', isOpen)
+                      }
+                    />
+                    {displayError && (
+                      <Typography text={displayError} customTextStyles={{ color: ColorPalette.RED, marginTop: 5 }} />
+                    )}
+                  </View>
+                ) : (
+                  <AnimatedTextInput
+                    label={label || fieldType}
+                    value={fieldValue}
+                    onChangeText={handleSingleFieldChange}
+                    keyboardType={keyboardType}
+                    customLabelColorFocused={ColorPalette.PURPLE_300}
+                    customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
+                    customBorderColor={
+                      displayError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
+                    }
+                    customFocusedBorderColor={ColorPalette.PURPLE_300}
+                    customBorderWidth={1}
+                    customFocusedBorderWidth={2}
+                    customErrorBorderWidth={2}
+                    error={displayError}
+                    customTextColor={ColorPalette.GREY_TEXT_500}
+                    showCountrySection={showCountrySection}
+                    countryCode={countryCode}
+                    countryFlag={countryFlag}
+                    onCountryPress={() => { }}
+                    rightIcons={[
+                      {
+                        icon: <CloseCircleIcon style={undefined} />,
+                        onPress: () => handleSingleFieldChange(''),
+                      },
+                    ]}
+                  />
+                ))}
               {captionText && (
                 <View
                   style={{

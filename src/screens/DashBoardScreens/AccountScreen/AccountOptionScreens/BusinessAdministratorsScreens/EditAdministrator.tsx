@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -7,12 +7,12 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import {useRoute, useFocusEffect} from '@react-navigation/native';
-import {useDispatch, useSelector} from 'react-redux';
-import {Header} from '../../../../../components/UserComponents/Header/Header';
-import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../config/colorPalette';
-import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
+import { useRoute, useFocusEffect } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { Header } from '../../../../../components/UserComponents/Header/Header';
+import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../config/colorPalette';
+import { goBack, navigate } from '../../../../../navigation/utils/navigationRef';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
 import {
@@ -21,14 +21,16 @@ import {
   ButtonState,
   ButtonVariant,
 } from '../../../../../components/UserComponents/Button';
-import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
-import {Administrator} from '../../../../../components/MainComponents/AdministratorCard/AdministratorCard';
-import {TrashIcon2} from '../../../../../assets/icons/NewProductIcons/TrashIcon2';
-import {RootState, AppDispatch} from '../../../../../redux/store';
-import {fetchProfile} from '../../../../../redux/slices/profileSlice';
-import {styles} from './EditAdministrator.styles';
+import { Typography } from '../../../../../components/UserComponents/Typography/Typography';
+import { Administrator } from '../../../../../components/MainComponents/AdministratorCard/AdministratorCard';
+import { TrashIcon2 } from '../../../../../assets/icons/NewProductIcons/TrashIcon2';
+import { RootState, AppDispatch } from '../../../../../redux/store';
+import { fetchProfile } from '../../../../../redux/slices/profileSlice';
+import { styles } from './EditAdministrator.styles';
 import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
 import LockIcon from '../../../../../assets/icons/LockIcon';
+import { getScreenHeight, getScreenWidth } from '../../../../../helpers/screenSize';
+import InfoIconPay from '../../../../../assets/icons/InfoIconPay';
 
 const INITIAL_COUNTRY_CODE = '+356';
 const MALTA_FLAG_URL =
@@ -43,18 +45,18 @@ const InfoIcon = () => (
   <Typography
     text="ⓘ"
     variant={TypographyVariant.PMEDIUM_REGULAR}
-    customTextStyles={{color: ColorPalette.GREY_TEXT_400, fontSize: 20}}
+    customTextStyles={{ color: ColorPalette.GREY_TEXT_400, fontSize: 20 }}
   />
 );
 
 const EditAdministrator = () => {
   const route = useRoute();
   const dispatch = useDispatch<AppDispatch>();
-  const {administrator, isCurrentUser} = (route.params as RouteParams) || {};
+  const { administrator, isCurrentUser } = (route.params as RouteParams) || {};
   const isEditMode = !!administrator;
 
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const {profileData, loading: profileLoading} = useSelector(
+  const { profileData, loading: profileLoading } = useSelector(
     (state: RootState) => state.profile,
   );
 
@@ -366,7 +368,7 @@ const EditAdministrator = () => {
         onPress: () => {
           navigate('Dashboard', {
             screen: 'Account',
-            params: {screen: 'FAQScreen'},
+            params: { screen: 'FAQScreen' },
           });
         },
         size: 24,
@@ -416,14 +418,14 @@ const EditAdministrator = () => {
           name={isEditMode ? 'Edit Administrator' : 'Add Administrator'}
           variant={TypographyVariant.H6_BOLD}
           textColor={ColorPalette.AgreeTerms}
-          leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+          leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
           rightIcons={null}
         />
         <View style={styles.errorContainer}>
           <Typography
             text={fetchError}
             variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{color: ColorPalette.RED_200}}
+            customTextStyles={{ color: ColorPalette.RED_200 }}
           />
           <Button
             text="Retry"
@@ -434,7 +436,7 @@ const EditAdministrator = () => {
               setFetchError('');
               setInitialLoading(true);
             }}
-            customStyles={{marginTop: 16}}
+            customStyles={{ marginTop: 16 }}
           />
         </View>
       </SafeAreaView>
@@ -447,7 +449,7 @@ const EditAdministrator = () => {
         name={isEditMode ? 'Edit Administrator' : 'Add Administrator'}
         variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
+        leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
         rightIcons={null}
       />
       <ScrollView
@@ -462,9 +464,11 @@ const EditAdministrator = () => {
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
               customTextStyles={styles.sectionTitle}
             />
-            {/* <TouchableOpacity>
-              <InfoIcon />
-            </TouchableOpacity> */}
+            <InfoIconPay
+              size={22}
+              color={ColorPalette.GREY_TEXT_400}
+              style={undefined}
+            />
           </View>
 
           <View style={styles.inputsContainer}>
@@ -486,7 +490,7 @@ const EditAdministrator = () => {
             <AnimatedTextInput
               label="Password"
               value="••••••••"
-              onChangeText={() => {}}
+              onChangeText={() => { }}
               keyboardType="default"
               secureTextEntry={true}
               customLabelColorFocused={ColorPalette.GREY_TEXT_400}
@@ -502,7 +506,7 @@ const EditAdministrator = () => {
             <AnimatedTextInput
               label="Confirm Password"
               value="••••••••"
-              onChangeText={() => {}}
+              onChangeText={() => { }}
               keyboardType="default"
               secureTextEntry={true}
               customLabelColorFocused={ColorPalette.GREY_TEXT_400}
@@ -525,9 +529,11 @@ const EditAdministrator = () => {
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
               customTextStyles={styles.sectionTitle}
             />
-            {/* <TouchableOpacity>
-              <InfoIcon />
-            </TouchableOpacity> */}
+            <InfoIconPay
+              size={22}
+              color={ColorPalette.GREY_TEXT_400}
+              style={undefined}
+            />
           </View>
 
           <View style={styles.inputsContainer}>
@@ -554,7 +560,7 @@ const EditAdministrator = () => {
               showCountrySection
               countryCode={INITIAL_COUNTRY_CODE}
               countryFlag={MALTA_FLAG_URL}
-              onCountryPress={() => {}}
+              onCountryPress={() => { }}
               customLabelColorFocused={ColorPalette.GREY_TEXT_400}
               customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
               rightText="Edit"
@@ -620,17 +626,58 @@ const EditAdministrator = () => {
               customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
               showCountrySection
               countryFlag={MALTA_FLAG_URL}
-              onCountryPress={() => {}}
+              onCountryPress={() => { }}
               customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
               disabled={true}
               rightIcons={[
                 {
                   icon: <LockIcon size={20} color="#4A4A4A" />,
-                  onPress: () => {},
+                  onPress: () => { },
                 },
               ]}
             />
+          </View>
+        </View>
+
+        {/* Role Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Typography
+              text="Role"
+              variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+              customTextStyles={styles.sectionTitle}
+            />
+            <InfoIconPay
+              size={22}
+              color={ColorPalette.GREY_TEXT_400}
+              style={undefined}
+            />
+          </View>
+
+          <View style={styles.inputsContainer}>
+            <TouchableOpacity
+              style={{
+                borderRadius: getScreenWidth(2),
+                paddingVertical: getScreenHeight(1.25),
+                marginHorizontal: getScreenWidth(4),
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: ColorPalette.MainHeading,
+                width: getScreenWidth(24)
+              }}
+              onPress={() => {}}
+              activeOpacity={0.7}
+            >
+              <Typography
+                variant={TypographyVariant.LMEDIUM_MEDIUM}
+                text={'Owner'}
+                customTextStyles={{
+                  color: ColorPalette.White,
+                  paddingVertical: getScreenHeight(0.2)
+                }}
+              />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -656,13 +703,13 @@ const EditAdministrator = () => {
       </ScrollView>
       <View style={styles.buttonContainer}>
         <Button
-          text={isSubmitting ? 'UPDATING...' : 'SUBMIT'}
+          text={isSubmitting ? 'Saving...' : 'Save Changes'}
           variant={ButtonVariant.PRIMARY}
           state={ButtonState.DEFAULT}
           size={ButtonSize.MEDIUM}
-          onPress={() => {}}
+          onPress={() => { }}
           loading={isSubmitting}
-          // disabled={isSubmitDisabled()}
+        // disabled={isSubmitDisabled()}
         />
       </View>
     </SafeAreaView>
