@@ -174,8 +174,8 @@ const NewOrders = () => {
       <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
         <Header
           name={getTitle()}
-          leftIcon={<ArrowLeft style={undefined} size={16} onPress={goBack} />}
-          variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+          leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
+          variant={TypographyVariant.H6_BOLD}
           textColor={ColorPalette.GREY_TEXT_500}
           rightIcons={[
             {
