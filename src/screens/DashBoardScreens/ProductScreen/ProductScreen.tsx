@@ -61,7 +61,7 @@ import LoaderIcon, { AnimatedLoader } from '../../../assets/icons/LoaderIcon.tsx
 const ProductScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchText, setSearchText] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
+  // const [showAddModal, setShowAddModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false); // added for filter icon
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -254,7 +254,7 @@ const ProductScreen = () => {
   };
 
   const handleAddManually = () => {
-    setShowAddModal(false);
+    // setShowAddModal(false);
     setTimeout(() => {
       navigate('Dashboard', {
         screen: 'Product',
@@ -263,9 +263,9 @@ const ProductScreen = () => {
     }, 300);
   };
 
-  const handleUploadCsv = () => {
-    setShowAddModal(false);
-  };
+  // const handleUploadCsv = () => {
+  //   setShowAddModal(false);
+  // };
 
   // Multi-select functions
   const activateMultiSelectMode = (productId: string) => {
@@ -504,26 +504,27 @@ const ProductScreen = () => {
     );
   };
 
-  const buttons: ButtonConfig[] = [
-    {
-      text: 'Upload CSV file',
-      onPress: () => handleUploadCsv(),
-      variant: ButtonVariant.PRIMARY,
-      state: ButtonState.DEFAULT,
-      size: ButtonSize.MEDIUM,
-      textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
-    },
-    {
-      text: 'Add product Manually',
-      onPress: () => handleAddManually(),
-      variant: ButtonVariant.PRIMARY,
-      state: ButtonState.DEFAULT,
-      type: ButtonType.OUTLINED,
-      size: ButtonSize.MEDIUM,
-      customStyles: { borderWidth: 1 },
-      textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
-    },
-  ];
+  //Add product modal buttons
+  // const buttons: ButtonConfig[] = [
+  //   {
+  //     text: 'Upload CSV file',
+  //     onPress: () => handleUploadCsv(),
+  //     variant: ButtonVariant.PRIMARY,
+  //     state: ButtonState.DEFAULT,
+  //     size: ButtonSize.MEDIUM,
+  //     textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
+  //   },
+  //   {
+  //     text: 'Add product Manually',
+  //     onPress: () => handleAddManually(),
+  //     variant: ButtonVariant.PRIMARY,
+  //     state: ButtonState.DEFAULT,
+  //     type: ButtonType.OUTLINED,
+  //     size: ButtonSize.MEDIUM,
+  //     customStyles: { borderWidth: 1 },
+  //     textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
+  //   },
+  // ];
 
   // Delete confirmation modal buttons
   const deleteConfirmButtons: ButtonConfig[] = [
@@ -1097,7 +1098,7 @@ const ProductScreen = () => {
                     variant={ButtonVariant.PRIMARY}
                     state={ButtonState.DEFAULT}
                     size={ButtonSize.MEDIUM}
-                    onPress={() => setShowAddModal(true)}
+                    onPress={() => handleAddManually()}
                     customStyles={{
                       minWidth: getScreenWidth(70),
                     }}
@@ -1110,11 +1111,11 @@ const ProductScreen = () => {
       )}
 
       {/* Add Product Modal */}
-      <AddModal
+      {/* <AddModal
         isVisible={showAddModal}
         onClose={() => setShowAddModal(false)}
         buttons={buttons}
-      />
+      /> */}
 
       {/* Delete Confirmation Modal */}
       <AddModal
@@ -1136,7 +1137,8 @@ const ProductScreen = () => {
       {!isMultiSelectMode && (products.length > 0 || selectedFilter.id === 'active') && (
         <TouchableOpacity
           style={styles.floatingButtonWithText}
-          onPress={() => setShowAddModal(true)}
+          // onPress={() => setShowAddModal(true)} - we had modal previously [Upload csv + Add product manually]
+          onPress={() => handleAddManually()}
           activeOpacity={0.8}>
           <PlusIcon
             size={36}
@@ -1156,32 +1158,3 @@ const ProductScreen = () => {
 };
 
 export default ProductScreen;
-
-//floating plus icon button if needed
-// {
-//   !isMultiSelectMode && (
-//     <TouchableOpacity
-//       style={
-//         products.length > 0
-//           ? styles.floatingButtonWithText
-//           : styles.floatingButtonIconOnly
-//       }
-//       onPress={() => setShowAddModal(true)}
-//       activeOpacity={0.8}>
-//       <PlusIcon
-//         size={products.length > 0 ? 36 : 24}
-//         color={ColorPalette.White}
-//         strokeWidth={2.5}
-//         style={products.length > 0 ? {marginRight: 8} : undefined}
-//       />
-
-//       {products.length > 0 && (
-//         <Typography
-//           text="Add Product"
-//           variant={TypographyVariant.LMEDIUM_BOLD}
-//           customTextStyles={styles.addProductText}
-//         />
-//       )}
-//     </TouchableOpacity>
-//   );
-// }
