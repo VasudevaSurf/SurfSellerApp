@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Alert, ScrollView, Linking } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { MainBanner } from '../../../components/MainComponents/MainBanner/MainBanner';
-import { Button } from '../../../components/UserComponents/Button/Button';
+import React, {useState, useEffect} from 'react';
+import {SafeAreaView, View, Alert, ScrollView, Linking} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
+import {Button} from '../../../components/UserComponents/Button/Button';
 import {
   ButtonSize,
   ButtonState,
   ButtonVariant,
 } from '../../../components/UserComponents/Button/Button.types';
-import { TextButton } from '../../../components/UserComponents/TextButton/TextButton';
+import {TextButton} from '../../../components/UserComponents/TextButton/TextButton';
 import AnimatedTextInput from '../../../components/UserComponents/TextInput/TextInput';
-import { Typography } from '../../../components/UserComponents/Typography/Typography';
-import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../config/colorPalette';
-import { Fonts } from '../../../config/fonts';
-import { globalStyles } from '../../../config/globalStyles';
-import { STATIC_TEXT } from '../../../config/staticText';
-import { getScreenWidth } from '../../../helpers/screenSize';
-import { styles } from './EmailSignIn.styles';
-import { loginUser, clearError } from '../../../redux/slices/authSlice';
-import type { AppDispatch, RootState } from '../../../redux/store';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../config/colorPalette';
+import {Fonts} from '../../../config/fonts';
+import {globalStyles} from '../../../config/globalStyles';
+import {STATIC_TEXT} from '../../../config/staticText';
+import {getScreenWidth} from '../../../helpers/screenSize';
+import {styles} from './EmailSignIn.styles';
+import {loginUser, clearError} from '../../../redux/slices/authSlice';
+import type {AppDispatch, RootState} from '../../../redux/store';
 
-const { surfTitle } = STATIC_TEXT.screens.onboarding;
+const {surfTitle} = STATIC_TEXT.screens.onboarding;
 
-const EmailSignIn = ({ navigation }) => {
+const EmailSignIn = ({navigation}) => {
   // Redux
   const dispatch = useDispatch<AppDispatch>();
-  const { isLoading, error } = useSelector((state: RootState) => state.auth);
+  const {isLoading, error} = useSelector((state: RootState) => state.auth);
 
   // State
   const [emailId, setEmailId] = useState('');
@@ -212,7 +212,7 @@ const EmailSignIn = ({ navigation }) => {
         {renderBanner()}
         <View style={styles.containerTwo}>
           {renderHeading()}
-          <View style={{ gap: getScreenWidth(4) }}>
+          <View style={{gap: getScreenWidth(4)}}>
             {renderEmailInput()}
             {renderTerms()}
           </View>

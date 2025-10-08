@@ -1,13 +1,13 @@
 // src/screens/DashBoardScreens/HomeScreen/HomeScreen.tsx
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   ScrollView,
   View,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import BellIcon from '../../../assets/icons/BellIcon';
 import BookmarkNoteIcon from '../../../assets/icons/BookmarkNoteIcon';
@@ -19,24 +19,24 @@ import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
 import SearchIcon from '../../../assets/icons/SearchIcon';
 import TotalSalesIcon from '../../../assets/icons/TotalSalesIcon';
 import TrendIcon from '../../../assets/icons/TrendIcon';
-import { MenuItem } from '../../../components/MainComponents/MenuItem/MenuItem';
-import { RecentOrder } from '../../../components/MainComponents/RecentOrder/RecentOrder';
-import { SlidingBar } from '../../../components/MainComponents/SlidingBar/SlidingBar';
+import {MenuItem} from '../../../components/MainComponents/MenuItem/MenuItem';
+import {RecentOrder} from '../../../components/MainComponents/RecentOrder/RecentOrder';
+import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
 import ToggleButtons from '../../../components/MainComponents/ToggleButtons/ToggleButtons';
-import { Header } from '../../../components/UserComponents/Header/Header';
-import { Typography } from '../../../components/UserComponents/Typography/Typography';
-import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../config/colorPalette';
-import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
-import { styles } from './HomeScreen.styles';
-import { navigate } from '../../../navigation/utils/navigationRef';
-import { RootState } from '../../../redux/store';
-import { useSelector } from 'react-redux';
+import {Header} from '../../../components/UserComponents/Header/Header';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../config/colorPalette';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
+import {styles} from './HomeScreen.styles';
+import {navigate} from '../../../navigation/utils/navigationRef';
+import {RootState} from '../../../redux/store';
+import {useSelector} from 'react-redux';
 import ArrowRightStyle from '../../../assets/icons/ArrowRightStyle';
 import {useDashboard} from '../../../hooks/useDashboard';
 import SalesChart from './components/SalesChart'; // Import the React Native chart component
 import AnimatedLoader from '../../../assets/icons/LoaderIcon';
-import { Image } from 'react-native';
+import {Image} from 'react-native';
 
 const HomeScreen = () => {
   const userData = useSelector((state: RootState) => state.auth.userData);
@@ -78,7 +78,7 @@ const HomeScreen = () => {
   const handleViewAllPress = () => {
     navigate('Dashboard', {
       screen: 'MainTabs',
-      params: { screen: 'Orders' },
+      params: {screen: 'Orders'},
     });
   };
 
@@ -137,9 +137,9 @@ const HomeScreen = () => {
   );
 
   const statusOptions = [
-    { id: 'pending', label: 'Pending' },
-    { id: 'accepted', label: 'Accepted' },
-    { id: 'cancelled', label: 'Cancelled' },
+    {id: 'pending', label: 'Pending'},
+    {id: 'accepted', label: 'Accepted'},
+    {id: 'cancelled', label: 'Cancelled'},
   ];
 
   const [selectedOption, setSelectedOption] = useState(statusOptions[0]);
@@ -219,51 +219,11 @@ const HomeScreen = () => {
 
   if (loading && !refreshing) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-        <Header
-          name={`Hello, ${userData?.firstname || 'User'}! 👋`}
-          // image={{
-          //   source: require('../../../assets/images/placeholder-profile.png'),
-          // }}
-          variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-          textColor={ColorPalette.GREY_TEXT_500}
-          rightIcons={[
-            // {
-            //   icon: SearchIcon,
-            //   onPress: () => console.log('Search pressed'),
-            //   size: 22,
-            //   color: ColorPalette.IconColor,
-            //   strokeWidth: 1.4,
-            // },
-            {
-              icon: BellIcon,
-              onPress: () =>
-                navigate('Dashboard', {
-                  screen: 'Account',
-                  params: { screen: 'NotificationScreen' },
-                }),
-              size: 22,
-              color: ColorPalette.IconColor,
-              strokeWidth: 1.5,
-            },
-            {
-              icon: QuestionMarkIcon,
-              onPress: () => {
-                navigate('Dashboard', {
-                  screen: 'Account',
-                  params: { screen: 'FAQScreen' },
-                });
-              },
-              size: 24,
-              color: ColorPalette.IconColor,
-              strokeWidth: 1.5,
-            },
-          ]}
-        />
+      <SafeAreaView style={{flex: 1}} edges={['bottom']}>
         <View
           style={[
             styles.mainContainer,
-            { justifyContent: 'center', alignItems: 'center' },
+            {justifyContent: 'center', alignItems: 'center'},
           ]}>
           <AnimatedLoader size={52} />
           <Typography
@@ -280,12 +240,11 @@ const HomeScreen = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView
+      style={{flex: 1, backgroundColor: ColorPalette.SearchBack}}
+      edges={['bottom']}>
       <Header
         name={`Hello, ${userData?.firstname || 'User'}! 👋`}
-        // image={{
-        //   source: require('../../../assets/images/placeholder-profile.png'),
-        // }}
         variant={TypographyVariant.LMEDIUM_EXTRABOLD}
         textColor={ColorPalette.GREY_TEXT_500}
         rightIcons={[
@@ -301,7 +260,7 @@ const HomeScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'NotificationScreen' },
+                params: {screen: 'NotificationScreen'},
               }),
             size: 22,
             color: ColorPalette.IconColor,
@@ -312,7 +271,7 @@ const HomeScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'FAQScreen' },
+                params: {screen: 'FAQScreen'},
               });
             },
             size: 24,
@@ -325,7 +284,7 @@ const HomeScreen = () => {
         style={styles.mainContainer}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: getScreenHeight(4) },
+          {paddingBottom: getScreenHeight(4)},
         ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -363,7 +322,7 @@ const HomeScreen = () => {
               leftIcon={item.leftIcon}
               rightIcon={item.rightIcon}
               onPress={item.onPress}
-              textStyle={{ color: ColorPalette.GREY_TEXT_500 }}
+              textStyle={{color: ColorPalette.GREY_TEXT_500}}
               variant={TypographyVariant.LMEDIUM_MEDIUM}
               containerStyle={styles.menuContainer}
               contentStyle={{
@@ -481,7 +440,6 @@ const HomeScreen = () => {
                     />
                   </View>
                 </View>
-
               </View>
 
               <View style={styles.activeProduct}>
@@ -491,7 +449,6 @@ const HomeScreen = () => {
                   </View>
                   <View style={styles.salesTwo}>
                     <View style={styles.rowSection}>
-
                       <Typography
                         variant={TypographyVariant.H4_BOLD}
                         text={income}
@@ -517,7 +474,6 @@ const HomeScreen = () => {
                     />
                   </View>
                 </View>
-
               </View>
             </View>
 
@@ -692,15 +648,12 @@ const HomeScreen = () => {
               //   />
               // </View>
 
-
-
               <View
                 style={{
                   flex: 1,
                   justifyContent: 'center',
                   alignItems: 'center',
                   paddingBottom: getScreenHeight(4),
-
                 }}>
                 <Image
                   source={require('../../../assets/images/emptyBox.png')}
@@ -721,7 +674,6 @@ const HomeScreen = () => {
                   }}
                 />
               </View>
-
             )}
           </View>
         </View>

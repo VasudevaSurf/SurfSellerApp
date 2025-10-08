@@ -1,4 +1,4 @@
-import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
 import SplashScreen from '../../screens/Onboarding/SplashScreen/SplashScreen';
 import WelcomeScreen from '../../screens/Onboarding/WelcomeScreen/WelcomeScreen';
@@ -11,19 +11,16 @@ export const OnboardingNavigator = () => {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        // Remove all transition animations
-        animationEnabled: false,
-        cardStyleInterpolator: ({current}) => ({
-          cardStyle: {
-            opacity: current.progress,
-          },
-        }),
+        animationEnabled: false, // Disable default animations
+        gestureEnabled: false, // Disable swipe gestures during onboarding
+        cardStyle: {backgroundColor: 'transparent'},
       }}>
       <Stack.Screen
         name="Splash"
         component={SplashScreen}
         options={{
           animationEnabled: false,
+          gestureEnabled: false,
         }}
       />
       <Stack.Screen
@@ -31,6 +28,7 @@ export const OnboardingNavigator = () => {
         component={WelcomeScreen}
         options={{
           animationEnabled: false,
+          gestureEnabled: false,
         }}
       />
     </Stack.Navigator>
