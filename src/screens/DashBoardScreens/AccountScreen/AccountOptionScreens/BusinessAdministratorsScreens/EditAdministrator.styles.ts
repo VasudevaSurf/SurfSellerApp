@@ -1,6 +1,6 @@
-import {StyleSheet} from 'react-native';
-import {ColorPalette} from '../../../../../config/colorPalette';
-import {BorderRadius, Spacing} from '../../../../../config/globalStyles';
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../../../../config/colorPalette';
+import { BorderRadius, Spacing } from '../../../../../config/globalStyles';
 import {
   getScreenHeight,
   getScreenWidth,
@@ -16,8 +16,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   scrollContent: {
-    paddingTop: getScreenHeight(2),
-    gap: Spacing.Small,
+    paddingTop: getScreenHeight(1.2),
+    gap: getScreenHeight(1.2),
     paddingBottom: getScreenHeight(4),
   },
   loadingContainer: {
@@ -36,14 +36,16 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
   },
   sectionHeader: {
+    display: 'flex',
     flexDirection: 'row',
+    gap: getScreenWidth(1),
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    paddingHorizontal: getScreenWidth(4),
+    marginTop: getScreenHeight(3),
   },
   sectionTitle: {
     color: ColorPalette.GREY_TEXT_500,
-    marginTop: getScreenHeight(3),
-    paddingHorizontal: getScreenHeight(2),
   },
   infoIcon: {
     color: ColorPalette.GREY_TEXT_400,
