@@ -46,4 +46,9 @@ export const styles = StyleSheet.create({
   footerText: {
     color: ColorPalette.GREY_TEXT_500,
   },
+  // New style for big centered logo
+  bigLogoImage: {
+    height: getFigmaDimension(100),
+    width: getFigmaDimension(100),
+  },
 });
