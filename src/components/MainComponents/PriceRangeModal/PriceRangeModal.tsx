@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal as RNModal,
   TouchableOpacity,
@@ -6,9 +6,9 @@ import {
   Dimensions,
 } from 'react-native';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
-import Svg, {Circle, Path} from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 import CloseIcon from '../../../assets/icons/CloseIcon';
-import {ColorPalette} from '../../../config/colorPalette';
+import { ColorPalette } from '../../../config/colorPalette';
 import {
   Button,
   ButtonSize,
@@ -16,11 +16,13 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../UserComponents/Button';
-import {Typography} from '../../UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
-import {styles} from './PriceRangeModal.styles';
-import {PriceRangeModalProps} from './PriceRangeModal.types';
-import {getScreenWidth} from '../../../helpers/screenSize';
+import { Typography } from '../../UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../UserComponents/Typography/Typography.types';
+import { styles } from './PriceRangeModal.styles';
+import { PriceRangeModalProps } from './PriceRangeModal.types';
+import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
+import Tooltip from '../Tooltip/Tooltip';
+import InfoIconPay from '../../../assets/icons/InfoIconPay';
 
 // Info Icon Component
 const InfoIcon = () => (
@@ -152,7 +154,7 @@ export const PriceRangeModal: React.FC<PriceRangeModalProps> = ({
                 text={headerText}
                 customTextStyles={[
                   styles.headerText,
-                  {color: ColorPalette.GREY_TEXT_500},
+                  { color: ColorPalette.GREY_TEXT_500 },
                 ]}
               />
             </View>
@@ -169,10 +171,26 @@ export const PriceRangeModal: React.FC<PriceRangeModalProps> = ({
                 <Typography
                   variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD_BOLD}
                   text="Filter Using the Price Range"
-                  customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+                  customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
                 />
-                <InfoIcon />
-              </View>
+                <Tooltip
+                  target={
+                    <InfoIconPay
+                      size={22}
+                      color={ColorPalette.GREY_TEXT_400}
+                      style={undefined}
+                    />
+                  }
+                  content={
+                    <Typography customTextStyles={{
+                      color: ColorPalette.GREY_TEXT_200,
+                      paddingVertical: getScreenHeight(0.1)
+                    }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                      Filter products based on price range.
+                    </Typography>
+                  }
+                  placement="bottom"
+                />                        </View>
 
               {/* Fixed Min/Max Price Labels with Slider in between */}
               <View style={styles.priceLabelsContainer}>
@@ -206,14 +224,14 @@ export const PriceRangeModal: React.FC<PriceRangeModalProps> = ({
                     markerStyle={styles.thumb}
                     pressedMarkerStyle={[
                       styles.thumb,
-                      {transform: [{scale: 1.2}]},
+                      { transform: [{ scale: 1.2 }] },
                     ]}
                   />
                 </View>
 
                 {/* Max Price Label - Fixed width */}
                 <View
-                  style={[styles.priceLabelWrapper, {alignItems: 'flex-end'}]}>
+                  style={[styles.priceLabelWrapper, { alignItems: 'flex-end' }]}>
                   <Typography
                     variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD_BOLD}
                     text={formatPrice(priceRange[1])}

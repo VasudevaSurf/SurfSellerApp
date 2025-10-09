@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal as RNModal,
   ScrollView,
@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import CloseIcon from '../../../assets/icons/CloseIcon';
 import InfoIcon from '../../../assets/icons/InfoIcon2'; // Import the new InfoIcon
-import {ColorPalette} from '../../../config/colorPalette';
+import { ColorPalette } from '../../../config/colorPalette';
 import {
   Button,
   ButtonSize,
@@ -16,30 +16,32 @@ import {
   ButtonVariant,
 } from '../../UserComponents/Button';
 import AnimatedTextInput from '../../UserComponents/TextInput/TextInput';
-import {Typography} from '../../UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
+import { Typography } from '../../UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../UserComponents/Typography/Typography.types';
 import Dropdown from '../DropdownModal/Dropdown';
-import {styles} from './FilterOrdersModal.styles';
+import { styles } from './FilterOrdersModal.styles';
 import {
   FilterOrdersModalProps,
   OrderFilters,
   OrderStatusOption,
 } from './FilterOrdersModal.types';
-import {getScreenHeight} from '../../../helpers/screenSize';
+import { getScreenHeight } from '../../../helpers/screenSize';
+import Tooltip from '../Tooltip/Tooltip';
+import InfoIconPay from '../../../assets/icons/InfoIconPay';
 
 const ORDER_STATUS_OPTIONS: OrderStatusOption[] = [
-  {value: 'all', label: 'All Orders'},
-  {value: 'Pending', label: 'Pending'},
-  {value: 'Processing', label: 'Processing'},
-  {value: 'Accepted', label: 'Accepted'},
-  {value: 'Shipped', label: 'Shipped'},
-  {value: 'Delivered', label: 'Delivered'},
-  {value: 'Completed', label: 'Completed'},
-  {value: 'Cancelled', label: 'Cancelled'},
-  {value: 'Returned', label: 'Returned'},
-  {value: 'Exchanged', label: 'Exchanged'},
-  {value: 'Failed', label: 'Failed'},
-  {value: 'Declined', label: 'Declined'},
+  { value: 'all', label: 'All Orders' },
+  { value: 'Pending', label: 'Pending' },
+  { value: 'Processing', label: 'Processing' },
+  { value: 'Accepted', label: 'Accepted' },
+  { value: 'Shipped', label: 'Shipped' },
+  { value: 'Delivered', label: 'Delivered' },
+  { value: 'Completed', label: 'Completed' },
+  { value: 'Cancelled', label: 'Cancelled' },
+  { value: 'Returned', label: 'Returned' },
+  { value: 'Exchanged', label: 'Exchanged' },
+  { value: 'Failed', label: 'Failed' },
+  { value: 'Declined', label: 'Declined' },
 ];
 
 export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
@@ -136,7 +138,7 @@ export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
           {/* Content */}
           <ScrollView
             style={styles.content}
-            contentContainerStyle={{gap: getScreenHeight(1.5)}}
+            contentContainerStyle={{ gap: getScreenHeight(1.5) }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">
             {/* Filter by Name, Email, or Phone Number Section */}
@@ -147,8 +149,24 @@ export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
                   text="Filter by Name, Email, or Phone Number"
                   customTextStyles={styles.sectionTitle}
                 />
-                <InfoIcon size={20} color={ColorPalette.GREY_TEXT_400} />
-              </View>
+                <Tooltip
+                  target={
+                    <InfoIconPay
+                      size={22}
+                      color={ColorPalette.GREY_TEXT_400}
+                      style={undefined}
+                    />
+                  }
+                  content={
+                    <Typography customTextStyles={{
+                      color: ColorPalette.GREY_TEXT_200,
+                      paddingVertical: getScreenHeight(0.1)
+                    }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                      Filter orders based on customer details.
+                    </Typography>
+                  }
+                  placement="bottom"
+                />                                </View>
 
               <View style={styles.inputGroup}>
                 <View
@@ -226,8 +244,24 @@ export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
                   text="Filter by Total Order Value (€)"
                   customTextStyles={styles.sectionTitle}
                 />
-                <InfoIcon size={20} color={ColorPalette.GREY_TEXT_400} />
-              </View>
+                <Tooltip
+                  target={
+                    <InfoIconPay
+                      size={22}
+                      color={ColorPalette.GREY_TEXT_400}
+                      style={undefined}
+                    />
+                  }
+                  content={
+                    <Typography customTextStyles={{
+                      color: ColorPalette.GREY_TEXT_200,
+                      paddingVertical: getScreenHeight(0.1)
+                    }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                      Filter orders based on total order value.
+                    </Typography>
+                  }
+                  placement="bottom"
+                />                                              </View>
 
               <View style={styles.rangeContainer}>
                 <View style={styles.rangeInput}>
@@ -235,7 +269,7 @@ export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
                     style={[
                       styles.rangeInputContainer,
                       focusedInput === 'minOrderValue' &&
-                        styles.rangeInputFocused,
+                      styles.rangeInputFocused,
                     ]}>
                     <AnimatedTextInput
                       label="From (€)"
@@ -263,7 +297,7 @@ export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
                     style={[
                       styles.rangeInputContainer,
                       focusedInput === 'maxOrderValue' &&
-                        styles.rangeInputFocused,
+                      styles.rangeInputFocused,
                     ]}>
                     <AnimatedTextInput
                       label="To (€)"
@@ -297,8 +331,24 @@ export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
                   text="Filter by Order Status"
                   customTextStyles={styles.sectionTitle}
                 />
-                <InfoIcon size={20} color={ColorPalette.GREY_TEXT_400} />
-              </View>
+                <Tooltip
+                  target={
+                    <InfoIconPay
+                      size={22}
+                      color={ColorPalette.GREY_TEXT_400}
+                      style={undefined}
+                    />
+                  }
+                  content={
+                    <Typography customTextStyles={{
+                      color: ColorPalette.GREY_TEXT_200,
+                      paddingVertical: getScreenHeight(0.1)
+                    }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                      Filter orders by their current status.
+                    </Typography>
+                  }
+                  placement="bottom"
+                />                                              </View>
 
               <View style={styles.dropdownContainer}>
                 <Dropdown
@@ -308,7 +358,7 @@ export const FilterOrdersModal: React.FC<FilterOrdersModalProps> = ({
                   placeholder="Select order status"
                   showSearch={false}
                   selectionType="radio"
-                  containerStyle={{zIndex: 1000}}
+                  containerStyle={{ zIndex: 1000 }}
                 />
               </View>
             </View>

@@ -1,5 +1,5 @@
-import {useFocusEffect, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState, useMemo} from 'react';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -10,32 +10,32 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
+import { useDispatch, useSelector } from 'react-redux';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
-import {Header} from '../../../../../components/UserComponents/Header/Header';
+import { Header } from '../../../../../components/UserComponents/Header/Header';
 import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
-import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../config/colorPalette';
+import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../config/colorPalette';
 import {
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
-import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
+import { goBack, navigate } from '../../../../../navigation/utils/navigationRef';
 import {
   fetchProfile,
   updateProfile,
 } from '../../../../../redux/slices/profileSlice';
-import {styles} from './PerosanlInfo.styles';
+import { styles } from './PerosanlInfo.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
-import {RootState, AppDispatch} from '../../../../../redux/store';
-import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
-import Svg, {Circle, Path} from 'react-native-svg';
-import {Spacing} from '../../../../../config/globalStyles';
+import { RootState, AppDispatch } from '../../../../../redux/store';
+import { Typography } from '../../../../../components/UserComponents/Typography/Typography';
+import Svg, { Circle, Path } from 'react-native-svg';
+import { Spacing } from '../../../../../config/globalStyles';
 import LockIcon from '../../../../../assets/icons/LockIcon';
-import {SlidingBar} from '../../../../../components/MainComponents/SlidingBar/SlidingBar';
-import {SlidingBarOption} from '../../../../../components/MainComponents/SlidingBar/SlidingBar.types';
-import {BadgeVariant} from '../../../../../components/UserComponents/Badges/Badge.types';
+import { SlidingBar } from '../../../../../components/MainComponents/SlidingBar/SlidingBar';
+import { SlidingBarOption } from '../../../../../components/MainComponents/SlidingBar/SlidingBar.types';
+import { BadgeVariant } from '../../../../../components/UserComponents/Badges/Badge.types';
 import ArrowDownIcon from '../../../../../assets/icons/ArrowDownIcon';
 import TextSymbolIcon from '../../../../../assets/icons/NewProductIcons/TextSymbolIcon';
 import UnderlineIcon from '../../../../../assets/icons/NewProductIcons/UnderlineIcon';
@@ -44,8 +44,8 @@ import UnderlineTextIcon from '../../../../../assets/icons/NewProductIcons/Under
 import AlignTextLeftIcon from '../../../../../assets/icons/NewProductIcons/AlignTextLeftIcon';
 import AlignTextCenterIcon from '../../../../../assets/icons/NewProductIcons/AlignTextCenterIcon';
 import AlignTextRightIcon from '../../../../../assets/icons/NewProductIcons/AlignTextRightIcon';
-import {Badge} from '../../../../../components/UserComponents/Badges/Badge';
-import {containerStyles} from '../CompanyProfilePages/ImageContainer.styles';
+import { Badge } from '../../../../../components/UserComponents/Badges/Badge';
+import { containerStyles } from '../CompanyProfilePages/ImageContainer.styles';
 import CloudDownloadIcon from '../../../../../assets/icons/CloudDownloadIcon';
 import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
 import {
@@ -54,6 +54,9 @@ import {
   ButtonState,
   ButtonVariant,
 } from '../../../../../components/UserComponents/Button';
+import AnimatedLoader from '../../../../../assets/icons/LoaderIcon';
+import InfoIconPay from '../../../../../assets/icons/InfoIconPay';
+import Tooltip from '../../../../../components/MainComponents/Tooltip/Tooltip';
 
 interface PersonalInfoProps {
   editMode?: boolean;
@@ -89,11 +92,11 @@ const INITIAL_COUNTRY_CODE = '+356';
 const MALTA_FLAG_URL =
   'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
 
-const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
+const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
   const route = useRoute();
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const {profileData, loading, error, rawProfileData} = useSelector(
+  const { profileData, loading, error, rawProfileData } = useSelector(
     (state: RootState) => state.profile,
   );
 
@@ -111,10 +114,10 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   const [vatChecked, setVatChecked] = useState(true);
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    {key: 'general', title: 'General'},
-    {key: 'description', title: 'Description'},
-    {key: 'logo', title: 'Logo'},
-    {key: 'terms', title: 'Terms & Condition'},
+    { key: 'general', title: 'General' },
+    { key: 'description', title: 'Description' },
+    { key: 'logo', title: 'Logo' },
+    { key: 'terms', title: 'Terms & Condition' },
   ]);
 
   const [countryCode, setCountryCode] = useState(INITIAL_COUNTRY_CODE);
@@ -128,8 +131,8 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   });
 
   const statusOptions = [
-    {id: 'yes', label: 'Yes'},
-    {id: 'no', label: 'No'},
+    { id: 'yes', label: 'Yes' },
+    { id: 'no', label: 'No' },
   ];
   const [selectedOption, setSelectedOption] = useState(statusOptions[0]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
@@ -445,10 +448,39 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
       style={styles.mainContainer}
       contentContainerStyle={[
         styles.scrollContent,
-        {paddingTop: getScreenHeight(2)},
+        { paddingTop: getScreenHeight(2) },
       ]}
       showsVerticalScrollIndicator={false}>
       <View style={styles.mainContainerTwo1}>
+        <View
+          style={{
+            flexDirection: 'row',
+            gap: 5,
+            paddingHorizontal: Spacing.Medium,
+            alignItems: 'center'
+          }}>
+          <Typography
+            text="Business Details"
+            variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+          />
+          <Tooltip
+            target={
+              <InfoIconPay
+                size={22}
+                color={ColorPalette.GREY_TEXT_400}
+                style={undefined}
+              />
+            }
+            content={
+              <Typography customTextStyles={{
+                color: ColorPalette.GREY_TEXT_200,
+                paddingVertical: getScreenHeight(0.1)
+              }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                Official information about your registered business.              </Typography>
+            }
+            placement="bottom"
+          />        </View>
         <AnimatedTextInput
           label="Business name"
           value={businessName}
@@ -477,14 +509,33 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
         />
       </View>
       <View style={styles.taxCheckContainer}>
-        <View style={{flexDirection: 'row', gap: 5}}>
+        <View style={{
+          flexDirection: 'row', gap: 5,
+          alignItems: 'center'
+        }}>
           <Typography
             text="Status"
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
-          <InfoIcon />
-        </View>
+          <Tooltip
+            target={
+              <InfoIconPay
+                size={22}
+                color={ColorPalette.GREY_TEXT_400}
+                style={undefined}
+              />
+            }
+            content={
+              <Typography customTextStyles={{
+                color: ColorPalette.GREY_TEXT_200,
+                paddingVertical: getScreenHeight(0.1)
+              }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                Current state of your store (active, pending, or inactive).
+              </Typography>
+            }
+            placement="bottom"
+          />          </View>
         <View style={styles.checkBoxContainer}>
           <TouchableOpacity
             style={styles.checkboxRow}
@@ -501,7 +552,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
             <Typography
               text="Active"
               variant={TypographyVariant.PMEDIUM_REGULAR}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
             />
           </TouchableOpacity>
         </View>
@@ -512,14 +563,31 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
             flexDirection: 'row',
             gap: 5,
             paddingHorizontal: Spacing.Medium,
+            alignItems: 'center'
           }}>
           <Typography
             text="Store Address"
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
-          <InfoIcon />
-        </View>
+          <Tooltip
+            target={
+              <InfoIconPay
+                size={22}
+                color={ColorPalette.GREY_TEXT_400}
+                style={undefined}
+              />
+            }
+            content={
+              <Typography customTextStyles={{
+                color: ColorPalette.GREY_TEXT_200,
+                paddingVertical: getScreenHeight(0.1)
+              }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                Registered physical location of your business
+              </Typography>
+            }
+            placement="bottom"
+          />             </View>
         <AnimatedTextInput
           label="Street name and number"
           value={streetName}
@@ -568,24 +636,24 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
           customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
           showCountrySection
           countryFlag={MALTA_FLAG_URL}
-          onCountryPress={() => {}}
+          onCountryPress={() => { }}
           customBorderColor={ColorPalette.GREY_TEXT_400}
           customBorderWidth={1}
           disabled={true}
           rightIcons={[
             {
               icon: <LockIcon size={20} color="#4A4A4A" />,
-              onPress: () => {},
+              onPress: () => { },
             },
           ]}
         />
       </View>
       <View style={styles.taxCheckContainer1}>
-        <View style={{flexDirection: 'row', gap: 5}}>
+        <View style={{ flexDirection: 'row', gap: 5 }}>
           <Typography
             text="Are the store and billing addresses the same?"
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
         </View>
         <View style={styles.checkBoxContainer}>
@@ -609,19 +677,37 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
       style={styles.mainContainer}
       contentContainerStyle={[
         styles.scrollContent,
-        {paddingTop: getScreenHeight(2)},
+        { paddingTop: getScreenHeight(2) },
       ]}
       showsVerticalScrollIndicator={false}>
       <View style={styles.mainContainerTwo}>
         <View style={styles.taxCheckContainer}>
-          <View style={{flexDirection: 'row', gap: 5, marginBottom: 16}}>
+          <View style={{
+            flexDirection: 'row', gap: 5, marginBottom: 16,
+            alignItems: 'center'
+          }}>
             <Typography
               text="Description"
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
             />
-            <InfoIcon />
-          </View>
+            <Tooltip
+              target={
+                <InfoIconPay
+                  size={22}
+                  color={ColorPalette.GREY_TEXT_400}
+                  style={undefined}
+                />
+              }
+              content={
+                <Typography customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1)
+                }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                  Short summary of your business and what you sell.              </Typography>
+              }
+              placement="bottom"
+            />               </View>
           <View style={styles.toolbar}>
             <Badge
               text="Paragraph"
@@ -737,7 +823,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
             <TextInput
               style={[
                 styles.textArea,
-                {textAlign: textAlignment},
+                { textAlign: textAlignment },
                 textFormat.bold && styles.boldText,
                 textFormat.italic && styles.italicText,
                 textFormat.underline && styles.underlineText,
@@ -755,7 +841,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
           </View>
 
           {/* Add Save Button */}
-          <View style={{marginTop: getScreenHeight(2)}}>
+          <View style={{ marginTop: getScreenHeight(2) }}>
             <Button
               text="SAVE CHANGES"
               variant={ButtonVariant.PRIMARY}
@@ -775,18 +861,33 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
       style={styles.mainContainer}
       contentContainerStyle={[
         styles.scrollContent,
-        {paddingTop: getScreenHeight(2)},
+        { paddingTop: getScreenHeight(2) },
       ]}
       showsVerticalScrollIndicator={false}>
       <View style={styles.imageContainer}>
-        <View style={{flexDirection: 'row', gap: 5, marginBottom: 25}}>
+        <View style={{ flexDirection: 'row', gap: 5, marginBottom: 25, alignItems: 'center' }}>
           <Typography
             text="Upload Logo"
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
-          <InfoIcon />
-        </View>
+          <Tooltip
+            target={
+              <InfoIconPay
+                size={22}
+                color={ColorPalette.GREY_TEXT_400}
+                style={undefined}
+              />
+            }
+            content={
+              <Typography customTextStyles={{
+                color: ColorPalette.GREY_TEXT_200,
+                paddingVertical: getScreenHeight(0.1)
+              }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                Add your business & Invoice logo to display on your store profile.             </Typography>
+            }
+            placement="bottom"
+          />               </View>
         <View style={containerStyles.wrapper}>
           <View style={containerStyles.logoContainer}>
             <View style={containerStyles.imageWrapper}>
@@ -847,19 +948,35 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
       style={styles.mainContainer}
       contentContainerStyle={[
         styles.scrollContent,
-        {paddingTop: getScreenHeight(2)},
+        { paddingTop: getScreenHeight(2) },
       ]}
       showsVerticalScrollIndicator={false}>
       <View style={styles.mainContainerTwo}>
         <View style={styles.taxCheckContainer}>
-          <View style={{flexDirection: 'row', gap: 5, marginBottom: 16}}>
+          <View style={{ flexDirection: 'row', gap: 5, marginBottom: 16, alignItems: 'center' }}>
             <Typography
               text="Terms & Condition"
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
             />
-            <InfoIcon />
-          </View>
+            <Tooltip
+              target={
+                <InfoIconPay
+                  size={22}
+                  color={ColorPalette.GREY_TEXT_400}
+                  style={undefined}
+                />
+              }
+              content={
+                <Typography customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1)
+                }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                  Your store’s policies for sales, returns, and refunds.
+                </Typography>
+              }
+              placement="bottom"
+            />                  </View>
           <View style={styles.toolbar}>
             <Badge
               text="Paragraph"
@@ -975,7 +1092,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
             <TextInput
               style={[
                 styles.textArea,
-                {textAlign: textAlignment},
+                { textAlign: textAlignment },
                 textFormat.bold && styles.boldText,
                 textFormat.italic && styles.italicText,
                 textFormat.underline && styles.underlineText,
@@ -993,7 +1110,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
           </View>
 
           {/* Add Save Button */}
-          <View style={{marginTop: getScreenHeight(2)}}>
+          <View style={{ marginTop: getScreenHeight(2) }}>
             <Button
               text="SAVE CHANGES"
               variant={ButtonVariant.PRIMARY}
@@ -1047,7 +1164,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
         <Header
           name="Business Profile"
           variant={TypographyVariant.H6_BOLD}
@@ -1059,7 +1176,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
               onPress: () => {
                 navigate('Dashboard', {
                   screen: 'Account',
-                  params: {screen: 'FAQScreen'},
+                  params: { screen: 'FAQScreen' },
                 });
               },
               size: 24,
@@ -1068,11 +1185,15 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
             },
           ]}
         />
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <AnimatedLoader size={52} />
           <Typography
-            text="Loading profile..."
-            variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+            text="Loading"
+            variant={TypographyVariant.PSMALL_MEDIUM}
+            customTextStyles={{
+              color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+              marginTop: getScreenHeight(1),
+            }}
           />
         </View>
       </SafeAreaView>
@@ -1080,7 +1201,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   }
 
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Header
         name="Business Profile"
         variant={TypographyVariant.H6_BOLD}
@@ -1092,7 +1213,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'FAQScreen'},
+                params: { screen: 'FAQScreen' },
               });
             },
             size: 24,
@@ -1102,12 +1223,12 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
         ]}
       />
       <TabView
-        navigationState={{index, routes}}
+        navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
-        initialLayout={{width: getScreenWidth(100)}}
+        initialLayout={{ width: getScreenWidth(100) }}
         renderTabBar={renderTabBar}
-        style={{flex: 1}}
+        style={{ flex: 1 }}
       />
     </SafeAreaView>
   );
