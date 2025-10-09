@@ -30,6 +30,8 @@ import {
 import FilterIcon from '../../../assets/icons/FilterIcon';
 import SuccessTickSquareIcon from '../../../assets/icons/ToastIcons/SuccessTick';
 import { showCustomToast } from '../../../components/MainComponents/Toast/ToastComponent';
+import { FilterOrdersModal } from '../../../components/MainComponents/FilterOrdersModal';
+import AnimatedLoader from '../../../assets/icons/LoaderIcon';
 
 export const statusIconMap: { [key: string]: ReactNode } = {
   'Pending': <SuccessTickSquareIcon size={18} />,
