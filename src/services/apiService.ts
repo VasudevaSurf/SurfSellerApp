@@ -135,6 +135,28 @@ export interface ProductDetailsResponse {
   };
 }
 
+export interface NotificationItem {
+  notification_id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  severity: string; // 'N' for normal
+  section: string; // 'administration', 'products', etc.
+  tag: string;
+  area: string;
+  action_url: string;
+  is_read: string; // '0' or '1'
+  pinned: string; // '0' or '1'
+  remind: string; // '0' or '1'
+  timestamp: string;
+}
+
+export interface NotificationsResponse {
+  notifications: NotificationItem[];
+  message: string;
+  result: boolean;
+}
+
 export interface OrderProduct {
   product_id: string;
   product: string;
@@ -513,6 +535,113 @@ const apiClient = axios.create({
   },
   timeout: 10000,
 });
+
+export const fetchNotificationsApi = async (
+  userId: string,
+  severity: string = 'N',
+  section?: string, // 'administration' | 'products' | undefined for all
+): Promise<NotificationsResponse> => {
+  try {
+    console.log('Fetching notifications for userId:', userId);
+
+    let url = `${API_BASE_URL}/api.php?_d=NtSeNotificationsApi&user_id=${userId}&severity=${severity}`;
+
+    if (section) {
+      url += `&section=${section}`;
+    }
+
+    const response = await axios({
+      method: 'GET',
+      url: url,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Notifications API response:', response.data);
+    return response.data as NotificationsResponse;
+  } catch (error: any) {
+    console.error('Fetch Notifications API error:', error);
+
+    if (error.response?.status === 404) {
+      throw new Error('Notifications not found');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to view notifications');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error. Please try again later.');
+    } else if (!error.response) {
+      throw new Error('Network error. Please check your connection.');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to fetch notifications',
+      );
+    }
+  }
+};
+
+// Add function to mark notification as read
+export const markNotificationAsReadApi = async (
+  userId: string,
+  notificationId: string,
+): Promise<{result: boolean; message: string}> => {
+  try {
+    console.log('Marking notification as read:', {userId, notificationId});
+
+    const response = await axios({
+      method: 'PUT',
+      url: `${API_BASE_URL}/api.php?_d=NtSeNotificationsApi`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        user_id: userId,
+        notification_id: notificationId,
+        is_read: '1',
+      },
+    });
+
+    console.log('Mark as read response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Mark notification as read error:', error);
+    throw new Error(
+      error.response?.data?.message || 'Failed to mark notification as read',
+    );
+  }
+};
+
+// Add function to delete notification
+export const deleteNotificationApi = async (
+  userId: string,
+  notificationId: string,
+): Promise<{result: boolean; message: string}> => {
+  try {
+    console.log('Deleting notification:', {userId, notificationId});
+
+    const response = await axios({
+      method: 'DELETE',
+      url: `${API_BASE_URL}/api.php?_d=NtSeNotificationsApi`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        user_id: userId,
+        notification_id: notificationId,
+      },
+    });
+
+    console.log('Delete notification response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Delete notification error:', error);
+    throw new Error(
+      error.response?.data?.message || 'Failed to delete notification',
+    );
+  }
+};
 
 // Helper function to find category ID by path
 const findCategoryIdByPath = (

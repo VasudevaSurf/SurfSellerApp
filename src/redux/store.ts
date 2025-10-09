@@ -11,6 +11,7 @@ import initializerReducer from './slices/initializerSlice';
 import categoriesReducer from './slices/categoriesSlice';
 import dashboardReducer from './slices/dashboardSlice'; // Add this line
 import withdrawalReducer from './slices/withdrawalSlice';
+import notificationsReducer from './slices/notificationsSlice';
 
 const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ const store = configureStore({
     categories: categoriesReducer,
     dashboard: dashboardReducer, // Add this line
     withdrawal: withdrawalReducer,
+    notifications: notificationsReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

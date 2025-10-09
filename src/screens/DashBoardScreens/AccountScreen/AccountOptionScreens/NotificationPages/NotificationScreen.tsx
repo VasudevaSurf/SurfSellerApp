@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {
   Dimensions,
   SafeAreaView,
@@ -6,25 +6,28 @@ import {
   TouchableOpacity,
   View,
   Animated,
+  RefreshControl,
 } from 'react-native';
-import ToggleSwitch from 'toggle-switch-react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../../../../redux/store';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
+import ToggleSwitch from 'toggle-switch-react-native';
 import ToggleButtons from '../../../../../components/MainComponents/ToggleButtons/ToggleButtons';
-import { Header } from '../../../../../components/UserComponents/Header/Header';
-import { Typography } from '../../../../../components/UserComponents/Typography/Typography';
-import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../../../config/colorPalette';
+import {Header} from '../../../../../components/UserComponents/Header/Header';
+import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../config/colorPalette';
 import {
   getFigmaDimension,
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
-import { BorderRadius } from '../../../../../config/globalStyles';
-import { goBack, navigate } from '../../../../../navigation/utils/navigationRef';
-import { styles } from './NotificationScreen.styles';
+import {BorderRadius} from '../../../../../config/globalStyles';
+import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
+import {styles} from './NotificationScreen.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
-import { TabView } from 'react-native-tab-view';
-import { AddModal } from '../../../../../components/MainComponents/AddModal/AddModal';
+import {TabView} from 'react-native-tab-view';
+import {AddModal} from '../../../../../components/MainComponents/AddModal/AddModal';
 import {
   Button,
   ButtonSize,
@@ -34,44 +37,30 @@ import {
 } from '../../../../../components/UserComponents/Button';
 import AnimatedLoader from '../../../../../assets/icons/LoaderIcon';
 import PlusIcon from '../../../../../assets/icons/PlusIcon';
-
-interface NotificationItem {
-  id: string;
-  title: string;
-  description: string;
-  time: string;
-}
+import {
+  fetchNotifications,
+  deleteNotification,
+  markNotificationAsRead,
+  clearNotificationsError,
+} from '../../../../../redux/slices/notificationsSlice';
+import {NotificationItem} from '../../../../../services/apiService';
 
 const NotificationScreen: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const userId = useSelector(
+    (state: RootState) => state.auth.userData?.user_id,
+  );
+  const {notifications, loading, error, deleting} = useSelector(
+    (state: RootState) => state.notifications,
+  );
+
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'all', title: 'All' },
-    { key: 'administrations', title: 'Administrations' },
-    { key: 'products', title: 'Products' },
+    {key: 'all', title: 'All'},
+    {key: 'administrations', title: 'Administrations'},
+    {key: 'products', title: 'Products'},
   ]);
-  const [loading, setLoading] = useState(false);
-  const [allNotifications, setAllNotifications] = useState<NotificationItem[]>([
-    {
-      id: '1',
-      title: 'Your product has been approved',
-      description:
-        'Abstract Fruit Trapezoidal Tote Bag" has been approved by the store administration.',
-      time: '2 hours ago',
-    },
-    {
-      id: '2',
-      title: 'Your product has been approved',
-      description:
-        'Abstract Fruit Trapezoidal Tote Bag" has been approved by the store administration.',
-      time: 'Yesterday',
-    },
-  ]);
-  const [administrationNotification, setAdministrationNotification] = useState<
-    NotificationItem[]
-  >([]);
-  const [productNotifications, setProductNotifications] = useState<
-    NotificationItem[]
-  >([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Animation references for each notification
   const animationRefs = useRef<{[key: string]: Animated.Value}>({});
@@ -83,6 +72,65 @@ const NotificationScreen: React.FC = () => {
     headerText: '',
     notificationId: '', // optional, single notification id
   });
+
+  // Load notifications on mount
+  useEffect(() => {
+    if (userId) {
+      loadNotifications();
+    }
+  }, [userId]);
+
+  const loadNotifications = useCallback(
+    (section?: string) => {
+      if (userId) {
+        dispatch(fetchNotifications({userId, section}));
+      }
+    },
+    [dispatch, userId],
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    const currentSection =
+      routes[index].key === 'all' ? undefined : routes[index].key;
+    await dispatch(
+      fetchNotifications({userId: userId!, section: currentSection}),
+    );
+    setRefreshing(false);
+  }, [dispatch, userId, index, routes]);
+
+  // Filter notifications by tab - FIXED KEY MAPPING
+  const getNotificationsForTab = useCallback(
+    (tabKey: string): NotificationItem[] => {
+      if (tabKey === 'all') {
+        return notifications;
+      }
+      // Map "administrations" to "administration" to match API
+      const sectionKey =
+        tabKey === 'administrations' ? 'administration' : tabKey;
+      return notifications.filter(n => n.section === sectionKey);
+    },
+    [notifications],
+  );
+
+  // Format timestamp
+  const formatTimestamp = (timestamp: string): string => {
+    const date = new Date(parseInt(timestamp) * 1000);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600)
+      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 604800) {
+      const days = Math.floor(diffInSeconds / 86400);
+      return days === 1 ? 'Yesterday' : `${days} days ago`;
+    }
+
+    return date.toLocaleDateString();
+  };
 
   // Initialize animation value for a notification
   const getAnimationValue = (id: string) => {
@@ -113,20 +161,21 @@ const NotificationScreen: React.FC = () => {
   };
 
   // Function to animate and remove a single notification
-  const animateAndRemoveNotification = (id: string, callback?: () => void) => {
+  const animateAndRemoveNotification = async (
+    id: string,
+    callback?: () => void,
+  ) => {
     const animValue = getAnimationValue(id);
 
     Animated.timing(animValue, {
       toValue: 1,
       duration: 300,
       useNativeDriver: true,
-    }).start(() => {
-      // Remove from state after animation completes
-      setAllNotifications(prev => prev.filter(item => item.id !== id));
-      setAdministrationNotification(prev =>
-        prev.filter(item => item.id !== id),
-      );
-      setProductNotifications(prev => prev.filter(item => item.id !== id));
+    }).start(async () => {
+      // Remove from server
+      if (userId) {
+        await dispatch(deleteNotification({userId, notificationId: id}));
+      }
 
       // Clean up animation ref
       delete animationRefs.current[id];
@@ -136,57 +185,43 @@ const NotificationScreen: React.FC = () => {
   };
 
   // Function to animate and remove all notifications
-  const animateAndClearAllNotifications = () => {
-    const currentNotifications = getCurrentNotifications();
+  const animateAndClearAllNotifications = async () => {
+    const currentNotifications = getNotificationsForTab(routes[index].key);
 
     if (currentNotifications.length === 0) return;
 
     // Start all animations simultaneously
-    const animations = currentNotifications.map((item, index) => {
-      const animValue = getAnimationValue(item.id);
+    const animations = currentNotifications.map((item, idx) => {
+      const animValue = getAnimationValue(item.notification_id);
 
       return Animated.timing(animValue, {
         toValue: 1,
         duration: 300,
-        delay: index * 100, // Stagger the animations
+        delay: idx * 100, // Stagger the animations
         useNativeDriver: true,
       });
     });
 
     // Run all animations in parallel
-    Animated.parallel(animations).start(() => {
-      // Clear all notifications after animations complete
-      switch (index) {
-        case 0: // All
-          setAllNotifications([]);
-          break;
-        case 1: // Administrations
-          setAdministrationNotification([]);
-          break;
-        case 2: // Products
-          setProductNotifications([]);
-          break;
+    Animated.parallel(animations).start(async () => {
+      // Delete all notifications from server
+      if (userId) {
+        for (const item of currentNotifications) {
+          await dispatch(
+            deleteNotification({
+              userId,
+              notificationId: item.notification_id,
+            }),
+          );
+          delete animationRefs.current[item.notification_id];
+        }
       }
-
-      // Clean up all animation refs
-      currentNotifications.forEach(item => {
-        delete animationRefs.current[item.id];
-      });
     });
   };
 
   // Get current notifications based on active tab
   const getCurrentNotifications = () => {
-    switch (index) {
-      case 0:
-        return allNotifications;
-      case 1:
-        return administrationNotification;
-      case 2:
-        return productNotifications;
-      default:
-        return [];
-    }
+    return getNotificationsForTab(routes[index].key);
   };
 
   const renderNotificationSection = (
@@ -196,8 +231,11 @@ const NotificationScreen: React.FC = () => {
   ) => {
     return (
       <ScrollView
-        style={{ flex: 1, marginHorizontal: getScreenWidth(4) }}
-        contentContainerStyle={{ flexGrow: 1 }}>
+        style={{flex: 1, marginHorizontal: getScreenWidth(4)}}
+        contentContainerStyle={{flexGrow: 1}}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <AnimatedLoader size={52} />
@@ -212,7 +250,8 @@ const NotificationScreen: React.FC = () => {
           </View>
         ) : data.length > 0 ? (
           data.map(item => {
-            const animValue = getAnimationValue(item.id);
+            const animValue = getAnimationValue(item.notification_id);
+            const isDeleting = deleting.includes(item.notification_id);
 
             // Animation styles
             const animatedStyle = {
@@ -237,28 +276,32 @@ const NotificationScreen: React.FC = () => {
             };
 
             return (
-              <Animated.View
-                key={item.id}
-                style={[styles.notificationCard, animatedStyle]}>
-                <View style={styles.notificationHeader}>
-                  <Typography
-                    text={item.title}
-                    variant={TypographyVariant.PSMALL_MEDIUM}
-                    customTextStyles={styles.notificationTitle}
-                  />
-                  <Typography
-                    text={item.time}
-                    variant={TypographyVariant.LSMALL_REGULAR}
-                    customTextStyles={styles.notificationTime}
-                  />
-                </View>
+              <TouchableOpacity
+                key={item.notification_id}
+                onLongPress={() => openDeleteModal(item.notification_id)}
+                disabled={isDeleting}
+                activeOpacity={0.7}>
+                <Animated.View style={[styles.notificationCard, animatedStyle]}>
+                  <View style={styles.notificationHeader}>
+                    <Typography
+                      text={item.title}
+                      variant={TypographyVariant.PSMALL_MEDIUM}
+                      customTextStyles={styles.notificationTitle}
+                    />
+                    <Typography
+                      text={formatTimestamp(item.timestamp)}
+                      variant={TypographyVariant.LSMALL_REGULAR}
+                      customTextStyles={styles.notificationTime}
+                    />
+                  </View>
 
-                <Typography
-                  text={item.description}
-                  variant={TypographyVariant.LMEDIUM_REGULAR}
-                  customTextStyles={styles.notificationDescription}
-                />
-              </Animated.View>
+                  <Typography
+                    text={item.message}
+                    variant={TypographyVariant.LMEDIUM_REGULAR}
+                    customTextStyles={styles.notificationDescription}
+                  />
+                </Animated.View>
+              </TouchableOpacity>
             );
           })
         ) : (
@@ -286,7 +329,7 @@ const NotificationScreen: React.FC = () => {
               onPress={() =>
                 navigate('Dashboard', {
                   screen: 'Home',
-                  params: { screen: 'HomeScreen' },
+                  params: {screen: 'HomeScreen'},
                 })
               }
               customStyles={styles.emptyButton}
@@ -297,25 +340,9 @@ const NotificationScreen: React.FC = () => {
     );
   };
 
-  const renderScene = ({ route }) => {
-    switch (route.key) {
-      case 'all':
-        return renderNotificationSection('All', allNotifications, loading);
-      case 'administrations':
-        return renderNotificationSection(
-          'Administrations',
-          administrationNotification,
-          loading,
-        );
-      case 'products':
-        return renderNotificationSection(
-          'Products',
-          productNotifications,
-          loading,
-        );
-      default:
-        return null;
-    }
+  const renderScene = ({route}) => {
+    const tabNotifications = getNotificationsForTab(route.key);
+    return renderNotificationSection(route.title, tabNotifications, loading);
   };
 
   const renderTabBar = props => (
@@ -325,7 +352,11 @@ const NotificationScreen: React.FC = () => {
         return (
           <TouchableOpacity
             key={i}
-            onPress={() => setIndex(i)}
+            onPress={() => {
+              setIndex(i);
+              const section = route.key === 'all' ? undefined : route.key;
+              loadNotifications(section);
+            }}
             style={[styles.tabButton, isFocused && styles.activeTabButton]}>
             <Typography
               text={route.title}
@@ -357,7 +388,7 @@ const NotificationScreen: React.FC = () => {
       return [
         {
           text: 'Cancel',
-          onPress: () => setModalConfig({ ...modalConfig, isVisible: false }),
+          onPress: () => setModalConfig({...modalConfig, isVisible: false}),
           variant: ButtonVariant.PRIMARY,
           type: ButtonType.OUTLINED,
           size: ButtonSize.MEDIUM,
@@ -370,7 +401,7 @@ const NotificationScreen: React.FC = () => {
             if (modalConfig.notificationId) {
               handleDeleteNotification(modalConfig.notificationId);
             }
-            setModalConfig({ ...modalConfig, isVisible: false });
+            setModalConfig({...modalConfig, isVisible: false});
           },
           variant: ButtonVariant.PRIMARY,
           type: ButtonType.PRIMARY,
@@ -385,7 +416,7 @@ const NotificationScreen: React.FC = () => {
       return [
         {
           text: 'Cancel',
-          onPress: () => setModalConfig({ ...modalConfig, isVisible: false }),
+          onPress: () => setModalConfig({...modalConfig, isVisible: false}),
           variant: ButtonVariant.PRIMARY,
           type: ButtonType.OUTLINED,
           size: ButtonSize.MEDIUM,
@@ -396,7 +427,7 @@ const NotificationScreen: React.FC = () => {
           text: 'Clear All',
           onPress: () => {
             handleClearAllNotifications();
-            setModalConfig({ ...modalConfig, isVisible: false });
+            setModalConfig({...modalConfig, isVisible: false});
           },
           variant: ButtonVariant.PRIMARY,
           type: ButtonType.PRIMARY,
@@ -423,7 +454,7 @@ const NotificationScreen: React.FC = () => {
               <Typography
                 text="Clear All"
                 variant={TypographyVariant.LMEDIUM_MEDIUM}
-                customTextStyles={{ color: ColorPalette.RED_200, fontSize: 16 }}
+                customTextStyles={{color: ColorPalette.RED_200, fontSize: 16}}
               />
             ),
             onPress: openClearAllModal,
@@ -436,10 +467,10 @@ const NotificationScreen: React.FC = () => {
           contentContainerStyle={[styles.scrollContent]}
           showsVerticalScrollIndicator={false}>
           <TabView
-            navigationState={{ index, routes }}
+            navigationState={{index, routes}}
             renderScene={renderScene}
             onIndexChange={setIndex}
-            initialLayout={{ width: Dimensions.get('window').width }}
+            initialLayout={{width: Dimensions.get('window').width}}
             renderTabBar={renderTabBar}
             swipeEnabled={false}
           />
@@ -448,7 +479,7 @@ const NotificationScreen: React.FC = () => {
 
       <AddModal
         isVisible={modalConfig.isVisible}
-        onClose={() => setModalConfig({ ...modalConfig, isVisible: false })}
+        onClose={() => setModalConfig({...modalConfig, isVisible: false})}
         headerTitle={modalConfig.headerTitle}
         headerText={modalConfig.headerText}
         buttons={getButtons()}
