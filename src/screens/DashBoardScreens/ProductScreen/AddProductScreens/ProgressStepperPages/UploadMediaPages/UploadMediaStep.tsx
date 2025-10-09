@@ -37,6 +37,8 @@ import {
 } from '../../../../../../services/imageService';
 import { Spacing } from '../../../../../../config/globalStyles';
 import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
+import SuccessTickSquareIcon from '../../../../../../assets/icons/ToastIcons/SuccessTick';
+import { showCustomToast } from '../../../../../../components/MainComponents/Toast/ToastComponent';
 
 interface FileData {
   id: string;
@@ -155,14 +157,19 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                   file_id: fileToDelete.fileId,
                 },
               );
+              console.log("delete result", deleteResult);
 
               if (deleteResult.success) {
                 console.log('✅ Image deleted from server successfully');
+                showCustomToast("Image removed successfully!", <SuccessTickSquareIcon size={18} />);
+
               } else {
-                console.warn(
-                  '⚠️ Failed to delete image from server:',
-                  deleteResult.error,
-                );
+                // console.warn(
+                //   '⚠️ Failed to delete image from server:',
+                //   deleteResult.error,
+                // );
+                showCustomToast("Failed to removed successfully!", <SuccessTickSquareIcon size={18} />);
+
                 // Continue with UI deletion even if server deletion fails
                 // The product update API will handle the final image list
               }
@@ -272,7 +279,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       }
 
       if (!result.success) {
-        Alert.alert('Error', result.error || 'Failed to select images');
+        // Alert.alert('Error', result.error || 'Failed to select images');
         setIsUploading(false);
         return;
       }
@@ -285,10 +292,12 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           if (validation.valid) {
             validImages.push(image);
           } else {
-            Alert.alert(
-              'Invalid Image',
-              validation.error || 'Invalid image selected',
-            );
+            // Alert.alert(
+            //   'Invalid Image',
+            //   validation.error || 'Invalid image selected',
+            // );
+            showCustomToast("Oops! Unsupported format!", <SuccessTickSquareIcon size={18} />);
+
           }
         }
 
@@ -383,36 +392,44 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
               // Show success message
               if (uploadResult.errors.length === 0) {
-                Alert.alert(
-                  'Success',
-                  `${uploadResult.uploadedImages.length} image(s) uploaded successfully!`,
-                );
+                // Alert.alert(
+                //   'Success',
+                //   `${uploadResult.uploadedImages.length} image(s) uploaded successfully!`,
+                // );
+
+                showCustomToast("Image(s) uploaded successfully.", <SuccessTickSquareIcon size={18} />);
+
               } else {
                 const successCount = uploadResult.uploadedImages.length;
                 const errorCount = uploadResult.errors.length;
-                Alert.alert(
-                  'Partial Success',
-                  `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
-                );
+                // Alert.alert(
+                //   'Partial Success',
+                //   `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
+                // );
+                showCustomToast(`${successCount} image(s) uploaded successfully, ${errorCount} failed.`, <SuccessTickSquareIcon size={18} />);
               }
             } else {
               console.error('Upload failed:', uploadResult.errors);
-              Alert.alert(
-                'Upload Failed',
-                'Failed to upload images. Please try again.',
-              );
+              // Alert.alert(
+              //   'Upload Failed',
+              //   'Failed to upload images. Please try again.',
+              // );
+
+              showCustomToast("Oops! Upload failed. Try again.", <SuccessTickSquareIcon size={18} />);
               setUploadStatus(files.length > 0 ? 'completed' : 'initial');
             }
           } catch (uploadError) {
             console.error('Upload error:', uploadError);
-            Alert.alert('Upload Error', 'Upload failed. Please try again.');
+            // Alert.alert('Upload Error', 'Upload failed. Please try again.');
+            showCustomToast("Oops! Upload failed. Try again.", <SuccessTickSquareIcon size={18} />);
             setUploadStatus(files.length > 0 ? 'completed' : 'initial');
           }
         }
       }
     } catch (error: any) {
       console.error('Selection error:', error);
-      Alert.alert('Selection Error', 'Failed to select images');
+      // Alert.alert('Selection Error', 'Failed to select images');
+      showCustomToast("Failed to select images", <SuccessTickSquareIcon size={18} />);
     } finally {
       setIsUploading(false);
       setCurrentUpload({ current: 0, total: 0 });

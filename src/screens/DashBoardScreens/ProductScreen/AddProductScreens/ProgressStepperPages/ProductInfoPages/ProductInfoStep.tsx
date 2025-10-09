@@ -427,7 +427,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               }} variant={TypographyVariant.LSMALL_MEDIUM}>
                 Availability state of the product (active, pending, or inactive).              </Typography>
             }
-            placement="right"
+            placement="bottom"
           />
         </View>
         <View style={styles.sliderComponent}>

@@ -40,6 +40,10 @@ import {TrashIcon2} from '../../../assets/icons/NewProductIcons/TrashIcon2';
 import BusinessAdministrators from './AccountOptionScreens/BusinessAdministratorsScreens/BusinessAdministrators';
 import EditAdministrator from './AccountOptionScreens/BusinessAdministratorsScreens/EditAdministrator';
 import TermsConditionsIcon from '../../../assets/icons/TermsAndConditionIcon';
+import Toast from 'react-native-toast-message';
+import { showCustomToast } from '../../../components/MainComponents/Toast/ToastComponent';
+import SuccessTickIcon from '../../../assets/icons/SuccessTickIcon';
+import SuccessTickSquareIcon from '../../../assets/icons/ToastIcons/SuccessTick';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
