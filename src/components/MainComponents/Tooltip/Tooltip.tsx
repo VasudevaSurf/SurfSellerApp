@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ReactNode } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Modal,
@@ -6,9 +6,6 @@ import {
     TouchableOpacity,
     Dimensions,
 } from 'react-native';
-import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize'; // Assuming this utility is available
-import { BorderRadius, Spacing } from '../../../config/globalStyles';
-import CrossCircleIcon from '../../../assets/icons/CrossIcon';
 import CloseIcon from '../../../assets/icons/CloseIcon';
 import { ColorPalette } from '../../../config/colorPalette';
 import { styles } from './Tooltip.styles';

@@ -31,6 +31,8 @@ import {
   transformFormDataToApiFormat,
 } from '../../../../services/apiService';
 import { useCategories } from '../../../../hooks/useCategories';
+import { showCustomToast } from '../../../../components/MainComponents/Toast/ToastComponent';
+import SuccessTickSquareIcon from '../../../../assets/icons/ToastIcons/SuccessTick';
 
 const STEPS = [
   { id: 1, label: 'Product Info' },
@@ -292,14 +294,18 @@ const AddProduct = () => {
       field => !formData[field]?.trim(),
     );
 
-    if (missingFields.length > 0) {
-      console.warn('⚠️ Missing required fields:', missingFields);
-      Alert.alert(
-        'Validation Error',
-        `Please fill in all required fields: ${missingFields.join(', ')}`,
-      );
-      return;
-    }
+    // if (missingFields.length > 0) {
+    //   console.warn('⚠️ Missing required fields:', missingFields);
+    //   // Alert.alert(
+    //   //   'Validation Error',
+    //   //   `Please fill in all required fields: ${missingFields.join(', ')}`,
+    //   // );
+    //   showCustomToast(
+    //     `Missing required fields: ${missingFields.join(', ')}`,
+    //     <SuccessTickSquareIcon size={18} />
+    //   )
+    //   return;
+    // }
 
     // For new products, check if images are properly uploaded (if any were selected)
     if (!editMode && formData.images.length > 0) {
@@ -307,16 +313,19 @@ const AddProduct = () => {
         !formData.imageRelativePaths ||
         formData.imageRelativePaths.length === 0
       ) {
-        Alert.alert(
-          'Images Not Uploaded',
-          'Please wait for images to finish uploading before saving the product.',
-        );
+        // Alert.alert(
+        //   'Images Not Uploaded',
+        //   'Please wait for images to finish uploading before saving the product.',
+        // );
+        showCustomToast("Oops! Upload failed. Try again.", <SuccessTickSquareIcon size={18} />);
+
         return;
       }
     }
 
     if (!userId) {
-      Alert.alert('Error', 'User session expired. Please login again.');
+      // Alert.alert('Error', 'User session expired. Please login again.');
+      showCustomToast("Session expired. Please login again.", <SuccessTickSquareIcon size={18} />)
       return;
     }
 
@@ -351,35 +360,50 @@ const AddProduct = () => {
       }
 
       // Show success message
-      Alert.alert(
-        'Success',
-        editMode
-          ? 'Product updated successfully! Image changes have been saved.'
-          : 'Product created successfully!',
-        [
-          {
-            text: 'OK',
-            onPress: () => goBack(),
-          },
-        ],
-      );
+      // Alert.alert(
+      //   'Success',
+      //   editMode
+      //     ? 'Product updated successfully! Image changes have been saved.'
+      //     : 'Product created successfully!',
+      //   [
+      //     {
+      //       text: 'OK',
+      //       onPress: () => goBack(),
+      //     },
+      //   ],
+      // );
+
+      goBack();
+      const successMessage = editMode
+        ? "Product details updated successfully."
+        : "Product added successfully.";
+
+      showCustomToast(successMessage, <SuccessTickSquareIcon size={18} />);
+
+
     } catch (error: any) {
       console.error('💥 Error saving product:', error);
 
-      Alert.alert(
-        editMode ? 'Update Failed' : 'Creation Failed',
-        error.message ||
+      // Alert.alert(
+      //   editMode ? 'Update Failed' : 'Creation Failed',
+      //   error.message ||
+      //   `Failed to ${editMode ? 'update' : 'create'
+      //   } product. Please try again.`,
+      //   [
+      //     { text: 'OK', style: 'default' },
+      //     {
+      //       text: 'Retry',
+      //       onPress: () => handleSubmit(),
+      //       style: 'default',
+      //     },
+      //   ],
+      // );
+
+      const erroMessage =
         `Failed to ${editMode ? 'update' : 'create'
-        } product. Please try again.`,
-        [
-          { text: 'OK', style: 'default' },
-          {
-            text: 'Retry',
-            onPress: () => handleSubmit(),
-            style: 'default',
-          },
-        ],
-      );
+        } product. Please try again.`
+      showCustomToast(erroMessage, <SuccessTickSquareIcon size={18} />);
+
     } finally {
       setIsSubmitting(false);
     }

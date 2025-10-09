@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, ReactNode } from 'react';
 import { ScrollView, View, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BellIcon from '../../../assets/icons/BellIcon';
-import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
 import { OrderInfo } from '../../../components/MainComponents/OrderInfo/OrderInfo';
 import { OrderStatus } from '../../../components/MainComponents/OrderInfo/OrderInfo.types';
 import { Header } from '../../../components/UserComponents/Header/Header';
@@ -26,9 +25,34 @@ import {
 } from '../../../redux/slices/ordersSlice';
 import AnimatedLoader from '../../../assets/icons/LoaderIcon';
 import FilterIcon from '../../../assets/icons/FilterIcon';
+import SuccessTickSquareIcon from '../../../assets/icons/ToastIcons/SuccessTick';
+import { showCustomToast } from '../../../components/MainComponents/Toast/ToastComponent';
+
+export const statusIconMap: { [key: string]: ReactNode } = {
+  'Pending': <SuccessTickSquareIcon size={18} />,
+  'Open': <SuccessTickSquareIcon size={18} />,
+  'Accepted': <SuccessTickSquareIcon size={18} />,
+  'Paid': <SuccessTickSquareIcon size={18} />,
+  'Declined': <SuccessTickSquareIcon size={18} />,
+  'Failed': <SuccessTickSquareIcon size={18} />,
+  'Backordered': <SuccessTickSquareIcon size={18} />,
+  'Shipped': <SuccessTickSquareIcon size={18} />,
+  'Delivered': <SuccessTickSquareIcon size={18} />,
+  'Completed': <SuccessTickSquareIcon size={18} />,
+  'Cancelled': <SuccessTickSquareIcon size={18} />,
+  'Returned': <SuccessTickSquareIcon size={18} />,
+  'Exchanged': <SuccessTickSquareIcon size={18} />,
+};
+
+export const showStatusToast = (status: string) => {
+  const message = `Order marked as ${status}`;
+  const iconComponent = statusIconMap[status] || <SuccessTickSquareIcon size={18} />;
+
+  showCustomToast(message, iconComponent);
+};
 
 // Map API status codes to display status
-const convertOrderStatus = (apiStatus: string): OrderStatus => {
+export const convertOrderStatus = (apiStatus: string): OrderStatus => {
   const statusMap: { [key: string]: OrderStatus } = {
     O: 'Pending',
     P: 'Processing',
@@ -233,9 +257,12 @@ const OrderScreen = () => {
         }
 
         const apiStatus = convertStatusToApi(newStatus);
-        await dispatch(
+        const res = await dispatch(
           updateOrderStatus({ userId, orderId, status: apiStatus }),
         ).unwrap();
+
+        const updatedStatus = convertOrderStatus(res.newStatus);
+        showStatusToast(updatedStatus);
 
         // Refresh orders list after successful update
         setTimeout(() => {

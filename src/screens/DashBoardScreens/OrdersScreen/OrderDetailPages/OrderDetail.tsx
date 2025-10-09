@@ -37,6 +37,7 @@ import {
 } from '../../../../redux/slices/orderDetailsSlice';
 import ChatIcon from '../../../../assets/icons/ChatIcon';
 import AnimatedLoader from '../../../../assets/icons/LoaderIcon';
+import { convertOrderStatus, showStatusToast } from '../OrderScreen';
 
 // Map API status codes to display status
 const mapStatusToDisplay = (apiStatus: string): OrderStatus => {
@@ -242,13 +243,16 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ route }) => {
       }
 
       const apiStatus = mapStatusToApi(newStatus);
-      await dispatch(
+      const res = await dispatch(
         updateOrderStatusDetails({
           userId,
           orderId: orderId!,
           status: apiStatus,
         }),
       ).unwrap();
+
+      const updatedStatus = convertOrderStatus(res.newStatus);
+      showStatusToast(updatedStatus);
 
       setCurrentStatus(newStatus);
       console.log('OrderDetail - Status updated successfully');
