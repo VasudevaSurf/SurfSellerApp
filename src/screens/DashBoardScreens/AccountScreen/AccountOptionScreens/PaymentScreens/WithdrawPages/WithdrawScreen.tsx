@@ -28,6 +28,7 @@ import {
   clearWithdrawalError,
 } from '../../../../../../redux/slices/withdrawalSlice';
 import {fetchBalanceApi} from '../../../../../../services/apiService';
+import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
 
 const WithdrawScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -235,10 +236,13 @@ const WithdrawScreen = () => {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
-        name="Withdraw"
+        name="Payments"
         variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
-        leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
+        leftIcon={
+          <ArrowLeftIcon style={undefined} size={16} onPress={goBack} />
+        }
+        // rightIcons={headerIcons}
       />
       <View style={styles.mainContainer}>
         <ScrollView
@@ -255,9 +259,29 @@ const WithdrawScreen = () => {
                 variant={TypographyVariant.PMEDIUM_SEMIBOLD}
                 customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
               />
-              <InfoIconPay
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_400}
+              <Tooltip
+                target={
+                  <InfoIconPay
+                    size={22}
+                    color={ColorPalette.GREY_TEXT_400}
+                    style={undefined}
+                  />
+                }
+                content={
+                  <Typography
+                    customTextStyles={{
+                      color: ColorPalette.GREY_TEXT_400,
+                      paddingVertical: getScreenHeight(0.1),
+                    }}
+                    variant={TypographyVariant.LSMALL_MEDIUM}>
+                    Request payout of your available earnings to your bank
+                    account.{' '}
+                  </Typography>
+                }
+                placement="bottom"
+                containerStyle={{
+                  width: 240,
+                }}
               />
             </View>
 

@@ -29,6 +29,7 @@ import { Badge } from '../../../../../../components/UserComponents/Badges/Badge'
 import { TrashIcon2 } from '../../../../../../assets/icons/NewProductIcons/TrashIcon2';
 import { AddModal } from '../../../../../../components/MainComponents/AddModal/AddModal';
 import Dropdown from '../../../../../../components/MainComponents/DropdownModal/Dropdown';
+import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
 
 interface InventoryStepProps {
   formData: any;
@@ -202,10 +203,25 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
             text="Inventory"
             customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
-          <InfoIconPay
-            size={22}
-            color={ColorPalette.GREY_TEXT_400}
-            style={undefined}
+          <Tooltip
+            target={
+              <InfoIconPay
+                size={22}
+                color={ColorPalette.GREY_TEXT_400}
+                style={undefined}
+              />
+            }
+            content={
+              <Typography customTextStyles={{
+                color: ColorPalette.GREY_TEXT_200,
+                paddingVertical: getScreenHeight(0.1)
+              }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                Quantity of the product currently in stock.              </Typography>
+            }
+            placement="right"
+            containerStyle={{
+              width: getScreenWidth(60)
+            }}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -320,10 +336,22 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
               text="Quantity Discount"
               customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
             />
-            <InfoIconPay
-              size={22}
-              color={ColorPalette.GREY_TEXT_400}
-              style={undefined}
+            <Tooltip
+              target={
+                <InfoIconPay
+                  size={22}
+                  color={ColorPalette.GREY_TEXT_400}
+                  style={undefined}
+                />
+              }
+              content={
+                <Typography customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1)
+                }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                  Price reduction offered for bulk purchases.             </Typography>
+              }
+              placement="bottom"
             />
           </View>
           <Button

@@ -36,6 +36,7 @@ import {
   UploadedImageData,
 } from '../../../../../../services/imageService';
 import { Spacing } from '../../../../../../config/globalStyles';
+import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
 
 interface FileData {
   id: string;
@@ -480,12 +481,24 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             text={getHeaderText()}
             customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
-          <InfoIconPay
-            size={22}
-            color={ColorPalette.GREY_TEXT_400}
-            style={undefined}
-            strokeWidth={1.5}
+          <Tooltip
+            target={
+              <InfoIconPay
+                size={22}
+                color={ColorPalette.GREY_TEXT_400}
+                style={undefined}
+              />
+            }
+            content={
+              <Typography customTextStyles={{
+                color: ColorPalette.GREY_TEXT_200,
+                paddingVertical: getScreenHeight(0.1)
+              }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                Photos showing the product from different angles.      </Typography>
+            }
+            placement="bottom"
           />
+
         </View>
 
         {(uploadStatus === 'initial' || (editMode && files.length === 0)) && (
