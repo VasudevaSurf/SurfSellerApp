@@ -275,9 +275,9 @@ export interface UserProfile {
   firstname?: string;
   lastname?: string;
   phone?: string;
-  company?: string;  // Changed from company_name
+  company?: string; // Changed from company_name
   vat_number?: string;
-  address?: string;  // Changed from street
+  address?: string; // Changed from street
   city?: string;
   postal_code?: string;
   country?: string;
@@ -816,39 +816,111 @@ export const fetchProfileApi = async (userId: string) => {
 export const updateProfileApi = async (
   userId: string,
   profileData: Partial<UserProfile>,
+  currentProfileData?: UserProfile | null,
 ): Promise<ProfileUpdateResponse> => {
   try {
-    console.log(
-      'Updating profile for userId:',
-      userId,
-      'with data:',
-      profileData,
-    );
+    console.log('🔄 Updating profile for userId:', userId);
+    console.log('📝 New data:', profileData);
+    console.log('📋 Current data:', currentProfileData);
 
-    // Prepare the request body
-    let requestBody: any = {
-      user_id: parseInt(userId),
-    };
+    // ALWAYS initialize both objects - API requires both to exist
+    const userData: any = {};
+    const companyData: any = {};
 
-    // Handle VAT number specially
-    if (profileData.vat_number !== undefined) {
-      requestBody.fields = {
-        52: profileData.vat_number,
-      };
-
-      // Remove vat_number from profileData as it's now in fields
-      const {vat_number, ...restProfileData} = profileData;
-
-      // Add other user_data if present
-      if (Object.keys(restProfileData).length > 0) {
-        requestBody.user_data = restProfileData;
+    // CRITICAL: First, populate company_data with ALL existing values
+    // This prevents the API from clearing fields we're not updating
+    if (currentProfileData) {
+      // Add all existing company data first
+      if (currentProfileData.company !== undefined) {
+        companyData.company = currentProfileData.company;
       }
-    } else {
-      // Normal case without VAT number
-      requestBody.user_data = profileData;
+      if (currentProfileData.vat_number !== undefined) {
+        companyData.fields_52 = currentProfileData.vat_number;
+      }
+      if (currentProfileData.address !== undefined) {
+        companyData.address = currentProfileData.address;
+      }
+      if (currentProfileData.city !== undefined) {
+        companyData.city = currentProfileData.city;
+      }
+      if (currentProfileData.postal_code !== undefined) {
+        companyData.postal_code = currentProfileData.postal_code;
+      }
+      if (currentProfileData.country !== undefined) {
+        companyData.country = currentProfileData.country;
+      }
+      if (currentProfileData.company_description !== undefined) {
+        companyData.company_description =
+          currentProfileData.company_description;
+      }
+      if (currentProfileData.terms !== undefined) {
+        companyData.terms = currentProfileData.terms;
+      }
+
+      // Add all existing user data first
+      if (currentProfileData.email !== undefined) {
+        userData.email = currentProfileData.email;
+      }
+      if (currentProfileData.firstname !== undefined) {
+        userData.firstname = currentProfileData.firstname;
+      }
+      if (currentProfileData.lastname !== undefined) {
+        userData.lastname = currentProfileData.lastname;
+      }
+      if (currentProfileData.phone !== undefined) {
+        userData.phone = currentProfileData.phone;
+      }
     }
 
-    console.log('Request body:', JSON.stringify(requestBody, null, 2));
+    // NOW override with new values being updated
+    // User data fields
+    if (profileData.email !== undefined) {
+      userData.email = profileData.email;
+    }
+    if (profileData.firstname !== undefined) {
+      userData.firstname = profileData.firstname;
+    }
+    if (profileData.lastname !== undefined) {
+      userData.lastname = profileData.lastname;
+    }
+    if (profileData.phone !== undefined) {
+      userData.phone = profileData.phone;
+    }
+
+    // Company data fields - override with new values
+    if (profileData.company !== undefined) {
+      companyData.company = profileData.company;
+    }
+    if (profileData.vat_number !== undefined) {
+      companyData.fields_52 = profileData.vat_number;
+    }
+    if (profileData.address !== undefined) {
+      companyData.address = profileData.address;
+    }
+    if (profileData.city !== undefined) {
+      companyData.city = profileData.city;
+    }
+    if (profileData.postal_code !== undefined) {
+      companyData.postal_code = profileData.postal_code;
+    }
+    if (profileData.country !== undefined) {
+      companyData.country = profileData.country;
+    }
+    if (profileData.company_description !== undefined) {
+      companyData.company_description = profileData.company_description;
+    }
+    if (profileData.terms !== undefined) {
+      companyData.terms = profileData.terms;
+    }
+
+    // CRITICAL: Always include both objects in request body
+    const requestBody = {
+      user_id: parseInt(userId),
+      user_data: userData,
+      company_data: companyData,
+    };
+
+    console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
 
     const response = await axios({
       method: 'POST',
@@ -861,10 +933,19 @@ export const updateProfileApi = async (
       timeout: 10000,
     });
 
-    console.log('Update Profile API response:', response.data);
+    console.log('📥 Update Profile API response:', response.data);
+
+    // Check if response is valid JSON
+    if (
+      typeof response.data === 'string' &&
+      response.data.includes('<b>Warning</b>')
+    ) {
+      throw new Error('Server returned an error. Please try again.');
+    }
+
     return response.data;
   } catch (error: any) {
-    console.error('Update Profile API error:', error);
+    console.error('❌ Update Profile API error:', error);
 
     if (error.code === 'ECONNABORTED') {
       throw new Error(
@@ -884,7 +965,9 @@ export const updateProfileApi = async (
       throw new Error('Network error. Please check your connection.');
     } else {
       throw new Error(
-        error.response?.data?.message || 'Failed to update profile',
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to update profile',
       );
     }
   }

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
+  Alert,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
@@ -21,7 +22,10 @@ import {
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
 import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
-import {fetchProfile} from '../../../../../redux/slices/profileSlice';
+import {
+  fetchProfile,
+  updateProfile,
+} from '../../../../../redux/slices/profileSlice';
 import {styles} from './PerosanlInfo.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import {RootState, AppDispatch} from '../../../../../redux/store';
@@ -44,6 +48,12 @@ import {Badge} from '../../../../../components/UserComponents/Badges/Badge';
 import {containerStyles} from '../CompanyProfilePages/ImageContainer.styles';
 import CloudDownloadIcon from '../../../../../assets/icons/CloudDownloadIcon';
 import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
+import {
+  Button,
+  ButtonSize,
+  ButtonState,
+  ButtonVariant,
+} from '../../../../../components/UserComponents/Button';
 
 interface PersonalInfoProps {
   editMode?: boolean;
@@ -124,6 +134,53 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   const [selectedOption, setSelectedOption] = useState(statusOptions[0]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
+  const handleUpdateDescription = async () => {
+    if (!userData?.user_id) {
+      Alert.alert('Error', 'User not found. Please login again.');
+      return;
+    }
+
+    try {
+      await dispatch(
+        updateProfile({
+          userId: userData.user_id,
+          profileData: {
+            company_description: companyDescription,
+          },
+        }),
+      ).unwrap();
+
+      Alert.alert('Success', 'Company description updated successfully');
+    } catch (error: any) {
+      Alert.alert(
+        'Update Failed',
+        error.message || 'Failed to update description',
+      );
+    }
+  };
+
+  const handleUpdateTerms = async () => {
+    if (!userData?.user_id) {
+      Alert.alert('Error', 'User not found. Please login again.');
+      return;
+    }
+
+    try {
+      await dispatch(
+        updateProfile({
+          userId: userData.user_id,
+          profileData: {
+            terms: termsAndConditions,
+          },
+        }),
+      ).unwrap();
+
+      Alert.alert('Success', 'Terms and conditions updated successfully');
+    } catch (error: any) {
+      Alert.alert('Update Failed', error.message || 'Failed to update terms');
+    }
+  };
+
   // Fetch profile data when component mounts
   useFocusEffect(
     React.useCallback(() => {
@@ -134,34 +191,139 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   );
 
   // Extract field value helper function
+  // Replace the getFieldValue helper function
   const getFieldValue = (fieldName: string): string => {
-    if (!rawProfileData?.sections) return '';
+    if (!rawProfileData?.sections) {
+      console.warn('⚠️ No rawProfileData sections available');
+      return '';
+    }
 
     for (const section of rawProfileData.sections) {
       for (const block of section.blocks) {
         const field = block.fields.find(f => f.field_name === fieldName);
         if (field) {
+          console.log(`✅ Found ${fieldName}:`, field.value || '(empty)');
           return field.value || '';
         }
       }
     }
+
+    console.warn(`⚠️ Field not found: ${fieldName}`);
     return '';
   };
 
-  // Update state when profile data changes
+  // Update the useEffect that extracts field values
   useEffect(() => {
     if (rawProfileData) {
-      // Extract all values from API
-      setBusinessName(getFieldValue('company'));
-      setVATNumber(getFieldValue('fields_52')); // VAT number field
-      setStreetName(getFieldValue('address'));
-      setCityName(getFieldValue('city'));
-      setPostalCode(getFieldValue('postal_code'));
-      setCountry(getFieldValue('country'));
-      setCompanyDescription(getFieldValue('company_description'));
-      setTermsAndConditions(getFieldValue('terms'));
+      console.log('📊 Profile data updated, refreshing display values');
+
+      // Extract all values from API - using getFieldValue helper
+      const company = getFieldValue('company');
+      const vat = getFieldValue('fields_52');
+      const address = getFieldValue('address');
+      const city = getFieldValue('city');
+      const postal = getFieldValue('postal_code');
+      const countryVal = getFieldValue('country');
+      const description = getFieldValue('company_description');
+      const terms = getFieldValue('terms');
+
+      console.log('📋 All extracted values:', {
+        company,
+        vat,
+        address,
+        city,
+        postal,
+        countryVal,
+        descriptionLength: description?.length || 0,
+        termsLength: terms?.length || 0,
+      });
+
+      // Update all state values
+      setBusinessName(company);
+      setVATNumber(vat);
+      setStreetName(address);
+      setCityName(city);
+      setPostalCode(postal);
+      setCountry(countryVal);
+      setCompanyDescription(description);
+      setTermsAndConditions(terms);
     }
   }, [rawProfileData]);
+
+  // Update state when profile data changes
+  // Update the useEffect that listens to profile data changes
+  // Update the useEffect that extracts field values
+  useEffect(() => {
+    if (rawProfileData) {
+      console.log('📊 Profile data updated, refreshing display values');
+
+      // Extract all values from API - using getFieldValue helper
+      const company = getFieldValue('company');
+      const vat = getFieldValue('fields_52');
+      const address = getFieldValue('address');
+      const city = getFieldValue('city');
+      const postal = getFieldValue('postal_code');
+      const countryVal = getFieldValue('country');
+      const description = getFieldValue('company_description');
+      const terms = getFieldValue('terms');
+
+      console.log('📋 Extracted values:', {
+        company,
+        vat,
+        address,
+        city,
+        postal,
+        countryVal,
+        description: description?.substring(0, 50) + '...',
+        terms: terms?.substring(0, 50) + '...',
+      });
+
+      // Only update state if values exist (to preserve data)
+      if (company !== undefined) setBusinessName(company);
+      if (vat !== undefined) setVATNumber(vat);
+      if (address !== undefined) setStreetName(address);
+      if (city !== undefined) setCityName(city);
+      if (postal !== undefined) setPostalCode(postal);
+      if (countryVal !== undefined) setCountry(countryVal);
+      if (description !== undefined) setCompanyDescription(description);
+      if (terms !== undefined) setTermsAndConditions(terms);
+    }
+  }, [rawProfileData]);
+
+  // Update the useFocusEffect to always refresh when screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log(
+        '🔄 PersonalInfo screen focused, fetching latest profile data',
+      );
+      if (userData?.user_id) {
+        dispatch(fetchProfile(userData.user_id));
+      }
+    }, [dispatch, userData?.user_id]),
+  );
+
+  // Add a new useEffect to log when state values change
+  useEffect(() => {
+    console.log('📝 Current state values:', {
+      businessName,
+      vatNumber,
+      streetName,
+      cityName,
+      postalCode,
+      country,
+      hasDescription: !!companyDescription,
+      hasTerms: !!termsAndConditions,
+    });
+  }, [
+    businessName,
+    vatNumber,
+    streetName,
+    cityName,
+    postalCode,
+    country,
+    companyDescription,
+    termsAndConditions,
+  ]);
 
   const toggleTextFormat = (format: 'bold' | 'italic' | 'underline') => {
     setTextFormat(prev => ({
@@ -591,6 +753,17 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
               onBlur={() => setIsFocused(false)}
             />
           </View>
+
+          {/* Add Save Button */}
+          <View style={{marginTop: getScreenHeight(2)}}>
+            <Button
+              text="SAVE CHANGES"
+              variant={ButtonVariant.PRIMARY}
+              state={ButtonState.DEFAULT}
+              size={ButtonSize.MEDIUM}
+              onPress={handleUpdateDescription}
+            />
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -816,6 +989,17 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
               onChangeText={setTermsAndConditions}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
+            />
+          </View>
+
+          {/* Add Save Button */}
+          <View style={{marginTop: getScreenHeight(2)}}>
+            <Button
+              text="SAVE CHANGES"
+              variant={ButtonVariant.PRIMARY}
+              state={ButtonState.DEFAULT}
+              size={ButtonSize.MEDIUM}
+              onPress={handleUpdateTerms}
             />
           </View>
         </View>

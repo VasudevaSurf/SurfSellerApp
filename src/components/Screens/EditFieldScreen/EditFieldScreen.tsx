@@ -19,6 +19,7 @@ import {goBack, navigate} from '../../../navigation/utils/navigationRef';
 import {
   updateProfile,
   clearUpdateSuccess,
+  fetchProfile,
 } from '../../../redux/slices/profileSlice';
 import {styles} from './EditFieldScreen.styles';
 import {
@@ -40,6 +41,7 @@ interface UpdatedEditFieldScreenProps {
   navigation: any;
 }
 
+// Update the submitFormAction function with better logging
 const submitFormAction = async (
   actionType: string,
   values: any,
@@ -49,6 +51,9 @@ const submitFormAction = async (
   try {
     let profileData: any = {};
 
+    console.log('🎯 Submit action:', {actionType, values});
+
+    // Only include the specific field being updated
     switch (actionType) {
       case 'updateName':
         profileData = {
@@ -70,12 +75,13 @@ const submitFormAction = async (
         profileData = {
           company: values,
         };
+        console.log('📝 Updating business name to:', values);
         break;
       case 'updateVATNumber':
-        // VAT number uses special field structure
         profileData = {
           vat_number: values,
         };
+        console.log('📝 Updating VAT number to:', values);
         break;
       case 'updateStreetName':
         profileData = {
@@ -97,10 +103,22 @@ const submitFormAction = async (
           country: values,
         };
         break;
+      case 'updateCompanyDescription':
+        profileData = {
+          company_description: values,
+        };
+        break;
+      case 'updateTermsAndConditions':
+        profileData = {
+          terms: values,
+        };
+        break;
       default:
         console.warn(`Unhandled action type: ${actionType}`);
         return false;
     }
+
+    console.log('🚀 Dispatching profile update with data:', profileData);
 
     const result = await dispatch(
       updateProfile({
@@ -109,9 +127,10 @@ const submitFormAction = async (
       }),
     ).unwrap();
 
+    console.log('✅ Profile update successful:', result);
     return true;
   } catch (error) {
-    console.error('Profile update failed:', error);
+    console.error('❌ Profile update failed:', error);
     throw error;
   }
 };
@@ -246,7 +265,13 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     setActiveDropdown(isOpen ? key : null);
   };
 
+  // Replace the navigateBack function
   const navigateBack = (updatedData: any) => {
+    // Dispatch action to refresh profile data
+    if (userData?.user_id) {
+      dispatch(fetchProfile(userData.user_id));
+    }
+
     // Show success message
     Alert.alert(
       'Success',
@@ -255,16 +280,8 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
         {
           text: 'OK',
           onPress: () => {
+            // Navigate back
             navigation.goBack();
-
-            // Navigate to appropriate screen
-            if (originScreen === 'CompanyProfile') {
-              navigation.navigate('PersonalInfo', updatedData);
-            } else if (originScreen === 'BankDetails') {
-              navigation.navigate('BankDetails', updatedData);
-            } else {
-              navigation.navigate('PersonalInfo', updatedData);
-            }
           },
         },
       ],
@@ -272,6 +289,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     );
   };
 
+  // Replace the entire handleSubmit function
   const handleSubmit = async (): Promise<void> => {
     if (!userData?.user_id) {
       setError('User not found. Please login again.');
@@ -308,17 +326,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           userData.user_id,
         );
 
-        const fullName = fieldValues.firstName
-          ? `${fieldValues.firstName || ''} ${
-              fieldValues.lastName || ''
-            }`.trim()
-          : fieldValues;
-
-        navigateBack(
-          originScreen === 'CompanyProfile'
-            ? fieldValues
-            : {updatedName: fullName},
-        );
+        navigateBack(fieldValues);
       } else {
         const validationFn = getValidationForType(validationType || fieldType);
         const validationResult = validationFn(fieldValue);
@@ -348,33 +356,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
             },
           });
         } else {
-          let updatedData = {};
-          switch (fieldType) {
-            case 'email':
-              updatedData = {updatedEmail: fieldValue};
-              break;
-            case 'businessName':
-              updatedData = {updatedName: fieldValue};
-              break;
-            case 'vatNumber':
-              updatedData = {updatedVat: fieldValue};
-              break;
-            case 'streetName':
-              updatedData = {updatedStreet: fieldValue};
-              break;
-            case 'cityName':
-              updatedData = {updatedCity: fieldValue};
-              break;
-            case 'postalCode':
-              updatedData = {updatedPostal: fieldValue};
-              break;
-            case 'country':
-              updatedData = {updatedCountry: fieldValue};
-              break;
-            default:
-              updatedData = {updatedName: fieldValue};
-          }
-          navigateBack(updatedData);
+          navigateBack({});
         }
       }
     } catch (error: any) {

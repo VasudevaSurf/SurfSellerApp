@@ -6,6 +6,7 @@ import {
   UserProfile,
   ProfileUpdateResponse,
 } from '../../services/apiService';
+import {RootState} from '../store';
 
 export interface ProfileState {
   profileData: UserProfile | null;
@@ -29,7 +30,7 @@ const initialState: ProfileState = {
   lastUpdated: null,
 };
 
-// Helper function to extract user profile from API response
+// Replace the helper function to extract user profile
 const extractUserProfile = (
   sections: ProfileResponse['sections'],
 ): UserProfile => {
@@ -51,14 +52,14 @@ const extractUserProfile = (
           case 'phone':
             userProfile.phone = field.value;
             break;
-          case 'company_name':
-            userProfile.company_name = field.value;
+          case 'company':
+            userProfile.company = field.value;
             break;
-          case 'vat_number':
+          case 'fields_52':
             userProfile.vat_number = field.value;
             break;
-          case 'street':
-            userProfile.street = field.value;
+          case 'address':
+            userProfile.address = field.value;
             break;
           case 'city':
             userProfile.city = field.value;
@@ -68,6 +69,12 @@ const extractUserProfile = (
             break;
           case 'country':
             userProfile.country = field.value;
+            break;
+          case 'company_description':
+            userProfile.company_description = field.value;
+            break;
+          case 'terms':
+            userProfile.terms = field.value;
             break;
         }
       });
@@ -97,7 +104,7 @@ export const updateProfile = createAsyncThunk(
   'profile/updateProfile',
   async (
     {userId, profileData}: {userId: string; profileData: Partial<UserProfile>},
-    {rejectWithValue},
+    {rejectWithValue, getState},
   ) => {
     try {
       console.log(
@@ -106,7 +113,16 @@ export const updateProfile = createAsyncThunk(
         'with data:',
         profileData,
       );
-      const response = await updateProfileApi(userId, profileData);
+
+      // Get current profile data from state
+      const state = getState() as RootState;
+      const currentProfileData = state.profile.profileData;
+
+      const response = await updateProfileApi(
+        userId,
+        profileData,
+        currentProfileData,
+      );
       console.log('Update profile API response:', response);
       return {response, profileData};
     } catch (error: any) {
@@ -171,20 +187,32 @@ const profileSlice = createSlice({
         state.updateError = null;
         state.updateSuccess = false;
       })
+      // In the updateProfile.fulfilled case
       .addCase(updateProfile.fulfilled, (state, action) => {
         console.log('updateProfile.fulfilled with data:', action.payload);
         state.updating = false;
-        // Immediately update local profile data
-        if (state.profileData) {
-          state.profileData = {
-            ...state.profileData,
-            ...action.payload.profileData,
-          };
-        } else {
-          state.profileData = action.payload.profileData;
+
+        // Check if response is valid
+        if (
+          action.payload.response &&
+          typeof action.payload.response === 'object'
+        ) {
+          // Only update if we got a proper response
+          if (action.payload.response.result === true) {
+            // Immediately update local profile data
+            if (state.profileData) {
+              state.profileData = {
+                ...state.profileData,
+                ...action.payload.profileData,
+              };
+            } else {
+              state.profileData = action.payload.profileData;
+            }
+            state.updateSuccess = true;
+          }
         }
+
         state.updateError = null;
-        state.updateSuccess = true;
         state.lastUpdated = Date.now();
       })
       .addCase(updateProfile.rejected, (state, action) => {
