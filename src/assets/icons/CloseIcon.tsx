@@ -1,7 +1,14 @@
 import React from 'react';
-import Svg, {Path} from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
-const CloseIcon = ({
+type CloseIconProps = {
+  size?: number;
+  color?: string;
+  strokeWidth?: number;
+  style?: any
+};
+
+const CloseIcon: React.FC<CloseIconProps> = ({
   size = 24,
   color = '#4A4A4A',
   strokeWidth = 1.5,
