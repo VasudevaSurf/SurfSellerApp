@@ -1,39 +1,41 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {Alert, SafeAreaView, ScrollView, View} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Alert, SafeAreaView, ScrollView, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
 import InfoIconOutline from '../../../../../../assets/icons/InfoIconOutline';
-import {Button} from '../../../../../../components/UserComponents/Button/Button';
+import { Button } from '../../../../../../components/UserComponents/Button/Button';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button/Button.types';
-import {Header} from '../../../../../../components/UserComponents/Header/Header';
+import { Header } from '../../../../../../components/UserComponents/Header/Header';
 import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getScreenHeight} from '../../../../../../helpers/screenSize';
-import {goBack} from '../../../../../../navigation/utils/navigationRef';
-import {styles} from './WithdrawScreen.styles';
+import { Typography } from '../../../../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../../config/colorPalette';
+import { getScreenHeight } from '../../../../../../helpers/screenSize';
+import { goBack } from '../../../../../../navigation/utils/navigationRef';
+import { styles } from './WithdrawScreen.styles';
 import ArrowLeft from '../../../../../../assets/icons/ArrowLeft';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import QuestionMarkIcon from '../../../../../../assets/icons/QuestionMarkIcon';
-import {RootState, AppDispatch} from '../../../../../../redux/store';
+import { RootState, AppDispatch } from '../../../../../../redux/store';
 import {
   createWithdrawal,
   clearWithdrawalState,
   clearWithdrawalError,
 } from '../../../../../../redux/slices/withdrawalSlice';
-import {fetchBalanceApi} from '../../../../../../services/apiService';
+import { fetchBalanceApi } from '../../../../../../services/apiService';
 import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
+import SuccessTickSquareIcon from '../../../../../../assets/icons/ToastIcons/SuccessTick';
+import { showCustomToast } from '../../../../../../components/MainComponents/Toast/ToastComponent';
 
 const WithdrawScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const {loading, success, error} = useSelector(
+  const { loading, success, error } = useSelector(
     (state: RootState) => state.withdrawal,
   );
 
@@ -67,33 +69,35 @@ const WithdrawScreen = () => {
   }, [userData?.user_id]);
 
   // Handle successful withdrawal
+  // Assuming you have imported: showCustomToast and SuccessTickSquareIcon
+
+  // Handle successful withdrawal
   useEffect(() => {
     if (success) {
-      Alert.alert(
-        'Success',
-        'Your withdrawal request has been submitted successfully!',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              dispatch(clearWithdrawalState());
-              goBack();
-            },
-          },
-        ],
+      goBack();
+      showCustomToast(
+        `Withdrawal of €${amount} requested successfully.`,
+        <SuccessTickSquareIcon size={18} />,
       );
+
+      const navigationDelay = setTimeout(() => {
+        dispatch(clearWithdrawalState());
+      }, 500);
+
+      return () => clearTimeout(navigationDelay);
     }
   }, [success, dispatch]);
 
   // Handle errors
+
+  // Handle errors
   useEffect(() => {
     if (error) {
-      Alert.alert('Error', error, [
-        {
-          text: 'OK',
-          onPress: () => dispatch(clearWithdrawalError()),
-        },
-      ]);
+      goBack()
+      const ErrorIcon = <SuccessTickSquareIcon size={18} />;
+      showCustomToast('Withdrawal failed. Please try again.', ErrorIcon);
+
+      dispatch(clearWithdrawalError());
     }
   }, [error, dispatch]);
 
@@ -126,6 +130,33 @@ const WithdrawScreen = () => {
     setAmountError('');
     return true;
   };
+
+  useEffect(() => {
+    if (amountError) {
+      let toastMessage = 'Enter a valid withdrawal amount.'; // Default fallback
+
+      // Map the internal error message to the user-facing toast message
+      if (amountError.includes('exceed available balance')) {
+        toastMessage = 'Amount exceeds available balance.';
+      } else if (amountError.includes('greater than 0')) {
+        toastMessage = `Enter a valid withdrawal amount`;
+      } else if (amountError.includes('required') || amountError.includes('valid amount')) {
+        toastMessage = 'Enter a valid withdrawal amount.';
+      } else if (amountError.includes('Minimum withdrawal')) {
+        toastMessage; // Use the exact validation message
+      } else if (Number(amount) > 999.99) {
+        toastMessage = 'Minimum withdrawal is €999.90'
+      }
+
+      // Show the custom toast only when an error is present
+      showCustomToast(
+        toastMessage,
+        <SuccessTickSquareIcon size={18} />,
+      );
+    }
+  }, [amountError, currentBalance]);
+
+
 
   const handleAmountChange = (value: string) => {
     // Allow only numbers and decimal point
@@ -165,8 +196,7 @@ const WithdrawScreen = () => {
 
     Alert.alert(
       'Confirm Withdrawal',
-      `Are you sure you want to withdraw €${numAmount.toFixed(2)}?${
-        comment ? `\n\nComment: ${comment}` : ''
+      `Are you sure you want to withdraw €${numAmount.toFixed(2)}?${comment ? `\n\nComment: ${comment}` : ''
       }`,
       [
         {
@@ -242,14 +272,14 @@ const WithdrawScreen = () => {
         leftIcon={
           <ArrowLeftIcon style={undefined} size={16} onPress={goBack} />
         }
-        // rightIcons={headerIcons}
+      // rightIcons={headerIcons}
       />
       <View style={styles.mainContainer}>
         <ScrollView
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            {paddingTop: getScreenHeight(2)},
+            { paddingTop: getScreenHeight(2) },
           ]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.mainInputContainer}>
@@ -257,7 +287,7 @@ const WithdrawScreen = () => {
               <Typography
                 text="Withdraw"
                 variant={TypographyVariant.PMEDIUM_SEMIBOLD}
-                customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+                customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
               />
               <Tooltip
                 target={
@@ -347,7 +377,7 @@ const WithdrawScreen = () => {
               borderWidth: 1,
               borderColor: ColorPalette.PURPLE_300,
             }}
-            customTextStyles={{color: ColorPalette.PURPLE_300}}
+            customTextStyles={{ color: ColorPalette.PURPLE_300 }}
             textVariant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
             disabled={loading}
           />
