@@ -1,5 +1,5 @@
-import { useFocusEffect, useRoute } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import {useFocusEffect, useRoute} from '@react-navigation/native';
+import React, {useEffect, useState, useMemo} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -9,29 +9,29 @@ import {
   TextInput,
   Image,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import {useDispatch, useSelector} from 'react-redux';
+import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
-import { Header } from '../../../../../components/UserComponents/Header/Header';
+import {Header} from '../../../../../components/UserComponents/Header/Header';
 import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
-import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../../../config/colorPalette';
+import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../config/colorPalette';
 import {
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../helpers/screenSize';
-import { goBack, navigate } from '../../../../../navigation/utils/navigationRef';
-import { fetchProfile } from '../../../../../redux/slices/profileSlice';
-import { styles } from './PerosanlInfo.styles';
+import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
+import {fetchProfile} from '../../../../../redux/slices/profileSlice';
+import {styles} from './PerosanlInfo.styles';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
-import { RootState, AppDispatch } from '../../../../../redux/store';
-import { Typography } from '../../../../../components/UserComponents/Typography/Typography';
-import Svg, { Circle, Path } from 'react-native-svg';
-import { Spacing } from '../../../../../config/globalStyles';
+import {RootState, AppDispatch} from '../../../../../redux/store';
+import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
+import Svg, {Circle, Path} from 'react-native-svg';
+import {Spacing} from '../../../../../config/globalStyles';
 import LockIcon from '../../../../../assets/icons/LockIcon';
-import { SlidingBar } from '../../../../../components/MainComponents/SlidingBar/SlidingBar';
-import { SlidingBarOption } from '../../../../../components/MainComponents/SlidingBar/SlidingBar.types';
-import { BadgeVariant } from '../../../../../components/UserComponents/Badges/Badge.types';
+import {SlidingBar} from '../../../../../components/MainComponents/SlidingBar/SlidingBar';
+import {SlidingBarOption} from '../../../../../components/MainComponents/SlidingBar/SlidingBar.types';
+import {BadgeVariant} from '../../../../../components/UserComponents/Badges/Badge.types';
 import ArrowDownIcon from '../../../../../assets/icons/ArrowDownIcon';
 import TextSymbolIcon from '../../../../../assets/icons/NewProductIcons/TextSymbolIcon';
 import UnderlineIcon from '../../../../../assets/icons/NewProductIcons/UnderlineIcon';
@@ -40,8 +40,8 @@ import UnderlineTextIcon from '../../../../../assets/icons/NewProductIcons/Under
 import AlignTextLeftIcon from '../../../../../assets/icons/NewProductIcons/AlignTextLeftIcon';
 import AlignTextCenterIcon from '../../../../../assets/icons/NewProductIcons/AlignTextCenterIcon';
 import AlignTextRightIcon from '../../../../../assets/icons/NewProductIcons/AlignTextRightIcon';
-import { Badge } from '../../../../../components/UserComponents/Badges/Badge';
-import { containerStyles } from '../CompanyProfilePages/ImageContainer.styles';
+import {Badge} from '../../../../../components/UserComponents/Badges/Badge';
+import {containerStyles} from '../CompanyProfilePages/ImageContainer.styles';
 import CloudDownloadIcon from '../../../../../assets/icons/CloudDownloadIcon';
 import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
 
@@ -79,62 +79,35 @@ const INITIAL_COUNTRY_CODE = '+356';
 const MALTA_FLAG_URL =
   'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
 
-const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
+const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   const route = useRoute();
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const { profileData, loading, error } = useSelector(
+  const {profileData, loading, error, rawProfileData} = useSelector(
     (state: RootState) => state.profile,
   );
-  const [description, setDescription] = useState('');
+
+  // State for all fields
+  const [businessName, setBusinessName] = useState('');
+  const [vatNumber, setVATNumber] = useState('');
+  const [streetName, setStreetName] = useState('');
+  const [cityName, setCityName] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [country, setCountry] = useState('');
+  const [companyDescription, setCompanyDescription] = useState('');
+  const [termsAndConditions, setTermsAndConditions] = useState('');
 
   const [isFocused, setIsFocused] = useState(false);
-  const [vatChecked, setVatChecked] = useState(false);
-
-  const [businessName, setBusinessName] = useState('John’s flower Shop');
-  const [vatNumber, setVATNumber] = useState('MT10927393');
-  // Tab state
+  const [vatChecked, setVatChecked] = useState(true);
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'general', title: 'General' },
-    { key: 'description', title: 'Description' },
-    { key: 'logo', title: 'Logo' },
-    { key: 'terms', title: 'Terms & Condition' },
+    {key: 'general', title: 'General'},
+    {key: 'description', title: 'Description'},
+    {key: 'logo', title: 'Logo'},
+    {key: 'terms', title: 'Terms & Condition'},
   ]);
 
-  // State for form fields
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [countryCode, setCountryCode] = useState(INITIAL_COUNTRY_CODE);
-  const [streetName, setStreetName] = useState('Triq San Pawl');
-  const [cityName, setCityName] = useState('City');
-  const [postalCode, setPostalCode] = useState('CLT 1210');
-  const [country, setCountry] = useState('Malta');
-
-  // Fetch profile data when component mounts or when returning to screen
-  useFocusEffect(
-    React.useCallback(() => {
-      if (userData?.user_id) {
-        dispatch(fetchProfile(userData.user_id));
-      }
-    }, [dispatch, userData?.user_id]),
-  );
-
-  // Update state when profile data changes
-  useEffect(() => {
-    if (profileData) {
-      // Construct full name from profile data
-      const firstName = profileData.firstname || '';
-      const lastName = profileData.lastname || '';
-      const constructedFullName = `${firstName} ${lastName}`.trim();
-
-      setFullName(constructedFullName || '');
-      setEmail(profileData.email || '');
-      setPhoneNumber(profileData.phone || '');
-    }
-  }, [profileData]);
-
   const [textAlignment, setTextAlignment] = useState<
     'left' | 'center' | 'right'
   >('left');
@@ -143,6 +116,52 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
     italic: false,
     underline: false,
   });
+
+  const statusOptions = [
+    {id: 'yes', label: 'Yes'},
+    {id: 'no', label: 'No'},
+  ];
+  const [selectedOption, setSelectedOption] = useState(statusOptions[0]);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
+  // Fetch profile data when component mounts
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userData?.user_id) {
+        dispatch(fetchProfile(userData.user_id));
+      }
+    }, [dispatch, userData?.user_id]),
+  );
+
+  // Extract field value helper function
+  const getFieldValue = (fieldName: string): string => {
+    if (!rawProfileData?.sections) return '';
+
+    for (const section of rawProfileData.sections) {
+      for (const block of section.blocks) {
+        const field = block.fields.find(f => f.field_name === fieldName);
+        if (field) {
+          return field.value || '';
+        }
+      }
+    }
+    return '';
+  };
+
+  // Update state when profile data changes
+  useEffect(() => {
+    if (rawProfileData) {
+      // Extract all values from API
+      setBusinessName(getFieldValue('company'));
+      setVATNumber(getFieldValue('fields_52')); // VAT number field
+      setStreetName(getFieldValue('address'));
+      setCityName(getFieldValue('city'));
+      setPostalCode(getFieldValue('postal_code'));
+      setCountry(getFieldValue('country'));
+      setCompanyDescription(getFieldValue('company_description'));
+      setTermsAndConditions(getFieldValue('terms'));
+    }
+  }, [rawProfileData]);
 
   const toggleTextFormat = (format: 'bold' | 'italic' | 'underline') => {
     setTextFormat(prev => ({
@@ -153,115 +172,6 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
 
   const handleAlignmentChange = (alignment: 'left' | 'center' | 'right') => {
     setTextAlignment(alignment);
-  };
-
-  const statusOptions = [
-    { id: 'yes', label: 'Yes' },
-    { id: 'no', label: 'No' },
-  ];
-
-  const [selectedOption, setSelectedOption] = useState(statusOptions[0]);
-
-  // Update from route params (for immediate UI feedback)
-  useFocusEffect(
-    React.useCallback(() => {
-      if (route.params) {
-        const { updatedName, updatedEmail, updatedPhone } = route.params;
-        if (updatedName) setFullName(updatedName);
-        if (updatedEmail) setEmail(updatedEmail);
-        if (updatedPhone) setPhoneNumber(updatedPhone);
-      }
-    }, [route.params]),
-  );
-
-  const handleEditName = () => {
-    const nameParts = fullName.split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
-
-    navigate('EditField', {
-      fieldType: 'name',
-      multipleFields: true,
-      initialValues: {
-        firstName,
-        lastName,
-      },
-      headerTitle: 'Update your name',
-      description:
-        'Please enter your name exactly as it appears on your ID or passport.',
-      fields: [
-        {
-          key: 'firstName',
-          label: 'First name',
-          keyboardType: 'default',
-          required: true,
-          validationType: 'firstName',
-        },
-        {
-          key: 'lastName',
-          label: 'Last name',
-          keyboardType: 'default',
-          required: false,
-          validationType: 'lastName',
-        },
-      ],
-      onSubmitActionType: 'updateName',
-    });
-  };
-
-  const handleEditEmail = () => {
-    navigate('Dashboard', {
-      screen: 'Account',
-      params: {
-        screen: 'EditField',
-        params: {
-          fieldType: 'email',
-          initialValue: email,
-          headerTitle: 'Update your email',
-          label: 'Email ID',
-          description:
-            'Please update your email ID to receive important updates and notifications.',
-          keyboardType: 'email-address',
-          validationType: 'email',
-          onSubmitActionType: 'updateEmail',
-          captionText: 'Email verified',
-          iconImage: require('../../../../../assets/images/elements.png'),
-          size: 24,
-        },
-      },
-    });
-  };
-
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-
-  const handleUpload = () => {
-    setIsAddModalVisible(true);
-  };
-
-  const handleEditPhone = () => {
-    navigate('Dashboard', {
-      screen: 'Account',
-      params: {
-        screen: 'EditField',
-        params: {
-          fieldType: 'phone',
-          initialValue: phoneNumber,
-          headerTitle: 'Update your phone number',
-          label: 'WhatsApp number',
-          description:
-            'Please update your WhatsApp number to get all your updates and orders details.',
-          keyboardType: 'phone-pad',
-          showCountrySection: true,
-          countryCode: countryCode,
-          countryFlag: MALTA_FLAG_URL,
-          validationType: 'phone',
-          onSubmitActionType: 'updatePhone',
-          captionText: 'WhatsApp number verified',
-          iconImage: require('../../../../../assets/images/elements.png'),
-          size: 24,
-        },
-      },
-    });
   };
 
   const handleEditBusinessName = () => {
@@ -302,59 +212,81 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
     });
   };
 
+  const handleEditStreetName = () => {
+    navigate('EditField', {
+      fieldType: 'streetName',
+      initialValue: streetName,
+      headerTitle: 'Update street address',
+      label: 'Street name and number',
+      keyboardType: 'default',
+      validationType: 'streetName',
+      onSubmitActionType: 'updateStreetName',
+      originScreen: 'CompanyProfile',
+    });
+  };
+
+  const handleEditCityName = () => {
+    navigate('EditField', {
+      fieldType: 'cityName',
+      initialValue: cityName,
+      headerTitle: 'Update city',
+      label: 'City',
+      keyboardType: 'default',
+      validationType: 'cityName',
+      onSubmitActionType: 'updateCityName',
+      originScreen: 'CompanyProfile',
+    });
+  };
+
+  const handleEditPostalCode = () => {
+    navigate('EditField', {
+      fieldType: 'postalCode',
+      initialValue: postalCode,
+      headerTitle: 'Update postal code',
+      label: 'Postal code',
+      keyboardType: 'default',
+      validationType: 'postalCode',
+      onSubmitActionType: 'updatePostalCode',
+      originScreen: 'CompanyProfile',
+    });
+  };
+
+  const handleUpload = () => {
+    setIsAddModalVisible(true);
+  };
+
+  // Update from route params
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params) {
+        const {
+          updatedName,
+          updatedVat,
+          updatedStreet,
+          updatedCity,
+          updatedPostal,
+          updatedCountry,
+        } = route.params;
+        if (updatedName) setBusinessName(updatedName);
+        if (updatedVat) setVATNumber(updatedVat);
+        if (updatedStreet) setStreetName(updatedStreet);
+        if (updatedCity) setCityName(updatedCity);
+        if (updatedPostal) setPostalCode(updatedPostal);
+        if (updatedCountry) setCountry(updatedCountry);
+      }
+    }, [route.params]),
+  );
+
   // General Tab Component
   const GeneralRoute = () => (
     <ScrollView
       style={styles.mainContainer}
       contentContainerStyle={[
         styles.scrollContent,
-        { paddingTop: getScreenHeight(2) },
+        {paddingTop: getScreenHeight(2)},
       ]}
       showsVerticalScrollIndicator={false}>
       <View style={styles.mainContainerTwo1}>
-        {/* <AnimatedTextInput
-          label="Full name"
-          value={fullName}
-          onChangeText={setFullName}
-          keyboardType="default"
-          customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-          customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
-          rightText="Edit"
-          onRightTextPress={handleEditName}
-          customBorderColor={ColorPalette.GREY_TEXT_400}
-          customBorderWidth={1}
-          disabled={true}
-        />
-        <AnimatedTextInput
-          label="Email ID"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="default"
-          customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-          customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
-          rightText="Edit"
-          onRightTextPress={handleEditEmail}
-          customBorderColor={ColorPalette.GREY_TEXT_400}
-          customBorderWidth={1}
-          disabled={true}
-        />
-        <AnimatedTextInput
-          label="WhatsApp number"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          keyboardType="phone-pad"
-          customLabelColorFocused={ColorPalette.GREY_TEXT_400}
-          customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
-          showCountrySection
-          countryCode={countryCode}
-          countryFlag={MALTA_FLAG_URL}
-          onCountryPress={() => {}}
-          rightText="Edit"
-          onRightTextPress={handleEditPhone}
-          customBorderColor={ColorPalette.GREY_TEXT_400}
-          customBorderWidth={1}
-          disabled={true}
-        /> */}
         <AnimatedTextInput
           label="Business name"
           value={businessName}
@@ -383,11 +315,11 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
         />
       </View>
       <View style={styles.taxCheckContainer}>
-        <View style={{ flexDirection: 'row', gap: 5 }}>
+        <View style={{flexDirection: 'row', gap: 5}}>
           <Typography
             text="Status"
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <InfoIcon />
         </View>
@@ -407,7 +339,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
             <Typography
               text="Active"
               variant={TypographyVariant.PMEDIUM_REGULAR}
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
             />
           </TouchableOpacity>
         </View>
@@ -422,7 +354,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
           <Typography
             text="Store Address"
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <InfoIcon />
         </View>
@@ -434,7 +366,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
           customLabelColorFocused={ColorPalette.GREY_TEXT_400}
           customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
           rightText="Edit"
-          onRightTextPress={handleEditName}
+          onRightTextPress={handleEditStreetName}
           customBorderColor={ColorPalette.GREY_TEXT_400}
           customBorderWidth={1}
           disabled={true}
@@ -447,7 +379,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
           customLabelColorFocused={ColorPalette.GREY_TEXT_400}
           customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
           rightText="Edit"
-          onRightTextPress={handleEditEmail}
+          onRightTextPress={handleEditCityName}
           customBorderColor={ColorPalette.GREY_TEXT_400}
           customBorderWidth={1}
           disabled={true}
@@ -460,7 +392,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
           customLabelColorFocused={ColorPalette.GREY_TEXT_400}
           customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
           rightText="Edit"
-          onRightTextPress={handleEditName}
+          onRightTextPress={handleEditPostalCode}
           customBorderColor={ColorPalette.GREY_TEXT_400}
           customBorderWidth={1}
           disabled={true}
@@ -474,24 +406,24 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
           customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
           showCountrySection
           countryFlag={MALTA_FLAG_URL}
-          onCountryPress={() => { }}
+          onCountryPress={() => {}}
           customBorderColor={ColorPalette.GREY_TEXT_400}
           customBorderWidth={1}
           disabled={true}
           rightIcons={[
             {
               icon: <LockIcon size={20} color="#4A4A4A" />,
-              onPress: () => { },
+              onPress: () => {},
             },
           ]}
         />
       </View>
       <View style={styles.taxCheckContainer1}>
-        <View style={{ flexDirection: 'row', gap: 5 }}>
+        <View style={{flexDirection: 'row', gap: 5}}>
           <Typography
             text="Are the store and billing addresses the same?"
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
         </View>
         <View style={styles.checkBoxContainer}>
@@ -510,22 +442,21 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
   );
 
   // Description Tab Component
-  // Description Tab Component
   const DescriptionRoute = () => (
     <ScrollView
       style={styles.mainContainer}
       contentContainerStyle={[
         styles.scrollContent,
-        { paddingTop: getScreenHeight(2) },
+        {paddingTop: getScreenHeight(2)},
       ]}
       showsVerticalScrollIndicator={false}>
       <View style={styles.mainContainerTwo}>
         <View style={styles.taxCheckContainer}>
-          <View style={{ flexDirection: 'row', gap: 5, marginBottom: 16 }}>
+          <View style={{flexDirection: 'row', gap: 5, marginBottom: 16}}>
             <Typography
               text="Description"
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
             />
             <InfoIcon />
           </View>
@@ -644,22 +575,18 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
             <TextInput
               style={[
                 styles.textArea,
-                { textAlign: textAlignment },
+                {textAlign: textAlignment},
                 textFormat.bold && styles.boldText,
                 textFormat.italic && styles.italicText,
                 textFormat.underline && styles.underlineText,
               ]}
-              placeholder={
-                editMode
-                  ? 'Update your product description...'
-                  : 'Sonic Wave Powerful sound, deep bass, 12H playtime, Bluetooth. Perfect for any space!'
-              }
+              placeholder="Enter company description..."
               placeholderTextColor={ColorPalette.PlaceholderText}
               multiline={true}
               numberOfLines={6}
               textAlignVertical="top"
-              value={description}
-              onChangeText={setDescription}
+              value={companyDescription}
+              onChangeText={setCompanyDescription}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
             />
@@ -675,20 +602,19 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
       style={styles.mainContainer}
       contentContainerStyle={[
         styles.scrollContent,
-        { paddingTop: getScreenHeight(2) },
+        {paddingTop: getScreenHeight(2)},
       ]}
       showsVerticalScrollIndicator={false}>
       <View style={styles.imageContainer}>
-        <View style={{ flexDirection: 'row', gap: 5, marginBottom: 25 }}>
+        <View style={{flexDirection: 'row', gap: 5, marginBottom: 25}}>
           <Typography
             text="Upload Logo"
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <InfoIcon />
         </View>
         <View style={containerStyles.wrapper}>
-          {/* Company Logo Section */}
           <View style={containerStyles.logoContainer}>
             <View style={containerStyles.imageWrapper}>
               <Image
@@ -712,10 +638,8 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
             />
           </View>
 
-          {/* Divider */}
           <View style={containerStyles.divider} />
 
-          {/* Invoice Logo Section */}
           <View style={containerStyles.logoContainer}>
             <View style={containerStyles.imageWrapper}>
               <Image
@@ -750,16 +674,16 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
       style={styles.mainContainer}
       contentContainerStyle={[
         styles.scrollContent,
-        { paddingTop: getScreenHeight(2) },
+        {paddingTop: getScreenHeight(2)},
       ]}
       showsVerticalScrollIndicator={false}>
       <View style={styles.mainContainerTwo}>
         <View style={styles.taxCheckContainer}>
-          <View style={{ flexDirection: 'row', gap: 5, marginBottom: 16 }}>
+          <View style={{flexDirection: 'row', gap: 5, marginBottom: 16}}>
             <Typography
               text="Terms & Condition"
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
             />
             <InfoIcon />
           </View>
@@ -878,22 +802,18 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
             <TextInput
               style={[
                 styles.textArea,
-                { textAlign: textAlignment },
+                {textAlign: textAlignment},
                 textFormat.bold && styles.boldText,
                 textFormat.italic && styles.italicText,
                 textFormat.underline && styles.underlineText,
               ]}
-              placeholder={
-                editMode
-                  ? 'Update your product description...'
-                  : 'Sonic Wave Powerful sound, deep bass, 12H playtime, Bluetooth. Perfect for any space!'
-              }
+              placeholder="Enter terms and conditions..."
               placeholderTextColor={ColorPalette.PlaceholderText}
               multiline={true}
               numberOfLines={6}
               textAlignVertical="top"
-              value={description}
-              onChangeText={setDescription}
+              value={termsAndConditions}
+              onChangeText={setTermsAndConditions}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
             />
@@ -903,7 +823,6 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
     </ScrollView>
   );
 
-  // Scene map for tabs
   const renderScene = SceneMap({
     general: GeneralRoute,
     description: DescriptionRoute,
@@ -911,7 +830,6 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
     terms: TermsRoute,
   });
 
-  // Custom Tab Bar
   const renderTabBar = (props: any) => (
     <TabBar
       {...props}
@@ -927,10 +845,10 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
         borderBottomColor: ColorPalette.GREY_TEXT_400,
       }}
       tabStyle={{
-        width: getScreenWidth(100) / 4, // Divide screen width equally among 4 tabs
+        width: getScreenWidth(100) / 4,
         paddingHorizontal: 0,
       }}
-      scrollEnabled={false} // Disable scrolling to fit all tabs on screen
+      scrollEnabled={false}
       labelStyle={{
         color: ColorPalette.AgreeTerms,
         fontSize: 12,
@@ -943,8 +861,42 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
     />
   );
 
+  if (loading) {
+    return (
+      <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+        <Header
+          name="Business Profile"
+          variant={TypographyVariant.H6_BOLD}
+          textColor={ColorPalette.AgreeTerms}
+          leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
+          rightIcons={[
+            {
+              icon: QuestionMarkIcon,
+              onPress: () => {
+                navigate('Dashboard', {
+                  screen: 'Account',
+                  params: {screen: 'FAQScreen'},
+                });
+              },
+              size: 24,
+              color: ColorPalette.IconColor,
+              strokeWidth: 1.5,
+            },
+          ]}
+        />
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Typography
+            text="Loading profile..."
+            variant={TypographyVariant.PMEDIUM_REGULAR}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
         name="Business Profile"
         variant={TypographyVariant.H6_BOLD}
@@ -956,21 +908,22 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'FAQScreen' },
+                params: {screen: 'FAQScreen'},
               });
             },
             size: 24,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
-        ]} />
+        ]}
+      />
       <TabView
-        navigationState={{ index, routes }}
+        navigationState={{index, routes}}
         renderScene={renderScene}
         onIndexChange={setIndex}
-        initialLayout={{ width: getScreenWidth(100) }}
+        initialLayout={{width: getScreenWidth(100)}}
         renderTabBar={renderTabBar}
-        style={{ flex: 1 }}
+        style={{flex: 1}}
       />
     </SafeAreaView>
   );

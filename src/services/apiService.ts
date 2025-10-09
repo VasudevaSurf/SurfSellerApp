@@ -275,14 +275,16 @@ export interface UserProfile {
   firstname?: string;
   lastname?: string;
   phone?: string;
-  company_name?: string;
+  company?: string;  // Changed from company_name
   vat_number?: string;
-  street?: string;
+  address?: string;  // Changed from street
   city?: string;
   postal_code?: string;
   country?: string;
   company_logo?: string;
   invoice_logo?: string;
+  company_description?: string;
+  terms?: string;
 }
 
 export interface ProfileUpdateResponse {
@@ -823,6 +825,31 @@ export const updateProfileApi = async (
       profileData,
     );
 
+    // Prepare the request body
+    let requestBody: any = {
+      user_id: parseInt(userId),
+    };
+
+    // Handle VAT number specially
+    if (profileData.vat_number !== undefined) {
+      requestBody.fields = {
+        52: profileData.vat_number,
+      };
+
+      // Remove vat_number from profileData as it's now in fields
+      const {vat_number, ...restProfileData} = profileData;
+
+      // Add other user_data if present
+      if (Object.keys(restProfileData).length > 0) {
+        requestBody.user_data = restProfileData;
+      }
+    } else {
+      // Normal case without VAT number
+      requestBody.user_data = profileData;
+    }
+
+    console.log('Request body:', JSON.stringify(requestBody, null, 2));
+
     const response = await axios({
       method: 'POST',
       url: 'https://dev.surf.mt/api.php?_d=NtSeProfilesApi',
@@ -830,10 +857,7 @@ export const updateProfileApi = async (
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
       },
-      data: {
-        user_data: profileData,
-        user_id: parseInt(userId),
-      },
+      data: requestBody,
       timeout: 10000,
     });
 
