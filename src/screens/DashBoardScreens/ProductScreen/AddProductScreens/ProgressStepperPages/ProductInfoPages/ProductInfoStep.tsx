@@ -39,6 +39,7 @@ import { SlidingBar } from '../../../../../../components/MainComponents/SlidingB
 import CrossCircleIcon from '../../../../../../assets/icons/CrossIcon';
 import { useCategories } from '../../../../../../hooks/useCategories';
 import { Category, FALLBACK_CATEGORIES } from './CategoryConstants';
+import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
 
 interface ProductInfoStepProps {
   formData: {
@@ -277,10 +278,23 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
             text={getHeaderText()}
             customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
-          <InfoIconPay
-            size={22}
-            color={ColorPalette.GREY_TEXT_400}
-            style={undefined}
+          <Tooltip
+            target={
+              <InfoIconPay
+                size={22}
+                color={ColorPalette.GREY_TEXT_400}
+                style={undefined}
+              />
+            }
+            content={
+              <Typography customTextStyles={{
+                color: ColorPalette.GREY_TEXT_200,
+                paddingVertical: getScreenHeight(0.1)
+              }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                Basic product data such as title, category, and price.
+              </Typography>
+            }
+            placement="bottom"
           />
         </View>
 
@@ -392,10 +406,22 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
             text={getStatusHeaderText()}
             customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
           />
-          <InfoIconPay
-            size={22}
-            color={ColorPalette.GREY_TEXT_400}
-            style={undefined}
+          <Tooltip
+            target={
+              <InfoIconPay
+                size={22}
+                color={ColorPalette.GREY_TEXT_400}
+                style={undefined}
+              />
+            }
+            content={
+              <Typography customTextStyles={{
+                color: ColorPalette.GREY_TEXT_200,
+                paddingVertical: getScreenHeight(0.1)
+              }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                Availability state of the product (active, pending, or inactive).              </Typography>
+            }
+            placement="right"
           />
         </View>
         <View style={styles.sliderComponent}>
@@ -422,10 +448,23 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               text={getDescriptionHeaderText()}
               customTextStyles={styles.sectionTitle}
             />
-            <InfoIconPay
-              size={22}
-              color={ColorPalette.GREY_TEXT_400}
-              style={undefined}
+            <Tooltip
+              target={
+                <InfoIconPay
+                  size={22}
+                  color={ColorPalette.GREY_TEXT_400}
+                  style={undefined} // Pass original style props
+                />
+              }
+              content={
+                <Typography customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1)
+                }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                  Detailed explanation of product features and usage.                </Typography>
+              }
+              placement="top"
+
             />
           </View>
 

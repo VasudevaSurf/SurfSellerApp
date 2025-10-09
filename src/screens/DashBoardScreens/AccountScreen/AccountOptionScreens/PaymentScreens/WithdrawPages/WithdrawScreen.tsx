@@ -1,25 +1,26 @@
-import React, {useMemo, useState} from 'react';
-import {SafeAreaView, ScrollView, View} from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { SafeAreaView, ScrollView, View } from 'react-native';
 import ArrowLeftIcon from '../../../../../../assets/icons/ArrowLeftIcon';
 import InfoIconOutline from '../../../../../../assets/icons/InfoIconOutline';
-import {Button} from '../../../../../../components/UserComponents/Button/Button';
+import { Button } from '../../../../../../components/UserComponents/Button/Button';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button/Button.types';
-import {Header} from '../../../../../../components/UserComponents/Header/Header';
+import { Header } from '../../../../../../components/UserComponents/Header/Header';
 import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
-import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../../config/colorPalette';
-import {getScreenHeight} from '../../../../../../helpers/screenSize';
-import {goBack} from '../../../../../../navigation/utils/navigationRef';
-import {styles} from './WithdrawScreen.styles';
+import { Typography } from '../../../../../../components/UserComponents/Typography/Typography';
+import { TypographyVariant } from '../../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../../config/colorPalette';
+import { getScreenHeight } from '../../../../../../helpers/screenSize';
+import { goBack } from '../../../../../../navigation/utils/navigationRef';
+import { styles } from './WithdrawScreen.styles';
 import ArrowLeft from '../../../../../../assets/icons/ArrowLeft';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import QuestionMarkIcon from '../../../../../../assets/icons/QuestionMarkIcon';
+import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
 
 const WithdrawScreen = () => {
   const [amount, setAmount] = useState('');
@@ -42,19 +43,19 @@ const WithdrawScreen = () => {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header
         name="Payments"
-        variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
+        variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={
           <ArrowLeftIcon style={undefined} size={16} onPress={goBack} />
         }
-        // rightIcons={headerIcons}
+      // rightIcons={headerIcons}
       />
       <View style={styles.mainContainer}>
         <ScrollView
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            {paddingTop: getScreenHeight(2)},
+            { paddingTop: getScreenHeight(2) },
           ]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.mainInputContainer}>
@@ -62,11 +63,27 @@ const WithdrawScreen = () => {
               <Typography
                 text="Withdraw"
                 variant={TypographyVariant.PMEDIUM_SEMIBOLD}
-                customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+                customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
               />
-              <InfoIconPay
-                style={undefined}
-                color={ColorPalette.GREY_TEXT_400}
+              <Tooltip
+                target={
+                  <InfoIconPay
+                    size={22}
+                    color={ColorPalette.GREY_TEXT_400}
+                    style={undefined}
+                  />
+                }
+                content={
+                  <Typography customTextStyles={{
+                    color: ColorPalette.GREY_TEXT_400,
+                    paddingVertical: getScreenHeight(0.1)
+                  }} variant={TypographyVariant.LSMALL_MEDIUM}>
+                    Request payout of your available earnings to your bank account. </Typography>
+                }
+                placement="bottom"
+                containerStyle={{
+                  width: 240,
+                }}
               />
             </View>
             <View style={styles.inputContainer}>
@@ -99,7 +116,7 @@ const WithdrawScreen = () => {
             state={ButtonState.DEFAULT}
             disabled
             size={ButtonSize.MEDIUM}
-            onPress={() => {}}
+            onPress={() => { }}
             textVariant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
           />
           <Button
@@ -108,12 +125,12 @@ const WithdrawScreen = () => {
             state={ButtonState.DEFAULT}
             size={ButtonSize.MEDIUM}
             type={ButtonType.OUTLINED}
-            onPress={() => {}}
+            onPress={() => { }}
             customStyles={{
               borderWidth: 1,
               borderColor: ColorPalette.PURPLE_300,
             }}
-            customTextStyles={{color: ColorPalette.PURPLE_300}}
+            customTextStyles={{ color: ColorPalette.PURPLE_300 }}
             textVariant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
           />
         </View>
