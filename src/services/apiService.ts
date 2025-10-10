@@ -1666,7 +1666,7 @@ export const transformFormDataToApiFormat = (
       exceptions_type: 'F',
       full_description: formData.description || '',
       list_price: '0.00',
-      list_qty_count: '',
+      list_qty_count: formData.listQtyCount || '', // ✅ ADD THIS
       max_qty: formData.maxQuantity || '',
       min_qty: formData.minQuantity || '',
       options_type: 'P',
@@ -1676,11 +1676,11 @@ export const transformFormDataToApiFormat = (
       product: formData.productName || '',
       product_code: formData.productCode || '',
       promo_text: '',
-      qty_step: '',
+      qty_step: formData.qtyStep || '', // ✅ ADD THIS
       sales_amount: '',
       search_words: '',
       short_description: '',
-      status: 'A', // Active by default
+      status: 'A',
       tax_ids: formData.taxType === 'VAT' ? [1] : [],
       timestamp: Math.floor(Date.now() / 1000).toString(),
       tracking: formData.trackInventory ? 'B' : 'N',

@@ -47,6 +47,8 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
   const [minQuantity, setMinQuantity] = useState('');
   const [maxQuantity, setMaxQuantity] = useState('');
   const [availableQuantity, setAvailableQuantity] = useState('');
+  const [qtyStep, setQtyStep] = useState('');
+  const [listQtyCount, setListQtyCount] = useState('');
   const [trackInventory, setTrackInventory] = useState('yes');
   const [vatChecked, setVatChecked] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -73,6 +75,8 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
       setMinQuantity(formData.minQuantity || '');
       setMaxQuantity(formData.maxQuantity || '');
       setAvailableQuantity(formData.availableQuantity || '');
+      setQtyStep(formData.qtyStep || ''); // ✅ ADD THIS
+      setListQtyCount(formData.listQtyCount || ''); // ✅ ADD THIS
       setTrackInventory(formData.trackInventory ? 'yes' : 'no');
       setVatChecked(formData.taxType === 'VAT');
     }
@@ -81,22 +85,44 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
   // Update form data when values change
   const handleProductCodeChange = (text: string) => {
     setProductCode(text);
-    updateFormData({productCode: text});
+    updateFormData({
+      productCode: text,
+      product_code: text, // API field name
+    });
   };
 
   const handleQualityStockChange = (text: string) => {
     setQualityStock(text);
-    updateFormData({quantity: text});
+    updateFormData({
+      quantity: text,
+      amount: text, // API field name
+    });
   };
 
   const handleMinQuantityChange = (text: string) => {
     setMinQuantity(text);
-    updateFormData({minQuantity: text});
+    updateFormData({
+      minQuantity: text,
+      min_qty: text, // API field name
+    });
   };
 
   const handleMaxQuantityChange = (text: string) => {
     setMaxQuantity(text);
-    updateFormData({maxQuantity: text});
+    updateFormData({
+      maxQuantity: text,
+      max_qty: text, // API field name
+    });
+  };
+
+  const handleQtyStepChange = (text: string) => {
+    setQtyStep(text);
+    updateFormData({qtyStep: text});
+  };
+
+  const handleListQtyCountChange = (text: string) => {
+    setListQtyCount(text);
+    updateFormData({listQtyCount: text});
   };
 
   const handleAvailableQuantityChange = (text: string) => {
@@ -106,12 +132,18 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
 
   const handleTrackInventoryChange = (value: string) => {
     setTrackInventory(value);
-    updateFormData({trackInventory: value === 'yes'});
+    updateFormData({
+      trackInventory: value === 'yes',
+      tracking: value === 'yes' ? 'B' : 'N', // API field: B = track, N = don't track
+    });
   };
 
   const handleVatChange = (checked: boolean) => {
     setVatChecked(checked);
-    updateFormData({taxType: checked ? 'VAT' : ''});
+    updateFormData({
+      taxType: checked ? 'VAT' : '',
+      tax_ids: checked ? [1] : [], // API field: array of tax IDs
+    });
   };
 
   const handleAddDiscount = () => {
@@ -167,7 +199,6 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
         size: ButtonSize.MEDIUM,
         customStyles: styles.customButton,
         customTextStyles: styles.customText,
-        // textVariant:TypographyVariant.LMEDIUM_SEMIBOLD
       },
       {
         text: 'Delete Item',
@@ -218,7 +249,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
                   paddingVertical: getScreenHeight(0.1),
                 }}
                 variant={TypographyVariant.LSMALL_MEDIUM}>
-                Quantity of the product currently in stock.{' '}
+                Quantity of the product currently in stock.
               </Typography>
             }
             placement="right"
@@ -254,12 +285,27 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
             keyboardType="numeric"
             required={false}
           />
+          {/* ✅ ADD THESE TWO NEW FIELDS */}
           <AnimatedTextInput
+            label="Quantity step (Optional)"
+            value={qtyStep}
+            onChangeText={handleQtyStepChange}
+            keyboardType="numeric"
+            required={false}
+          />
+          <AnimatedTextInput
+            label="List quantity count (Optional)"
+            value={listQtyCount}
+            onChangeText={handleListQtyCountChange}
+            keyboardType="numeric"
+            required={false}
+          />
+          {/* <AnimatedTextInput
             label="Number of available quantities"
             value={availableQuantity}
             onChangeText={handleAvailableQuantityChange}
             keyboardType="numeric"
-          />
+          /> */}
         </View>
       </View>
       {/* <View style={styles.sectionItem}>
@@ -322,8 +368,8 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
         </View>
       </View>
 
-      {/* Quantity Discount Section */}
-      <View style={styles.section}>
+      {/* Quantity Discount Section - Keep existing implementation */}
+      {/* <View style={styles.section}>
         <View
           style={{
             flexDirection: 'row',
@@ -352,7 +398,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
                     paddingVertical: getScreenHeight(0.1),
                   }}
                   variant={TypographyVariant.LSMALL_MEDIUM}>
-                  Price reduction offered for bulk purchases.{' '}
+                  Price reduction offered for bulk purchases.
                 </Typography>
               }
               placement="bottom"
@@ -363,24 +409,13 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
             textVariant={TypographyVariant.H6_MEDIUM}
             customTextStyles={{
               color: ColorPalette.GREY_TEXT_500,
-              // paddingLeft: 16,
-              // width:
-              //   discounts.length === 0
-              //     ? getScreenWidth(20)
-              //     : getScreenWidth(30),
             }}
             onPress={handleAddDiscount}
             activeOpacity={0.7}
             type={ButtonType.OUTLINED}
             customStyles={{
-              // width:
-              //   discounts.length === 0
-              //     ? getScreenWidth(36)
-              //     : getScreenWidth(46),
               height: getScreenWidth(12),
               borderRadius: BorderRadius.Small,
-              // justifyContent: 'center',
-              // alignItems: 'center',
               borderWidth: 1,
               borderColor: ColorPalette.GREY_TEXT_500,
               ...(discounts.length === 0
@@ -403,8 +438,6 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
           />
         </View>
 
-        {/* Render input fields */}
-
         {discounts.length > 0 &&
           discounts.map((discount, index) => (
             <View
@@ -417,7 +450,6 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
                   marginHorizontal: Spacing.Medium,
                   borderRadius: BorderRadius.Small,
                   borderColor: ColorPalette.GREY_100,
-                  // marginTop: index > 0 ? Spacing.Medium : 0,
                 },
               ]}>
               <AnimatedTextInput
@@ -448,7 +480,6 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
 
               <View
                 style={{
-                  // flex: 1,
                   zIndex: activeDropdown ? 3 : 1,
                   marginHorizontal: Spacing.Medium,
                 }}>
@@ -463,7 +494,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
                   }
                   placeholder="Select discount type"
                   selectionType="radio"
-                  showSearch={false} // No need to search for two options
+                  showSearch={false}
                   onDropdownToggle={isOpen => handleDropdownToggle(isOpen)}
                 />
               </View>
@@ -485,71 +516,9 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
                 rightIcon={TrashIcon2}
                 iconSize={18}
               />
-              <View style={styles.selectContainer}>
-                {/* Always visible select category row */}
-                {/* <TouchableOpacity
-              style={[styles.inputContainer, styles.selectBtn]}
-              activeOpacity={0.7}
-              onPress={navigateToCategorySelection}>
-              <Typography
-                variant={TypographyVariant.PSMALL_REGULAR}
-                text={getCategoryPlaceholderText()}
-                customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
-              />
-              <ArrowRightIcon color={ColorPalette.GREY_TEXT_400} 
-              style={undefined}
-              />
-            </TouchableOpacity> */}
-
-                {/* Selected categories list (only when available) */}
-                {/* {safeFormData.categoryPath &&
-              safeFormData.categoryPath.length > 0 &&
-              safeFormData.categoryPath.map((item, index) => (
-                <View
-                  key={index}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    backgroundColor: '#3A5AFE0D',
-                    paddingVertical: getScreenHeight(1.5),
-                    paddingHorizontal: getScreenWidth(4),
-                    borderRadius: BorderRadius.Small,
-                    marginTop: getScreenHeight(1),
-                  }}>
-                  <Typography
-                    text={item}
-                    variant={TypographyVariant.PMEDIUM_REGULAR}
-                    customTextStyles={{
-                      color: ColorPalette.ProgressLine,
-                    }}
-                  />
-
-                  <TouchableOpacity
-                    onPress={() => {
-                      const updatedPath = safeFormData.categoryPath.slice(
-                        0,
-                        index,
-                      );
-                      updateFormData({
-                        ...safeFormData,
-                        categoryPath: updatedPath,
-                        category: updatedPath[0] || '',
-                        subcategory:
-                          updatedPath.length > 1
-                            ? updatedPath[updatedPath.length - 1]
-                            : undefined,
-                        categoryDisplay: updatedPath.join(' > '),
-                      });
-                    }}>
-                    <CrossCircleIcon size={24} />
-                  </TouchableOpacity>
-                </View>
-              ))} */}
-              </View>
             </View>
           ))}
-      </View>
+      </View> */}
       <AddModal
         isVisible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

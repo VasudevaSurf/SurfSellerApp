@@ -1,10 +1,10 @@
 // Updated AddProduct.tsx with proper user ID and product ID passing
 
-import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import React, {useState, useEffect} from 'react';
+import {ScrollView, View, Alert} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useRoute, RouteProp} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
 import ArrowLeftIcon from '../../../../assets/icons/ArrowLeftIcon';
 import {
   Button,
@@ -12,33 +12,33 @@ import {
   ButtonState,
   ButtonVariant,
 } from '../../../../components/UserComponents/Button';
-import { Header } from '../../../../components/UserComponents/Header/Header';
-import { TypographyVariant } from '../../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../../config/colorPalette';
-import { getScreenHeight } from '../../../../helpers/screenSize';
-import { goBack } from '../../../../navigation/utils/navigationRef';
-import { styles } from './AddProduct.styles';
+import {Header} from '../../../../components/UserComponents/Header/Header';
+import {TypographyVariant} from '../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../config/colorPalette';
+import {getScreenHeight} from '../../../../helpers/screenSize';
+import {goBack} from '../../../../navigation/utils/navigationRef';
+import {styles} from './AddProduct.styles';
 import FeaturesStep from './ProgressStepperPages/FeaturesStepPages/FeaturesStep';
 import InventoryStep from './ProgressStepperPages/InventoryStepPages/InventoryStep';
 import ProductInfoStep from './ProgressStepperPages/ProductInfoPages/ProductInfoStep';
 import ProgressStepper from './ProgressStepperPages/ProgressStepper';
 import UploadMediaStep from './ProgressStepperPages/UploadMediaPages/UploadMediaStep';
 import ArrowLeft from '../../../../assets/icons/ArrowLeft';
-import { RootState } from '../../../../redux/store';
+import {RootState} from '../../../../redux/store';
 import {
   createProductApi,
   updateProductApi,
   transformFormDataToApiFormat,
 } from '../../../../services/apiService';
-import { useCategories } from '../../../../hooks/useCategories';
-import { showCustomToast } from '../../../../components/MainComponents/Toast/ToastComponent';
+import {useCategories} from '../../../../hooks/useCategories';
+import {showCustomToast} from '../../../../components/MainComponents/Toast/ToastComponent';
 import SuccessTickSquareIcon from '../../../../assets/icons/ToastIcons/SuccessTick';
 
 const STEPS = [
-  { id: 1, label: 'Product Info' },
-  { id: 2, label: 'Upload Media' },
-  { id: 3, label: 'Inventory' },
-  { id: 4, label: 'Variant(s)' },
+  {id: 1, label: 'Product Info'},
+  {id: 2, label: 'Upload Media'},
+  {id: 3, label: 'Inventory'},
+  {id: 4, label: 'Variant(s)'},
 ];
 
 interface RouteParams {
@@ -69,12 +69,12 @@ interface RouteParams {
     categoryPath?: string[];
     category_listing?: {
       id: number;
-      name: string
-    }
+      name: string;
+    };
   };
 }
 
-type AddProductRouteProp = RouteProp<{ AddProduct: RouteParams }, 'AddProduct'>;
+type AddProductRouteProp = RouteProp<{AddProduct: RouteParams}, 'AddProduct'>;
 
 interface FormData {
   productId: string;
@@ -89,6 +89,8 @@ interface FormData {
   quantity: string;
   minQuantity: string;
   maxQuantity: string;
+  qtyStep: string; // ✅ ADD THIS
+  listQtyCount: string; // ✅ ADD THIS
   trackInventory: boolean;
   taxType: string;
   brand: string;
@@ -99,20 +101,18 @@ interface FormData {
   countryOfOrigin: string;
   categoryPath: string[];
   categoryDisplay?: string;
-  // NEW: Add user and product context for image operations
   userId?: string;
   category_listing: {
     id: number;
     name: string;
-  }
-  selectedCategories: { id: string; name: string; path: string[] }[];
+  };
+  selectedCategories: {id: string; name: string; path: string[]}[];
 }
 
 const AddProduct = () => {
   const route = useRoute<AddProductRouteProp>();
-  const { productId, editMode = false, productData } = route.params || {};
-  console.log("AddProduct route params:", productData);
-
+  const {productId, editMode = false, productData} = route.params || {};
+  console.log('AddProduct route params:', productData);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -124,7 +124,7 @@ const AddProduct = () => {
   );
 
   // Use categories hook to get available categories
-  const { categories } = useCategories();
+  const {categories} = useCategories();
 
   // Initialize formData with all required fields and proper defaults
   const [formData, setFormData] = useState<FormData>({
@@ -140,6 +140,8 @@ const AddProduct = () => {
     quantity: '',
     minQuantity: '',
     maxQuantity: '',
+    qtyStep: '', // ✅ ADD THIS
+    listQtyCount: '', // ✅ ADD THIS
     trackInventory: false,
     taxType: 'VAT',
     brand: '',
@@ -150,64 +152,74 @@ const AddProduct = () => {
     countryOfOrigin: '',
     categoryPath: [],
     categoryDisplay: '',
-    // NEW: Pass user context for image operations
     userId: userId,
     category_listing: {
       id: 0,
-      name: ''
+      name: '',
     },
-    selectedCategories: [] as { id: string; name: string; path: string[] }[],
+    selectedCategories: [] as {id: string; name: string; path: string[]}[],
   });
-
   // Pre-fill form data if in edit mode
   useEffect(() => {
     if (editMode && productData) {
+      console.log('🔄 Pre-filling form data in edit mode:', productData);
+
       const originalImageList = Array.isArray(productData.images)
         ? productData.images
         : [];
       setOriginalImages(originalImageList);
 
+      setFormData(prevData => {
+        const updatedData = {
+          ...prevData,
+          productId: productData.productId || productId || '',
+          productName: productData.productName || '',
+          price: productData.price || '',
+          category: productData.category || '',
+          subcategory: productData.subcategory || '',
+          description: productData.description || '',
+          images: originalImageList,
+          imageRelativePaths: Array.isArray(productData.imageRelativePaths)
+            ? productData.imageRelativePaths
+            : [],
+          productCode: productData.productCode || '',
+          quantity: productData.quantity || '',
+          minQuantity: productData.minQuantity || '',
+          maxQuantity: productData.maxQuantity || '',
+          qtyStep: productData.qtyStep || '', // ✅ ADD THIS
+          listQtyCount: productData.listQtyCount || '', // ✅ ADD THIS
+          trackInventory: Boolean(productData.trackInventory),
+          taxType: productData.taxType || 'VAT',
+          brand: productData.brand || '',
+          color: productData.color || '',
+          size: productData.size || '',
+          weight: productData.weight || '',
+          manufacturer: productData.manufacturer || '',
+          countryOfOrigin: productData.countryOfOrigin || '',
+          categoryPath: Array.isArray(productData.categoryPath)
+            ? productData.categoryPath
+            : [],
+          categoryDisplay: productData.categoryPath
+            ? productData.categoryPath.join(' > ')
+            : '',
+          userId: userId,
+          category_listing: productData.category_listing || {id: 0, name: ''},
+          selectedCategories: productData.selectedCategories || [],
+        };
 
+        console.log('✅ Form data updated with inventory values:', {
+          minQuantity: updatedData.minQuantity,
+          maxQuantity: updatedData.maxQuantity,
+          qtyStep: updatedData.qtyStep, // ✅ LOG THIS
+          listQtyCount: updatedData.listQtyCount, // ✅ LOG THIS
+        });
 
-      setFormData(prevData => ({
-        ...prevData,
-        productId: productData.productId || productId || '',
-        productName: productData.productName || '',
-        price: productData.price || '',
-        category: productData.category || '',
-        subcategory: productData.subcategory || '',
-        description: productData.description || '',
-        images: originalImageList,
-        imageRelativePaths: Array.isArray(productData.imageRelativePaths)
-          ? productData.imageRelativePaths
-          : [],
-        productCode: productData.productCode || '',
-        quantity: productData.quantity || '',
-        minQuantity: productData.minQuantity || '',
-        maxQuantity: productData.maxQuantity || '',
-        trackInventory: Boolean(productData.trackInventory),
-        taxType: productData.taxType || 'VAT',
-        brand: productData.brand || '',
-        color: productData.color || '',
-        size: productData.size || '',
-        weight: productData.weight || '',
-        manufacturer: productData.manufacturer || '',
-        countryOfOrigin: productData.countryOfOrigin || '',
-        categoryPath: Array.isArray(productData.categoryPath)
-          ? productData.categoryPath
-          : [],
-        categoryDisplay: productData.categoryPath
-          ? productData.categoryPath.join(' > ')
-          : '',
-        // NEW: Ensure user context is passed
-        userId: userId,
-        category_listing: productData.category_listing || { id: 0, name: '' },
-      }));
+        return updatedData;
+      });
     }
   }, [editMode, productData, productId, userId]);
 
-  console.log("formData on edit screen", formData);
-
+  console.log('formData on edit screen', formData);
 
   // Update user context when userId changes
   useEffect(() => {
@@ -291,7 +303,7 @@ const AddProduct = () => {
       //   currentImages: formData.images?.length || 0,
       //   imageRelativePaths: formData.imageRelativePaths?.length || 0,
       // },
-      formData
+      formData,
     });
 
     // Validate required fields
@@ -323,7 +335,10 @@ const AddProduct = () => {
         //   'Images Not Uploaded',
         //   'Please wait for images to finish uploading before saving the product.',
         // );
-        showCustomToast("Oops! Upload failed. Try again.", <SuccessTickSquareIcon size={18} />);
+        showCustomToast(
+          'Oops! Upload failed. Try again.',
+          <SuccessTickSquareIcon size={18} />,
+        );
 
         return;
       }
@@ -331,7 +346,10 @@ const AddProduct = () => {
 
     if (!userId) {
       // Alert.alert('Error', 'User session expired. Please login again.');
-      showCustomToast("Session expired. Please login again.", <SuccessTickSquareIcon size={18} />)
+      showCustomToast(
+        'Session expired. Please login again.',
+        <SuccessTickSquareIcon size={18} />,
+      );
       return;
     }
 
@@ -381,12 +399,10 @@ const AddProduct = () => {
 
       goBack();
       const successMessage = editMode
-        ? "Product details updated successfully."
-        : "Product added successfully.";
+        ? 'Product details updated successfully.'
+        : 'Product added successfully.';
 
       showCustomToast(successMessage, <SuccessTickSquareIcon size={18} />);
-
-
     } catch (error: any) {
       console.error('💥 Error saving product:', error);
 
@@ -405,11 +421,10 @@ const AddProduct = () => {
       //   ],
       // );
 
-      const erroMessage =
-        `Failed to ${editMode ? 'update' : 'create'
-        } product. Please try again.`
+      const erroMessage = `Failed to ${
+        editMode ? 'update' : 'create'
+      } product. Please try again.`;
       showCustomToast(erroMessage, <SuccessTickSquareIcon size={18} />);
-
     } finally {
       setIsSubmitting(false);
     }
@@ -544,7 +559,7 @@ const AddProduct = () => {
         onStepPress={handleStepPress}
       />
 
-      <View style={[styles.mainContainer, { paddingBottom: getScreenHeight(7) }]}>
+      <View style={[styles.mainContainer, {paddingBottom: getScreenHeight(7)}]}>
         <ScrollView
           style={styles.mainContainer}
           contentContainerStyle={[styles.scrollContent]}

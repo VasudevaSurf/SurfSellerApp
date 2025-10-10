@@ -290,10 +290,12 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               />
             }
             content={
-              <Typography customTextStyles={{
-                color: ColorPalette.GREY_TEXT_200,
-                paddingVertical: getScreenHeight(0.1)
-              }} variant={TypographyVariant.LSMALL_MEDIUM}>
+              <Typography
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1),
+                }}
+                variant={TypographyVariant.LSMALL_MEDIUM}>
                 Basic product data such as title, category, and price.
               </Typography>
             }
@@ -310,9 +312,19 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
           />
           <AnimatedTextInput
             label="Enter price*"
-            value={formatPrice(safeFormData.price)}
-            onChangeText={text => updateFormData({price: text})}
-            keyboardType="phone-pad"
+            value={safeFormData.price} // ✅ Direct value, no formatting
+            onChangeText={text => {
+              // Clean input: allow only numbers and one decimal point
+              const cleaned = text.replace(/[^0-9.]/g, '');
+              const parts = cleaned.split('.');
+              const formatted =
+                parts.length > 1
+                  ? parts[0] + '.' + parts[1].slice(0, 2)
+                  : parts[0];
+
+              updateFormData({price: formatted});
+            }}
+            keyboardType="decimal-pad"
             countryCode={<EuroIcon />}
             showCountrySection
           />
@@ -421,11 +433,15 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               />
             }
             content={
-              <Typography customTextStyles={{
-                color: ColorPalette.GREY_TEXT_200,
-                paddingVertical: getScreenHeight(0.1)
-              }} variant={TypographyVariant.LSMALL_MEDIUM}>
-                Availability state of the product (active, pending, or inactive).              </Typography>
+              <Typography
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1),
+                }}
+                variant={TypographyVariant.LSMALL_MEDIUM}>
+                Availability state of the product (active, pending, or
+                inactive).{' '}
+              </Typography>
             }
             placement="bottom"
           />
@@ -463,14 +479,16 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
                 />
               }
               content={
-                <Typography customTextStyles={{
-                  color: ColorPalette.GREY_TEXT_200,
-                  paddingVertical: getScreenHeight(0.1)
-                }} variant={TypographyVariant.LSMALL_MEDIUM}>
-                  Detailed explanation of product features and usage.                </Typography>
+                <Typography
+                  customTextStyles={{
+                    color: ColorPalette.GREY_TEXT_200,
+                    paddingVertical: getScreenHeight(0.1),
+                  }}
+                  variant={TypographyVariant.LSMALL_MEDIUM}>
+                  Detailed explanation of product features and usage.{' '}
+                </Typography>
               }
               placement="top"
-
             />
           </View>
 

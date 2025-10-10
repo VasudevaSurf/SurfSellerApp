@@ -1,6 +1,6 @@
 // src/components/MainComponents/ProductInfo/ProductInfo.tsx
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   Image,
   ImageSourcePropType,
@@ -9,28 +9,28 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import ToggleSwitch from 'toggle-switch-react-native';
 import MoreVerticalIcon from '../../../assets/icons/MoreVerticalIcon';
-import { ColorPalette } from '../../../config/colorPalette';
-import { getFigmaDimension } from '../../../helpers/screenSize';
+import {ColorPalette} from '../../../config/colorPalette';
+import {getFigmaDimension} from '../../../helpers/screenSize';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../UserComponents/Button';
-import { Typography } from '../../UserComponents/Typography/Typography';
-import { TypographyVariant } from '../../UserComponents/Typography/Typography.types';
-import { AddModal, ButtonConfig } from '../AddModal/AddModal';
-import { styles } from './ProductInfo.styles';
-import { ProductInfoProps } from './ProductInfo.types';
-import { navigate } from '../../../navigation/utils/navigationRef';
+import {Typography} from '../../UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
+import {AddModal, ButtonConfig} from '../AddModal/AddModal';
+import {styles} from './ProductInfo.styles';
+import {ProductInfoProps} from './ProductInfo.types';
+import {navigate} from '../../../navigation/utils/navigationRef';
 import {
   deleteProduct,
   fetchProductDetails,
 } from '../../../redux/slices/productsSlice';
-import { AppDispatch, RootState } from '../../../redux/store';
+import {AppDispatch, RootState} from '../../../redux/store';
 import AnimatedLoader from '../../../assets/icons/LoaderIcon';
 
 const DefaultProduct = require('../../../assets/images/defaultProduct.png');
@@ -51,7 +51,6 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   productData,
   disabled = false,
 }) => {
-
   const dispatch = useDispatch<AppDispatch>();
   const [showModal, setShowModal] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
@@ -61,7 +60,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   const userId = useSelector(
     (state: RootState) => state.auth.userData?.user_id,
   );
-  const { deletingProducts, deleteError, updatingStatus } = useSelector(
+  const {deletingProducts, deleteError, updatingStatus} = useSelector(
     (state: RootState) => state.products,
   );
 
@@ -85,7 +84,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 
       // Fetch complete product details from API
       const productDetails = await dispatch(
-        fetchProductDetails({ userId, productId }),
+        fetchProductDetails({userId, productId}),
       ).unwrap();
 
       console.log('✅ Product details loaded:', productDetails);
@@ -127,7 +126,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         'Error',
         'Failed to load product details. Please try again.',
         [
-          { text: 'OK', style: 'default' },
+          {text: 'OK', style: 'default'},
           {
             text: 'Edit Anyway',
             onPress: () => navigateWithBasicData(),
@@ -191,7 +190,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       screen: 'Product',
       params: {
         screen: 'ProductDetails',
-        params: { productId },
+        params: {productId},
       },
     });
     setShowModal(false);
@@ -233,7 +232,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 
               // Show success message
               Alert.alert('Success', 'Product deleted successfully', [
-                { text: 'OK', style: 'default' },
+                {text: 'OK', style: 'default'},
               ]);
             } catch (error: any) {
               console.error('❌ Failed to delete product:', error);
@@ -243,7 +242,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 'Delete Failed',
                 error.message || 'Failed to delete product. Please try again.',
                 [
-                  { text: 'OK', style: 'default' },
+                  {text: 'OK', style: 'default'},
                   {
                     text: 'Retry',
                     onPress: () => handleDelete(),
@@ -269,7 +268,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       return;
     }
 
-    console.log('🔄 Toggle changed:', { productId, isOn });
+    console.log('🔄 Toggle changed:', {productId, isOn});
 
     // Call the parent handler
     if (onActiveChange) {
@@ -315,7 +314,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
       state: ButtonState.DEFAULT,
       type: ButtonType.OUTLINED,
       size: ButtonSize.MEDIUM,
-      customStyles: { borderWidth: 1 },
+      customStyles: {borderWidth: 1},
       textVariant: TypographyVariant.LMEDIUM_EXTRASEMIBOLD,
     },
   ];
@@ -324,7 +323,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
     if (!orderImage || orderImage.trim() === '' || imageLoadError) {
       return DefaultProduct;
     }
-    return { uri: orderImage };
+    return {uri: orderImage};
   };
 
   const handleImageError = () => {
@@ -345,7 +344,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         styles.container,
         style,
         // Add visual feedback for disabled states
-        isDisabled && { opacity: 0.7 },
+        isDisabled && {opacity: 0.7},
       ]}
       disabled={isDisabled}
       activeOpacity={isDisabled ? 1 : 0.7}>
@@ -444,7 +443,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               text={productName}
               customTextStyles={[
                 styles.productNameText,
-                isDisabled && { color: ColorPalette.GREY_TEXT_200 },
+                isDisabled && {color: ColorPalette.GREY_TEXT_200},
               ]}
               numberOfLines={2}
             />
@@ -452,7 +451,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           <View style={styles.iconContainer}>
             <MoreVerticalIcon
               onPress={() => !isDisabled && setShowModal(true)}
-              style={[undefined, isDisabled && { opacity: 0.5 }]}
+              style={[undefined, isDisabled && {opacity: 0.5}]}
             />
           </View>
         </View>
@@ -464,7 +463,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               text="Seller Price :"
               customTextStyles={[
                 styles.labelText,
-                isDisabled && { color: ColorPalette.GREY_TEXT_200 },
+                isDisabled && {color: ColorPalette.GREY_TEXT_200},
               ]}
             />
             <Typography
@@ -472,7 +471,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               text={sellerPrice}
               customTextStyles={[
                 styles.valueText,
-                isDisabled && { color: ColorPalette.GREY_TEXT_200 },
+                isDisabled && {color: ColorPalette.GREY_TEXT_200},
               ]}
             />
           </View>
@@ -482,7 +481,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               text="Platform fee :"
               customTextStyles={[
                 styles.labelText,
-                isDisabled && { color: ColorPalette.GREY_TEXT_200 },
+                isDisabled && {color: ColorPalette.GREY_TEXT_200},
               ]}
             />
             <Typography
@@ -490,7 +489,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               text={platformFee}
               customTextStyles={[
                 styles.valueText,
-                isDisabled && { color: ColorPalette.GREY_TEXT_200 },
+                isDisabled && {color: ColorPalette.GREY_TEXT_200},
               ]}
             />
           </View>
@@ -503,7 +502,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               text="Stock :"
               customTextStyles={[
                 styles.labelText,
-                isDisabled && { color: ColorPalette.GREY_TEXT_200 },
+                isDisabled && {color: ColorPalette.GREY_TEXT_200},
               ]}
             />
             <Typography
@@ -511,7 +510,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               text={stock}
               customTextStyles={[
                 styles.valueText,
-                isDisabled && { color: ColorPalette.GREY_TEXT_200 },
+                isDisabled && {color: ColorPalette.GREY_TEXT_200},
               ]}
             />
           </View>
@@ -525,7 +524,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               label={active ? 'Active' : 'Hidden'}
               labelStyle={[
                 styles.toggleLabel,
-                isDisabled && { color: ColorPalette.GREY_TEXT_200 },
+                isDisabled && {color: ColorPalette.GREY_TEXT_200},
               ]}
               size="small"
               onToggle={handleToggleChange}
@@ -535,7 +534,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 elevation: 0,
                 shadowOpacity: 0,
                 shadowColor: 'transparent',
-                shadowOffset: { height: 0, width: 0 },
+                shadowOffset: {height: 0, width: 0},
                 shadowRadius: 0,
                 width: thumbDiameter,
                 height: thumbDiameter,
@@ -548,7 +547,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 elevation: 0,
                 shadowOpacity: 0,
                 shadowColor: 'transparent',
-                shadowOffset: { height: 0, width: 0 },
+                shadowOffset: {height: 0, width: 0},
                 shadowRadius: 0,
                 width: thumbDiameter,
                 height: thumbDiameter,
@@ -578,7 +577,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 
             {/* Show loading indicator next to toggle during status update */}
             {isUpdatingStatus && (
-              <View style={{ marginLeft: getFigmaDimension(8) }}>
+              <View style={{marginLeft: getFigmaDimension(8)}}>
                 <ActivityIndicator
                   size="small"
                   color={ColorPalette.PURPLE_300}
@@ -606,7 +605,6 @@ const extractProductDataFromAPI = (
 ) => {
   console.log('🔍 Extracting product data from API response:', apiResponse);
 
-  // Initialize with basic info
   let extractedData = {
     productId: basicInfo.productId,
     productName: basicInfo.productName,
@@ -618,8 +616,10 @@ const extractProductDataFromAPI = (
     imageRelativePaths: [],
     productCode: '',
     quantity: basicInfo.stock || '0',
-    minQuantity: '1',
+    minQuantity: '',
     maxQuantity: '',
+    qtyStep: '', // ✅ ADD THIS
+    listQtyCount: '', // ✅ ADD THIS
     trackInventory: true,
     taxType: 'VAT',
     brand: '',
@@ -631,6 +631,7 @@ const extractProductDataFromAPI = (
     categoryPath: [],
     status: basicInfo.active ? 'A' : 'D',
     category_listing: apiResponse?.category_listing || [],
+    selectedCategories: [],
   };
 
   try {
@@ -649,12 +650,11 @@ const extractProductDataFromAPI = (
       extractedData.images = imageUrls;
       console.log('📸 Extracted images from API:', imageUrls);
     } else if (basicInfo.orderImage) {
-      // Fallback to the basic image from the listing
       extractedData.images = [basicInfo.orderImage];
       console.log('📸 Using fallback image:', basicInfo.orderImage);
     }
 
-    // Extract product details from sections if available
+    // ✅ Extract product details from sections if available
     if (apiResponse?.sections && Array.isArray(apiResponse.sections)) {
       apiResponse.sections.forEach((section: any) => {
         if (section.blocks && Array.isArray(section.blocks)) {
@@ -667,11 +667,12 @@ const extractProductDataFromAPI = (
                       field.value || extractedData.productName;
                     break;
                   case 'nt_price':
+                  case 'price':
                     extractedData.price = field.value || extractedData.price;
                     break;
                   case 'amount':
                     extractedData.quantity =
-                      field.value || extractedData.quantity;
+                      field.value?.toString() || extractedData.quantity;
                     break;
                   case 'full_description':
                     extractedData.description = field.value || '';
@@ -680,12 +681,20 @@ const extractProductDataFromAPI = (
                     extractedData.productCode = field.value || '';
                     break;
                   case 'min_qty':
-                    extractedData.minQuantity =
-                      field.value || extractedData.minQuantity;
+                    extractedData.minQuantity = field.value?.toString() || '';
+                    console.log('✅ Extracted min_qty:', field.value);
                     break;
                   case 'max_qty':
-                    extractedData.maxQuantity =
-                      field.value || extractedData.maxQuantity;
+                    extractedData.maxQuantity = field.value?.toString() || '';
+                    console.log('✅ Extracted max_qty:', field.value);
+                    break;
+                  case 'qty_step': // ✅ ADD THIS
+                    extractedData.qtyStep = field.value?.toString() || '';
+                    console.log('✅ Extracted qty_step:', field.value);
+                    break;
+                  case 'list_qty_count': // ✅ ADD THIS
+                    extractedData.listQtyCount = field.value?.toString() || '';
+                    console.log('✅ Extracted list_qty_count:', field.value);
                     break;
                   case 'status':
                     extractedData.status = field.value || extractedData.status;
@@ -710,6 +719,15 @@ const extractProductDataFromAPI = (
         );
         extractedData.category =
           categories[0].name || categories[0].category || '';
+
+        // ✅ Also set selectedCategories for multi-select
+        extractedData.selectedCategories = categories.map((cat: any) => ({
+          id: cat.id?.toString() || '',
+          name: cat.name || cat.category || '',
+          path: categories
+            .slice(0, categories.indexOf(cat) + 1)
+            .map((c: any) => c.name || c.category),
+        }));
       }
       console.log('📂 Extracted categories:', extractedData.categoryPath);
     }
@@ -719,11 +737,15 @@ const extractProductDataFromAPI = (
       extractedData = {
         ...extractedData,
         ...existingProductData,
-        // Preserve the extracted API data for key fields
+        // ✅ Preserve the extracted API data for key fields (don't let existingProductData override)
         images: extractedData.images,
         categoryPath: extractedData.categoryPath,
         description: extractedData.description,
         productCode: extractedData.productCode,
+        minQuantity:
+          extractedData.minQuantity || existingProductData.minQuantity || '',
+        maxQuantity:
+          extractedData.maxQuantity || existingProductData.maxQuantity || '',
       };
     }
 
@@ -731,7 +753,6 @@ const extractProductDataFromAPI = (
     return extractedData;
   } catch (error) {
     console.error('❌ Error extracting product data:', error);
-    // Return basic data as fallback
     return {
       ...extractedData,
       images: basicInfo.orderImage ? [basicInfo.orderImage] : [],
