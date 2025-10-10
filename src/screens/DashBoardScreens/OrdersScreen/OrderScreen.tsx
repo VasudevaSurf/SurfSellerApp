@@ -1,5 +1,11 @@
 import React, {useState, useEffect, useCallback, ReactNode} from 'react';
-import {ScrollView, View, ActivityIndicator, Image} from 'react-native';
+import {
+  ScrollView,
+  View,
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BellIcon from '../../../assets/icons/BellIcon';
 import {OrderInfo} from '../../../components/MainComponents/OrderInfo/OrderInfo';
@@ -9,7 +15,7 @@ import {SearchBox} from '../../../components/UserComponents/SearchBox/SearchBox'
 import {Typography} from '../../../components/UserComponents/Typography/Typography';
 import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
 import {ColorPalette} from '../../../config/colorPalette';
-import {getScreenHeight} from '../../../helpers/screenSize';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {navigate} from '../../../navigation/utils/navigationRef';
 import {styles} from './OrderScreen.styles';
 import {SlidingBar} from '../../../components/MainComponents/SlidingBar/SlidingBar';
@@ -47,6 +53,7 @@ export const statusIconMap: {[key: string]: ReactNode} = {
   Cancelled: <SuccessTickSquareIcon size={18} />,
   Returned: <SuccessTickSquareIcon size={18} />,
   Exchanged: <SuccessTickSquareIcon size={18} />,
+  Processing: <SuccessTickSquareIcon size={18} />,
 };
 
 export const showStatusToast = (status: string) => {
@@ -58,28 +65,29 @@ export const showStatusToast = (status: string) => {
   showCustomToast(message, iconComponent);
 };
 
-// Map API status codes to display status
+// ✅ UPDATED: Map API status codes to display status
 export const convertOrderStatus = (apiStatus: string): OrderStatus => {
   const statusMap: {[key: string]: OrderStatus} = {
     O: 'Pending',
-    P: 'Processing',
+    P: 'Accepted', // ✅ CHANGED from 'Processing'
     C: 'Completed',
     F: 'Failed',
     I: 'Cancelled',
     D: 'Declined',
     B: 'Shipped',
-    Y: 'Processing',
-    A: 'Processing',
+    Y: 'Processing', // ✅ "Awaiting call" maps to Processing
+    A: 'Processing', // ✅ "Fraud checking" maps to Processing
   };
 
   return statusMap[apiStatus] || 'Processing';
 };
 
-// Map display status back to API status codes
+// ✅ UPDATED: Map display status back to API status codes
 const convertStatusToApi = (displayStatus: OrderStatus): string => {
   const statusMap: {[key: string]: string} = {
     Pending: 'O',
-    Processing: 'P',
+    Accepted: 'P', // ✅ ADDED
+    Processing: 'Y', // ✅ Maps to "Awaiting call"
     Completed: 'C',
     Failed: 'F',
     Cancelled: 'I',
@@ -90,13 +98,14 @@ const convertStatusToApi = (displayStatus: OrderStatus): string => {
   return statusMap[displayStatus] || 'P';
 };
 
-// Get API status from filter ID
+// ✅ UPDATED: Get API status from filter ID
 const getApiStatusFromFilter = (filterId: string): string | undefined => {
   if (filterId === 'all') return undefined;
 
   const filterToApiMap: {[key: string]: string} = {
     pending: 'O',
-    processing: 'P',
+    accepted: 'P', // ✅ ADDED
+    processing: 'Y', // ✅ Maps to "Awaiting call"
     completed: 'C',
     failed: 'F',
     cancelled: 'I',
@@ -194,10 +203,11 @@ const OrderScreen = () => {
       };
     }) || [];
 
-  // Define filter options
+  // ✅ UPDATED: Define filter options
   const filterOptions = [
     {id: 'all', label: 'All'},
     {id: 'pending', label: 'Pending'},
+    {id: 'accepted', label: 'Accepted'}, // ✅ ADDED
     {id: 'processing', label: 'Processing'},
     {id: 'completed', label: 'Completed'},
     {id: 'shipped', label: 'Shipped'},
@@ -315,12 +325,11 @@ const OrderScreen = () => {
     [dispatch, userId, currentFilters],
   );
 
-  // NEW: Handle apply filters
+  // Handle apply filters
   const handleApplyFilters = (filters: OrderFilters) => {
     console.log('Applying order filters:', filters);
 
     setCurrentFilters(filters);
-
     dispatch(setActiveFilters(filters));
 
     if (userId) {
@@ -336,12 +345,11 @@ const OrderScreen = () => {
     setIsFilterModalVisible(false);
   };
 
-  // NEW: Handle clear filters
+  // Handle clear filters
   const handleClearFilters = () => {
     console.log('Clearing order filters');
 
     setCurrentFilters({});
-
     dispatch(clearActiveFilters());
 
     if (userId) {
@@ -350,7 +358,7 @@ const OrderScreen = () => {
     }
   };
 
-  // NEW: Check if any filters are active
+  // Check if any filters are active
   const hasActiveFilters = (): boolean => {
     return (
       Object.keys(currentFilters).length > 0 &&
@@ -358,7 +366,7 @@ const OrderScreen = () => {
     );
   };
 
-  // NEW: Count active filters
+  // Count active filters
   const getActiveFilterCount = (): number => {
     let count = 0;
     if (currentFilters.customerName) count++;
@@ -405,15 +413,6 @@ const OrderScreen = () => {
     };
   }, [statusUpdateError, searchTimeoutRef, dispatch]);
 
-  console.log(
-    'loading:',
-    loading,
-    'error:',
-    error,
-    'orders:',
-    formattedOrders.length,
-  );
-
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
@@ -453,7 +452,7 @@ const OrderScreen = () => {
         />
       </View>
 
-      {/* NEW: Active filters indicator */}
+      {/* Active filters indicator */}
       {hasActiveFilters() && (
         <View
           style={{
@@ -642,7 +641,6 @@ const OrderScreen = () => {
         </ScrollView>
       )}
 
-      {/* NEW: FilterOrdersModal */}
       <FilterOrdersModal
         isVisible={isFilterModalVisible}
         onClose={() => setIsFilterModalVisible(false)}

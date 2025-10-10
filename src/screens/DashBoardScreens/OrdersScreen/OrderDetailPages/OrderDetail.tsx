@@ -1,6 +1,4 @@
 // src/screens/DashBoardScreens/OrdersScreen/OrderDetailPages/OrderDetail.tsx
-// SELF-CONTAINED VERSION - No external imports needed!
-
 import React, {useState, useEffect} from 'react';
 import {
   Image,
@@ -9,6 +7,7 @@ import {
   View,
   Alert,
   Share,
+  TouchableOpacity,
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import ChevronDownIcon from '../../../../assets/icons/ArrowDownIcon';
@@ -41,30 +40,31 @@ import {
 } from '../../../../redux/slices/orderDetailsSlice';
 import ChatIcon from '../../../../assets/icons/ChatIcon';
 import AnimatedLoader from '../../../../assets/icons/LoaderIcon';
-import { convertOrderStatus, showStatusToast } from '../OrderScreen';
+import {convertOrderStatus, showStatusToast} from '../OrderScreen';
 
-// Map API status codes to display status
+// ✅ UPDATED: Map API status codes to display status
 const mapStatusToDisplay = (apiStatus: string): OrderStatus => {
   const statusMap: {[key: string]: OrderStatus} = {
     O: 'Pending',
-    P: 'Processing',
+    P: 'Accepted', // ✅ CHANGED from 'Processing'
     C: 'Completed',
     F: 'Failed',
     I: 'Cancelled',
     D: 'Declined',
     B: 'Shipped',
-    Y: 'Processing',
-    A: 'Processing',
+    Y: 'Processing', // ✅ "Awaiting call" maps to Processing
+    A: 'Processing', // ✅ "Fraud checking" maps to Processing
   };
 
   return statusMap[apiStatus] || 'Processing';
 };
 
-// Map display status back to API status codes
+// ✅ UPDATED: Map display status back to API status codes
 const mapStatusToApi = (displayStatus: OrderStatus): string => {
   const statusMap: {[key: string]: string} = {
     Pending: 'O',
-    Processing: 'P',
+    Accepted: 'P', // ✅ ADDED
+    Processing: 'Y', // ✅ Maps to "Awaiting call"
     Completed: 'C',
     Failed: 'F',
     Cancelled: 'I',
@@ -97,11 +97,9 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     (state: RootState) => state.auth.userData?.user_id,
   );
 
-  // Get data from route params
   const params = route?.params || {};
   const orderId = params.orderId;
 
-  // Local state for UI data with fallbacks
   const [orderData, setOrderData] = useState({
     orderNumber: params.orderNumber || orderId || 'N/A',
     orderDate: params.orderDate || new Date().toLocaleDateString(),
@@ -133,12 +131,10 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     shipping: '€0.00',
   });
 
-  // Reset state when component mounts
   useEffect(() => {
     dispatch(resetOrderDetails());
   }, [dispatch]);
 
-  // Fetch order details when component mounts
   useEffect(() => {
     if (userId && orderId) {
       console.log('OrderDetail - Fetching order details:', {userId, orderId});
@@ -146,16 +142,13 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     }
   }, [dispatch, userId, orderId]);
 
-  // Update local state when orderDetails changes
   useEffect(() => {
     if (orderDetails) {
-      // Get the first product information if available
       const firstProduct =
         orderDetails.products && orderDetails.products.length > 0
           ? orderDetails.products[0]
           : null;
 
-      // Update product info
       setProductInfo({
         name: firstProduct?.product || params.orderName || 'Product',
         image:
@@ -165,7 +158,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         quantity: firstProduct?.amount || params.orderQuantity || 1,
       });
 
-      // Update order data
       setOrderData({
         orderNumber:
           orderDetails.order_number ||
@@ -191,7 +183,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
           'Pending',
       });
 
-      // Update customer information
       setCustomerInfo({
         name:
           `${orderDetails.firstname || ''} ${
@@ -212,7 +203,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
           '',
       });
 
-      // Update pricing information
       setPriceInfo({
         total: orderDetails.total || params.orderPrice || '€0.00',
         subtotal:
@@ -225,11 +215,9 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
           : '€0.00',
       });
 
-      // Extract shipping information
       let shippingMethod = 'N/A';
       let shippingAddress = 'N/A';
 
-      // Get shipping method
       if (orderDetails.shipping_name) {
         shippingMethod = orderDetails.shipping_name;
       } else if (
@@ -244,7 +232,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         }
       }
 
-      // Get shipping address
       if (orderDetails.customer_address) {
         const addressLines = [
           orderDetails.customer_address.line_1,
@@ -276,7 +263,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         address: shippingAddress,
       });
 
-      // Extract payment information
       let paymentMethod = 'N/A';
 
       if (orderDetails.payment_name) {
@@ -298,7 +284,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         method: paymentMethod,
       });
 
-      // Update current status
       setCurrentStatus(
         mapStatusToDisplay(orderDetails.status) ||
           params.orderStatus ||
@@ -307,7 +292,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     }
   }, [orderDetails, params]);
 
-  // Clear errors when component unmounts
   useEffect(() => {
     return () => {
       if (statusUpdateError) {
@@ -316,7 +300,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     };
   }, [statusUpdateError, dispatch]);
 
-  // Handle status change
   const handleStatusChange = async (newStatus: OrderStatus) => {
     try {
       console.log('OrderDetail - Status change to:', newStatus);
@@ -345,11 +328,9 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     }
   };
 
-  // SELF-CONTAINED INVOICE FUNCTION - No external dependencies!
   const handlePrintInvoice = async () => {
     console.log('Print Invoice button pressed');
 
-    // Validate data
     if (!orderData.orderNumber || orderData.orderNumber === 'N/A') {
       Alert.alert(
         'Error',
@@ -362,7 +343,6 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     setPrintingInvoice(true);
 
     try {
-      // Create invoice text - Simple format without special characters
       const invoiceText = `
 ========================================
          INVOICE - SELLER HUB
@@ -428,7 +408,6 @@ Phone: +356 9282 9128
 
       console.log('Invoice text prepared');
 
-      // Show share dialog
       await Share.share({
         title: `Invoice ${orderData.orderNumber}`,
         message: invoiceText,
@@ -438,7 +417,6 @@ Phone: +356 9282 9128
     } catch (error: any) {
       console.error('Error sharing invoice:', error);
 
-      // Only show error if user didn't cancel
       if (error.message && !error.message.toLowerCase().includes('cancel')) {
         Alert.alert('Error', 'Failed to share invoice. Please try again.', [
           {text: 'OK'},
@@ -449,7 +427,6 @@ Phone: +356 9282 9128
     }
   };
 
-  // Define accordion sections data
   const SECTIONS = [
     {
       title: 'Customer details',
@@ -594,11 +571,12 @@ Phone: +356 9282 9128
     setActiveSections(activeSections);
   };
 
-  // Helper function to determine status color
+  // ✅ UPDATED: Helper function to determine status color
   const getStatusColor = (status: OrderStatus): string => {
     const statusColorMap: {[key: string]: string} = {
       Pending: '#ff9522',
-      Processing: '#97cf4d',
+      Accepted: '#97cf4d', // ✅ ADDED - Same green as API
+      Processing: '#cc4125', // ✅ Updated to match "Awaiting call" color
       Completed: '#1FC16B',
       Failed: '#ff5215',
       Cancelled: '#c2c2c2',
@@ -609,7 +587,6 @@ Phone: +356 9282 9128
     return statusColorMap[status] || ColorPalette.PURPLE_300;
   };
 
-  // Show loading spinner
   if (loading && !orderData.orderNumber) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>

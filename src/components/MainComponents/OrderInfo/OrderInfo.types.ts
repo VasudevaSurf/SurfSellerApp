@@ -1,11 +1,12 @@
 import {StyleProp, ViewStyle} from 'react-native';
 
+// ✅ UPDATED: Added 'Accepted' to OrderStatus
 export type OrderStatus =
   | 'All'
   | 'Pending'
   | 'Processing'
   | 'Open'
-  | 'Accepted'
+  | 'Accepted' // ✅ ADDED
   | 'Paid'
   | 'Declined'
   | 'Failed'

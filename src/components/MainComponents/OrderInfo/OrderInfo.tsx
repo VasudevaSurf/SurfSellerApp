@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import React, {useState} from 'react';
+import {Image, TouchableOpacity, View} from 'react-native';
 import ArrowDownIcon from '../../../assets/icons/ArrowDownIcon';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
-import { ColorPalette } from '../../../config/colorPalette';
-import { getScreenHeight } from '../../../helpers/screenSize';
-import { Badge } from '../../UserComponents/Badges/Badge';
-import { BadgeType, BadgeVariant } from '../../UserComponents/Badges/Badge.types';
-import { Typography } from '../../UserComponents/Typography/Typography';
-import { TypographyVariant } from '../../UserComponents/Typography/Typography.types';
-import { StatusModal } from '../StatusModal/StatusModal';
-import { styles } from './OrderInfo.styles';
-import { OrderInfoProps, OrderStatus } from './OrderInfo.types';
+import {ColorPalette} from '../../../config/colorPalette';
+import {getScreenHeight} from '../../../helpers/screenSize';
+import {Badge} from '../../UserComponents/Badges/Badge';
+import {BadgeType, BadgeVariant} from '../../UserComponents/Badges/Badge.types';
+import {Typography} from '../../UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../UserComponents/Typography/Typography.types';
+import {StatusModal} from '../StatusModal/StatusModal';
+import {styles} from './OrderInfo.styles';
+import {OrderInfoProps, OrderStatus} from './OrderInfo.types';
 
+// ✅ UPDATED: Added Accepted status
 export const getStatusBadgeType = (status: OrderStatus): BadgeType => {
   switch (status) {
     case 'Delivered':
@@ -25,10 +26,10 @@ export const getStatusBadgeType = (status: OrderStatus): BadgeType => {
     case 'Shipped':
       return BadgeType.WARNING;
 
-    case 'Accepted':
+    case 'Accepted': // ✅ ADDED
     case 'Exchanged':
     case 'Returned':
-      return BadgeType.PRIMARY; // Blue / active process
+      return BadgeType.PRIMARY;
 
     case 'Cancelled':
     case 'Declined':
@@ -36,13 +37,14 @@ export const getStatusBadgeType = (status: OrderStatus): BadgeType => {
       return BadgeType.DANGER;
 
     default:
-      return BadgeType.SECONDARY; // For 'All' or unknown statuses
+      return BadgeType.SECONDARY;
   }
 };
 
+// ✅ UPDATED: Added Accepted status color
 export const getStatusColors = (
   status: OrderStatus,
-): { borderColor: string; textColor: string } => {
+): {borderColor: string; textColor: string} => {
   switch (status) {
     // ✅ Green statuses
     case 'Delivered':
@@ -64,11 +66,16 @@ export const getStatusColors = (
       };
 
     // 🔵 Blue / Active process statuses
-    case 'Accepted':
+    case 'Accepted': // ✅ ADDED - Using green color as per API
+      return {
+        borderColor: '#97cf4d',
+        textColor: '#97cf4d',
+      };
+
     case 'Exchanged':
     case 'Returned':
       return {
-        borderColor: ColorPalette.ProgressLine, // You can use a suitable blue from your palette
+        borderColor: ColorPalette.ProgressLine,
         textColor: ColorPalette.ProgressLine,
       };
 
@@ -78,10 +85,17 @@ export const getStatusColors = (
     case 'Failed':
       return {
         borderColor: ColorPalette.RED_100,
-        textColor: ColorPalette.RED_100, // matches your current usage
+        textColor: ColorPalette.RED_100,
       };
 
-    // Default / unknown status (like 'All' or 'Processing')
+    // Processing status (Awaiting call)
+    case 'Processing':
+      return {
+        borderColor: '#cc4125',
+        textColor: '#cc4125',
+      };
+
+    // Default / unknown status
     default:
       return {
         borderColor: ColorPalette.GREY_200,
@@ -106,8 +120,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
   onCardPress,
   style,
 }) => {
-
-  console.log("orderStatus in orderInfo:", orderStatus);
+  console.log('orderStatus in orderInfo:', orderStatus);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const statusColors = getStatusColors(orderStatus);
@@ -134,7 +147,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
       activeOpacity={0.7}>
       {/* Header with order number and date */}
       <View style={styles.headerContainer}>
-        <View style={{ gap: getScreenHeight(0.5) }}>
+        <View style={{gap: getScreenHeight(0.5)}}>
           <Typography
             text={`Order #${orderNumber}`}
             variant={TypographyVariant.H5_BOLD}
@@ -157,7 +170,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
       <View style={styles.productContainer}>
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: orderImage }}
+            source={{uri: orderImage}}
             style={styles.orderImage}
             resizeMode="cover"
           />
@@ -178,7 +191,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
             <Typography
               text={`Quantity: `}
               variant={TypographyVariant.PMEDIUM_REGULAR}
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
             <Typography
               text={`${orderQuantity || 1}`}
@@ -191,7 +204,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
             <Typography
               text="Total:"
               variant={TypographyVariant.PMEDIUM_REGULAR}
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
             <Typography
               text={`${orderPrice}`}
@@ -207,7 +220,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
         <Typography
           text="Order status:"
           variant={TypographyVariant.PSMALL_MEDIUM}
-          customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
+          customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
         />
         <Badge
           text={orderStatus}
