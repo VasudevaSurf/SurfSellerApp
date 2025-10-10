@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Alert, Image, TouchableOpacity, View } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Alert, Image, TouchableOpacity, View} from 'react-native';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import CircleOutlineClose from '../../../../../../assets/icons/NewProductIcons/CircleOutlineClose';
 import CloudManIcon from '../../../../../../assets/icons/NewProductIcons/CloudManIcon';
 import CrossArrowsIcon from '../../../../../../assets/icons/NewProductIcons/CrossArrowsIcon';
-import { AddModal } from '../../../../../../components/MainComponents/AddModal/AddModal';
+import {AddModal} from '../../../../../../components/MainComponents/AddModal/AddModal';
 import FileItem from '../../../../../../components/MainComponents/FileItem/FileItem';
 import {
   Button,
@@ -13,15 +13,15 @@ import {
   ButtonType,
   ButtonVariant,
 } from '../../../../../../components/UserComponents/Button';
-import { Typography } from '../../../../../../components/UserComponents/Typography/Typography';
-import { TypographyVariant } from '../../../../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../../../../config/colorPalette';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
 import {
   getFigmaDimension,
   getScreenHeight,
   getScreenWidth,
 } from '../../../../../../helpers/screenSize';
-import { styles } from './UploadMediaStep.styles';
+import {styles} from './UploadMediaStep.styles';
 import {
   pickImagesFromGallery,
   takePhotoWithCamera,
@@ -33,12 +33,13 @@ import {
   uploadMultipleProductImages,
   deleteProductImage,
   extractRelativePathFromUrl,
+  deleteProductImageFromServer,
   UploadedImageData,
 } from '../../../../../../services/imageService';
-import { Spacing } from '../../../../../../config/globalStyles';
+import {Spacing} from '../../../../../../config/globalStyles';
 import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
 import SuccessTickSquareIcon from '../../../../../../assets/icons/ToastIcons/SuccessTick';
-import { showCustomToast } from '../../../../../../components/MainComponents/Toast/ToastComponent';
+import {showCustomToast} from '../../../../../../components/MainComponents/Toast/ToastComponent';
 
 interface FileData {
   id: string;
@@ -70,7 +71,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [currentUpload, setCurrentUpload] = useState({ current: 0, total: 0 });
+  const [currentUpload, setCurrentUpload] = useState({current: 0, total: 0});
   const [files, setFiles] = useState<FileData[]>([]);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
 
@@ -99,15 +100,15 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             fileExtension === 'jpg' || fileExtension === 'jpeg'
               ? '180 KB'
               : fileExtension === 'png'
-                ? '250 KB'
-                : '200 KB';
+              ? '250 KB'
+              : '200 KB';
 
           return {
             id: `prefilled-${index}-${Date.now()}`,
             name: filename,
             size: estimatedSize,
             date: 'Uploaded',
-            thumbnailSource: { uri: imageUrl },
+            thumbnailSource: {uri: imageUrl},
             isExisting: true,
             originalUrl: imageUrl,
             viewUrl: imageUrl,
@@ -125,109 +126,86 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   }, [editMode, formData.images]);
 
   const handleDelete = async (fileId: string) => {
-    const fileToDelete = files.find(file => file.id === fileId);
-    if (!fileToDelete) {
-      console.error('File to delete not found');
-      return;
-    }
+  const fileToDelete = files.find(file => file.id === fileId);
+  if (!fileToDelete) {
+    console.error('File to delete not found');
+    return;
+  }
 
-    Alert.alert('Delete File', 'Are you sure you want to delete this file?', [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'Delete',
-        onPress: async () => {
-          console.log('🗑️ Deleting file:', fileToDelete);
+  Alert.alert('Delete File', 'Are you sure you want to delete this file?', [
+    {
+      text: 'Cancel',
+      style: 'cancel',
+    },
+    {
+      text: 'Delete',
+      onPress: async () => {
+        console.log('🗑️ Removing file from form:', fileToDelete);
 
-          // If it's an existing image, try to delete it from server
-          if (fileToDelete.isExisting && fileToDelete.relativePath) {
-            try {
-              console.log(
-                '🗑️ Attempting to delete image from server:',
-                fileToDelete.relativePath,
-              );
+        // ✅ IMMEDIATE UI UPDATE - Remove from files list
+        const updatedFiles = files.filter(file => file.id !== fileId);
+        setFiles(updatedFiles);
 
-              const deleteResult = await deleteProductImage(
-                fileToDelete.relativePath,
-                {
-                  user_id: formData.userId, // Pass user ID if available
-                  product_id: formData.productId, // Pass product ID if available
-                  file_id: fileToDelete.fileId,
-                },
-              );
-              console.log("delete result", deleteResult);
-
-              if (deleteResult.success) {
-                console.log('✅ Image deleted from server successfully');
-                showCustomToast("Image removed successfully!", <SuccessTickSquareIcon size={18} />);
-
-              } else {
-                // console.warn(
-                //   '⚠️ Failed to delete image from server:',
-                //   deleteResult.error,
-                // );
-                showCustomToast("Failed to removed successfully!", <SuccessTickSquareIcon size={18} />);
-
-                // Continue with UI deletion even if server deletion fails
-                // The product update API will handle the final image list
-              }
-            } catch (error) {
-              console.error('❌ Error deleting image from server:', error);
-              // Continue with UI deletion even if server deletion fails
-            }
-          }
-
-          // Remove from files list
-          const updatedFiles = files.filter(file => file.id !== fileId);
-          setFiles(updatedFiles);
-
-          // Update form data - remove the deleted image
-          const updatedImages = formData.images.filter((img: string) => {
-            if (fileToDelete.isExisting) {
-              return (
-                img !== fileToDelete.originalUrl && img !== fileToDelete.viewUrl
-              );
-            } else {
-              return img !== fileToDelete.uri && img !== fileToDelete.viewUrl;
-            }
-          });
-
-          // Update relative paths - remove if it's a new upload
-          let updatedRelativePaths = formData.imageRelativePaths || [];
-          if (fileToDelete.relativePath && !fileToDelete.isExisting) {
-            updatedRelativePaths = updatedRelativePaths.filter(
-              (path: string) => path !== fileToDelete.relativePath,
+        // ✅ Update form data - remove the deleted image
+        const updatedImages = formData.images.filter((img: string) => {
+          if (fileToDelete.isExisting) {
+            // Remove by comparing URLs
+            return (
+              img !== fileToDelete.originalUrl && 
+              img !== fileToDelete.viewUrl
+            );
+          } else {
+            // Remove by comparing URI or view URL
+            return (
+              img !== fileToDelete.uri && 
+              img !== fileToDelete.viewUrl
             );
           }
+        });
 
-          console.log('📸 Updating form data after deletion:', {
-            before: {
-              images: formData.images?.length || 0,
-              relativePaths: formData.imageRelativePaths?.length || 0,
-            },
-            after: {
-              images: updatedImages.length,
-              relativePaths: updatedRelativePaths.length,
-            },
-          });
+        // ✅ Update relative paths
+        let updatedRelativePaths = formData.imageRelativePaths || [];
+        
+        // For existing images, remove from relative paths
+        if (fileToDelete.relativePath) {
+          updatedRelativePaths = updatedRelativePaths.filter(
+            (path: string) => path !== fileToDelete.relativePath,
+          );
+        }
 
-          // Update form data
-          updateFormData({
-            images: updatedImages,
-            imageRelativePaths: updatedRelativePaths,
-          });
+        console.log('📸 Form data after deletion:', {
+          before: {
+            images: formData.images?.length || 0,
+            relativePaths: formData.imageRelativePaths?.length || 0,
+          },
+          after: {
+            images: updatedImages.length,
+            relativePaths: updatedRelativePaths.length,
+          },
+          deletedPath: fileToDelete.relativePath,
+        });
 
-          // If no files left, reset to initial state
-          if (updatedFiles.length === 0) {
-            setUploadStatus('initial');
-          }
-        },
-        style: 'destructive',
+        // ✅ Update form data immediately
+        updateFormData({
+          images: updatedImages,
+          imageRelativePaths: updatedRelativePaths,
+        });
+
+        // Show success message
+        showCustomToast(
+          "Image removed successfully!",
+          <SuccessTickSquareIcon size={18} />
+        );
+
+        // If no files left, reset to initial state
+        if (updatedFiles.length === 0) {
+          setUploadStatus('initial');
+        }
       },
-    ]);
-  };
+      style: 'destructive',
+    },
+  ]);
+};
 
   const handleOptimize = (fileId: string) => {
     Alert.alert(
@@ -296,8 +274,10 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             //   'Invalid Image',
             //   validation.error || 'Invalid image selected',
             // );
-            showCustomToast("Oops! Unsupported format!", <SuccessTickSquareIcon size={18} />);
-
+            showCustomToast(
+              'Oops! Unsupported format!',
+              <SuccessTickSquareIcon size={18} />,
+            );
           }
         }
 
@@ -310,7 +290,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
           setUploadStatus('uploading');
           setUploadProgress(0);
-          setCurrentUpload({ current: 0, total: validImages.length });
+          setCurrentUpload({current: 0, total: validImages.length});
 
           try {
             // Upload images using the dedicated image service
@@ -323,7 +303,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               })),
               (current, total, fileName) => {
                 console.log(`Uploading ${current}/${total}: ${fileName}`);
-                setCurrentUpload({ current, total });
+                setCurrentUpload({current, total});
                 const progress = total > 0 ? (current / total) * 100 : 0;
                 setUploadProgress(progress);
               },
@@ -348,7 +328,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                   name: image.fileName,
                   size: formatFileSize(image.fileSize),
                   date: new Date().toLocaleDateString(),
-                  thumbnailSource: { uri: image.viewUrl || image.uri },
+                  thumbnailSource: {uri: image.viewUrl || image.uri},
                   uri: image.uri,
                   relativePath: image.relativePath,
                   viewUrl: image.viewUrl,
@@ -397,8 +377,10 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 //   `${uploadResult.uploadedImages.length} image(s) uploaded successfully!`,
                 // );
 
-                showCustomToast("Image(s) uploaded successfully.", <SuccessTickSquareIcon size={18} />);
-
+                showCustomToast(
+                  'Image(s) uploaded successfully.',
+                  <SuccessTickSquareIcon size={18} />,
+                );
               } else {
                 const successCount = uploadResult.uploadedImages.length;
                 const errorCount = uploadResult.errors.length;
@@ -406,7 +388,10 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 //   'Partial Success',
                 //   `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
                 // );
-                showCustomToast(`${successCount} image(s) uploaded successfully, ${errorCount} failed.`, <SuccessTickSquareIcon size={18} />);
+                showCustomToast(
+                  `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
+                  <SuccessTickSquareIcon size={18} />,
+                );
               }
             } else {
               console.error('Upload failed:', uploadResult.errors);
@@ -415,13 +400,19 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               //   'Failed to upload images. Please try again.',
               // );
 
-              showCustomToast("Oops! Upload failed. Try again.", <SuccessTickSquareIcon size={18} />);
+              showCustomToast(
+                'Oops! Upload failed. Try again.',
+                <SuccessTickSquareIcon size={18} />,
+              );
               setUploadStatus(files.length > 0 ? 'completed' : 'initial');
             }
           } catch (uploadError) {
             console.error('Upload error:', uploadError);
             // Alert.alert('Upload Error', 'Upload failed. Please try again.');
-            showCustomToast("Oops! Upload failed. Try again.", <SuccessTickSquareIcon size={18} />);
+            showCustomToast(
+              'Oops! Upload failed. Try again.',
+              <SuccessTickSquareIcon size={18} />,
+            );
             setUploadStatus(files.length > 0 ? 'completed' : 'initial');
           }
         }
@@ -429,17 +420,20 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
     } catch (error: any) {
       console.error('Selection error:', error);
       // Alert.alert('Selection Error', 'Failed to select images');
-      showCustomToast("Failed to select images", <SuccessTickSquareIcon size={18} />);
+      showCustomToast(
+        'Failed to select images',
+        <SuccessTickSquareIcon size={18} />,
+      );
     } finally {
       setIsUploading(false);
-      setCurrentUpload({ current: 0, total: 0 });
+      setCurrentUpload({current: 0, total: 0});
     }
   };
 
   const handleCancelUpload = () => {
     setUploadStatus(files.length > 0 ? 'completed' : 'initial');
     setUploadProgress(0);
-    setCurrentUpload({ current: 0, total: 0 });
+    setCurrentUpload({current: 0, total: 0});
     setIsUploading(false);
   };
 
@@ -496,7 +490,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           <Typography
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
             text={getHeaderText()}
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <Tooltip
             target={
@@ -507,15 +501,17 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               />
             }
             content={
-              <Typography customTextStyles={{
-                color: ColorPalette.GREY_TEXT_200,
-                paddingVertical: getScreenHeight(0.1)
-              }} variant={TypographyVariant.LSMALL_MEDIUM}>
-                Photos showing the product from different angles.      </Typography>
+              <Typography
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1),
+                }}
+                variant={TypographyVariant.LSMALL_MEDIUM}>
+                Photos showing the product from different angles.{' '}
+              </Typography>
             }
             placement="bottom"
           />
-
         </View>
 
         {(uploadStatus === 'initial' || (editMode && files.length === 0)) && (
@@ -536,7 +532,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             <Typography
               variant={TypographyVariant.LMEDIUM_REGULAR}
               text="PNG, JPG, GIF up to 10MB"
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
           </View>
         )}
@@ -580,7 +576,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             <Typography
               variant={TypographyVariant.LMEDIUM_REGULAR}
               text="PNG, JPG, GIF up to 10MB"
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
           </View>
         )}
@@ -591,8 +587,8 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
         onClose={() => setIsAddModalVisible(false)}
         buttons={modalButtons}
         showCloseIcon={true}
-        containerStyle={{ paddingVertical: 16 }}
-        footerStyle={{ flexDirection: 'column', gap: 12 }}
+        containerStyle={{paddingVertical: 16}}
+        footerStyle={{flexDirection: 'column', gap: 12}}
       />
 
       {uploadStatus === 'uploading' && (
@@ -602,7 +598,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               <Typography
                 text={`Uploading ${currentUpload.current}/${currentUpload.total} images`}
                 variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-                customTextStyles={{ color: ColorPalette.GREY_TEXT_400 }}
+                customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
               />
               <CrossArrowsIcon style={undefined} size={18} />
             </View>
@@ -617,12 +613,12 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             </View>
           </View>
           <View
-            style={[styles.progressLine, { width: `${uploadProgress}%` }]}></View>
+            style={[styles.progressLine, {width: `${uploadProgress}%`}]}></View>
           <View style={styles.progressPercent}>
             <Typography
               text={`${Math.round(uploadProgress)}% uploading`}
               variant={TypographyVariant.LMEDIUM_REGULAR}
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
             <TouchableOpacity onPress={handleCancelUpload}>
               <CircleOutlineClose style={undefined} />
@@ -637,15 +633,15 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             <Typography
               text={editMode ? 'Product Images' : 'Recent Uploaded'}
               variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
             />
             <Typography
               text={`${files.length} items`}
               variant={TypographyVariant.PSMALL_MEDIUM}
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_100 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
             />
           </View>
-          <View style={{ gap: getFigmaDimension(4) }}>
+          <View style={{gap: getFigmaDimension(4)}}>
             {files.map(file => (
               <FileItem
                 key={file.id}

@@ -448,18 +448,18 @@ const NotificationScreen: React.FC = () => {
         variant={TypographyVariant.H6_BOLD}
         textColor={ColorPalette.AgreeTerms}
         leftIcon={<ArrowLeft style={undefined} size={22} onPress={goBack} />}
-        rightIcons={[
-          {
-            icon: () => (
-              <Typography
-                text="Clear All"
-                variant={TypographyVariant.LMEDIUM_MEDIUM}
-                customTextStyles={{color: ColorPalette.RED_200, fontSize: 16}}
-              />
-            ),
-            onPress: openClearAllModal,
-          },
-        ]}
+        // rightIcons={[
+        //   {
+        //     icon: () => (
+        //       <Typography
+        //         text="Clear All"
+        //         variant={TypographyVariant.LMEDIUM_MEDIUM}
+        //         customTextStyles={{color: ColorPalette.RED_200, fontSize: 16}}
+        //       />
+        //     ),
+        //     onPress: openClearAllModal,
+        //   },
+        // ]}
       />
       <View style={styles.mainContainer}>
         <ScrollView
