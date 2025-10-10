@@ -76,6 +76,19 @@ const extractUserProfile = (
           case 'terms':
             userProfile.terms = field.value;
             break;
+          // NEW: Extract bank details
+          case 'accountholder_full_name':
+            userProfile.accountholder_full_name = field.value;
+            break;
+          case 'bank_name':
+            userProfile.bank_name = field.value;
+            break;
+          case 'iban':
+            userProfile.iban = field.value;
+            break;
+          case 'bic':
+            userProfile.bic = field.value;
+            break;
         }
       });
     });

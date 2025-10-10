@@ -297,9 +297,9 @@ export interface UserProfile {
   firstname?: string;
   lastname?: string;
   phone?: string;
-  company?: string; // Changed from company_name
+  company?: string;
   vat_number?: string;
-  address?: string; // Changed from street
+  address?: string;
   city?: string;
   postal_code?: string;
   country?: string;
@@ -307,6 +307,11 @@ export interface UserProfile {
   invoice_logo?: string;
   company_description?: string;
   terms?: string;
+  // NEW: Add bank details fields
+  accountholder_full_name?: string;
+  bank_name?: string;
+  iban?: string;
+  bic?: string;
 }
 
 export interface ProfileUpdateResponse {
@@ -952,14 +957,40 @@ export const updateProfileApi = async (
     console.log('📝 New data:', profileData);
     console.log('📋 Current data:', currentProfileData);
 
-    // ALWAYS initialize both objects - API requires both to exist
     const userData: any = {};
     const companyData: any = {};
 
-    // CRITICAL: First, populate company_data with ALL existing values
-    // This prevents the API from clearing fields we're not updating
+    // Populate with existing data first
     if (currentProfileData) {
-      // Add all existing company data first
+      // User data fields
+      if (currentProfileData.email !== undefined) {
+        userData.email = currentProfileData.email;
+      }
+      if (currentProfileData.firstname !== undefined) {
+        userData.firstname = currentProfileData.firstname;
+      }
+      if (currentProfileData.lastname !== undefined) {
+        userData.lastname = currentProfileData.lastname;
+      }
+      if (currentProfileData.phone !== undefined) {
+        userData.phone = currentProfileData.phone;
+      }
+      // NEW: Bank details
+      if (currentProfileData.accountholder_full_name !== undefined) {
+        userData.accountholder_full_name =
+          currentProfileData.accountholder_full_name;
+      }
+      if (currentProfileData.bank_name !== undefined) {
+        userData.bank_name = currentProfileData.bank_name;
+      }
+      if (currentProfileData.iban !== undefined) {
+        userData.iban = currentProfileData.iban;
+      }
+      if (currentProfileData.bic !== undefined) {
+        userData.bic = currentProfileData.bic;
+      }
+
+      // Company data fields
       if (currentProfileData.company !== undefined) {
         companyData.company = currentProfileData.company;
       }
@@ -985,24 +1016,10 @@ export const updateProfileApi = async (
       if (currentProfileData.terms !== undefined) {
         companyData.terms = currentProfileData.terms;
       }
-
-      // Add all existing user data first
-      if (currentProfileData.email !== undefined) {
-        userData.email = currentProfileData.email;
-      }
-      if (currentProfileData.firstname !== undefined) {
-        userData.firstname = currentProfileData.firstname;
-      }
-      if (currentProfileData.lastname !== undefined) {
-        userData.lastname = currentProfileData.lastname;
-      }
-      if (currentProfileData.phone !== undefined) {
-        userData.phone = currentProfileData.phone;
-      }
     }
 
-    // NOW override with new values being updated
-    // User data fields
+    // Override with new values
+    // User data
     if (profileData.email !== undefined) {
       userData.email = profileData.email;
     }
@@ -1015,8 +1032,21 @@ export const updateProfileApi = async (
     if (profileData.phone !== undefined) {
       userData.phone = profileData.phone;
     }
+    // NEW: Bank details updates
+    if (profileData.accountholder_full_name !== undefined) {
+      userData.accountholder_full_name = profileData.accountholder_full_name;
+    }
+    if (profileData.bank_name !== undefined) {
+      userData.bank_name = profileData.bank_name;
+    }
+    if (profileData.iban !== undefined) {
+      userData.iban = profileData.iban;
+    }
+    if (profileData.bic !== undefined) {
+      userData.bic = profileData.bic;
+    }
 
-    // Company data fields - override with new values
+    // Company data
     if (profileData.company !== undefined) {
       companyData.company = profileData.company;
     }
@@ -1042,7 +1072,6 @@ export const updateProfileApi = async (
       companyData.terms = profileData.terms;
     }
 
-    // CRITICAL: Always include both objects in request body
     const requestBody = {
       user_id: parseInt(userId),
       user_data: userData,
@@ -1064,7 +1093,6 @@ export const updateProfileApi = async (
 
     console.log('📥 Update Profile API response:', response.data);
 
-    // Check if response is valid JSON
     if (
       typeof response.data === 'string' &&
       response.data.includes('<b>Warning</b>')
