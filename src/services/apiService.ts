@@ -314,6 +314,42 @@ export interface UserProfile {
   bic?: string;
 }
 
+export interface LogoImage {
+  logo_id: string;
+  layout_id: string;
+  style_id: string;
+  company_id: string;
+  type: string;
+  storefront_id: string;
+  image: any[];
+}
+
+export interface LogoData {
+  theme?: LogoImage;
+  mail?: LogoImage;
+}
+
+export interface ProfileLogoField {
+  name: string;
+  field_name: string;
+  main_object: string;
+  field_type: string;
+  field_type_desc: string;
+  field_disabled: boolean;
+  logos: LogoData;
+  required: boolean;
+  variants: any;
+}
+
+export interface LogoUploadResponse {
+  result: boolean;
+  message: string;
+  logo_data?: {
+    theme?: string;
+    mail?: string;
+  };
+}
+
 export interface ProfileUpdateResponse {
   result: boolean;
   message: string;
@@ -540,6 +576,112 @@ const apiClient = axios.create({
   },
   timeout: 10000,
 });
+
+export const uploadCompanyLogoApi = async (
+  userId: string,
+  logoUri: string,
+  logoType: 'theme' | 'mail' = 'theme',
+): Promise<LogoUploadResponse> => {
+  try {
+    console.log('📤 Uploading company logo:', {userId, logoType});
+
+    const formData = new FormData();
+
+    // Add the logo file
+    formData.append(`file_logotypes_image_icon[${logoType}]`, {
+      uri: logoUri,
+      type: 'image/png',
+      name: `logo_${logoType}_${Date.now()}.png`,
+    } as any);
+
+    // Add required parameters
+    formData.append(`type_logotypes_image_icon[${logoType}]`, 'local');
+    formData.append(`is_high_res_logotypes_image_icon[${logoType}]`, '');
+    formData.append('user_id', userId);
+    formData.append('logo_update', '1');
+    formData.append(`logotypes_image_data[${logoType}][type]`, 'M');
+    formData.append(`logotypes_image_data[${logoType}][object_id]`, userId);
+    formData.append(
+      `logotypes_image_data[${logoType}][image_alt]`,
+      logoType === 'theme' ? 'Company Logo' : 'Invoice Logo',
+    );
+
+    const response = await fetch(
+      'https://dev.surf.mt/api.php?_d=NtSeProfilesApi',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: API_AUTH_HEADER,
+        },
+        body: formData,
+      },
+    );
+
+    const responseText = await response.text();
+    console.log('📥 Logo upload response:', {
+      status: response.status,
+      responseText: responseText.substring(0, 200),
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        result: false,
+        message: `HTTP ${response.status}: Failed to upload logo`,
+      };
+    }
+
+    try {
+      const responseData = JSON.parse(responseText);
+      return {
+        result: responseData.result || true,
+        message: responseData.message || 'Logo uploaded successfully',
+        logo_data: responseData.logo_data,
+      };
+    } catch (parseError) {
+      if (response.status === 200) {
+        return {
+          result: true,
+          message: 'Logo uploaded successfully',
+        };
+      }
+      throw parseError;
+    }
+  } catch (error: any) {
+    console.error('❌ Upload logo error:', error);
+    throw new Error(error.message || 'Failed to upload logo');
+  }
+};
+
+export const getProfileLogosApi = async (
+  userId: string,
+): Promise<LogoData | null> => {
+  try {
+    console.log('📥 Fetching profile logos for userId:', userId);
+
+    const response = await fetchProfileApi(userId);
+
+    // Find the Profile Logo section
+    const logoSection = response.sections.find(
+      section => section.section_type === 'profile_logo',
+    );
+
+    if (logoSection && logoSection.blocks.length > 0) {
+      const logoField = logoSection.blocks[0].fields[0] as any;
+
+      if (logoField && logoField.logos) {
+        console.log('✅ Found logos:', logoField.logos);
+        return logoField.logos as LogoData;
+      }
+    }
+
+    console.log('⚠️ No logos found in profile');
+    return null;
+  } catch (error) {
+    console.error('❌ Get profile logos error:', error);
+    return null;
+  }
+};
 
 export const fetchNotificationsApi = async (
   userId: string,
