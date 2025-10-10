@@ -77,7 +77,7 @@ const WithdrawScreen = () => {
       goBack();
       showCustomToast(
         `Withdrawal of €${amount} requested successfully.`,
-        <SuccessTickSquareIcon size={18} />,
+        '✅',
       );
 
       const navigationDelay = setTimeout(() => {
@@ -94,8 +94,7 @@ const WithdrawScreen = () => {
   useEffect(() => {
     if (error) {
       goBack()
-      const ErrorIcon = <SuccessTickSquareIcon size={18} />;
-      showCustomToast('Withdrawal failed. Please try again.', ErrorIcon);
+      showCustomToast('Withdrawal failed. Please try again.', '❌');
 
       dispatch(clearWithdrawalError());
     }
@@ -151,7 +150,7 @@ const WithdrawScreen = () => {
       // Show the custom toast only when an error is present
       showCustomToast(
         toastMessage,
-        <SuccessTickSquareIcon size={18} />,
+        '⚠️',
       );
     }
   }, [amountError, currentBalance]);

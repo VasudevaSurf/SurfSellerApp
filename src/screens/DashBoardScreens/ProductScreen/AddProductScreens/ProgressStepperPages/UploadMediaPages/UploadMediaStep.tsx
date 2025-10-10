@@ -161,14 +161,14 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
               if (deleteResult.success) {
                 console.log('✅ Image deleted from server successfully');
-                showCustomToast("Image removed successfully!", <SuccessTickSquareIcon size={18} />);
+                showCustomToast("Image removed successfully!", '🗑️');
 
               } else {
                 // console.warn(
                 //   '⚠️ Failed to delete image from server:',
                 //   deleteResult.error,
                 // );
-                showCustomToast("Failed to removed successfully!", <SuccessTickSquareIcon size={18} />);
+                showCustomToast("Failed to removed successfully!", '❌');
 
                 // Continue with UI deletion even if server deletion fails
                 // The product update API will handle the final image list
@@ -296,7 +296,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             //   'Invalid Image',
             //   validation.error || 'Invalid image selected',
             // );
-            showCustomToast("Oops! Unsupported format!", <SuccessTickSquareIcon size={18} />);
+            showCustomToast("Oops! Unsupported format!", '❌');
 
           }
         }
@@ -397,7 +397,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 //   `${uploadResult.uploadedImages.length} image(s) uploaded successfully!`,
                 // );
 
-                showCustomToast("Image(s) uploaded successfully.", <SuccessTickSquareIcon size={18} />);
+                showCustomToast("Image(s) uploaded successfully.", '✅');
 
               } else {
                 const successCount = uploadResult.uploadedImages.length;
@@ -406,7 +406,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 //   'Partial Success',
                 //   `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
                 // );
-                showCustomToast(`${successCount} image(s) uploaded successfully, ${errorCount} failed.`, <SuccessTickSquareIcon size={18} />);
+                showCustomToast(`${successCount} image(s) uploaded successfully, ${errorCount} failed.`, '✅');
               }
             } else {
               console.error('Upload failed:', uploadResult.errors);
@@ -415,13 +415,13 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               //   'Failed to upload images. Please try again.',
               // );
 
-              showCustomToast("Oops! Upload failed. Try again.", <SuccessTickSquareIcon size={18} />);
+              showCustomToast("Oops! Upload failed. Try again.", '❌');
               setUploadStatus(files.length > 0 ? 'completed' : 'initial');
             }
           } catch (uploadError) {
             console.error('Upload error:', uploadError);
             // Alert.alert('Upload Error', 'Upload failed. Please try again.');
-            showCustomToast("Oops! Upload failed. Try again.", <SuccessTickSquareIcon size={18} />);
+            showCustomToast("Oops! Upload failed. Try again.", '❌');
             setUploadStatus(files.length > 0 ? 'completed' : 'initial');
           }
         }
@@ -429,7 +429,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
     } catch (error: any) {
       console.error('Selection error:', error);
       // Alert.alert('Selection Error', 'Failed to select images');
-      showCustomToast("Failed to select images", <SuccessTickSquareIcon size={18} />);
+      showCustomToast("Failed to select images", '❌');
     } finally {
       setIsUploading(false);
       setCurrentUpload({ current: 0, total: 0 });
