@@ -604,170 +604,216 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   );
 
   // Description Tab Component
-  const DescriptionRoute = () => (
-    <ScrollView
-      style={styles.mainContainer}
-      contentContainerStyle={[
-        styles.scrollContent,
-        {paddingTop: getScreenHeight(2)},
-      ]}
-      showsVerticalScrollIndicator={false}>
-      <View style={styles.mainContainerTwo}>
-        <View style={styles.taxCheckContainer}>
-          <View style={{flexDirection: 'row', gap: 5, marginBottom: 16}}>
-            <Typography
-              text="Description"
-              variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
-            />
-            <InfoIcon />
-          </View>
-          <View style={styles.toolbar}>
-            <Badge
-              text="Paragraph"
-              variant={BadgeVariant.FILLED}
-              rightIcon={ArrowDownIcon}
-              onPress={e => {
-                e.stopPropagation();
-              }}
-              textVariant={TypographyVariant.LSMALL_REGULAR}
-              customContainerStyle={styles.containerStyle}
-              customTextColor={ColorPalette.GREY_TEXT_400}
-              iconSize={16}
-            />
+  const DescriptionRoute = () => {
+    const [localDescription, setLocalDescription] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
 
-            <View style={styles.toolbarIcons}>
-              <TouchableOpacity
-                onPress={() => toggleTextFormat('bold')}
-                style={[textFormat.bold && styles.activeFormatButton]}>
-                <Typography
-                  variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
-                  text="B"
-                  customTextStyles={{
-                    color: textFormat.bold
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400,
-                  }}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => toggleTextFormat('italic')}
-                style={[textFormat.italic && styles.activeFormatButton]}>
-                <TextSymbolIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textFormat.italic
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => toggleTextFormat('underline')}
-                style={[textFormat.underline && styles.activeFormatButton]}>
-                <UnderlineIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textFormat.underline
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <PencilUnderlineIcon style={undefined} size={18} />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <UnderlineTextIcon style={undefined} size={18} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleAlignmentChange('left')}
-                style={[textAlignment === 'left' && styles.activeFormatButton]}>
-                <AlignTextLeftIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textAlignment === 'left'
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                  strokeWidth={1.5}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleAlignmentChange('center')}
+    // Initialize local state only once when screen loads
+    React.useEffect(() => {
+      if (companyDescription && !isEditing) {
+        setLocalDescription(companyDescription);
+      }
+    }, [companyDescription]);
+
+    const handleSave = async () => {
+      if (!userData?.user_id) {
+        Alert.alert('Error', 'User not found. Please login again.');
+        return;
+      }
+
+      try {
+        await dispatch(
+          updateProfile({
+            userId: userData.user_id,
+            profileData: {
+              company_description: localDescription,
+            },
+          }),
+        ).unwrap();
+
+        setCompanyDescription(localDescription);
+        setIsEditing(false);
+        Alert.alert('Success', 'Company description updated successfully');
+      } catch (error: any) {
+        Alert.alert(
+          'Update Failed',
+          error.message || 'Failed to update description',
+        );
+      }
+    };
+
+    return (
+      <ScrollView
+        style={styles.mainContainer}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {paddingTop: getScreenHeight(2)},
+        ]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
+        <View style={styles.mainContainerTwo}>
+          <View style={styles.taxCheckContainer}>
+            <View style={{flexDirection: 'row', gap: 5, marginBottom: 16}}>
+              <Typography
+                text="Description"
+                variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+                customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+              />
+              <InfoIcon />
+            </View>
+
+            <View style={styles.toolbar}>
+              <Badge
+                text="Paragraph"
+                variant={BadgeVariant.FILLED}
+                rightIcon={ArrowDownIcon}
+                onPress={e => {
+                  e.stopPropagation();
+                }}
+                textVariant={TypographyVariant.LSMALL_REGULAR}
+                customContainerStyle={styles.containerStyle}
+                customTextColor={ColorPalette.GREY_TEXT_400}
+                iconSize={16}
+              />
+
+              <View style={styles.toolbarIcons}>
+                <TouchableOpacity
+                  onPress={() => toggleTextFormat('bold')}
+                  style={[textFormat.bold && styles.activeFormatButton]}>
+                  <Typography
+                    variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
+                    text="B"
+                    customTextStyles={{
+                      color: textFormat.bold
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400,
+                    }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => toggleTextFormat('italic')}
+                  style={[textFormat.italic && styles.activeFormatButton]}>
+                  <TextSymbolIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textFormat.italic
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => toggleTextFormat('underline')}
+                  style={[textFormat.underline && styles.activeFormatButton]}>
+                  <UnderlineIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textFormat.underline
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <PencilUnderlineIcon style={undefined} size={18} />
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <UnderlineTextIcon style={undefined} size={18} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleAlignmentChange('left')}
+                  style={[
+                    textAlignment === 'left' && styles.activeFormatButton,
+                  ]}>
+                  <AlignTextLeftIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textAlignment === 'left'
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                    strokeWidth={1.5}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleAlignmentChange('center')}
+                  style={[
+                    textAlignment === 'center' && styles.activeFormatButton,
+                  ]}>
+                  <AlignTextCenterIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textAlignment === 'center'
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleAlignmentChange('right')}
+                  style={[
+                    textAlignment === 'right' && styles.activeFormatButton,
+                  ]}>
+                  <AlignTextRightIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textAlignment === 'right'
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                    strokeWidth={1.5}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View
+              style={[
+                styles.textAreaContainer,
+                isEditing && styles.textAreaContainerFocused,
+              ]}>
+              <TextInput
                 style={[
-                  textAlignment === 'center' && styles.activeFormatButton,
-                ]}>
-                <AlignTextCenterIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textAlignment === 'center'
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleAlignmentChange('right')}
-                style={[
-                  textAlignment === 'right' && styles.activeFormatButton,
-                ]}>
-                <AlignTextRightIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textAlignment === 'right'
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                  strokeWidth={1.5}
-                />
-              </TouchableOpacity>
+                  styles.textArea,
+                  {textAlign: textAlignment},
+                  textFormat.bold && styles.boldText,
+                  textFormat.italic && styles.italicText,
+                  textFormat.underline && styles.underlineText,
+                ]}
+                placeholder="Enter company description..."
+                placeholderTextColor={ColorPalette.PlaceholderText}
+                multiline={true}
+                numberOfLines={6}
+                textAlignVertical="top"
+                value={localDescription}
+                onChangeText={text => {
+                  setLocalDescription(text);
+                  if (!isEditing) setIsEditing(true);
+                }}
+                onFocus={() => setIsEditing(true)}
+                onBlur={() => {}}
+              />
+            </View>
+
+            <View style={{marginTop: getScreenHeight(2)}}>
+              <Button
+                text="SAVE CHANGES"
+                variant={ButtonVariant.PRIMARY}
+                state={ButtonState.DEFAULT}
+                size={ButtonSize.MEDIUM}
+                onPress={handleSave}
+              />
             </View>
           </View>
-          <View
-            style={[
-              styles.textAreaContainer,
-              isFocused && styles.textAreaContainerFocused,
-            ]}>
-            <TextInput
-              style={[
-                styles.textArea,
-                {textAlign: textAlignment},
-                textFormat.bold && styles.boldText,
-                textFormat.italic && styles.italicText,
-                textFormat.underline && styles.underlineText,
-              ]}
-              placeholder="Enter company description..."
-              placeholderTextColor={ColorPalette.PlaceholderText}
-              multiline={true}
-              numberOfLines={6}
-              textAlignVertical="top"
-              value={companyDescription}
-              onChangeText={setCompanyDescription}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-            />
-          </View>
-
-          {/* Add Save Button */}
-          <View style={{marginTop: getScreenHeight(2)}}>
-            <Button
-              text="SAVE CHANGES"
-              variant={ButtonVariant.PRIMARY}
-              state={ButtonState.DEFAULT}
-              size={ButtonSize.MEDIUM}
-              onPress={handleUpdateDescription}
-            />
-          </View>
         </View>
-      </View>
-    </ScrollView>
-  );
+      </ScrollView>
+    );
+  };
 
   // Logo Tab Component
   const LogoRoute = () => (
@@ -842,170 +888,213 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   );
 
   // Terms & Condition Tab Component
-  const TermsRoute = () => (
-    <ScrollView
-      style={styles.mainContainer}
-      contentContainerStyle={[
-        styles.scrollContent,
-        {paddingTop: getScreenHeight(2)},
-      ]}
-      showsVerticalScrollIndicator={false}>
-      <View style={styles.mainContainerTwo}>
-        <View style={styles.taxCheckContainer}>
-          <View style={{flexDirection: 'row', gap: 5, marginBottom: 16}}>
-            <Typography
-              text="Terms & Condition"
-              variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
-            />
-            <InfoIcon />
-          </View>
-          <View style={styles.toolbar}>
-            <Badge
-              text="Paragraph"
-              variant={BadgeVariant.FILLED}
-              rightIcon={ArrowDownIcon}
-              onPress={e => {
-                e.stopPropagation();
-              }}
-              textVariant={TypographyVariant.LSMALL_REGULAR}
-              customContainerStyle={styles.containerStyle}
-              customTextColor={ColorPalette.GREY_TEXT_400}
-              iconSize={16}
-            />
+  const TermsRoute = () => {
+    const [localTerms, setLocalTerms] = useState('');
+    const [isEditingTerms, setIsEditingTerms] = useState(false);
 
-            <View style={styles.toolbarIcons}>
-              <TouchableOpacity
-                onPress={() => toggleTextFormat('bold')}
-                style={[textFormat.bold && styles.activeFormatButton]}>
-                <Typography
-                  variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
-                  text="B"
-                  customTextStyles={{
-                    color: textFormat.bold
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400,
-                  }}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => toggleTextFormat('italic')}
-                style={[textFormat.italic && styles.activeFormatButton]}>
-                <TextSymbolIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textFormat.italic
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => toggleTextFormat('underline')}
-                style={[textFormat.underline && styles.activeFormatButton]}>
-                <UnderlineIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textFormat.underline
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <PencilUnderlineIcon style={undefined} size={18} />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <UnderlineTextIcon style={undefined} size={18} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleAlignmentChange('left')}
-                style={[textAlignment === 'left' && styles.activeFormatButton]}>
-                <AlignTextLeftIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textAlignment === 'left'
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                  strokeWidth={1.5}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleAlignmentChange('center')}
+    // Initialize local state only once when screen loads
+    React.useEffect(() => {
+      if (termsAndConditions && !isEditingTerms) {
+        setLocalTerms(termsAndConditions);
+      }
+    }, [termsAndConditions]);
+
+    const handleSaveTerms = async () => {
+      if (!userData?.user_id) {
+        Alert.alert('Error', 'User not found. Please login again.');
+        return;
+      }
+
+      try {
+        await dispatch(
+          updateProfile({
+            userId: userData.user_id,
+            profileData: {
+              terms: localTerms,
+            },
+          }),
+        ).unwrap();
+
+        setTermsAndConditions(localTerms);
+        setIsEditingTerms(false);
+        Alert.alert('Success', 'Terms and conditions updated successfully');
+      } catch (error: any) {
+        Alert.alert('Update Failed', error.message || 'Failed to update terms');
+      }
+    };
+
+    return (
+      <ScrollView
+        style={styles.mainContainer}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {paddingTop: getScreenHeight(2)},
+        ]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
+        <View style={styles.mainContainerTwo}>
+          <View style={styles.taxCheckContainer}>
+            <View style={{flexDirection: 'row', gap: 5, marginBottom: 16}}>
+              <Typography
+                text="Terms & Condition"
+                variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+                customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+              />
+              <InfoIcon />
+            </View>
+
+            <View style={styles.toolbar}>
+              <Badge
+                text="Paragraph"
+                variant={BadgeVariant.FILLED}
+                rightIcon={ArrowDownIcon}
+                onPress={e => {
+                  e.stopPropagation();
+                }}
+                textVariant={TypographyVariant.LSMALL_REGULAR}
+                customContainerStyle={styles.containerStyle}
+                customTextColor={ColorPalette.GREY_TEXT_400}
+                iconSize={16}
+              />
+
+              <View style={styles.toolbarIcons}>
+                <TouchableOpacity
+                  onPress={() => toggleTextFormat('bold')}
+                  style={[textFormat.bold && styles.activeFormatButton]}>
+                  <Typography
+                    variant={TypographyVariant.LMEDIUM_EXTRASEMIBOLD}
+                    text="B"
+                    customTextStyles={{
+                      color: textFormat.bold
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400,
+                    }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => toggleTextFormat('italic')}
+                  style={[textFormat.italic && styles.activeFormatButton]}>
+                  <TextSymbolIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textFormat.italic
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => toggleTextFormat('underline')}
+                  style={[textFormat.underline && styles.activeFormatButton]}>
+                  <UnderlineIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textFormat.underline
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <PencilUnderlineIcon style={undefined} size={18} />
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <UnderlineTextIcon style={undefined} size={18} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleAlignmentChange('left')}
+                  style={[
+                    textAlignment === 'left' && styles.activeFormatButton,
+                  ]}>
+                  <AlignTextLeftIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textAlignment === 'left'
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                    strokeWidth={1.5}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleAlignmentChange('center')}
+                  style={[
+                    textAlignment === 'center' && styles.activeFormatButton,
+                  ]}>
+                  <AlignTextCenterIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textAlignment === 'center'
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleAlignmentChange('right')}
+                  style={[
+                    textAlignment === 'right' && styles.activeFormatButton,
+                  ]}>
+                  <AlignTextRightIcon
+                    style={undefined}
+                    size={18}
+                    color={
+                      textAlignment === 'right'
+                        ? ColorPalette.Primary
+                        : ColorPalette.GREY_TEXT_400
+                    }
+                    strokeWidth={1.5}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View
+              style={[
+                styles.textAreaContainer,
+                isEditingTerms && styles.textAreaContainerFocused,
+              ]}>
+              <TextInput
                 style={[
-                  textAlignment === 'center' && styles.activeFormatButton,
-                ]}>
-                <AlignTextCenterIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textAlignment === 'center'
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleAlignmentChange('right')}
-                style={[
-                  textAlignment === 'right' && styles.activeFormatButton,
-                ]}>
-                <AlignTextRightIcon
-                  style={undefined}
-                  size={18}
-                  color={
-                    textAlignment === 'right'
-                      ? ColorPalette.Primary
-                      : ColorPalette.GREY_TEXT_400
-                  }
-                  strokeWidth={1.5}
-                />
-              </TouchableOpacity>
+                  styles.textArea,
+                  {textAlign: textAlignment},
+                  textFormat.bold && styles.boldText,
+                  textFormat.italic && styles.italicText,
+                  textFormat.underline && styles.underlineText,
+                ]}
+                placeholder="Enter terms and conditions..."
+                placeholderTextColor={ColorPalette.PlaceholderText}
+                multiline={true}
+                numberOfLines={6}
+                textAlignVertical="top"
+                value={localTerms}
+                onChangeText={text => {
+                  setLocalTerms(text);
+                  if (!isEditingTerms) setIsEditingTerms(true);
+                }}
+                onFocus={() => setIsEditingTerms(true)}
+                onBlur={() => {}}
+              />
+            </View>
+
+            <View style={{marginTop: getScreenHeight(2)}}>
+              <Button
+                text="SAVE CHANGES"
+                variant={ButtonVariant.PRIMARY}
+                state={ButtonState.DEFAULT}
+                size={ButtonSize.MEDIUM}
+                onPress={handleSaveTerms}
+              />
             </View>
           </View>
-          <View
-            style={[
-              styles.textAreaContainer,
-              isFocused && styles.textAreaContainerFocused,
-            ]}>
-            <TextInput
-              style={[
-                styles.textArea,
-                {textAlign: textAlignment},
-                textFormat.bold && styles.boldText,
-                textFormat.italic && styles.italicText,
-                textFormat.underline && styles.underlineText,
-              ]}
-              placeholder="Enter terms and conditions..."
-              placeholderTextColor={ColorPalette.PlaceholderText}
-              multiline={true}
-              numberOfLines={6}
-              textAlignVertical="top"
-              value={termsAndConditions}
-              onChangeText={setTermsAndConditions}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-            />
-          </View>
-
-          {/* Add Save Button */}
-          <View style={{marginTop: getScreenHeight(2)}}>
-            <Button
-              text="SAVE CHANGES"
-              variant={ButtonVariant.PRIMARY}
-              state={ButtonState.DEFAULT}
-              size={ButtonSize.MEDIUM}
-              onPress={handleUpdateTerms}
-            />
-          </View>
         </View>
-      </View>
-    </ScrollView>
-  );
+      </ScrollView>
+    );
+  };
 
   const renderScene = SceneMap({
     general: GeneralRoute,
