@@ -76,17 +76,17 @@ const extractUserProfile = (
           case 'terms':
             userProfile.terms = field.value;
             break;
-          // NEW: Extract bank details
-          case 'accountholder_full_name':
+          // Bank details - using correct field names from API
+          case 'fields_53': // Account Holder Full Name
             userProfile.accountholder_full_name = field.value;
             break;
-          case 'bank_name':
+          case 'fields_57': // Bank Name
             userProfile.bank_name = field.value;
             break;
-          case 'iban':
+          case 'fields_54': // IBAN
             userProfile.iban = field.value;
             break;
-          case 'bic':
+          case 'fields_56': // BIC
             userProfile.bic = field.value;
             break;
         }

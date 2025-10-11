@@ -1096,71 +1096,96 @@ export const updateProfileApi = async (
 ): Promise<ProfileUpdateResponse> => {
   try {
     console.log('🔄 Updating profile for userId:', userId);
-    console.log('📝 New data:', profileData);
-    console.log('📋 Current data:', currentProfileData);
+    console.log('📝 New data to update:', profileData);
+    console.log('📋 Current profile data:', currentProfileData);
 
     const userData: any = {};
     const companyData: any = {};
 
-    // Populate with existing data first
+    // Helper function to check if a value is provided in the update
+    const isUpdating = (key: keyof UserProfile) =>
+      profileData.hasOwnProperty(key);
+
+    // Populate with existing data ONLY for fields NOT being updated
     if (currentProfileData) {
       // User data fields
-      if (currentProfileData.email !== undefined) {
+      if (!isUpdating('email') && currentProfileData.email !== undefined) {
         userData.email = currentProfileData.email;
       }
-      if (currentProfileData.firstname !== undefined) {
+      if (
+        !isUpdating('firstname') &&
+        currentProfileData.firstname !== undefined
+      ) {
         userData.firstname = currentProfileData.firstname;
       }
-      if (currentProfileData.lastname !== undefined) {
+      if (
+        !isUpdating('lastname') &&
+        currentProfileData.lastname !== undefined
+      ) {
         userData.lastname = currentProfileData.lastname;
       }
-      if (currentProfileData.phone !== undefined) {
+      if (!isUpdating('phone') && currentProfileData.phone !== undefined) {
         userData.phone = currentProfileData.phone;
-      }
-      // NEW: Bank details
-      if (currentProfileData.accountholder_full_name !== undefined) {
-        userData.accountholder_full_name =
-          currentProfileData.accountholder_full_name;
-      }
-      if (currentProfileData.bank_name !== undefined) {
-        userData.bank_name = currentProfileData.bank_name;
-      }
-      if (currentProfileData.iban !== undefined) {
-        userData.iban = currentProfileData.iban;
-      }
-      if (currentProfileData.bic !== undefined) {
-        userData.bic = currentProfileData.bic;
       }
 
       // Company data fields
-      if (currentProfileData.company !== undefined) {
+      if (!isUpdating('company') && currentProfileData.company !== undefined) {
         companyData.company = currentProfileData.company;
       }
-      if (currentProfileData.vat_number !== undefined) {
+      if (
+        !isUpdating('vat_number') &&
+        currentProfileData.vat_number !== undefined
+      ) {
         companyData.fields_52 = currentProfileData.vat_number;
       }
-      if (currentProfileData.address !== undefined) {
+      if (!isUpdating('address') && currentProfileData.address !== undefined) {
         companyData.address = currentProfileData.address;
       }
-      if (currentProfileData.city !== undefined) {
+      if (!isUpdating('city') && currentProfileData.city !== undefined) {
         companyData.city = currentProfileData.city;
       }
-      if (currentProfileData.postal_code !== undefined) {
+      if (
+        !isUpdating('postal_code') &&
+        currentProfileData.postal_code !== undefined
+      ) {
         companyData.postal_code = currentProfileData.postal_code;
       }
-      if (currentProfileData.country !== undefined) {
+      if (!isUpdating('country') && currentProfileData.country !== undefined) {
         companyData.country = currentProfileData.country;
       }
-      if (currentProfileData.company_description !== undefined) {
+      if (
+        !isUpdating('company_description') &&
+        currentProfileData.company_description !== undefined
+      ) {
         companyData.company_description =
           currentProfileData.company_description;
       }
-      if (currentProfileData.terms !== undefined) {
+      if (!isUpdating('terms') && currentProfileData.terms !== undefined) {
         companyData.terms = currentProfileData.terms;
+      }
+
+      // Bank details - ONLY include if NOT being updated
+      if (
+        !isUpdating('accountholder_full_name') &&
+        currentProfileData.accountholder_full_name !== undefined
+      ) {
+        companyData.fields_53 = currentProfileData.accountholder_full_name;
+      }
+      if (
+        !isUpdating('bank_name') &&
+        currentProfileData.bank_name !== undefined
+      ) {
+        companyData.fields_57 = currentProfileData.bank_name;
+      }
+      if (!isUpdating('iban') && currentProfileData.iban !== undefined) {
+        companyData.fields_54 = currentProfileData.iban;
+      }
+      if (!isUpdating('bic') && currentProfileData.bic !== undefined) {
+        companyData.fields_56 = currentProfileData.bic;
       }
     }
 
-    // Override with new values
+    // NOW apply the new values (these will override any existing values)
     // User data
     if (profileData.email !== undefined) {
       userData.email = profileData.email;
@@ -1173,19 +1198,6 @@ export const updateProfileApi = async (
     }
     if (profileData.phone !== undefined) {
       userData.phone = profileData.phone;
-    }
-    // NEW: Bank details updates
-    if (profileData.accountholder_full_name !== undefined) {
-      userData.accountholder_full_name = profileData.accountholder_full_name;
-    }
-    if (profileData.bank_name !== undefined) {
-      userData.bank_name = profileData.bank_name;
-    }
-    if (profileData.iban !== undefined) {
-      userData.iban = profileData.iban;
-    }
-    if (profileData.bic !== undefined) {
-      userData.bic = profileData.bic;
     }
 
     // Company data
@@ -1214,13 +1226,37 @@ export const updateProfileApi = async (
       companyData.terms = profileData.terms;
     }
 
+    // Bank details updates - MAP to correct field names
+    if (profileData.accountholder_full_name !== undefined) {
+      companyData.fields_53 = profileData.accountholder_full_name;
+      console.log(
+        '✅ Updating fields_53 (Account Holder) to:',
+        profileData.accountholder_full_name,
+      );
+    }
+    if (profileData.bank_name !== undefined) {
+      companyData.fields_57 = profileData.bank_name;
+      console.log(
+        '✅ Updating fields_57 (Bank Name) to:',
+        profileData.bank_name,
+      );
+    }
+    if (profileData.iban !== undefined) {
+      companyData.fields_54 = profileData.iban;
+      console.log('✅ Updating fields_54 (IBAN) to:', profileData.iban);
+    }
+    if (profileData.bic !== undefined) {
+      companyData.fields_56 = profileData.bic;
+      console.log('✅ Updating fields_56 (BIC) to:', profileData.bic);
+    }
+
     const requestBody = {
       user_id: parseInt(userId),
       user_data: userData,
       company_data: companyData,
     };
 
-    console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
+    console.log('📤 Final request body:', JSON.stringify(requestBody, null, 2));
 
     const response = await axios({
       method: 'POST',

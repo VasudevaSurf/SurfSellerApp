@@ -1,4 +1,4 @@
-// Update src/screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BankDetailsPages/BankDetails.tsx
+// src/screens/DashBoardScreens/AccountScreen/AccountOptionScreens/BankDetailsPages/BankDetails.tsx
 
 import {useFocusEffect, useRoute} from '@react-navigation/native';
 import React, {useState, useEffect} from 'react';
@@ -41,6 +41,7 @@ const BankDetails = () => {
   // Fetch profile data when component mounts
   useFocusEffect(
     React.useCallback(() => {
+      console.log('🔄 BankDetails - Fetching profile data');
       if (userData?.user_id) {
         dispatch(fetchProfile(userData.user_id));
       }
@@ -50,6 +51,7 @@ const BankDetails = () => {
   // Helper function to get field value from raw profile data
   const getFieldValue = (fieldName: string): string => {
     if (!rawProfileData?.sections) {
+      console.warn('⚠️ No rawProfileData sections available');
       return '';
     }
 
@@ -57,10 +59,13 @@ const BankDetails = () => {
       for (const block of section.blocks) {
         const field = block.fields.find(f => f.field_name === fieldName);
         if (field) {
+          console.log(`✅ Found ${fieldName}:`, field.value || '(empty)');
           return field.value || '';
         }
       }
     }
+
+    console.warn(`⚠️ Field not found: ${fieldName}`);
     return '';
   };
 
@@ -69,10 +74,11 @@ const BankDetails = () => {
     if (rawProfileData) {
       console.log('📊 Bank details - Profile data updated');
 
-      const holderName = getFieldValue('accountholder_full_name');
-      const iban = getFieldValue('iban');
-      const bic = getFieldValue('bic');
-      const bank = getFieldValue('bank_name');
+      // Use the CORRECT field names from the API
+      const holderName = getFieldValue('fields_53'); // Account Holder Full Name
+      const iban = getFieldValue('fields_54'); // IBAN
+      const bic = getFieldValue('fields_56'); // BIC
+      const bank = getFieldValue('fields_57'); // Bank Name
 
       console.log('💳 Extracted bank details:', {
         holderName,

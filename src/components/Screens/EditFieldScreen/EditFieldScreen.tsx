@@ -113,6 +113,31 @@ const submitFormAction = async (
           terms: values,
         };
         break;
+      // ✅ ADD THESE BANK DETAILS CASES
+      case 'updateAccountName':
+        profileData = {
+          accountholder_full_name: values, // This will be mapped to fields_53 in the API service
+        };
+        console.log('📝 Updating account holder name to:', values);
+        break;
+      case 'updateBankName':
+        profileData = {
+          bank_name: values, // This will be mapped to fields_57 in the API service
+        };
+        console.log('📝 Updating bank name to:', values);
+        break;
+      case 'updateIBAN':
+        profileData = {
+          iban: values, // This will be mapped to fields_54 in the API service
+        };
+        console.log('📝 Updating IBAN to:', values);
+        break;
+      case 'updateBicCode':
+        profileData = {
+          bic: values, // This will be mapped to fields_56 in the API service
+        };
+        console.log('📝 Updating BIC code to:', values);
+        break;
       default:
         console.warn(`Unhandled action type: ${actionType}`);
         return false;
