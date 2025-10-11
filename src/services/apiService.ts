@@ -314,6 +314,18 @@ export interface UserProfile {
   bic?: string;
 }
 
+export interface ProfileLogoField {
+  name: string;
+  field_name: string;
+  main_object: string;
+  field_type: string;
+  field_type_desc: string;
+  field_disabled: boolean;
+  logos: LogoData;
+  required: boolean;
+  variants: any;
+}
+
 export interface LogoImage {
   logo_id: string;
   layout_id: string;
@@ -327,18 +339,6 @@ export interface LogoImage {
 export interface LogoData {
   theme?: LogoImage;
   mail?: LogoImage;
-}
-
-export interface ProfileLogoField {
-  name: string;
-  field_name: string;
-  main_object: string;
-  field_type: string;
-  field_type_desc: string;
-  field_disabled: boolean;
-  logos: LogoData;
-  required: boolean;
-  variants: any;
 }
 
 export interface LogoUploadResponse {
@@ -583,22 +583,42 @@ export const uploadCompanyLogoApi = async (
   logoType: 'theme' | 'mail' = 'theme',
 ): Promise<LogoUploadResponse> => {
   try {
-    console.log('📤 Uploading company logo:', {userId, logoType});
+    console.log('📤 Uploading company logo:', {userId, logoType, logoUri});
 
     const formData = new FormData();
 
-    // Add the logo file
+    // Get the file name and type
+    const uriParts = logoUri.split('/');
+    const fileName =
+      uriParts[uriParts.length - 1] || `logo_${logoType}_${Date.now()}.jpg`;
+
+    // Determine mime type from file extension
+    let mimeType = 'image/jpeg';
+    if (fileName.toLowerCase().endsWith('.png')) {
+      mimeType = 'image/png';
+    } else if (
+      fileName.toLowerCase().endsWith('.jpg') ||
+      fileName.toLowerCase().endsWith('.jpeg')
+    ) {
+      mimeType = 'image/jpeg';
+    }
+
+    console.log('📋 File details:', {fileName, mimeType, logoType});
+
+    // CRITICAL: Add the file with correct format
     formData.append(`file_logotypes_image_icon[${logoType}]`, {
       uri: logoUri,
-      type: 'image/png',
-      name: `logo_${logoType}_${Date.now()}.png`,
+      type: mimeType,
+      name: fileName,
     } as any);
 
-    // Add required parameters
+    // Add the metadata fields exactly as shown in the working curl
     formData.append(`type_logotypes_image_icon[${logoType}]`, 'local');
     formData.append(`is_high_res_logotypes_image_icon[${logoType}]`, '');
     formData.append('user_id', userId);
     formData.append('logo_update', '1');
+
+    // Add the logotypes_image_data fields
     formData.append(`logotypes_image_data[${logoType}][type]`, 'M');
     formData.append(`logotypes_image_data[${logoType}][object_id]`, userId);
     formData.append(
@@ -606,12 +626,23 @@ export const uploadCompanyLogoApi = async (
       logoType === 'theme' ? 'Company Logo' : 'Invoice Logo',
     );
 
+    console.log('📦 FormData prepared with fields:', {
+      file: `file_logotypes_image_icon[${logoType}]`,
+      type: `type_logotypes_image_icon[${logoType}]`,
+      user_id: userId,
+      logo_update: '1',
+      data_type: 'M',
+      data_object_id: userId,
+      data_image_alt: logoType === 'theme' ? 'Company Logo' : 'Invoice Logo',
+    });
+
     const response = await fetch(
       'https://dev.surf.mt/api.php?_d=NtSeProfilesApi',
       {
         method: 'POST',
         headers: {
           Authorization: API_AUTH_HEADER,
+          // DO NOT set Content-Type - let FormData set it with boundary
         },
         body: formData,
       },
@@ -620,12 +651,12 @@ export const uploadCompanyLogoApi = async (
     const responseText = await response.text();
     console.log('📥 Logo upload response:', {
       status: response.status,
-      responseText: responseText.substring(0, 200),
+      responseText: responseText.substring(0, 500),
     });
 
     if (!response.ok) {
+      console.error('❌ Upload failed with status:', response.status);
       return {
-        success: false,
         result: false,
         message: `HTTP ${response.status}: Failed to upload logo`,
       };
@@ -633,12 +664,28 @@ export const uploadCompanyLogoApi = async (
 
     try {
       const responseData = JSON.parse(responseText);
-      return {
-        result: responseData.result || true,
-        message: responseData.message || 'Logo uploaded successfully',
-        logo_data: responseData.logo_data,
-      };
+
+      console.log('📊 Parsed response:', responseData);
+
+      if (responseData.result) {
+        console.log('✅ Logo uploaded successfully');
+
+        return {
+          result: true,
+          message: responseData.message || 'Logo uploaded successfully',
+          logo_data: responseData.logo_data,
+        };
+      } else {
+        console.error('❌ API returned result: false');
+        return {
+          result: false,
+          message: responseData.message || 'Logo upload failed',
+        };
+      }
     } catch (parseError) {
+      console.error('❌ Error parsing response:', parseError);
+
+      // If we got 200 status but can't parse, assume success
       if (response.status === 200) {
         return {
           result: true,
@@ -649,10 +696,12 @@ export const uploadCompanyLogoApi = async (
     }
   } catch (error: any) {
     console.error('❌ Upload logo error:', error);
+    console.error('Error stack:', error.stack);
     throw new Error(error.message || 'Failed to upload logo');
   }
 };
 
+// Update the getProfileLogosApi to extract image URLs correctly
 export const getProfileLogosApi = async (
   userId: string,
 ): Promise<LogoData | null> => {
@@ -671,6 +720,17 @@ export const getProfileLogosApi = async (
 
       if (logoField && logoField.logos) {
         console.log('✅ Found logos:', logoField.logos);
+
+        // Log the complete structure to debug
+        console.log(
+          '🔍 Theme logo structure:',
+          JSON.stringify(logoField.logos.theme, null, 2),
+        );
+        console.log(
+          '🔍 Mail logo structure:',
+          JSON.stringify(logoField.logos.mail, null, 2),
+        );
+
         return logoField.logos as LogoData;
       }
     }

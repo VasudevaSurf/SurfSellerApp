@@ -5,29 +5,39 @@ import {
   ProfileResponse,
   UserProfile,
   ProfileUpdateResponse,
+  LogoUploadResponse,
+  LogoData,
+  getProfileLogosApi,
+  uploadCompanyLogoApi,
 } from '../../services/apiService';
 import {RootState} from '../store';
 
 export interface ProfileState {
   profileData: UserProfile | null;
   rawProfileData: ProfileResponse | null;
+  logos: LogoData | null; // Add this
   loading: boolean;
   error: string | null;
   updating: boolean;
   updateError: string | null;
   updateSuccess: boolean;
   lastUpdated: number | null;
+  uploadingLogo: boolean; // Add this
+  logoUploadError: string | null; // Add this
 }
 
 const initialState: ProfileState = {
   profileData: null,
   rawProfileData: null,
+  logos: null, // Add this
   loading: false,
   error: null,
   updating: false,
   updateError: null,
   updateSuccess: false,
   lastUpdated: null,
+  uploadingLogo: false, // Add this
+  logoUploadError: null, // Add this
 };
 
 // Replace the helper function to extract user profile
@@ -145,6 +155,49 @@ export const updateProfile = createAsyncThunk(
   },
 );
 
+export const uploadCompanyLogo = createAsyncThunk(
+  'profile/uploadLogo',
+  async (
+    {
+      userId,
+      logoUri,
+      logoType,
+    }: {
+      userId: string;
+      logoUri: string;
+      logoType: 'theme' | 'mail';
+    },
+    {rejectWithValue},
+  ) => {
+    try {
+      console.log('Uploading logo:', {userId, logoType});
+      const response = await uploadCompanyLogoApi(userId, logoUri, logoType);
+
+      // Fetch updated logos after upload
+      const logos = await getProfileLogosApi(userId);
+
+      return {response, logos, logoType};
+    } catch (error: any) {
+      console.error('Upload logo error:', error);
+      return rejectWithValue(error.message || 'Failed to upload logo');
+    }
+  },
+);
+
+export const fetchProfileLogos = createAsyncThunk(
+  'profile/fetchLogos',
+  async (userId: string, {rejectWithValue}) => {
+    try {
+      console.log('Fetching logos for userId:', userId);
+      const logos = await getProfileLogosApi(userId);
+      return logos;
+    } catch (error: any) {
+      console.error('Fetch logos error:', error);
+      return rejectWithValue(error.message || 'Failed to fetch logos');
+    }
+  },
+);
+
 const profileSlice = createSlice({
   name: 'profile',
   initialState,
@@ -152,6 +205,7 @@ const profileSlice = createSlice({
     clearProfileError: state => {
       state.error = null;
       state.updateError = null;
+      state.logoUploadError = null; // Add this
     },
     clearUpdateSuccess: state => {
       state.updateSuccess = false;
@@ -175,44 +229,33 @@ const profileSlice = createSlice({
     builder
       // Fetch Profile
       .addCase(fetchProfile.pending, state => {
-        console.log('fetchProfile.pending');
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
-        console.log('fetchProfile.fulfilled with data:', action.payload);
         state.loading = false;
         state.rawProfileData = action.payload;
         state.profileData = extractUserProfile(action.payload.sections);
         state.error = null;
         state.lastUpdated = Date.now();
-        console.log('Extracted profile data:', state.profileData);
       })
       .addCase(fetchProfile.rejected, (state, action) => {
-        console.log('fetchProfile.rejected with error:', action.payload);
         state.loading = false;
         state.error = action.payload as string;
       })
       // Update Profile
       .addCase(updateProfile.pending, state => {
-        console.log('updateProfile.pending');
         state.updating = true;
         state.updateError = null;
         state.updateSuccess = false;
       })
-      // In the updateProfile.fulfilled case
       .addCase(updateProfile.fulfilled, (state, action) => {
-        console.log('updateProfile.fulfilled with data:', action.payload);
         state.updating = false;
-
-        // Check if response is valid
         if (
           action.payload.response &&
           typeof action.payload.response === 'object'
         ) {
-          // Only update if we got a proper response
           if (action.payload.response.result === true) {
-            // Immediately update local profile data
             if (state.profileData) {
               state.profileData = {
                 ...state.profileData,
@@ -224,15 +267,33 @@ const profileSlice = createSlice({
             state.updateSuccess = true;
           }
         }
-
         state.updateError = null;
         state.lastUpdated = Date.now();
       })
       .addCase(updateProfile.rejected, (state, action) => {
-        console.log('updateProfile.rejected with error:', action.payload);
         state.updating = false;
         state.updateError = action.payload as string;
         state.updateSuccess = false;
+      })
+      // Upload Logo
+      .addCase(uploadCompanyLogo.pending, state => {
+        state.uploadingLogo = true;
+        state.logoUploadError = null;
+      })
+      .addCase(uploadCompanyLogo.fulfilled, (state, action) => {
+        state.uploadingLogo = false;
+        if (action.payload.logos) {
+          state.logos = action.payload.logos;
+        }
+        state.logoUploadError = null;
+      })
+      .addCase(uploadCompanyLogo.rejected, (state, action) => {
+        state.uploadingLogo = false;
+        state.logoUploadError = action.payload as string;
+      })
+      // Fetch Logos
+      .addCase(fetchProfileLogos.fulfilled, (state, action) => {
+        state.logos = action.payload;
       });
   },
 });
