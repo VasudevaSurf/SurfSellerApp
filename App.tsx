@@ -4,13 +4,14 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Provider} from 'react-redux';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {StatusBar} from 'react-native'; // ✅ Fixed import
+import Toast from 'react-native-toast-message';
+
 import store from './src/redux/store';
 import {RootNavigator} from './src/navigation/RootNavigator';
 import {navigationRef} from './src/navigation/utils/navigationRef';
-import Toast from 'react-native-toast-message';
-
 import {ToastComponent} from './src/components/MainComponents/Toast/ToastComponent';
-import {StatusBar} from 'react-native/Libraries/Components/StatusBar/StatusBar';
+
 const toastConfig = {
   success: (props: any) => <ToastComponent {...props} />,
   error: (props: any) => <ToastComponent {...props} />,

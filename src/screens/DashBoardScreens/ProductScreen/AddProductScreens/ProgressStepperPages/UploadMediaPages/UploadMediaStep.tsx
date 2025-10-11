@@ -126,86 +126,82 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   }, [editMode, formData.images]);
 
   const handleDelete = async (fileId: string) => {
-  const fileToDelete = files.find(file => file.id === fileId);
-  if (!fileToDelete) {
-    console.error('File to delete not found');
-    return;
-  }
+    const fileToDelete = files.find(file => file.id === fileId);
+    if (!fileToDelete) {
+      console.error('File to delete not found');
+      return;
+    }
 
-  Alert.alert('Delete File', 'Are you sure you want to delete this file?', [
-    {
-      text: 'Cancel',
-      style: 'cancel',
-    },
-    {
-      text: 'Delete',
-      onPress: async () => {
-        console.log('🗑️ Removing file from form:', fileToDelete);
+    Alert.alert('Delete File', 'Are you sure you want to delete this file?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        onPress: async () => {
+          console.log('🗑️ Removing file from form:', fileToDelete);
 
-        // ✅ IMMEDIATE UI UPDATE - Remove from files list
-        const updatedFiles = files.filter(file => file.id !== fileId);
-        setFiles(updatedFiles);
+          // ✅ IMMEDIATE UI UPDATE - Remove from files list
+          const updatedFiles = files.filter(file => file.id !== fileId);
+          setFiles(updatedFiles);
 
-        // ✅ Update form data - remove the deleted image
-        const updatedImages = formData.images.filter((img: string) => {
-          if (fileToDelete.isExisting) {
-            // Remove by comparing URLs
-            return (
-              img !== fileToDelete.originalUrl && 
-              img !== fileToDelete.viewUrl
-            );
-          } else {
-            // Remove by comparing URI or view URL
-            return (
-              img !== fileToDelete.uri && 
-              img !== fileToDelete.viewUrl
+          // ✅ Update form data - remove the deleted image
+          const updatedImages = formData.images.filter((img: string) => {
+            if (fileToDelete.isExisting) {
+              // Remove by comparing URLs
+              return (
+                img !== fileToDelete.originalUrl && img !== fileToDelete.viewUrl
+              );
+            } else {
+              // Remove by comparing URI or view URL
+              return img !== fileToDelete.uri && img !== fileToDelete.viewUrl;
+            }
+          });
+
+          // ✅ Update relative paths
+          let updatedRelativePaths = formData.imageRelativePaths || [];
+
+          // For existing images, remove from relative paths
+          if (fileToDelete.relativePath) {
+            updatedRelativePaths = updatedRelativePaths.filter(
+              (path: string) => path !== fileToDelete.relativePath,
             );
           }
-        });
 
-        // ✅ Update relative paths
-        let updatedRelativePaths = formData.imageRelativePaths || [];
-        
-        // For existing images, remove from relative paths
-        if (fileToDelete.relativePath) {
-          updatedRelativePaths = updatedRelativePaths.filter(
-            (path: string) => path !== fileToDelete.relativePath,
+          console.log('📸 Form data after deletion:', {
+            before: {
+              images: formData.images?.length || 0,
+              relativePaths: formData.imageRelativePaths?.length || 0,
+            },
+            after: {
+              images: updatedImages.length,
+              relativePaths: updatedRelativePaths.length,
+            },
+            deletedPath: fileToDelete.relativePath,
+          });
+
+          // ✅ Update form data immediately
+          updateFormData({
+            images: updatedImages,
+            imageRelativePaths: updatedRelativePaths,
+          });
+
+          // Show success message
+          showCustomToast(
+            'Image removed successfully!',
+            <SuccessTickSquareIcon size={18} />,
           );
-        }
 
-        console.log('📸 Form data after deletion:', {
-          before: {
-            images: formData.images?.length || 0,
-            relativePaths: formData.imageRelativePaths?.length || 0,
-          },
-          after: {
-            images: updatedImages.length,
-            relativePaths: updatedRelativePaths.length,
-          },
-          deletedPath: fileToDelete.relativePath,
-        });
-
-        // ✅ Update form data immediately
-        updateFormData({
-          images: updatedImages,
-          imageRelativePaths: updatedRelativePaths,
-        });
-
-        // Show success message
-        showCustomToast(
-          "Image removed successfully!",
-          <SuccessTickSquareIcon size={18} />
-        );
-
-        // If no files left, reset to initial state
-        if (updatedFiles.length === 0) {
-          setUploadStatus('initial');
-        }
+          // If no files left, reset to initial state
+          if (updatedFiles.length === 0) {
+            setUploadStatus('initial');
+          }
+        },
+        style: 'destructive',
       },
-      style: 'destructive',
-    },
-  ]);
-};
+    ]);
+  };
 
   const handleOptimize = (fileId: string) => {
     Alert.alert(
@@ -274,8 +270,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             //   'Invalid Image',
             //   validation.error || 'Invalid image selected',
             // );
-            showCustomToast("Oops! Unsupported format!", '❌');
-
+            showCustomToast('Oops! Unsupported format!', '❌');
           }
         }
 
@@ -375,8 +370,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 //   `${uploadResult.uploadedImages.length} image(s) uploaded successfully!`,
                 // );
 
-                showCustomToast("Image(s) uploaded successfully.", '✅');
-
+                showCustomToast('Image(s) uploaded successfully.', '✅');
               } else {
                 const successCount = uploadResult.uploadedImages.length;
                 const errorCount = uploadResult.errors.length;
@@ -384,7 +378,10 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                 //   'Partial Success',
                 //   `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
                 // );
-                showCustomToast(`${successCount} image(s) uploaded successfully, ${errorCount} failed.`, '✅');
+                showCustomToast(
+                  `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
+                  '✅',
+                );
               }
             } else {
               console.error('Upload failed:', uploadResult.errors);
@@ -393,13 +390,13 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               //   'Failed to upload images. Please try again.',
               // );
 
-              showCustomToast("Oops! Upload failed. Try again.", '❌');
+              showCustomToast('Oops! Upload failed. Try again.', '❌');
               setUploadStatus(files.length > 0 ? 'completed' : 'initial');
             }
           } catch (uploadError) {
             console.error('Upload error:', uploadError);
             // Alert.alert('Upload Error', 'Upload failed. Please try again.');
-            showCustomToast("Oops! Upload failed. Try again.", '❌');
+            showCustomToast('Oops! Upload failed. Try again.', '❌');
             setUploadStatus(files.length > 0 ? 'completed' : 'initial');
           }
         }
@@ -407,7 +404,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
     } catch (error: any) {
       console.error('Selection error:', error);
       // Alert.alert('Selection Error', 'Failed to select images');
-      showCustomToast("Failed to select images", '❌');
+      showCustomToast('Failed to select images', '❌');
     } finally {
       setIsUploading(false);
       setCurrentUpload({current: 0, total: 0});
