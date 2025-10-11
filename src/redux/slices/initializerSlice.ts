@@ -3,13 +3,21 @@ import {
   fetchInitializerApi,
   InitializerResponse,
 } from '../../services/apiService';
-import { cleanUrl } from '../../config/regex';
+import {cleanUrl} from '../../config/regex';
 
 export interface InitializerState {
   data: InitializerResponse | null;
   loading: boolean;
   error: string | null;
   lastFetched: number | null;
+}
+
+export interface AppUpdateConfig {
+  is_app_update_required: boolean;
+  android_version: string;
+  ios_version: string;
+  android_url: string;
+  ios_url: string;
 }
 
 const initialState: InitializerState = {
