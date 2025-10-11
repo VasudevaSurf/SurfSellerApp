@@ -1,20 +1,31 @@
-// src/screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PersonalInfo/PersonalInfo.tsx
-
-import {useFocusEffect, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState, useMemo, useRef} from 'react';
-import {SafeAreaView, View} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {TabView, TabBar} from 'react-native-tab-view';
-import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
-import {Header} from '../../../../../components/UserComponents/Header/Header';
-import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
-import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
-import {ColorPalette} from '../../../../../config/colorPalette';
-import {getScreenWidth} from '../../../../../helpers/screenSize';
-import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
+import React, { useEffect, useState, useMemo } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  Image,
+  Alert,
+} from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import ArrowLeftIcon from '../../../../../assets/icons/ArrowLeftIcon';
+import { Header } from '../../../../../components/UserComponents/Header/Header';
+import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
+import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
+import { ColorPalette } from '../../../../../config/colorPalette';
+import {
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../helpers/screenSize';
+import { goBack, navigate } from '../../../../../navigation/utils/navigationRef';
 import {
   fetchProfile,
   fetchProfileLogos,
+  updateProfile,
 } from '../../../../../redux/slices/profileSlice';
 import {RootState, AppDispatch} from '../../../../../redux/store';
 import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
@@ -24,16 +35,75 @@ import GeneralTab from './TabScreens/GeneralTab';
 import DescriptionTab from './TabScreens/DescriptionTab';
 import LogoTab from './TabScreens/LogoTab';
 import TermsTab from './TabScreens/TermsTab';
+import { styles } from './PerosanlInfo.styles';
+import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
+import { Typography } from '../../../../../components/UserComponents/Typography/Typography';
+import Svg, { Circle, Path } from 'react-native-svg';
+import { Spacing } from '../../../../../config/globalStyles';
+import LockIcon from '../../../../../assets/icons/LockIcon';
+import { SlidingBar } from '../../../../../components/MainComponents/SlidingBar/SlidingBar';
+import { SlidingBarOption } from '../../../../../components/MainComponents/SlidingBar/SlidingBar.types';
+import { BadgeVariant } from '../../../../../components/UserComponents/Badges/Badge.types';
+import ArrowDownIcon from '../../../../../assets/icons/ArrowDownIcon';
+import TextSymbolIcon from '../../../../../assets/icons/NewProductIcons/TextSymbolIcon';
+import UnderlineIcon from '../../../../../assets/icons/NewProductIcons/UnderlineIcon';
+import PencilUnderlineIcon from '../../../../../assets/icons/NewProductIcons/PencilUnderlineIcon';
+import UnderlineTextIcon from '../../../../../assets/icons/NewProductIcons/UnderlineTextIcon';
+import AlignTextLeftIcon from '../../../../../assets/icons/NewProductIcons/AlignTextLeftIcon';
+import AlignTextCenterIcon from '../../../../../assets/icons/NewProductIcons/AlignTextCenterIcon';
+import AlignTextRightIcon from '../../../../../assets/icons/NewProductIcons/AlignTextRightIcon';
+import { Badge } from '../../../../../components/UserComponents/Badges/Badge';
+import { containerStyles } from '../CompanyProfilePages/ImageContainer.styles';
+import CloudDownloadIcon from '../../../../../assets/icons/CloudDownloadIcon';
+import {
+  Button,
+  ButtonSize,
+  ButtonState,
+  ButtonVariant,
+} from '../../../../../components/UserComponents/Button';
+import AnimatedLoader from '../../../../../assets/icons/LoaderIcon';
+import InfoIconPay from '../../../../../assets/icons/InfoIconPay';
+import Tooltip from '../../../../../components/MainComponents/Tooltip/Tooltip';
 
 interface PersonalInfoProps {
   editMode?: boolean;
 }
 
-const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
+const InfoIcon = () => (
+  <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <Circle
+      cx="9.99984"
+      cy="9.99996"
+      r="8.33333"
+      stroke="#4A4A4A"
+      strokeWidth="1.5"
+    />
+    <Path
+      d="M9.99325 12.5H10.0007"
+      stroke="#4A4A4A"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M10 10L10 6.66667"
+      stroke="#4A4A4A"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const INITIAL_COUNTRY_CODE = '+356';
+const MALTA_FLAG_URL =
+  'https://cdn.countryflags.com/thumbs/malta/flag-round-250.png';
+
+const PersonalInfo: React.FC<PersonalInfoProps> = ({ editMode = false }) => {
   const route = useRoute();
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const {profileData, loading, error, rawProfileData} = useSelector(
+  const { profileData, loading, error, rawProfileData } = useSelector(
     (state: RootState) => state.profile,
   );
 
@@ -50,18 +120,82 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   const [companyDescription, setCompanyDescription] = useState('');
   const [termsAndConditions, setTermsAndConditions] = useState('');
   const [vatChecked, setVatChecked] = useState(true);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   // Tab state
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    {key: 'general', title: 'General'},
-    {key: 'description', title: 'Description'},
-    {key: 'logo', title: 'Logo'},
-    {key: 'terms', title: 'Terms & Condition'},
+    { key: 'general', title: 'General' },
+    { key: 'description', title: 'Description' },
+    { key: 'logo', title: 'Logo' },
+    { key: 'terms', title: 'Terms & Condition' },
   ]);
 
   // Fetch profile data when component mounts - ONLY ONCE
+  const [countryCode, setCountryCode] = useState(INITIAL_COUNTRY_CODE);
+  const [textAlignment, setTextAlignment] = useState<
+    'left' | 'center' | 'right'
+  >('left');
+  const [textFormat, setTextFormat] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+  });
+
+  const statusOptions = [
+    { id: 'yes', label: 'Yes' },
+    { id: 'no', label: 'No' },
+  ];
+  const [selectedOption, setSelectedOption] = useState(statusOptions[0]);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
+  const handleUpdateDescription = async () => {
+    if (!userData?.user_id) {
+      Alert.alert('Error', 'User not found. Please login again.');
+      return;
+    }
+
+    try {
+      await dispatch(
+        updateProfile({
+          userId: userData.user_id,
+          profileData: {
+            company_description: companyDescription,
+          },
+        }),
+      ).unwrap();
+
+      Alert.alert('Success', 'Company description updated successfully');
+    } catch (error: any) {
+      Alert.alert(
+        'Update Failed',
+        error.message || 'Failed to update description',
+      );
+    }
+  };
+
+  const handleUpdateTerms = async () => {
+    if (!userData?.user_id) {
+      Alert.alert('Error', 'User not found. Please login again.');
+      return;
+    }
+
+    try {
+      await dispatch(
+        updateProfile({
+          userId: userData.user_id,
+          profileData: {
+            terms: termsAndConditions,
+          },
+        }),
+      ).unwrap();
+
+      Alert.alert('Success', 'Terms and conditions updated successfully');
+    } catch (error: any) {
+      Alert.alert('Update Failed', error.message || 'Failed to update terms');
+    }
+  };
+
+  // Fetch profile data when component mounts
   useFocusEffect(
     React.useCallback(() => {
       console.log('🔄 PersonalInfo focused');
@@ -301,7 +435,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
 
   if (loading && !rawProfileData) {
     return (
-      <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
         <Header
           name="Business Profile"
           variant={TypographyVariant.H6_BOLD}
@@ -313,7 +447,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
               onPress: () => {
                 navigate('Dashboard', {
                   screen: 'Account',
-                  params: {screen: 'FAQScreen'},
+                  params: { screen: 'FAQScreen' },
                 });
               },
               size: 24,
@@ -322,11 +456,15 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
             },
           ]}
         />
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <AnimatedLoader size={52} />
           <Typography
-            text="Loading profile..."
-            variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
+            text="Loading"
+            variant={TypographyVariant.PSMALL_MEDIUM}
+            customTextStyles={{
+              color: ColorPalette.PRIMARY_GRADIENT_SELLER.colors[0],
+              marginTop: getScreenHeight(1),
+            }}
           />
         </View>
       </SafeAreaView>
@@ -334,7 +472,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
   }
 
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Header
         name="Business Profile"
         variant={TypographyVariant.H6_BOLD}
@@ -346,7 +484,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'FAQScreen'},
+                params: { screen: 'FAQScreen' },
               });
             },
             size: 24,
@@ -356,12 +494,12 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({editMode = false}) => {
         ]}
       />
       <TabView
-        navigationState={{index, routes}}
+        navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
-        initialLayout={{width: getScreenWidth(100)}}
+        initialLayout={{ width: getScreenWidth(100) }}
         renderTabBar={renderTabBar}
-        style={{flex: 1}}
+        style={{ flex: 1 }}
       />
     </SafeAreaView>
   );

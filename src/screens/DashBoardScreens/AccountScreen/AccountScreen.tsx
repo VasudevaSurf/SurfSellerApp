@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Image, ScrollView, Share, View } from 'react-native';
+import { Image, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
@@ -36,14 +36,8 @@ import PrivacyPolicyIcon from '../../../assets/icons/PrivacyPolicyIcon';
 import ShareAppIcon from '../../../assets/icons/ShareAppIcon';
 import ChatIcon from '../../../assets/icons/ChatIcon';
 import LogoutIcon from '../../../assets/icons/LogOutIcon';
-import {TrashIcon2} from '../../../assets/icons/NewProductIcons/TrashIcon2';
-import BusinessAdministrators from './AccountOptionScreens/BusinessAdministratorsScreens/BusinessAdministrators';
-import EditAdministrator from './AccountOptionScreens/BusinessAdministratorsScreens/EditAdministrator';
+import { TrashIcon2 } from '../../../assets/icons/NewProductIcons/TrashIcon2';
 import TermsConditionsIcon from '../../../assets/icons/TermsAndConditionIcon';
-import Toast from 'react-native-toast-message';
-import { showCustomToast } from '../../../components/MainComponents/Toast/ToastComponent';
-import SuccessTickIcon from '../../../assets/icons/SuccessTickIcon';
-import SuccessTickSquareIcon from '../../../assets/icons/ToastIcons/SuccessTick';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -206,7 +200,7 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'BusinessAdministrators'},
+                params: { screen: 'BusinessAdministrators' },
               }),
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {

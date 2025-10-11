@@ -335,10 +335,7 @@ const AddProduct = () => {
         //   'Images Not Uploaded',
         //   'Please wait for images to finish uploading before saving the product.',
         // );
-        showCustomToast(
-          'Oops! Upload failed. Try again.',
-          <SuccessTickSquareIcon size={18} />,
-        );
+        showCustomToast("Oops! Upload failed. Try again.", '❌');
 
         return;
       }
@@ -346,10 +343,7 @@ const AddProduct = () => {
 
     if (!userId) {
       // Alert.alert('Error', 'User session expired. Please login again.');
-      showCustomToast(
-        'Session expired. Please login again.',
-        <SuccessTickSquareIcon size={18} />,
-      );
+      showCustomToast("Session expired. Please login again.", '❌')
       return;
     }
 
@@ -402,7 +396,9 @@ const AddProduct = () => {
         ? 'Product details updated successfully.'
         : 'Product added successfully.';
 
-      showCustomToast(successMessage, <SuccessTickSquareIcon size={18} />);
+      showCustomToast(successMessage, '✅');
+
+
     } catch (error: any) {
       console.error('💥 Error saving product:', error);
 
@@ -421,10 +417,11 @@ const AddProduct = () => {
       //   ],
       // );
 
-      const erroMessage = `Failed to ${
-        editMode ? 'update' : 'create'
-      } product. Please try again.`;
-      showCustomToast(erroMessage, <SuccessTickSquareIcon size={18} />);
+      const erroMessage =
+        `Failed to ${editMode ? 'update' : 'create'
+        } product. Please try again.`
+      showCustomToast(erroMessage, '❌');
+
     } finally {
       setIsSubmitting(false);
     }

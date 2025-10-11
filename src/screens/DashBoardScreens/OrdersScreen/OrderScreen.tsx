@@ -35,37 +35,35 @@ import {
 } from '../../../redux/slices/ordersSlice';
 import FilterIcon from '../../../assets/icons/FilterIcon';
 import SuccessTickSquareIcon from '../../../assets/icons/ToastIcons/SuccessTick';
-import {showCustomToast} from '../../../components/MainComponents/Toast/ToastComponent';
-import {FilterOrdersModal} from '../../../components/MainComponents/FilterOrdersModal/FilterOrdersModal';
+import { showCustomToast } from '../../../components/MainComponents/Toast/ToastComponent';
+import { FilterOrdersModal } from '../../../components/MainComponents/FilterOrdersModal';
 import AnimatedLoader from '../../../assets/icons/LoaderIcon';
 
-export const statusIconMap: {[key: string]: ReactNode} = {
-  Pending: <SuccessTickSquareIcon size={18} />,
-  Open: <SuccessTickSquareIcon size={18} />,
-  Accepted: <SuccessTickSquareIcon size={18} />,
-  Paid: <SuccessTickSquareIcon size={18} />,
-  Declined: <SuccessTickSquareIcon size={18} />,
-  Failed: <SuccessTickSquareIcon size={18} />,
-  Backordered: <SuccessTickSquareIcon size={18} />,
-  Shipped: <SuccessTickSquareIcon size={18} />,
-  Delivered: <SuccessTickSquareIcon size={18} />,
-  Completed: <SuccessTickSquareIcon size={18} />,
-  Cancelled: <SuccessTickSquareIcon size={18} />,
-  Returned: <SuccessTickSquareIcon size={18} />,
-  Exchanged: <SuccessTickSquareIcon size={18} />,
-  Processing: <SuccessTickSquareIcon size={18} />,
+export const statusIconMap: { [key: string]: ReactNode | string } = {
+  'Pending': '⏳',
+  'Open': '📂',
+  'Accepted':'✅',
+  'Paid': '💰',
+  'Declined':'🚫',
+  'Failed': '❌',
+  'Backordered': '📦',
+  'Shipped': '🚚',
+  'Delivered': '📬',
+  'Completed': '🏆',
+  'Cancelled': '🗑️',
+  'Returned': '🔄',
+  'Exchanged': '♻️',
 };
 
-export const showStatusToast = (status: string) => {
+export const showStatusToast = (status: string) => {  
   const message = `Order marked as ${status}`;
-  const iconComponent = statusIconMap[status] || (
-    <SuccessTickSquareIcon size={18} />
-  );
-
+  const iconComponent = statusIconMap[status] || <SuccessTickSquareIcon size={18} />;
+  
   showCustomToast(message, iconComponent);
 };
 
-// ✅ UPDATED: Map API status codes to display status
+
+// Map API status codes to display status
 export const convertOrderStatus = (apiStatus: string): OrderStatus => {
   const statusMap: {[key: string]: OrderStatus} = {
     O: 'Pending',
@@ -84,7 +82,7 @@ export const convertOrderStatus = (apiStatus: string): OrderStatus => {
 
 // ✅ UPDATED: Map display status back to API status codes
 const convertStatusToApi = (displayStatus: OrderStatus): string => {
-  const statusMap: {[key: string]: string} = {
+  const statusMap: { [key: string]: string } = {
     Pending: 'O',
     Accepted: 'P', // ✅ ADDED
     Processing: 'Y', // ✅ Maps to "Awaiting call"
@@ -102,7 +100,7 @@ const convertStatusToApi = (displayStatus: OrderStatus): string => {
 const getApiStatusFromFilter = (filterId: string): string | undefined => {
   if (filterId === 'all') return undefined;
 
-  const filterToApiMap: {[key: string]: string} = {
+  const filterToApiMap: { [key: string]: string } = {
     pending: 'O',
     accepted: 'P', // ✅ ADDED
     processing: 'Y', // ✅ Maps to "Awaiting call"
@@ -170,7 +168,7 @@ const OrderScreen = () => {
   useEffect(() => {
     if (userId) {
       const apiStatus = getApiStatusFromFilter(statusFilter);
-      dispatch(fetchOrders({userId, status: apiStatus}));
+      dispatch(fetchOrders({ userId, status: apiStatus }));
     }
   }, [dispatch, userId]);
 
@@ -218,7 +216,7 @@ const OrderScreen = () => {
 
   const [selectedFilter, setSelectedFilter] = useState(
     filterOptions.find(option => option.id === statusFilter) ||
-      filterOptions[0],
+    filterOptions[0],
   );
 
   // Update selected filter when statusFilter changes
@@ -243,10 +241,10 @@ const OrderScreen = () => {
       const timeoutId = setTimeout(() => {
         if (userId) {
           if (text.trim()) {
-            dispatch(searchOrders({userId, searchTerm: text}));
+            dispatch(searchOrders({ userId, searchTerm: text }));
           } else {
             const apiStatus = getApiStatusFromFilter(statusFilter);
-            dispatch(fetchOrders({userId, status: apiStatus}));
+            dispatch(fetchOrders({ userId, status: apiStatus }));
           }
         }
       }, 500);
@@ -260,10 +258,10 @@ const OrderScreen = () => {
   const handleSearch = useCallback(() => {
     if (userId) {
       if (searchText.trim()) {
-        dispatch(searchOrders({userId, searchTerm: searchText}));
+        dispatch(searchOrders({ userId, searchTerm: searchText }));
       } else {
         const apiStatus = getApiStatusFromFilter(statusFilter);
-        dispatch(fetchOrders({userId, status: apiStatus}));
+        dispatch(fetchOrders({ userId, status: apiStatus }));
       }
     }
   }, [dispatch, userId, searchText, statusFilter]);
@@ -288,7 +286,7 @@ const OrderScreen = () => {
         // Refresh orders list after successful update
         setTimeout(() => {
           const currentApiStatus = getApiStatusFromFilter(statusFilter);
-          dispatch(fetchOrders({userId: userId!, status: currentApiStatus}));
+          dispatch(fetchOrders({ userId: userId!, status: currentApiStatus }));
         }, 1000);
       } catch (error: any) {
         console.error('Failed to update order status:', error);
@@ -299,7 +297,7 @@ const OrderScreen = () => {
 
   // Handle filter selection
   const handleFilterSelect = useCallback(
-    (filter: {id: string; label: string}) => {
+    (filter: { id: string; label: string }) => {
       dispatch(setStatusFilter(filter.id));
 
       if (userId) {
@@ -318,7 +316,7 @@ const OrderScreen = () => {
             }),
           );
         } else {
-          dispatch(fetchOrders({userId, status: apiStatus}));
+          dispatch(fetchOrders({ userId, status: apiStatus }));
         }
       }
     },
@@ -354,7 +352,7 @@ const OrderScreen = () => {
 
     if (userId) {
       const apiStatus = getApiStatusFromFilter(statusFilter);
-      dispatch(fetchOrders({userId, status: apiStatus}));
+      dispatch(fetchOrders({ userId, status: apiStatus }));
     }
   };
 
@@ -414,7 +412,7 @@ const OrderScreen = () => {
   }, [statusUpdateError, searchTimeoutRef, dispatch]);
 
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Header
         name="Orders"
         variant={TypographyVariant.H6_BOLD}
@@ -425,7 +423,7 @@ const OrderScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: {screen: 'NotificationScreen'},
+                params: { screen: 'NotificationScreen' },
               }),
             size: 22,
             color: ColorPalette.IconColor,
@@ -465,13 +463,12 @@ const OrderScreen = () => {
             borderBottomWidth: 1,
             borderBottomColor: ColorPalette.GREY_100,
           }}>
-          <View style={{flex: 1}}>
+          <View style={{ flex: 1 }}>
             <Typography
-              text={`${getActiveFilterCount()} filter${
-                getActiveFilterCount() > 1 ? 's' : ''
-              } applied`}
+              text={`${getActiveFilterCount()} filter${getActiveFilterCount() > 1 ? 's' : ''
+                } applied`}
               variant={TypographyVariant.PSMALL_MEDIUM}
-              customTextStyles={{color: ColorPalette.PURPLE_300}}
+              customTextStyles={{ color: ColorPalette.PURPLE_300 }}
             />
             {currentFilters.customerName && (
               <Typography
@@ -505,9 +502,8 @@ const OrderScreen = () => {
             )}
             {(currentFilters.minOrderValue || currentFilters.maxOrderValue) && (
               <Typography
-                text={`• Value: €${currentFilters.minOrderValue || '0'} - €${
-                  currentFilters.maxOrderValue || '∞'
-                }`}
+                text={`• Value: €${currentFilters.minOrderValue || '0'} - €${currentFilters.maxOrderValue || '∞'
+                  }`}
                 variant={TypographyVariant.PXSMALL_REGULAR}
                 customTextStyles={{
                   color: ColorPalette.GREY_TEXT_400,
@@ -520,7 +516,7 @@ const OrderScreen = () => {
             <Typography
               text="Clear All"
               variant={TypographyVariant.PSMALL_SEMIBOLD}
-              customTextStyles={{color: ColorPalette.RED_100}}
+              customTextStyles={{ color: ColorPalette.RED_100 }}
             />
           </TouchableOpacity>
         </View>
@@ -546,7 +542,7 @@ const OrderScreen = () => {
           <Typography
             text={`Error updating status: ${statusUpdateError}`}
             variant={TypographyVariant.PSMALL_MEDIUM}
-            customTextStyles={{color: '#C62828'}}
+            customTextStyles={{ color: '#C62828' }}
           />
         </View>
       )}
@@ -568,7 +564,7 @@ const OrderScreen = () => {
           <Typography
             text={`Error: ${error}`}
             variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{color: ColorPalette.RED_200}}
+            customTextStyles={{ color: ColorPalette.RED_200 }}
           />
         </View>
       ) : (
@@ -576,7 +572,7 @@ const OrderScreen = () => {
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            {paddingBottom: getScreenHeight(4)},
+            { paddingBottom: getScreenHeight(4) },
           ]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.productContainer}>
@@ -612,11 +608,11 @@ const OrderScreen = () => {
                     hasActiveFilters()
                       ? 'No orders match your filters'
                       : searchText.trim()
-                      ? `No orders found for "${searchText}"`
-                      : 'No orders found'
+                        ? `No orders found for "${searchText}"`
+                        : 'No orders found'
                   }
                   variant={TypographyVariant.PMEDIUM_SEMIBOLD}
-                  customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
+                  customTextStyles={{ color: ColorPalette.GREY_TEXT_400 }}
                 />
                 {(searchText.trim() || hasActiveFilters()) && (
                   <TouchableOpacity
@@ -624,7 +620,7 @@ const OrderScreen = () => {
                       setSearchText('');
                       handleClearFilters();
                     }}
-                    style={{marginTop: getScreenHeight(1)}}>
+                    style={{ marginTop: getScreenHeight(1) }}>
                     <Typography
                       text="Clear search and filters"
                       variant={TypographyVariant.PSMALL_MEDIUM}
