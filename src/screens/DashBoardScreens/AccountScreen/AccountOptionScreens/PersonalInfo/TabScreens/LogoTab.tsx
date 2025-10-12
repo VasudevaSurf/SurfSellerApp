@@ -1,4 +1,4 @@
-// src/screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PersonalInfo/LogoTab.tsx
+// src/screens/DashBoardScreens/AccountScreen/AccountOptionScreens/PersonalInfo/TabScreens/LogoTab.tsx
 
 import React, {useState, useEffect, useRef} from 'react';
 import {
@@ -22,11 +22,7 @@ import {styles} from '../PerosanlInfo.styles';
 import {containerStyles} from '../../CompanyProfilePages/ImageContainer.styles';
 import {getScreenHeight} from '../../../../../../helpers/screenSize';
 import {RootState, AppDispatch} from '../../../../../../redux/store';
-import {
-  uploadCompanyLogo,
-  fetchProfileLogos,
-  fetchProfile,
-} from '../../../../../../redux/slices/profileSlice';
+import {fetchProfile} from '../../../../../../redux/slices/profileSlice';
 import Svg, {Circle, Path} from 'react-native-svg';
 
 const InfoIcon = () => (
@@ -55,12 +51,13 @@ const InfoIcon = () => (
   </Svg>
 );
 
+const API_AUTH_HEADER =
+  'Basic YWRtaW5Ac3VyZi5tdDpOOW9aMnlXMzc3cEg1VTExNTFiY3YyZlYyNDYySTk1NA==';
+
 const LogoTab: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const {uploadingLogo, logoUploadError, rawProfileData} = useSelector(
-    (state: RootState) => state.profile,
-  );
+  const {rawProfileData} = useSelector((state: RootState) => state.profile);
 
   const [companyLogoUri, setCompanyLogoUri] = useState<string | null>(null);
   const [invoiceLogoUri, setInvoiceLogoUri] = useState<string | null>(null);
@@ -68,16 +65,18 @@ const LogoTab: React.FC = () => {
     null,
   );
 
-  // Track if we've already processed the profile data
+  const [themeLogoId, setThemeLogoId] = useState<string | null>(null);
+  const [mailLogoId, setMailLogoId] = useState<string | null>(null);
+
   const processedRef = useRef(false);
 
-  // Extract logo URLs from the raw profile data - ONLY when rawProfileData changes
+  // Extract logo URLs AND logo IDs from profile data
   useEffect(() => {
     if (!rawProfileData?.sections || processedRef.current) {
       return;
     }
 
-    console.log('🔍 Extracting logos from rawProfileData');
+    console.log('🔍 Extracting logos and logo IDs from rawProfileData');
     processedRef.current = true;
 
     const logoSection = rawProfileData.sections.find(
@@ -87,25 +86,23 @@ const LogoTab: React.FC = () => {
     if (logoSection?.blocks?.[0]?.fields?.[0]?.logos) {
       const logosData = logoSection.blocks[0].fields[0].logos;
 
-      console.log('📦 Logos data:', logosData);
+      console.log('📦 Full logos data:', JSON.stringify(logosData, null, 2));
 
-      // Extract theme logo
+      // Extract theme logo and logo_id
       if (logosData.theme) {
         console.log('🎨 Theme logo data:', logosData.theme);
 
-        if (
-          logosData.theme.image &&
-          Array.isArray(logosData.theme.image) &&
-          logosData.theme.image.length > 0
-        ) {
-          const themeImage = logosData.theme.image[0];
-          console.log('🖼️ Theme image object:', themeImage);
+        if (logosData.theme.logo_id) {
+          setThemeLogoId(logosData.theme.logo_id);
+          console.log('✅ Theme logo_id extracted:', logosData.theme.logo_id);
+        }
 
+        if (logosData.theme.image) {
+          const themeImage = logosData.theme.image;
           const imagePath =
-            themeImage?.detailed?.image_path ||
-            themeImage?.icon?.image_path ||
-            themeImage?.image_path ||
-            themeImage?.http_image_path;
+            themeImage.image_path ||
+            themeImage.http_image_path ||
+            themeImage.https_image_path;
 
           if (imagePath) {
             const fullUrl = imagePath.startsWith('http')
@@ -117,23 +114,21 @@ const LogoTab: React.FC = () => {
         }
       }
 
-      // Extract mail logo
+      // Extract mail logo and logo_id
       if (logosData.mail) {
         console.log('📧 Mail logo data:', logosData.mail);
 
-        if (
-          logosData.mail.image &&
-          Array.isArray(logosData.mail.image) &&
-          logosData.mail.image.length > 0
-        ) {
-          const mailImage = logosData.mail.image[0];
-          console.log('🖼️ Mail image object:', mailImage);
+        if (logosData.mail.logo_id) {
+          setMailLogoId(logosData.mail.logo_id);
+          console.log('✅ Mail logo_id extracted:', logosData.mail.logo_id);
+        }
 
+        if (logosData.mail.image) {
+          const mailImage = logosData.mail.image;
           const imagePath =
-            mailImage?.detailed?.image_path ||
-            mailImage?.icon?.image_path ||
-            mailImage?.image_path ||
-            mailImage?.http_image_path;
+            mailImage.image_path ||
+            mailImage.http_image_path ||
+            mailImage.https_image_path;
 
           if (imagePath) {
             const fullUrl = imagePath.startsWith('http')
@@ -144,9 +139,13 @@ const LogoTab: React.FC = () => {
           }
         }
       }
+
+      console.log('📊 Extracted Logo IDs:', {
+        theme: themeLogoId,
+        mail: mailLogoId,
+      });
     }
 
-    // Reset the ref when profile data changes
     return () => {
       processedRef.current = false;
     };
@@ -159,8 +158,8 @@ const LogoTab: React.FC = () => {
       {
         mediaType: 'photo',
         quality: 0.8,
-        maxWidth: 1024,
-        maxHeight: 1024,
+        maxWidth: 1200,
+        maxHeight: 400,
         includeBase64: false,
       },
       (response: ImagePickerResponse) => {
@@ -185,16 +184,32 @@ const LogoTab: React.FC = () => {
           });
 
           if (asset.uri) {
-            handleUploadLogo(asset.uri, logoType);
+            handleUploadLogo(asset.uri, asset.fileName, asset.type, logoType);
           }
         }
       },
     );
   };
 
-  const handleUploadLogo = async (uri: string, logoType: 'theme' | 'mail') => {
+  const handleUploadLogo = async (
+    uri: string,
+    fileName: string | undefined,
+    mimeType: string | undefined,
+    logoType: 'theme' | 'mail',
+  ) => {
     if (!userData?.user_id) {
       Alert.alert('Error', 'User not found. Please login again.');
+      return;
+    }
+
+    const objectId = logoType === 'theme' ? themeLogoId : mailLogoId;
+
+    if (!objectId) {
+      console.error('❌ Logo ID not found for type:', logoType);
+      Alert.alert(
+        'Error',
+        'Logo information not loaded. Please refresh and try again.',
+      );
       return;
     }
 
@@ -202,33 +217,148 @@ const LogoTab: React.FC = () => {
       uri,
       logoType,
       userId: userData.user_id,
+      objectId: objectId,
     });
+
     setUploadingType(logoType);
 
+    // 🔥 STEP 1: Show image immediately (optimistic update)
+    console.log('⚡ Immediate UI update - showing selected image');
+    if (logoType === 'theme') {
+      setCompanyLogoUri(uri);
+    } else {
+      setInvoiceLogoUri(uri);
+    }
+
     try {
-      const result = await dispatch(
-        uploadCompanyLogo({
-          userId: userData.user_id,
-          logoUri: uri,
-          logoType: logoType,
-        }),
-      ).unwrap();
+      const formData = new FormData();
 
-      console.log('✅ Upload successful, result:', result);
+      const actualFileName = fileName || `logo_${logoType}_${Date.now()}.jpg`;
+      const actualMimeType = mimeType || 'image/jpeg';
 
-      // Refresh profile data to get the updated logo
-      // Reset the processed ref so we extract logos again
-      processedRef.current = false;
-      await dispatch(fetchProfile(userData.user_id));
+      console.log('📋 Upload details:', {
+        fileName: actualFileName,
+        mimeType: actualMimeType,
+        logoType,
+        objectId,
+        userId: userData.user_id,
+      });
 
-      Alert.alert(
-        'Success',
-        `${
-          logoType === 'theme' ? 'Company' : 'Invoice'
-        } logo uploaded successfully`,
+      formData.append(`file_logotypes_image_icon[${logoType}]`, {
+        uri: uri,
+        type: actualMimeType,
+        name: actualFileName,
+      } as any);
+
+      formData.append(`type_logotypes_image_icon[${logoType}]`, 'local');
+      formData.append(`is_high_res_logotypes_image_icon[${logoType}]`, '');
+      formData.append(`logotypes_image_data[${logoType}][type]`, 'M');
+      formData.append(`logotypes_image_data[${logoType}][object_id]`, objectId);
+      formData.append(
+        `logotypes_image_data[${logoType}][image_alt]`,
+        logoType === 'theme' ? 'Company Logo' : 'Invoice Logo',
       );
+      formData.append('user_id', userData.user_id);
+      formData.append('logo_update', '1');
+
+      console.log('📤 Uploading to server...');
+
+      const response = await fetch(
+        'https://dev.surf.mt/api.php?_d=NtSeProfilesApi',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: API_AUTH_HEADER,
+          },
+          body: formData,
+        },
+      );
+
+      const responseText = await response.text();
+      console.log('📥 Upload response:', {
+        status: response.status,
+        responseText: responseText.substring(0, 500),
+      });
+
+      if (!response.ok) {
+        // 🔥 Revert optimistic update on error
+        console.error('❌ Upload failed, reverting image');
+        throw new Error(`HTTP ${response.status}: Failed to upload logo`);
+      }
+
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (parseError) {
+        if (response.status === 200) {
+          console.log('✅ Upload successful (200 status)');
+          responseData = {result: true, message: 'Logo uploaded successfully'};
+        } else {
+          throw new Error('Failed to parse response');
+        }
+      }
+
+      if (responseData.result) {
+        console.log('✅ Logo uploaded successfully to server');
+
+        // 🔥 STEP 2: Refresh profile data in background (silent)
+        console.log('🔄 Refreshing profile data in background...');
+        processedRef.current = false;
+        dispatch(fetchProfile(userData.user_id));
+
+        // 🔥 STEP 3: Show success message
+        Alert.alert(
+          'Success',
+          `${
+            logoType === 'theme' ? 'Company' : 'Invoice'
+          } logo uploaded successfully`,
+        );
+      } else {
+        throw new Error(responseData.message || 'Upload failed');
+      }
     } catch (error: any) {
       console.error('❌ Upload failed:', error);
+
+      // 🔥 Revert optimistic update on error
+      console.log('⏪ Reverting to previous image state');
+      if (logoType === 'theme') {
+        // Try to restore from rawProfileData
+        const logoSection = rawProfileData?.sections?.find(
+          section => section.section_type === 'profile_logo',
+        );
+        const previousImage =
+          logoSection?.blocks?.[0]?.fields?.[0]?.logos?.theme?.image;
+        const previousPath =
+          previousImage?.image_path || previousImage?.http_image_path;
+
+        if (previousPath) {
+          const fullUrl = previousPath.startsWith('http')
+            ? previousPath
+            : `https://dev.surf.mt/${previousPath}`;
+          setCompanyLogoUri(fullUrl);
+        } else {
+          setCompanyLogoUri(null);
+        }
+      } else {
+        // Try to restore from rawProfileData
+        const logoSection = rawProfileData?.sections?.find(
+          section => section.section_type === 'profile_logo',
+        );
+        const previousImage =
+          logoSection?.blocks?.[0]?.fields?.[0]?.logos?.mail?.image;
+        const previousPath =
+          previousImage?.image_path || previousImage?.http_image_path;
+
+        if (previousPath) {
+          const fullUrl = previousPath.startsWith('http')
+            ? previousPath
+            : `https://dev.surf.mt/${previousPath}`;
+          setInvoiceLogoUri(fullUrl);
+        } else {
+          setInvoiceLogoUri(null);
+        }
+      }
+
       Alert.alert(
         'Upload Failed',
         error.message || 'Failed to upload logo. Please try again.',
@@ -254,6 +384,27 @@ const LogoTab: React.FC = () => {
         />
       );
     }
+
+    // 🔥 Handle local file URIs (file://)
+    if (uri && uri.startsWith('file://')) {
+      return (
+        <Image
+          source={{uri}}
+          style={containerStyles.image}
+          resizeMode="contain"
+          onError={error => {
+            console.error(
+              '❌ Local image load error:',
+              error.nativeEvent.error,
+            );
+          }}
+          onLoad={() => {
+            console.log('✅ Local image loaded:', uri);
+          }}
+        />
+      );
+    }
+
     return (
       <Image
         source={defaultImage}
@@ -292,8 +443,8 @@ const LogoTab: React.FC = () => {
               <TouchableOpacity
                 style={containerStyles.editButton}
                 onPress={() => handleImagePicker('theme')}
-                disabled={uploadingLogo && uploadingType === 'theme'}>
-                {uploadingLogo && uploadingType === 'theme' ? (
+                disabled={uploadingType === 'theme' || !themeLogoId}>
+                {uploadingType === 'theme' ? (
                   <ActivityIndicator
                     size="small"
                     color={ColorPalette.Primary}
@@ -325,8 +476,8 @@ const LogoTab: React.FC = () => {
               <TouchableOpacity
                 style={containerStyles.editButton}
                 onPress={() => handleImagePicker('mail')}
-                disabled={uploadingLogo && uploadingType === 'mail'}>
-                {uploadingLogo && uploadingType === 'mail' ? (
+                disabled={uploadingType === 'mail' || !mailLogoId}>
+                {uploadingType === 'mail' ? (
                   <ActivityIndicator
                     size="small"
                     color={ColorPalette.Primary}
@@ -347,17 +498,6 @@ const LogoTab: React.FC = () => {
             />
           </View>
         </View>
-
-        {/* Error Message */}
-        {logoUploadError && (
-          <View style={{marginTop: 16}}>
-            <Typography
-              text={logoUploadError}
-              variant={TypographyVariant.PSMALL_REGULAR}
-              customTextStyles={{color: ColorPalette.RED_100}}
-            />
-          </View>
-        )}
       </View>
     </ScrollView>
   );
