@@ -1,4 +1,4 @@
-// Updated AddProduct.tsx with proper user ID and product ID passing
+// src/screens/DashBoardScreens/ProductScreen/AddProductScreens/AddProduct.tsx
 
 import React, {useState, useEffect} from 'react';
 import {ScrollView, View, Alert} from 'react-native';
@@ -29,10 +29,12 @@ import {
   createProductApi,
   updateProductApi,
   transformFormDataToApiFormat,
+  ProductFeature,
 } from '../../../../services/apiService';
 import {useCategories} from '../../../../hooks/useCategories';
 import {showCustomToast} from '../../../../components/MainComponents/Toast/ToastComponent';
 import SuccessTickSquareIcon from '../../../../assets/icons/ToastIcons/SuccessTick';
+import {useProductFeatures} from '../../../../hooks/useProductFeatures';
 
 const STEPS = [
   {id: 1, label: 'Product Info'},
@@ -57,6 +59,8 @@ interface RouteParams {
     quantity: string;
     minQuantity: string;
     maxQuantity: string;
+    qtyStep?: string;
+    listQtyCount?: string;
     trackInventory: boolean;
     taxType: string;
     brand: string;
@@ -89,8 +93,8 @@ interface FormData {
   quantity: string;
   minQuantity: string;
   maxQuantity: string;
-  qtyStep: string; // ✅ ADD THIS
-  listQtyCount: string; // ✅ ADD THIS
+  qtyStep: string;
+  listQtyCount: string;
   trackInventory: boolean;
   taxType: string;
   brand: string;
@@ -107,6 +111,9 @@ interface FormData {
     name: string;
   };
   selectedCategories: {id: string; name: string; path: string[]}[];
+  // NEW: Features fields
+  availableFeatures?: ProductFeature[];
+  selectedFeatures?: {[fieldName: string]: string};
 }
 
 const AddProduct = () => {
@@ -126,6 +133,13 @@ const AddProduct = () => {
   // Use categories hook to get available categories
   const {categories} = useCategories();
 
+  // NEW: Load features if in edit mode
+  const {
+    features: availableFeatures,
+    loading: featuresLoading,
+    error: featuresError,
+  } = useProductFeatures(editMode ? productId : undefined);
+
   // Initialize formData with all required fields and proper defaults
   const [formData, setFormData] = useState<FormData>({
     productId: productId || '',
@@ -140,8 +154,8 @@ const AddProduct = () => {
     quantity: '',
     minQuantity: '',
     maxQuantity: '',
-    qtyStep: '', // ✅ ADD THIS
-    listQtyCount: '', // ✅ ADD THIS
+    qtyStep: '',
+    listQtyCount: '',
     trackInventory: false,
     taxType: 'VAT',
     brand: '',
@@ -158,7 +172,10 @@ const AddProduct = () => {
       name: '',
     },
     selectedCategories: [] as {id: string; name: string; path: string[]}[],
+    availableFeatures: [],
+    selectedFeatures: {},
   });
+
   // Pre-fill form data if in edit mode
   useEffect(() => {
     if (editMode && productData) {
@@ -186,8 +203,8 @@ const AddProduct = () => {
           quantity: productData.quantity || '',
           minQuantity: productData.minQuantity || '',
           maxQuantity: productData.maxQuantity || '',
-          qtyStep: productData.qtyStep || '', // ✅ ADD THIS
-          listQtyCount: productData.listQtyCount || '', // ✅ ADD THIS
+          qtyStep: productData.qtyStep || '',
+          listQtyCount: productData.listQtyCount || '',
           trackInventory: Boolean(productData.trackInventory),
           taxType: productData.taxType || 'VAT',
           brand: productData.brand || '',
@@ -210,14 +227,46 @@ const AddProduct = () => {
         console.log('✅ Form data updated with inventory values:', {
           minQuantity: updatedData.minQuantity,
           maxQuantity: updatedData.maxQuantity,
-          qtyStep: updatedData.qtyStep, // ✅ LOG THIS
-          listQtyCount: updatedData.listQtyCount, // ✅ LOG THIS
+          qtyStep: updatedData.qtyStep,
+          listQtyCount: updatedData.listQtyCount,
         });
 
         return updatedData;
       });
     }
   }, [editMode, productData, productId, userId]);
+
+  // NEW: Update formData when features are loaded from API
+  useEffect(() => {
+    if (availableFeatures && availableFeatures.length > 0) {
+      console.log('🎨 Features loaded from API, updating form data:', {
+        featuresCount: availableFeatures.length,
+        features: availableFeatures.map(f => ({
+          name: f.name,
+          fieldName: f.field_name,
+          value: f.value,
+        })),
+      });
+
+      // Extract current feature values from API
+      const selectedFeatures: {[fieldName: string]: string} = {};
+
+      availableFeatures.forEach(feature => {
+        if (feature.value) {
+          selectedFeatures[feature.field_name] = feature.value;
+          console.log(
+            `✅ Loaded feature: ${feature.name} (${feature.field_name}) = ${feature.value}`,
+          );
+        }
+      });
+
+      setFormData(prevData => ({
+        ...prevData,
+        availableFeatures,
+        selectedFeatures,
+      }));
+    }
+  }, [availableFeatures]);
 
   console.log('formData on edit screen', formData);
 
@@ -236,6 +285,7 @@ const AddProduct = () => {
       keys: Object.keys(newData),
       imageCount: newData.images?.length,
       relativePathCount: newData.imageRelativePaths?.length,
+      hasFeatures: !!newData.selectedFeatures,
     });
 
     setFormData(prevData => {
@@ -290,21 +340,36 @@ const AddProduct = () => {
   };
 
   const handleSubmit = async () => {
-    // Add debug logging
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🚀 [SUBMIT] Form submission started');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('Mode:', editMode ? 'EDIT' : 'CREATE');
+    console.log('Product ID:', formData.productId);
+    console.log('User ID:', userId);
+
+    // Debug image state
     debugImageState();
 
-    console.log('🚀 Form submitted:', {
-      editMode,
-      productId: formData.productId,
-      userId: formData.userId,
-      // formData: {
-      //   productName: formData.productName,
-      //   price: formData.price,
-      //   currentImages: formData.images?.length || 0,
-      //   imageRelativePaths: formData.imageRelativePaths?.length || 0,
-      // },
-      formData,
-    });
+    console.log('\n🎨 [FEATURES] Current feature state:');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    if (formData.selectedFeatures) {
+      console.log('Selected Features:', formData.selectedFeatures);
+      console.log(
+        'Feature Count:',
+        Object.keys(formData.selectedFeatures).length,
+      );
+
+      Object.entries(formData.selectedFeatures).forEach(([key, value]) => {
+        console.log(`  📌 Feature [${key}] = "${value}"`);
+      });
+    } else {
+      console.log('⚠️ NO SELECTED FEATURES');
+    }
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    console.log('\n📋 Complete Form Data:');
+    console.log(JSON.stringify(formData, null, 2));
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
     // Validate required fields
     const requiredFields = ['productName', 'price'];
@@ -312,46 +377,16 @@ const AddProduct = () => {
       field => !formData[field]?.trim(),
     );
 
-    // if (missingFields.length > 0) {
-    //   console.warn('⚠️ Missing required fields:', missingFields);
-    //   // Alert.alert(
-    //   //   'Validation Error',
-    //   //   `Please fill in all required fields: ${missingFields.join(', ')}`,
-    //   // );
-    //   showCustomToast(
-    //     `Missing required fields: ${missingFields.join(', ')}`,
-    //     <SuccessTickSquareIcon size={18} />
-    //   )
-    //   return;
-    // }
-
-    // For new products, check if images are properly uploaded (if any were selected)
-    if (!editMode && formData.images.length > 0) {
-      if (
-        !formData.imageRelativePaths ||
-        formData.imageRelativePaths.length === 0
-      ) {
-        // Alert.alert(
-        //   'Images Not Uploaded',
-        //   'Please wait for images to finish uploading before saving the product.',
-        // );
-        showCustomToast("Oops! Upload failed. Try again.", '❌');
-
-        return;
-      }
-    }
-
     if (!userId) {
-      // Alert.alert('Error', 'User session expired. Please login again.');
-      showCustomToast("Session expired. Please login again.", '❌')
+      console.error('❌ No userId available');
+      showCustomToast('Session expired. Please login again.', '❌');
       return;
     }
 
-    // Show loading state
     setIsSubmitting(true);
 
     try {
-      // Transform form data to API format
+      console.log('\n🔄 Transforming form data to API format...');
       const apiData = transformFormDataToApiFormat(
         formData,
         userId,
@@ -360,36 +395,38 @@ const AddProduct = () => {
         originalImages,
       );
 
-      console.log('🎯 Final API call:', {
-        method: editMode ? 'UPDATE' : 'CREATE',
-        productId: apiData.product_id,
-        productName: apiData.product_data.product,
-        imageCount: apiData.image_pair_positon?.length || 0,
-        imagePaths: apiData.image_pair_positon || [],
-      });
+      console.log('\n🎯 Final API call details:');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('Method:', editMode ? 'UPDATE' : 'CREATE');
+      console.log('Product ID:', apiData.product_id);
+      console.log('Product Name:', apiData.product_data.product);
+      console.log('Image Count:', apiData.image_pair_positon?.length || 0);
+      console.log(
+        'Feature Count:',
+        apiData.product_features
+          ? Object.keys(apiData.product_features).length
+          : 0,
+      );
+
+      if (apiData.product_features) {
+        console.log('\n🎨 Features being sent to API:');
+        Object.entries(apiData.product_features).forEach(([key, value]) => {
+          console.log(`  📌 [${key}] = "${value}"`);
+        });
+      }
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
       let result;
       if (editMode) {
-        // console.log('🔄 Updating existing product...');
+        console.log('📤 Calling updateProductApi...');
         result = await updateProductApi(apiData);
       } else {
-        // console.log('✨ Creating new product...');
+        console.log('📤 Calling createProductApi...');
         result = await createProductApi(apiData);
       }
 
-      // Show success message
-      // Alert.alert(
-      //   'Success',
-      //   editMode
-      //     ? 'Product updated successfully! Image changes have been saved.'
-      //     : 'Product created successfully!',
-      //   [
-      //     {
-      //       text: 'OK',
-      //       onPress: () => goBack(),
-      //     },
-      //   ],
-      // );
+      console.log('\n✅ API call successful!');
+      console.log('Result:', result);
 
       goBack();
       const successMessage = editMode
@@ -397,34 +434,23 @@ const AddProduct = () => {
         : 'Product added successfully.';
 
       showCustomToast(successMessage, '✅');
-
-
     } catch (error: any) {
-      console.error('💥 Error saving product:', error);
+      console.error('\n❌ Error during submit:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response?.data,
+      });
 
-      // Alert.alert(
-      //   editMode ? 'Update Failed' : 'Creation Failed',
-      //   error.message ||
-      //   `Failed to ${editMode ? 'update' : 'create'
-      //   } product. Please try again.`,
-      //   [
-      //     { text: 'OK', style: 'default' },
-      //     {
-      //       text: 'Retry',
-      //       onPress: () => handleSubmit(),
-      //       style: 'default',
-      //     },
-      //   ],
-      // );
-
-      const erroMessage =
-        `Failed to ${editMode ? 'update' : 'create'
-        } product. Please try again.`
-      showCustomToast(erroMessage, '❌');
-
+      const errorMessage = `Failed to ${
+        editMode ? 'update' : 'create'
+      } product. Please try again.`;
+      showCustomToast(errorMessage, '❌');
     } finally {
       setIsSubmitting(false);
     }
+
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   };
 
   const handleNext = () => {
@@ -530,8 +556,14 @@ const AddProduct = () => {
     productId: formData.productId,
     imageCount: formData.images.length,
     relativePathCount: formData.imageRelativePaths.length,
+    featuresCount: formData.availableFeatures?.length || 0,
+    selectedFeaturesCount: formData.selectedFeatures
+      ? Object.keys(formData.selectedFeatures).length
+      : 0,
     isValidStep: isValidStep(),
     isDisabled: isButtonDisabled(),
+    featuresLoading,
+    featuresError,
   });
 
   return (

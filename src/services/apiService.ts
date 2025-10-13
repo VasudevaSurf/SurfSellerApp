@@ -31,6 +31,35 @@ export interface Product {
   status_details?: any;
 }
 
+export interface ProductFeatureVariant {
+  id: string;
+  name: string;
+}
+
+export interface ProductFeature {
+  name: string;
+  field_name: string;
+  main_object: string;
+  field_type: string;
+  field_type_desc: string;
+  field_disabled: boolean;
+  required: boolean;
+  value: string | null;
+  variants: ProductFeatureVariant[] | null;
+}
+
+export interface ProductFeatureBlock {
+  block_name: string;
+  fields: ProductFeature[] | null;
+}
+
+export interface ProductFeaturesSection {
+  name: string;
+  section_type: string;
+  selected: boolean;
+  blocks: ProductFeatureBlock[] | null;
+}
+
 export interface ProductsResponse {
   products: Product[];
   total_items: string;
@@ -481,6 +510,7 @@ export interface CreateProductRequest {
   };
   user_id: string;
   product_id?: number;
+  product_features?: {[key: string]: string}; // NEW: Add features
 }
 
 export interface CreateProductResponse {
@@ -1835,14 +1865,63 @@ export const updateProductApi = async (
       throw new Error('Product ID is required for update');
     }
 
-    console.log('🔄 Updating product with complete image replacement:', {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🔄 [UPDATE PRODUCT API] Starting product update');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('📋 Product Info:', {
       productId: productData.product_id,
       productName: productData.product_data.product,
-      imageCount: productData.image_pair_positon?.length || 0,
-      imagePaths: productData.image_pair_positon,
+      userId: productData.user_id,
     });
 
-    // IMPORTANT: The API should replace ALL images with this new set
+    console.log('\n📦 Request Payload Breakdown:');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    console.log('\n1️⃣ Basic Info:');
+    console.log('   Product Name:', productData.product_data.product);
+    console.log('   Price:', productData.product_data.price);
+    console.log('   Status:', productData.product_data.status);
+
+    console.log('\n2️⃣ Inventory:');
+    console.log('   Quantity:', productData.product_data.amount);
+    console.log('   Product Code:', productData.product_data.product_code);
+    console.log('   Min Qty:', productData.product_data.min_qty);
+    console.log('   Max Qty:', productData.product_data.max_qty);
+    console.log('   Qty Step:', productData.product_data.qty_step);
+    console.log('   List Qty Count:', productData.product_data.list_qty_count);
+
+    console.log('\n3️⃣ Categories:');
+    console.log('   Category IDs:', productData.product_data.category_ids);
+
+    console.log('\n4️⃣ Images:');
+    console.log('   Image Count:', productData.image_pair_positon?.length || 0);
+    console.log('   Image Paths:', productData.image_pair_positon || []);
+
+    console.log('\n5️⃣ Features (CRITICAL):');
+    if (productData.product_features) {
+      console.log('   ✅ Features Present:', {
+        count: Object.keys(productData.product_features).length,
+        data: productData.product_features,
+      });
+
+      // Log each feature individually
+      Object.entries(productData.product_features).forEach(([key, value]) => {
+        console.log(`   📌 Feature [${key}] = "${value}"`);
+      });
+    } else {
+      console.log('   ⚠️ NO FEATURES IN PAYLOAD');
+    }
+
+    console.log('\n📤 [API CALL] Sending request to server...');
+    console.log('URL: https://dev.surf.mt/api.php?_d=NtSeProductsApi');
+    console.log('Method: POST');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    // Log the complete stringified payload
+    console.log('\n📋 Complete JSON Payload:');
+    console.log(JSON.stringify(productData, null, 2));
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
     const response = await axios({
       method: 'POST',
       url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi`,
@@ -1850,22 +1929,57 @@ export const updateProductApi = async (
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
       },
-      data: {
-        ...productData,
-        // Ensure we're explicitly updating images
-        update_images: true, // Add this flag if your API supports it
-      },
+      data: productData,
     });
 
-    console.log('✅ Product update response:', response.data);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('📥 [API RESPONSE] Received response from server');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('Status:', response.status);
+    console.log('Status Text:', response.statusText);
+
+    console.log('\n📊 Response Data:');
+    console.log(JSON.stringify(response.data, null, 2));
 
     if (response.data.result === false) {
+      console.error('\n❌ [API ERROR] Server returned result: false');
+      console.error('Error Message:', response.data.message);
+      console.error('Full Response:', response.data);
       throw new Error(response.data.message || 'Product update failed');
     }
 
+    console.log('\n✅ [SUCCESS] Product updated successfully');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
     return response.data as CreateProductResponse;
   } catch (error: any) {
-    console.error('❌ Update Product API error:', error);
+    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.error('❌ [UPDATE PRODUCT ERROR] Failed to update product');
+    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.error('Error Type:', error.constructor.name);
+    console.error('Error Message:', error.message);
+
+    if (error.response) {
+      console.error('\n📡 Server Response Error:');
+      console.error('Status:', error.response.status);
+      console.error('Status Text:', error.response.statusText);
+      console.error(
+        'Response Data:',
+        JSON.stringify(error.response.data, null, 2),
+      );
+      console.error('Response Headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('\n📡 No Response Received:');
+      console.error('Request was made but no response received');
+      console.error('Request:', error.request);
+    } else {
+      console.error('\n⚙️ Request Setup Error:');
+      console.error('Error during request setup:', error.message);
+    }
+
+    console.error('\n📋 Stack Trace:');
+    console.error(error.stack);
+    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
     if (error.response?.status === 404) {
       throw new Error('Product not found');
@@ -1878,12 +1992,7 @@ export const updateProductApi = async (
         error.response?.data?.message ||
         error.message ||
         'Failed to update product';
-      console.error('Full error details:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: errorMessage,
-      });
+      console.error('Final error message:', errorMessage);
       throw new Error(errorMessage);
     }
   }
@@ -1896,12 +2005,18 @@ export const transformFormDataToApiFormat = (
   availableCategories: CategoryData[] = [],
   originalImages?: string[],
 ): CreateProductRequest => {
-  console.log('🔄 Transforming form data to API format:', {
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('🔄 [TRANSFORM] Starting form data transformation');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📋 Input Parameters:', {
     editMode,
+    userId,
+    productId: formData.productId,
     productName: formData.productName,
-    currentImages: formData.images?.length || 0,
-    imageRelativePaths: formData.imageRelativePaths?.length || 0,
-    originalImages: originalImages?.length || 0,
+    hasFeatures: !!formData.selectedFeatures,
+    featuresCount: formData.selectedFeatures
+      ? Object.keys(formData.selectedFeatures).length
+      : 0,
   });
 
   // Extract category IDs from categoryPath
@@ -1921,6 +2036,11 @@ export const transformFormDataToApiFormat = (
     }
   }
 
+  console.log('📂 Categories:', {
+    categoryPath: formData.categoryPath,
+    categoryIds,
+  });
+
   const apiData: CreateProductRequest = {
     lang_code: 'en',
     product_data: {
@@ -1932,7 +2052,7 @@ export const transformFormDataToApiFormat = (
       exceptions_type: 'F',
       full_description: formData.description || '',
       list_price: '0.00',
-      list_qty_count: formData.listQtyCount || '', // ✅ ADD THIS
+      list_qty_count: formData.listQtyCount || '',
       max_qty: formData.maxQuantity || '',
       min_qty: formData.minQuantity || '',
       options_type: 'P',
@@ -1942,7 +2062,7 @@ export const transformFormDataToApiFormat = (
       product: formData.productName || '',
       product_code: formData.productCode || '',
       promo_text: '',
-      qty_step: formData.qtyStep || '', // ✅ ADD THIS
+      qty_step: formData.qtyStep || '',
       sales_amount: '',
       search_words: '',
       short_description: '',
@@ -1962,12 +2082,10 @@ export const transformFormDataToApiFormat = (
   if (editMode) {
     console.log('📸 Processing images for edit mode...');
 
-    // For edit mode, we need to collect ALL current images as relative paths
     const currentImages = formData.images || [];
 
     for (const imageUrl of currentImages) {
       if (imageUrl.startsWith('http')) {
-        // This is an existing image URL - convert to relative path
         const relativePath = extractRelativePathFromUrl(imageUrl);
         if (relativePath && !imagePaths.includes(relativePath)) {
           imagePaths.push(relativePath);
@@ -1975,7 +2093,6 @@ export const transformFormDataToApiFormat = (
       }
     }
 
-    // Add newly uploaded images (relative paths)
     if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
       for (const relativePath of formData.imageRelativePaths) {
         if (
@@ -1993,7 +2110,6 @@ export const transformFormDataToApiFormat = (
       paths: imagePaths,
     });
   } else {
-    // For create mode, only use newly uploaded images
     if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
       formData.imageRelativePaths.forEach((path: string) => {
         if (path && !path.startsWith('http') && !imagePaths.includes(path)) {
@@ -2005,26 +2121,62 @@ export const transformFormDataToApiFormat = (
     console.log('✅ Collected image paths for create mode:', imagePaths.length);
   }
 
-  // Set the image_pair_positon with all current relative paths
   if (imagePaths.length > 0) {
     apiData.image_pair_positon = imagePaths;
   } else {
-    // If no images, send empty array to clear all images
     apiData.image_pair_positon = [];
   }
+
+  // NEW: Add product features with extensive debugging
+  console.log('\n🎨 [FEATURES] Processing product features...');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+  if (formData.selectedFeatures) {
+    const featureKeys = Object.keys(formData.selectedFeatures);
+    console.log('📊 Features found in formData:', {
+      count: featureKeys.length,
+      keys: featureKeys,
+      values: formData.selectedFeatures,
+    });
+
+    // Filter out empty values
+    const validFeatures: {[key: string]: string} = {};
+
+    featureKeys.forEach(key => {
+      const value = formData.selectedFeatures[key];
+      if (value && value.trim() !== '') {
+        validFeatures[key] = value;
+        console.log(`  ✅ Feature "${key}" = "${value}"`);
+      } else {
+        console.log(`  ⚠️ Feature "${key}" is empty, skipping`);
+      }
+    });
+
+    if (Object.keys(validFeatures).length > 0) {
+      apiData.product_features = validFeatures;
+      console.log('✅ Added features to API data:', {
+        count: Object.keys(validFeatures).length,
+        features: validFeatures,
+      });
+    } else {
+      console.log('⚠️ No valid features to add');
+    }
+  } else {
+    console.log('⚠️ No selectedFeatures in formData');
+  }
+
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
   // Add product_id for updates
   if (editMode && formData.productId) {
     apiData.product_id = parseInt(formData.productId);
+    console.log('🔑 Product ID for update:', apiData.product_id);
   }
 
-  console.log('🎯 Final API data for product:', {
-    productId: apiData.product_id,
-    productName: apiData.product_data.product,
-    imageCount: apiData.image_pair_positon?.length || 0,
-    imagePaths: apiData.image_pair_positon || [],
-    isEdit: editMode,
-  });
+  console.log('\n📦 [FINAL API DATA] Complete payload:');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log(JSON.stringify(apiData, null, 2));
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
   return apiData;
 };

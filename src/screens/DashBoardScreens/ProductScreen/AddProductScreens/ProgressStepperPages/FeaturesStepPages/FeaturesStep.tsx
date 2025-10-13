@@ -1,71 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import InfoIcon from '../../../../../../assets/icons/InfoIcon';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import Dropdown from '../../../../../../components/MainComponents/DropdownModal/Dropdown';
 import AnimatedTextInput from '../../../../../../components/UserComponents/TextInput/TextInput';
-import { Typography } from '../../../../../../components/UserComponents/Typography/Typography';
-import { TypographyVariant } from '../../../../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../../../../config/colorPalette';
-import { getScreenHeight, getScreenWidth } from '../../../../../../helpers/screenSize';
-import { styles } from './FeaturesStep.styles';
-import CheckIcon from '../../../../../../assets/icons/CheckIcon';
+import {Typography} from '../../../../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../../config/colorPalette';
+import {
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../../helpers/screenSize';
+import {styles} from './FeaturesStep.styles';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
-
-const BRAND_OPTIONS = [
-  { value: 'Kinnie', label: 'Kinnie' },
-  { value: 'Twistees', label: 'Twistees' },
-  { value: 'Mdina Glass', label: 'Mdina Glass' },
-  { value: 'Melita Limited', label: 'Melita Limited' },
-  { value: 'Charles & Ron', label: 'Charles & Ron' },
-  { value: 'Simonds Farsons Cisk', label: 'Simonds Farsons Cisk' },
-  { value: 'Gaia & Nina', label: 'Gaia & Nina' },
-  { value: 'Mvintage', label: 'Mvintage' },
-  {
-    value: 'Corinthia Hotels International',
-    label: 'Corinthia Hotels International',
-  },
-  { value: 'Kandy Kids', label: 'Kandy Kids' },
-  { value: 'Kullhadd', label: 'Kullhadd' },
-  { value: 'KRS Releasing', label: 'KRS Releasing' },
-  { value: "Kellogg's", label: "Kellogg's" },
-];
-
-const COLOR_OPTIONS = [
-  { value: 'Chartreuse', label: 'Chartreuse' },
-  { value: 'Amber', label: 'Amber' },
-  { value: 'Periwinkle', label: 'Periwinkle' },
-  { value: 'TurquoiseBlue', label: 'Turquoise' },
-  { value: 'Lavender', label: 'Lavender' },
-  { value: 'Coral', label: 'Coral' },
-  { value: 'Indigo', label: 'Indigo' },
-  { value: 'Celeste', label: 'Celeste' },
-  { value: 'Ochre', label: 'Ochre' },
-];
-
-const SIZE_OPTIONS = [
-  { value: 'XXS', label: 'XXSmall' },
-  { value: 'XS', label: 'XSmall' },
-  { value: 'S', label: 'Small' },
-  { value: 'L', label: 'Large' },
-  { value: 'M', label: 'Medium' },
-  { value: 'XL', label: 'XLarge' },
-  { value: 'XXL', label: 'XXLarge' },
-  { value: 'XXXL', label: 'XXXLarge' },
-  { value: '4XL', label: '4XLLarge' },
-];
-
-const COUNTRY_OPTIONS = [
-  { value: 'Malta', label: 'Malta' },
-  { value: 'United Kingdom', label: 'United Kingdom' },
-  { value: 'Italy', label: 'Italy' },
-  { value: 'Germany', label: 'Germany' },
-  { value: 'Spain', label: 'Spain' },
-  { value: 'Saudi Arabia', label: 'Saudi Arabia' },
-  { value: 'France', label: 'France' },
-  { value: 'India', label: 'India' },
-  { value: 'Russia', label: 'Russia' },
-];
+import {ProductFeature} from '../../../../../../services/apiService';
+import CheckIcon from '../../../../../../assets/icons/CheckIcon';
+import {BorderRadius, Spacing} from '../../../../../../config/globalStyles';
 
 interface FeaturesStepProps {
   formData: any;
@@ -78,271 +32,324 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
   updateFormData,
   editMode = false,
 }) => {
-  const [manufacturedBy, setManufacturedBy] = useState('');
-  const [weighBy, setWeighBy] = useState('');
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [localFeatureValues, setLocalFeatureValues] = useState<{
+    [fieldName: string]: string;
+  }>({});
 
-  const [selectedBrand, setSelectedBrand] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
-  const [selectedSize, setSelectedSize] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState('');
-
-  const [shippingPrice, setShippingPrice] = useState('');
+  // Shipping properties state
   const [shippingWeight, setShippingWeight] = useState('');
+  const [shippingPrice, setShippingPrice] = useState('');
   const [freeShippingChecked, setFreeShippingChecked] = useState(false);
+
+  // Item in a box state
+  const [unitsPerBox, setUnitsPerBox] = useState('');
+  const [extraUnitsInSameBox, setExtraUnitsInSameBox] = useState('');
+
+  // Box dimension state
   const [boxDimensionLength, setBoxDimensionLength] = useState('');
   const [boxDimensionWidth, setBoxDimensionWidth] = useState('');
-  const [boxDimensionHeigth, setBoxDimensionHeight] = useState('');
-  const [unitsPerBox, setUnitsPerBox] = useState('');
-  const [extraUnitsInSameBox, setExtraUnitsInSameBox] = useState(''); //optional
+  const [boxDimensionHeight, setBoxDimensionHeight] = useState('');
 
-  // State to manage which dropdown is currently active
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  // Extract available features from formData
+  const availableFeatures: ProductFeature[] = formData.availableFeatures || [];
 
-  // Pre-fill data if in edit mode
+  console.log('🎨 FeaturesStep render:', {
+    editMode,
+    availableFeaturesCount: availableFeatures.length,
+    selectedFeatures: formData.selectedFeatures,
+    availableFeatures: availableFeatures.map(f => ({
+      name: f.name,
+      fieldName: f.field_name,
+      value: f.value,
+      hasVariants: !!f.variants,
+    })),
+  });
+
+  // Initialize local state from formData
+  useEffect(() => {
+    if (formData.selectedFeatures) {
+      console.log('📥 Initializing feature values:', formData.selectedFeatures);
+      setLocalFeatureValues(formData.selectedFeatures);
+    }
+  }, [formData.selectedFeatures]);
+
+  // Initialize shipping and box data from formData
   useEffect(() => {
     if (editMode && formData) {
-      setManufacturedBy(formData.manufacturer || '');
-      setWeighBy(formData.weight || '');
-      setSelectedBrand(formData.brand || '');
-      setSelectedColor(formData.color || '');
-      setSelectedSize(formData.size ? [formData.size] : []);
-      setSelectedCountry(formData.countryOfOrigin || '');
+      setShippingWeight(formData.shippingWeight || '');
+      setShippingPrice(formData.shippingPrice || '');
+      setFreeShippingChecked(formData.freeShipping || false);
+      setUnitsPerBox(formData.unitsPerBox || '');
+      setExtraUnitsInSameBox(formData.extraUnitsInSameBox || '');
+      setBoxDimensionLength(formData.boxDimensionLength || '');
+      setBoxDimensionWidth(formData.boxDimensionWidth || '');
+      setBoxDimensionHeight(formData.boxDimensionHeight || '');
     }
   }, [editMode, formData]);
 
-  // Update form data when values change
-  const handleManufacturerChange = (text: string) => {
-    setManufacturedBy(text);
-    updateFormData({ manufacturer: text });
-  };
-
-  const handleWeightChange = (text: string) => {
-    setWeighBy(text);
-    updateFormData({ weight: text });
-  };
-
-  const handleBrandChange = (value: string) => {
-    setSelectedBrand(value);
-    updateFormData({ brand: value });
-  };
-
-  const handleColorChange = (value: string) => {
-    setSelectedColor(value);
-    updateFormData({ color: value });
-  };
-
-  const handleSizeChange = (values: string[]) => {
-    setSelectedSize(values);
-    updateFormData({ size: values.length > 0 ? values[0] : '' });
-  };
-
-  const handleCountryChange = (value: string) => {
-    setSelectedCountry(value);
-    updateFormData({ countryOfOrigin: value });
-  };
-
-  const handleShippingWeightChange = (value: string) => {
-    setShippingWeight(value);
-  };
-
-  const handleShippingPriceChange = (value: string) => {
-    setShippingPrice(value);
-  };
-
-  const handleFreeShippingCheckbox = (checked: boolean) => {
-    setFreeShippingChecked(checked);
-  };
-
-  const handleUnitsPerBoxChange = (value: string) => {
-    setUnitsPerBox(value);
-  };
-
-  const handleExtraUnitInSameBoxChange = (value: string) => {
-    setExtraUnitsInSameBox(value);
-  };
-
-  const handleBoxDimensionLengthChange = (value: string) => {
-    setBoxDimensionLength(value);
-  };
-
-  const handleBoxDimensionWidthChange = (value: string) => {
-    setBoxDimensionWidth(value);
-  };
-
-  const handleBoxDimensionHeightChange = (value: string) => {
-    setBoxDimensionHeight(value);
-  };
-
-  // Handler for dropdown toggle
-  const handleDropdownToggle = (dropdownName, isOpen) => {
+  const handleDropdownToggle = (fieldName: string, isOpen: boolean) => {
     if (isOpen) {
-      setActiveDropdown(dropdownName);
-    } else if (activeDropdown === dropdownName) {
+      setActiveDropdown(fieldName);
+    } else if (activeDropdown === fieldName) {
       setActiveDropdown(null);
     }
   };
 
-  return (
-    <View style={styles.container}>
-      {/* Features Section */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Typography
-            variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            text="Features"
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
-          />
-          <Tooltip
-            target={
-              <InfoIconPay
-                size={22}
-                color={ColorPalette.GREY_TEXT_400}
-                style={undefined}
-              />
+  const handleFeatureChange = (fieldName: string, value: string) => {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🎨 [FEATURE CHANGE] User changed a feature');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('Field Name:', fieldName);
+    console.log('New Value:', value);
+    console.log('Previous Value:', localFeatureValues[fieldName] || '(empty)');
+
+    const updatedValues = {
+      ...localFeatureValues,
+      [fieldName]: value,
+    };
+
+    console.log('\n📊 All Feature Values After Change:');
+    console.log(JSON.stringify(updatedValues, null, 2));
+
+    setLocalFeatureValues(updatedValues);
+
+    console.log('\n📤 Updating parent formData...');
+    updateFormData({
+      selectedFeatures: updatedValues,
+    });
+    console.log('✅ Parent formData updated');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  };
+
+  const handleShippingWeightChange = (value: string) => {
+    setShippingWeight(value);
+    updateFormData({shippingWeight: value});
+  };
+
+  const handleShippingPriceChange = (value: string) => {
+    setShippingPrice(value);
+    updateFormData({shippingPrice: value});
+  };
+
+  const handleFreeShippingCheckbox = (checked: boolean) => {
+    setFreeShippingChecked(checked);
+    updateFormData({freeShipping: checked});
+  };
+
+  const handleUnitsPerBoxChange = (value: string) => {
+    setUnitsPerBox(value);
+    updateFormData({unitsPerBox: value});
+  };
+
+  const handleExtraUnitInSameBoxChange = (value: string) => {
+    setExtraUnitsInSameBox(value);
+    updateFormData({extraUnitsInSameBox: value});
+  };
+
+  const handleBoxDimensionLengthChange = (value: string) => {
+    setBoxDimensionLength(value);
+    updateFormData({boxDimensionLength: value});
+  };
+
+  const handleBoxDimensionWidthChange = (value: string) => {
+    setBoxDimensionWidth(value);
+    updateFormData({boxDimensionWidth: value});
+  };
+
+  const handleBoxDimensionHeightChange = (value: string) => {
+    setBoxDimensionHeight(value);
+    updateFormData({boxDimensionHeight: value});
+  };
+
+  // Group features by field name for better organization
+  const brandFeature = availableFeatures.find(f =>
+    f.name.toLowerCase().includes('brand'),
+  );
+  const colorFeature = availableFeatures.find(f =>
+    f.name.toLowerCase().includes('color'),
+  );
+  const sizeFeature = availableFeatures.find(f =>
+    f.name.toLowerCase().includes('size'),
+  );
+  const weightFeature = availableFeatures.find(f =>
+    f.name.toLowerCase().includes('weight'),
+  );
+
+  // Get other features that don't match the common ones
+  const otherFeatures = availableFeatures.filter(
+    f =>
+      !f.name.toLowerCase().includes('brand') &&
+      !f.name.toLowerCase().includes('color') &&
+      !f.name.toLowerCase().includes('size') &&
+      !f.name.toLowerCase().includes('weight'),
+  );
+
+  const renderFeatureField = (
+    feature: ProductFeature,
+    index: number,
+    totalCount: number,
+  ) => {
+    const currentValue = localFeatureValues[feature.field_name] || '';
+    const zIndex = totalCount - index;
+
+    console.log('🎨 Rendering feature:', {
+      name: feature.name,
+      fieldName: feature.field_name,
+      currentValue,
+      hasVariants: !!feature.variants,
+      variantsCount: feature.variants?.length || 0,
+    });
+
+    // If field has variants, show dropdown
+    if (feature.variants && feature.variants.length > 0) {
+      const options = feature.variants.map(variant => ({
+        value: variant.id,
+        label: variant.name,
+      }));
+
+      return (
+        <View
+          key={feature.field_name}
+          style={{
+            zIndex: activeDropdown === feature.field_name ? 999 : zIndex,
+          }}>
+          <Dropdown
+            options={options}
+            selectedValue={currentValue}
+            onSelect={value => handleFeatureChange(feature.field_name, value)}
+            placeholder={`Select ${feature.name.toLowerCase()}`}
+            showSearch={options.length > 5}
+            searchPlaceholder={`Search ${feature.name.toLowerCase()}`}
+            selectionType="radio"
+            onDropdownToggle={isOpen =>
+              handleDropdownToggle(feature.field_name, isOpen)
             }
-            content={
-              <Typography customTextStyles={{
-                color: ColorPalette.GREY_TEXT_200,
-                paddingVertical: getScreenHeight(0.1)
-              }} variant={TypographyVariant.LSMALL_MEDIUM}>
-                Key product highlights or specifications.        </Typography>
-            }
-            placement="right"
-            containerStyle={{
-              width: getScreenWidth(60)
-            }}
           />
         </View>
+      );
+    }
 
-        <View style={{ gap: getScreenWidth(4) }}>
-          {/* First row of dropdowns */}
-          <View style={styles.inputContainer}>
-            {/* Brand Dropdown */}
-            <View style={{ flex: 1, zIndex: activeDropdown === 'brand' ? 3 : 1 }}>
-              <Dropdown
-                options={BRAND_OPTIONS}
-                selectedValue={selectedBrand}
-                onSelect={handleBrandChange}
-                placeholder="Select brand"
-                showSearch={true}
-                searchPlaceholder="Search brands"
-                selectionType="radio"
-                onDropdownToggle={isOpen =>
-                  handleDropdownToggle('brand', isOpen)
-                }
-              />
-            </View>
+    // If no variants, show text input
+    return (
+      <View key={feature.field_name}>
+        <AnimatedTextInput
+          label={`Enter ${feature.name.toLowerCase()}`}
+          value={currentValue}
+          onChangeText={value => handleFeatureChange(feature.field_name, value)}
+          keyboardType="default"
+          required={feature.required}
+        />
+      </View>
+    );
+  };
 
-            {/* Color Dropdown with color indicators */}
-            <View style={{ flex: 1, zIndex: activeDropdown === 'color' ? 3 : 1 }}>
-              <Dropdown
-                options={COLOR_OPTIONS}
-                selectedValue={selectedColor}
-                onSelect={handleColorChange}
-                placeholder="Select color"
-                showSearch={true}
-                searchPlaceholder="Search colors"
-                selectionType="radio"
-                showColorIndicator={true} // Enable color indicators
-                onDropdownToggle={isOpen =>
-                  handleDropdownToggle('color', isOpen)
-                }
-              />
-            </View>
-
-            {/* Size Dropdown - multi-select */}
-            <View style={{ flex: 1, zIndex: activeDropdown === 'size' ? 3 : 1 }}>
-              <Dropdown
-                options={SIZE_OPTIONS}
-                selectedValue={selectedSize}
-                onSelect={handleSizeChange}
-                placeholder="Select size"
-                showSearch={true}
-                searchPlaceholder="Search sizes"
-                selectionType="checkbox"
-                onDropdownToggle={isOpen =>
-                  handleDropdownToggle('size', isOpen)
-                }
-              />
-            </View>
+  // Render loading state
+  if (editMode && (!availableFeatures || availableFeatures.length === 0)) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Typography
+              variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+              text="Features"
+              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            />
           </View>
 
-          {/* Weight input */}
-          <AnimatedTextInput
-            label="Enter weight(Kgs : 0.000)"
-            value={weighBy}
-            onChangeText={handleWeightChange}
-            keyboardType="numeric"
-          />
-        </View>
-      </View>
-
-      {/* Manufacturing Details Section */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Typography
-            variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-            text="Manufacturing details"
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
-          />
-          <Tooltip
-            target={
-              <InfoIconPay
-                size={22}
-                color={ColorPalette.GREY_TEXT_400}
-                style={undefined}
-              />
-            }
-            content={
-              <Typography customTextStyles={{
-                color: ColorPalette.GREY_TEXT_200,
-                paddingVertical: getScreenHeight(0.1)
-              }} variant={TypographyVariant.LSMALL_MEDIUM}>
-                Information about where or by whom the product was made.       </Typography>
-            }
-            placement="bottom"
-          />
-        </View>
-
-        <View style={styles.inputContainerOne}>
-          {/* Manufacturer input */}
-          <AnimatedTextInput
-            label="Enter manufactured by"
-            value={manufacturedBy}
-            onChangeText={handleManufacturerChange}
-            keyboardType="default"
-          />
-
-          {/* Country dropdown */}
           <View
             style={{
-              flex: 1,
-              marginHorizontal: getScreenWidth(4),
-              zIndex: activeDropdown === 'country' ? 3 : 1,
+              padding: getScreenWidth(4),
+              alignItems: 'center',
+              gap: getScreenHeight(2),
             }}>
-            <Dropdown
-              options={COUNTRY_OPTIONS}
-              selectedValue={selectedCountry}
-              onSelect={handleCountryChange}
-              placeholder="Select country of origin"
-              showSearch={true}
-              searchPlaceholder="Search countries"
-              selectionType="radio"
-              onDropdownToggle={isOpen =>
-                handleDropdownToggle('country', isOpen)
-              }
+            <ActivityIndicator size="large" color={ColorPalette.PURPLE_300} />
+            <Typography
+              variant={TypographyVariant.PSMALL_REGULAR}
+              text="Loading features..."
+              customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
             />
           </View>
         </View>
       </View>
+    );
+  }
 
-      {/* Shipping Property Section */}
+  return (
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{paddingBottom: getScreenHeight(8)}}>
+      {/* Product Features Section */}
+      {availableFeatures.length > 0 && (
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Typography
+              variant={TypographyVariant.LMEDIUM_EXTRABOLD}
+              text="Product Features"
+              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
+            />
+            <Tooltip
+              target={
+                <InfoIconPay
+                  size={22}
+                  color={ColorPalette.GREY_TEXT_400}
+                  style={undefined}
+                />
+              }
+              content={
+                <Typography
+                  customTextStyles={{
+                    color: ColorPalette.GREY_TEXT_200,
+                    paddingVertical: getScreenHeight(0.1),
+                  }}
+                  variant={TypographyVariant.LSMALL_MEDIUM}>
+                  Key product highlights or specifications.
+                </Typography>
+              }
+              placement="right"
+              containerStyle={{
+                width: getScreenWidth(60),
+              }}
+            />
+          </View>
+
+          <View
+            style={{
+              gap: getScreenWidth(4),
+              paddingHorizontal: getScreenWidth(4),
+            }}>
+            {/* Render common features first if they exist */}
+            {(brandFeature || colorFeature || sizeFeature) && (
+              <View style={{gap: getScreenWidth(4)}}>
+                {brandFeature &&
+                  renderFeatureField(brandFeature, 0, availableFeatures.length)}
+                {colorFeature &&
+                  renderFeatureField(colorFeature, 1, availableFeatures.length)}
+                {sizeFeature &&
+                  renderFeatureField(sizeFeature, 2, availableFeatures.length)}
+              </View>
+            )}
+
+            {/* Render weight feature separately */}
+            {weightFeature &&
+              renderFeatureField(weightFeature, 3, availableFeatures.length)}
+
+            {/* Render other features */}
+            {otherFeatures.map((feature, index) =>
+              renderFeatureField(feature, index + 4, availableFeatures.length),
+            )}
+          </View>
+        </View>
+      )}
+
+      {/* Shipping Properties Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Typography
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
             text="Shipping properties"
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <Tooltip
             target={
@@ -353,26 +360,27 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
               />
             }
             content={
-              <Typography customTextStyles={{
-                color: ColorPalette.GREY_TEXT_200,
-                paddingVertical: getScreenHeight(0.1)
-              }} variant={TypographyVariant.LSMALL_MEDIUM}>
-                Details used to calculate delivery options and costs.       </Typography>
+              <Typography
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1),
+                }}
+                variant={TypographyVariant.LSMALL_MEDIUM}>
+                Details used to calculate delivery options and costs.
+              </Typography>
             }
             placement="bottom"
           />
         </View>
 
         <View style={styles.inputContainerOne}>
-          {/* Weight input */}
           <AnimatedTextInput
-            label="Enter weight(Kgs : 0.000)"
+            label="Enter weight (Kgs: 0.000)"
             value={shippingWeight}
             onChangeText={handleShippingWeightChange}
             keyboardType="numeric"
           />
 
-          {/* Enter Price */}
           <AnimatedTextInput
             label="Enter price"
             value={shippingPrice}
@@ -380,11 +388,19 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
             keyboardType="numeric"
           />
         </View>
+
         <View style={styles.checkBoxContainer}>
           <TouchableOpacity
             style={styles.checkboxRow}
             onPress={() => handleFreeShippingCheckbox(!freeShippingChecked)}>
-            <View style={[styles.checkbox]}>
+            <View
+              style={[
+                styles.checkbox,
+                freeShippingChecked && {
+                  backgroundColor: ColorPalette.PURPLE_300,
+                  borderColor: ColorPalette.PURPLE_300,
+                },
+              ]}>
               {freeShippingChecked && (
                 <View style={styles.checkmark}>
                   <CheckIcon size={24} />
@@ -394,19 +410,19 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
             <Typography
               text="Free Shipping"
               variant={TypographyVariant.PMEDIUM_REGULAR}
-              customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
             />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Item in a box Section */}
+      {/* Item in a Box Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Typography
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
             text="Item in a box"
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <Tooltip
             target={
@@ -417,11 +433,14 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
               />
             }
             content={
-              <Typography customTextStyles={{
-                color: ColorPalette.GREY_TEXT_200,
-                paddingVertical: getScreenHeight(0.1)
-              }} variant={TypographyVariant.LSMALL_MEDIUM}>
-                List of everything included with the product.     </Typography>
+              <Typography
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1),
+                }}
+                variant={TypographyVariant.LSMALL_MEDIUM}>
+                List of everything included with the product.
+              </Typography>
             }
             placement="bottom"
           />
@@ -433,6 +452,7 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
           onChangeText={handleUnitsPerBoxChange}
           keyboardType="numeric"
         />
+
         <AnimatedTextInput
           label="Enter extra units in the same box (optional)"
           value={extraUnitsInSameBox}
@@ -442,13 +462,13 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
         />
       </View>
 
-      {/* Box Dimension Section*/}
+      {/* Box Dimension Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Typography
             variant={TypographyVariant.LMEDIUM_EXTRABOLD}
             text="Box Dimension"
-            customTextStyles={{ color: ColorPalette.GREY_TEXT_500 }}
+            customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
           />
           <Tooltip
             target={
@@ -459,41 +479,63 @@ const FeaturesStep: React.FC<FeaturesStepProps> = ({
               />
             }
             content={
-              <Typography customTextStyles={{
-                color: ColorPalette.GREY_TEXT_200,
-                paddingVertical: getScreenHeight(0.1)
-              }} variant={TypographyVariant.LSMALL_MEDIUM}>
-                Packaging size used for shipping calculations.      </Typography>
+              <Typography
+                customTextStyles={{
+                  color: ColorPalette.GREY_TEXT_200,
+                  paddingVertical: getScreenHeight(0.1),
+                }}
+                variant={TypographyVariant.LSMALL_MEDIUM}>
+                Packaging size used for shipping calculations.
+              </Typography>
             }
             placement="bottom"
           />
         </View>
 
         <View style={styles.inputContainerOne}>
-          {/* Weight input */}
           <AnimatedTextInput
-            label="Enter length (Inch : 0.000)"
+            label="Enter length (Inch: 0.000)"
             value={boxDimensionLength}
             onChangeText={handleBoxDimensionLengthChange}
             keyboardType="numeric"
           />
-          {/* Weight input */}
+
           <AnimatedTextInput
-            label="Enter width (Inch : 0.000)"
+            label="Enter width (Inch: 0.000)"
             value={boxDimensionWidth}
             onChangeText={handleBoxDimensionWidthChange}
             keyboardType="numeric"
           />
-          {/* Weight input */}
+
           <AnimatedTextInput
-            label="Enter height (Inch : 0.000)"
-            value={boxDimensionHeigth}
+            label="Enter height (Inch: 0.000)"
+            value={boxDimensionHeight}
             onChangeText={handleBoxDimensionHeightChange}
             keyboardType="numeric"
           />
         </View>
       </View>
-    </View>
+
+      {/* Fallback message if no features */}
+      {availableFeatures.length === 0 && !editMode && (
+        <View style={styles.section}>
+          <View
+            style={{
+              padding: getScreenWidth(4),
+              alignItems: 'center',
+            }}>
+            <Typography
+              variant={TypographyVariant.PSMALL_REGULAR}
+              text="No features available for this product category. Features will load after saving the product."
+              customTextStyles={{
+                color: ColorPalette.GREY_TEXT_300,
+                textAlign: 'center',
+              }}
+            />
+          </View>
+        </View>
+      )}
+    </ScrollView>
   );
 };
 
