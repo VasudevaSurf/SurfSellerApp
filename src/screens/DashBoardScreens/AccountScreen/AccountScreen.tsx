@@ -1,32 +1,32 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Image, ScrollView, Share, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {Image, ScrollView, Share, View, Linking, Alert} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useDispatch, useSelector} from 'react-redux';
 import ArrowRightIcon from '../../../assets/icons/ArrowRightIcon';
 import QuestionMarkIcon from '../../../assets/icons/QuestionMarkIcon';
-import { AddModal } from '../../../components/MainComponents/AddModal/AddModal';
-import { MenuItem } from '../../../components/MainComponents/MenuItem/MenuItem';
+import {AddModal} from '../../../components/MainComponents/AddModal/AddModal';
+import {MenuItem} from '../../../components/MainComponents/MenuItem/MenuItem';
 import {
   ButtonSize,
   ButtonState,
   ButtonType,
   ButtonVariant,
 } from '../../../components/UserComponents/Button';
-import { Header } from '../../../components/UserComponents/Header/Header';
-import { Typography } from '../../../components/UserComponents/Typography/Typography';
-import { TypographyVariant } from '../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../config/colorPalette';
-import { getScreenHeight, getScreenWidth } from '../../../helpers/screenSize';
+import {Header} from '../../../components/UserComponents/Header/Header';
+import {Typography} from '../../../components/UserComponents/Typography/Typography';
+import {TypographyVariant} from '../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../config/colorPalette';
+import {getScreenHeight, getScreenWidth} from '../../../helpers/screenSize';
 import {
   navigate,
   navigateToAuth,
 } from '../../../navigation/utils/navigationRef';
-import { logoutUser } from '../../../redux/slices/authSlice';
-import { fetchProfile } from '../../../redux/slices/profileSlice';
-import { styles } from './AccountScreen.styles';
-import { RootState, AppDispatch } from '../../../redux/store';
+import {logoutUser} from '../../../redux/slices/authSlice';
+import {fetchProfile} from '../../../redux/slices/profileSlice';
+import {styles} from './AccountScreen.styles';
+import {RootState, AppDispatch} from '../../../redux/store';
 import BusinessProfileIcon from '../../../assets/icons/BusinessProfileIcon';
-import { BorderRadius } from '../../../config/globalStyles';
+import {BorderRadius} from '../../../config/globalStyles';
 import BusinessAdministrationIcon from '../../../assets/icons/BusinessAdministratorsIcon';
 import BankDetailsIcon from '../../../assets/icons/BankDetailsIcon';
 import PaymentsIcon from '../../../assets/icons/PaymentsIcon';
@@ -36,7 +36,7 @@ import PrivacyPolicyIcon from '../../../assets/icons/PrivacyPolicyIcon';
 import ShareAppIcon from '../../../assets/icons/ShareAppIcon';
 import ChatIcon from '../../../assets/icons/ChatIcon';
 import LogoutIcon from '../../../assets/icons/LogOutIcon';
-import { TrashIcon2 } from '../../../assets/icons/NewProductIcons/TrashIcon2';
+import {TrashIcon2} from '../../../assets/icons/NewProductIcons/TrashIcon2';
 import TermsConditionsIcon from '../../../assets/icons/TermsAndConditionIcon';
 
 const AccountScreen = () => {
@@ -44,9 +44,52 @@ const AccountScreen = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const { profileData, loading, error } = useSelector(
+  const {profileData, loading, error} = useSelector(
     (state: RootState) => state.profile,
   );
+
+  // ✅ Get initializer data for Privacy Policy and Terms URLs
+  const initializerData = useSelector(
+    (state: RootState) => state.initializer.data,
+  );
+
+  // ✅ Debug: Log initializer data when component mounts or data changes
+  useEffect(() => {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('📋 [ACCOUNT SCREEN] Initializer Data Check');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('Has Initializer Data?', !!initializerData);
+
+    if (initializerData) {
+      console.log('📊 Available URLs:');
+      console.log(
+        '├─ Privacy Policy URL:',
+        initializerData.privacy_policy_page,
+      );
+      console.log('├─ Terms of Use URL:', initializerData.terms_of_use_page);
+      console.log('├─ WhatsApp URL:', initializerData.whatsapp_url);
+      console.log('└─ Default Language:', initializerData.default_language);
+
+      console.log('\n🔍 URL Details:');
+      console.log('Privacy Policy:');
+      console.log('├─ Type:', typeof initializerData.privacy_policy_page);
+      console.log(
+        '├─ Length:',
+        initializerData.privacy_policy_page?.length || 0,
+      );
+      console.log('└─ Value:', initializerData.privacy_policy_page);
+
+      console.log('\nTerms of Use:');
+      console.log('├─ Type:', typeof initializerData.terms_of_use_page);
+      console.log('├─ Length:', initializerData.terms_of_use_page?.length || 0);
+      console.log('└─ Value:', initializerData.terms_of_use_page);
+    } else {
+      console.warn('⚠️ No initializer data available yet');
+      console.log('Initializer data should be loaded on app startup');
+      console.log('Check RootNavigator initialization');
+    }
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  }, [initializerData]);
 
   // Fetch profile data when component mounts
   useEffect(() => {
@@ -77,6 +120,50 @@ const AccountScreen = () => {
       setShowLogoutModal(false);
     }
   }, [dispatch]);
+
+  // ✅ Handle opening external links - use URL exactly as provided by API
+  const handleOpenLink = useCallback(async (url: string, linkName: string) => {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`🔗 [OPEN LINK] Attempting to open: ${linkName}`);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    try {
+      console.log('📊 Link Details:');
+      console.log('├─ Link Name:', linkName);
+      console.log('├─ URL (RAW from API):', url);
+      console.log('├─ URL Length:', url?.length || 0);
+      console.log('└─ Is Empty?', !url || url.trim() === '');
+
+      if (!url || url.trim() === '') {
+        console.error('❌ URL is empty or undefined');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+        Alert.alert('Error', `${linkName} link is not available`);
+        return;
+      }
+
+      console.log('\n🚀 Opening URL directly (no modifications)...');
+
+      // Just open the URL directly without any canOpenURL check or modifications
+      await Linking.openURL(url);
+      console.log('✅ [OPEN LINK] Successfully opened:', linkName);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    } catch (error) {
+      console.error('\n💥 [OPEN LINK] Failed to open URL');
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.error('Error Details:', {
+        linkName,
+        url,
+        errorMessage: error?.message,
+        errorType: error?.name,
+      });
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+      Alert.alert(
+        'Unable to Open Link',
+        `Failed to open ${linkName}\n\nURL: ${url}\n\nError: ${error?.message}`,
+      );
+    }
+  }, []);
 
   // Memoize modal buttons with updated logout functionality
   const logoutButtons = useMemo(
@@ -135,7 +222,6 @@ const AccountScreen = () => {
   const onShare = async () => {
     try {
       const result = await Share.share({
-        // title: 'Surf Seller App', - only supported if we use react-native-share library
         message: `Manage your business anytime, anywhere with the Surf Seller App. \nDownload now and start selling smarter with Surf.`,
       });
 
@@ -153,7 +239,7 @@ const AccountScreen = () => {
     }
   };
 
-  // Menu grouped config
+  // ✅ Menu grouped config with dynamic Privacy Policy and Terms URLs
   const menuSections = useMemo(
     () => [
       {
@@ -176,7 +262,7 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'PersonalInfo' },
+                params: {screen: 'PersonalInfo'},
               }),
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {
@@ -200,7 +286,7 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'BusinessAdministrators' },
+                params: {screen: 'BusinessAdministrators'},
               }),
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {
@@ -224,9 +310,8 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'BankDetails' },
+                params: {screen: 'BankDetails'},
               }),
-            leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {
               borderRadius: BorderRadius.Full,
@@ -249,35 +334,13 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'PaymentInfo' },
+                params: {screen: 'PaymentInfo'},
               }),
-            leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {
               borderRadius: BorderRadius.Full,
             },
           },
-          // {
-          //   label: 'Motivation',
-          //   leftIcon: (
-          //     <MotivationIcon
-          //       style={undefined}
-          //       color={ColorPalette.GREY_TEXT_100}
-          //     />
-          //   ),
-          //   rightIcon: (
-          //     <ArrowRightIcon
-          //       style={undefined}
-          //       color={ColorPalette.GREY_TEXT_100}
-          //     />
-          //   ),
-          //   onPress: () => {},
-          //   leftIconBackgroundColor: ColorPalette.VerySmallIconBack,
-          //   leftIconBackgroundColor: ColorPalette.SearchBack,
-          //   leftIconStyles: {
-          //     borderRadius: BorderRadius.Full,
-          //   },
-          // },
         ],
       },
       {
@@ -301,56 +364,13 @@ const AccountScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'NotificationScreen' },
+                params: {screen: 'NotificationScreen'},
               }),
             leftIconBackgroundColor: ColorPalette.SearchBack,
             leftIconStyles: {
               borderRadius: BorderRadius.Full,
             },
           },
-          // {
-          //   label: 'Change Language',
-          //   leftIcon: (
-          //     <LanguageIcon
-          //       style={undefined}
-          //       color={ColorPalette.GREY_TEXT_100}
-          //       strokeWidth={2}
-          //     />
-          //   ),
-          //   leftIconBackgroundColor: ColorPalette.SearchBack,
-          //   leftIconStyles: {
-          //     borderRadius: BorderRadius.Full,
-          //   },
-          //   rightIcon: (
-          //     <ArrowRightIcon
-          //       style={undefined}
-          //       color={ColorPalette.GREY_TEXT_100}
-          //     />
-          //   ),
-          //   onPress: () => { },
-          // },
-          // {
-          //   label: 'Change Currency',
-          //   leftIcon: (
-          //     <EuroIcon
-          //       style={undefined}
-          //       color={ColorPalette.GREY_TEXT_100}
-          //       size={20}
-          //       strokeWidth={2}
-          //     />
-          //   ),
-          //   leftIconBackgroundColor: ColorPalette.SearchBack,
-          //   leftIconStyles: {
-          //     borderRadius: BorderRadius.Full,
-          //   },
-          //   rightIcon: (
-          //     <ArrowRightIcon
-          //       style={undefined}
-          //       color={ColorPalette.GREY_TEXT_100}
-          //     />
-          //   ),
-          //   onPress: () => { },
-          // },
         ],
       },
       {
@@ -374,7 +394,7 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: onShare
+            onPress: onShare,
           },
           {
             label: 'Surf Chatbot',
@@ -398,7 +418,7 @@ const AccountScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'ChatScreen' },
+                params: {screen: 'ChatScreen'},
               });
             },
           },
@@ -420,7 +440,7 @@ const AccountScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'FAQ' },
+                params: {screen: 'FAQ'},
               });
             },
           },
@@ -443,7 +463,18 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => { },
+            // ✅ Open Privacy Policy URL from Initializer API
+            onPress: () => {
+              console.log('🔘 Privacy Policy menu item pressed');
+              console.log(
+                'Privacy Policy URL:',
+                initializerData?.privacy_policy_page,
+              );
+              handleOpenLink(
+                initializerData?.privacy_policy_page || '',
+                'Privacy Policy',
+              );
+            },
           },
           {
             label: 'Terms & Conditions',
@@ -464,7 +495,18 @@ const AccountScreen = () => {
                 color={ColorPalette.GREY_TEXT_100}
               />
             ),
-            onPress: () => { },
+            // ✅ Open Terms of Use URL from Initializer API
+            onPress: () => {
+              console.log('🔘 Terms & Conditions menu item pressed');
+              console.log(
+                'Terms of Use URL:',
+                initializerData?.terms_of_use_page,
+              );
+              handleOpenLink(
+                initializerData?.terms_of_use_page || '',
+                'Terms & Conditions',
+              );
+            },
           },
         ],
       },
@@ -518,7 +560,7 @@ const AccountScreen = () => {
         ],
       },
     ],
-    [],
+    [initializerData, handleOpenLink], // ✅ Dependencies include initializerData
   );
 
   // Memoize the profile section
@@ -551,49 +593,6 @@ const AccountScreen = () => {
     [fullName],
   );
 
-  // Memoize the sales section
-  // const SalesSection = useCallback(
-  //   () => (
-  //     <View style={styles.salesContainer}>
-  //       <View style={styles.twoContainer}>
-  //         <View style={styles.iconBack}>
-  //           <CircularEuroIcon style={undefined} />
-  //         </View>
-  //         <View style={styles.salesTwo}>
-  //           <Typography
-  //             variant={TypographyVariant.H5_SEMIBOLD}
-  //             text="€47,125.34"
-  //             customTextStyles={styles.countValue}
-  //           />
-  //           <Typography
-  //             variant={TypographyVariant.LSMALL_REGULAR}
-  //             text="Total Sales"
-  //             customTextStyles={styles.countCaption}
-  //           />
-  //         </View>
-  //       </View>
-  //       <View style={styles.twoContainer}>
-  //         <View style={styles.iconBackOne}>
-  //           <PackageIcon style={undefined} />
-  //         </View>
-  //         <View style={styles.salesTwo}>
-  //           <Typography
-  //             variant={TypographyVariant.H5_SEMIBOLD}
-  //             text="1529"
-  //             customTextStyles={styles.countValue}
-  //           />
-  //           <Typography
-  //             variant={TypographyVariant.LSMALL_REGULAR}
-  //             text="Total Orders"
-  //             customTextStyles={styles.countCaption}
-  //           />
-  //         </View>
-  //       </View>
-  //     </View>
-  //   ),
-  //   [],
-  // );
-
   return (
     <SafeAreaView
       style={{
@@ -611,23 +610,23 @@ const AccountScreen = () => {
             onPress: () => {
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'FAQ' },
+                params: {screen: 'FAQ'},
               });
             },
             size: 24,
             color: ColorPalette.IconColor,
             strokeWidth: 1.5,
           },
-        ]} />
+        ]}
+      />
       <ScrollView
         style={styles.mainContainer}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: getScreenHeight(4) },
+          {paddingBottom: getScreenHeight(4)},
         ]}
         showsVerticalScrollIndicator={false}>
         <ProfileSection />
-        {/* <SalesSection /> */}
 
         {menuSections.map((section, sectionIndex) => (
           <View
@@ -657,10 +656,10 @@ const AccountScreen = () => {
                   leftIcon={item.leftIcon}
                   rightIcon={item.rightIcon}
                   onPress={item.onPress}
-                  textStyle={{ color: ColorPalette.GREY_TEXT_500 }}
+                  textStyle={{color: ColorPalette.GREY_TEXT_500}}
                   variant={TypographyVariant.PMEDIUM_MEDIUM}
                   containerStyle={styles.menuContainer}
-                  contentStyle={{ gap: getScreenWidth(4) }}
+                  contentStyle={{gap: getScreenWidth(4)}}
                   leftIconBackgroundColor={item.leftIconBackgroundColor}
                   leftIconContainerStyle={{
                     width: 44,
@@ -676,19 +675,6 @@ const AccountScreen = () => {
             </View>
           </View>
         ))}
-        {/* <View style={styles.profileOptionsContainer}>
-          {menuItems.map((item, index) => (
-            <MenuItem
-              key={index}
-              label={item.label}
-              leftIcon={item.leftIcon}
-              rightIcon={item.rightIcon}
-              onPress={item.onPress}
-              textStyle={{color: ColorPalette.GREY_TEXT_500}}
-              variant={TypographyVariant.LMEDIUM_MEDIUM}
-            />
-          ))}
-        </View> */}
 
         <AddModal
           isVisible={showLogoutModal}
