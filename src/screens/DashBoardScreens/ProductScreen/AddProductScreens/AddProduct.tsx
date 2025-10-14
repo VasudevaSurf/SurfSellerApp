@@ -89,8 +89,8 @@ interface FormData {
   quantity: string;
   minQuantity: string;
   maxQuantity: string;
-  qtyStep: string; // ✅ ADD THIS
-  listQtyCount: string; // ✅ ADD THIS
+  qtyStep: string;
+  listQtyCount: string;
   trackInventory: boolean;
   taxType: string;
   brand: string;
@@ -107,11 +107,201 @@ interface FormData {
     name: string;
   };
   selectedCategories: {id: string; name: string; path: string[]}[];
+
+  // NEW: Add product features from Extra Fields
+  productFeatures?: {
+    [fieldName: string]: string | number; // field_name -> selected variant id
+  };
+
+  // NEW: Store the complete extra fields structure for reference
+  extraFieldsData?: Array<{
+    name: string;
+    field_name: string;
+    main_object: string;
+    field_type: string;
+    field_type_desc: string;
+    field_disabled: boolean;
+    required: boolean;
+    value: string | null;
+    variants: Array<{
+      id: string;
+      name: string;
+    }>;
+  }>;
 }
+
+const extractExtraFieldsFromProductData = (
+  productData: any,
+): {
+  productFeatures: {[fieldName: string]: string | number};
+  extraFieldsData: Array<any>;
+} => {
+  console.log('🔍 Starting Extra Fields extraction');
+  console.log(
+    '📦 Product Data Structure:',
+    JSON.stringify(productData, null, 2),
+  );
+
+  const productFeatures: {[fieldName: string]: string | number} = {};
+  let extraFieldsData: Array<any> = [];
+
+  // Check if we have the raw API response structure
+  if (productData.sections && Array.isArray(productData.sections)) {
+    console.log(
+      '✅ Found sections array, length:',
+      productData.sections.length,
+    );
+
+    // Log all section names to debug
+    productData.sections.forEach((section: any, index: number) => {
+      console.log(`Section ${index}:`, {
+        name: section.name,
+        section_type: section.section_type,
+        has_blocks: !!section.blocks,
+        blocks_length: section.blocks?.length || 0,
+      });
+    });
+
+    const featuresSection = productData.sections.find(
+      (section: any) => section.section_type === 'features',
+    );
+
+    if (featuresSection) {
+      console.log('✅ Found Features section:', {
+        name: featuresSection.name,
+        blocks_count: featuresSection.blocks?.length || 0,
+      });
+
+      if (featuresSection.blocks && Array.isArray(featuresSection.blocks)) {
+        // Log all block names
+        featuresSection.blocks.forEach((block: any, index: number) => {
+          console.log(`Block ${index}:`, {
+            block_name: block.block_name,
+            has_fields: !!block.fields,
+            fields_length: block.fields?.length || 0,
+          });
+        });
+
+        // Find the "Extra Fields" block
+        const extraFieldsBlock = featuresSection.blocks.find(
+          (block: any) => block.block_name === 'Extra Fields',
+        );
+
+        if (extraFieldsBlock) {
+          console.log('✅ Found Extra Fields block');
+
+          if (
+            extraFieldsBlock.fields &&
+            Array.isArray(extraFieldsBlock.fields)
+          ) {
+            console.log(
+              '✅ Found fields array, length:',
+              extraFieldsBlock.fields.length,
+            );
+
+            // Filter out fields without variants (like Brand with null variants)
+            extraFieldsData = extraFieldsBlock.fields.filter((field: any) => {
+              const hasVariants =
+                field.variants && Array.isArray(field.variants);
+              console.log(`Field "${field.name}" (${field.field_name}):`, {
+                has_variants: hasVariants,
+                variants_count: hasVariants ? field.variants.length : 0,
+                current_value: field.value,
+              });
+              return hasVariants;
+            });
+
+            console.log(
+              '✅ Filtered fields (with variants):',
+              extraFieldsData.length,
+            );
+
+            // Extract current values for all fields (even those without variants)
+            extraFieldsBlock.fields.forEach((field: any) => {
+              if (
+                field.value !== null &&
+                field.value !== '' &&
+                field.value !== undefined
+              ) {
+                productFeatures[field.field_name] = field.value;
+                console.log(
+                  `Set feature value: ${field.field_name} = ${field.value}`,
+                );
+              }
+            });
+
+            console.log('✅ Final Extracted Data:', {
+              fieldCount: extraFieldsData.length,
+              featureCount: Object.keys(productFeatures).length,
+              fields: extraFieldsData.map(f => f.name),
+              currentValues: productFeatures,
+            });
+          } else {
+            console.warn('⚠️ Extra Fields block has no fields array');
+          }
+        } else {
+          console.warn('⚠️ No "Extra Fields" block found');
+          console.log(
+            'Available blocks:',
+            featuresSection.blocks.map((b: any) => b.block_name),
+          );
+        }
+      } else {
+        console.warn('⚠️ Features section has no blocks array');
+      }
+    } else {
+      console.warn('⚠️ No Features section found');
+      console.log(
+        'Available sections:',
+        productData.sections.map((s: any) => ({
+          name: s.name,
+          type: s.section_type,
+        })),
+      );
+    }
+  } else {
+    console.warn('⚠️ No sections array found in product data');
+    console.log('Product data keys:', Object.keys(productData));
+  }
+
+  console.log('🏁 Extraction complete:', {
+    fieldsExtracted: extraFieldsData.length,
+    featuresExtracted: Object.keys(productFeatures).length,
+  });
+
+  return {productFeatures, extraFieldsData};
+};
 
 const AddProduct = () => {
   const route = useRoute<AddProductRouteProp>();
   const {productId, editMode = false, productData} = route.params || {};
+
+  useEffect(() => {
+    console.log('🧪 TEST - AddProduct received params:', {
+      productId,
+      editMode,
+      hasProductData: !!productData,
+      productDataKeys: productData ? Object.keys(productData) : [],
+      hasSections: productData?.sections ? true : false,
+      sectionsCount: productData?.sections?.length || 0,
+    });
+
+    if (productData?.sections) {
+      console.log(
+        '🧪 TEST - Sections structure:',
+        JSON.stringify(
+          productData.sections.map((s: any) => ({
+            name: s.name,
+            type: s.section_type,
+            blocksCount: s.blocks?.length || 0,
+            blockNames: s.blocks?.map((b: any) => b.block_name) || [],
+          })),
+          null,
+          2,
+        ),
+      );
+    }
+  }, [productId, editMode, productData]);
   console.log('AddProduct route params:', productData);
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -162,12 +352,32 @@ const AddProduct = () => {
   // Pre-fill form data if in edit mode
   useEffect(() => {
     if (editMode && productData) {
-      console.log('🔄 Pre-filling form data in edit mode:', productData);
+      console.log('🔄 Pre-filling form data in edit mode');
+      console.log(
+        '📦 Raw productData received:',
+        JSON.stringify(productData, null, 2),
+      );
 
       const originalImageList = Array.isArray(productData.images)
         ? productData.images
         : [];
       setOriginalImages(originalImageList);
+
+      // Extract extra fields features
+      console.log('🔍 About to extract extra fields...');
+      const {productFeatures, extraFieldsData} =
+        extractExtraFieldsFromProductData(productData);
+
+      console.log('📋 Extraction results:', {
+        productFeatures,
+        extraFieldsDataCount: extraFieldsData.length,
+        extraFieldsData: extraFieldsData.map(f => ({
+          name: f.name,
+          field_name: f.field_name,
+          value: f.value,
+          variants_count: f.variants?.length || 0,
+        })),
+      });
 
       setFormData(prevData => {
         const updatedData = {
@@ -186,8 +396,8 @@ const AddProduct = () => {
           quantity: productData.quantity || '',
           minQuantity: productData.minQuantity || '',
           maxQuantity: productData.maxQuantity || '',
-          qtyStep: productData.qtyStep || '', // ✅ ADD THIS
-          listQtyCount: productData.listQtyCount || '', // ✅ ADD THIS
+          qtyStep: productData.qtyStep || '',
+          listQtyCount: productData.listQtyCount || '',
           trackInventory: Boolean(productData.trackInventory),
           taxType: productData.taxType || 'VAT',
           brand: productData.brand || '',
@@ -205,13 +415,18 @@ const AddProduct = () => {
           userId: userId,
           category_listing: productData.category_listing || {id: 0, name: ''},
           selectedCategories: productData.selectedCategories || [],
+
+          // Add extracted features
+          productFeatures: productFeatures,
+          extraFieldsData: extraFieldsData,
         };
 
-        console.log('✅ Form data updated with inventory values:', {
-          minQuantity: updatedData.minQuantity,
-          maxQuantity: updatedData.maxQuantity,
-          qtyStep: updatedData.qtyStep, // ✅ LOG THIS
-          listQtyCount: updatedData.listQtyCount, // ✅ LOG THIS
+        console.log('✅ Form data updated:', {
+          productName: updatedData.productName,
+          featuresCount: Object.keys(productFeatures).length,
+          extraFieldsCount: extraFieldsData.length,
+          productFeatures: updatedData.productFeatures,
+          extraFieldsData: updatedData.extraFieldsData,
         });
 
         return updatedData;
@@ -335,7 +550,7 @@ const AddProduct = () => {
         //   'Images Not Uploaded',
         //   'Please wait for images to finish uploading before saving the product.',
         // );
-        showCustomToast("Oops! Upload failed. Try again.", '❌');
+        showCustomToast('Oops! Upload failed. Try again.', '❌');
 
         return;
       }
@@ -343,7 +558,7 @@ const AddProduct = () => {
 
     if (!userId) {
       // Alert.alert('Error', 'User session expired. Please login again.');
-      showCustomToast("Session expired. Please login again.", '❌')
+      showCustomToast('Session expired. Please login again.', '❌');
       return;
     }
 
@@ -397,8 +612,6 @@ const AddProduct = () => {
         : 'Product added successfully.';
 
       showCustomToast(successMessage, '✅');
-
-
     } catch (error: any) {
       console.error('💥 Error saving product:', error);
 
@@ -417,11 +630,10 @@ const AddProduct = () => {
       //   ],
       // );
 
-      const erroMessage =
-        `Failed to ${editMode ? 'update' : 'create'
-        } product. Please try again.`
+      const erroMessage = `Failed to ${
+        editMode ? 'update' : 'create'
+      } product. Please try again.`;
       showCustomToast(erroMessage, '❌');
-
     } finally {
       setIsSubmitting(false);
     }

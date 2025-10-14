@@ -297,13 +297,18 @@ export const fetchProductDetails = createAsyncThunk(
 
       console.log('📦 Raw product details response:', response);
 
+      // IMPORTANT: Keep the ENTIRE response including sections
       const enhancedResponse = {
-        ...response,
+        ...response, // ← This should include response.sections
         images: extractImagesFromResponse(response),
         productData: response.product_data || response,
       };
 
-      console.log('✅ Enhanced product details:', enhancedResponse);
+      console.log('✅ Enhanced product details:', {
+        hasSections: !!enhancedResponse.sections,
+        sectionsCount: enhancedResponse.sections?.length || 0,
+        sections: enhancedResponse.sections?.map((s: any) => s.name) || [],
+      });
 
       return enhancedResponse;
     } catch (error: any) {
@@ -716,13 +721,14 @@ const productsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchProductDetails.fulfilled, (state, action) => {
-        console.log(
-          '✅ fetchProductDetails.fulfilled with enhanced data:',
-          action.payload,
-        );
+        console.log('✅ fetchProductDetails.fulfilled with enhanced data:', {
+          hasSections: !!action.payload.sections,
+          sectionsCount: action.payload.sections?.length || 0,
+        });
+
         state.loading = false;
         state.productDetails = {
-          ...action.payload,
+          ...action.payload, // ← This should preserve sections
           images: action.payload.images || [],
         };
         state.error = null;

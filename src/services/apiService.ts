@@ -481,6 +481,11 @@ export interface CreateProductRequest {
   };
   user_id: string;
   product_id?: number;
+
+  // NEW: Add product_feature for Extra Fields
+  product_feature?: {
+    [fieldName: string]: string | number;
+  };
 }
 
 export interface CreateProductResponse {
@@ -1902,6 +1907,7 @@ export const transformFormDataToApiFormat = (
     currentImages: formData.images?.length || 0,
     imageRelativePaths: formData.imageRelativePaths?.length || 0,
     originalImages: originalImages?.length || 0,
+    hasProductFeatures: !!formData.productFeatures,
   });
 
   // Extract category IDs from categoryPath
@@ -1932,7 +1938,7 @@ export const transformFormDataToApiFormat = (
       exceptions_type: 'F',
       full_description: formData.description || '',
       list_price: '0.00',
-      list_qty_count: formData.listQtyCount || '', // ✅ ADD THIS
+      list_qty_count: formData.listQtyCount || '',
       max_qty: formData.maxQuantity || '',
       min_qty: formData.minQuantity || '',
       options_type: 'P',
@@ -1942,7 +1948,7 @@ export const transformFormDataToApiFormat = (
       product: formData.productName || '',
       product_code: formData.productCode || '',
       promo_text: '',
-      qty_step: formData.qtyStep || '', // ✅ ADD THIS
+      qty_step: formData.qtyStep || '',
       sales_amount: '',
       search_words: '',
       short_description: '',
@@ -1956,18 +1962,42 @@ export const transformFormDataToApiFormat = (
     user_id: userId,
   };
 
+  // NEW: Add product_feature if available
+  if (
+    formData.productFeatures &&
+    Object.keys(formData.productFeatures).length > 0
+  ) {
+    console.log(
+      '📋 Adding product features to API payload:',
+      formData.productFeatures,
+    );
+
+    // Transform features: convert string values to appropriate types
+    const transformedFeatures: {[key: string]: string | number} = {};
+
+    Object.entries(formData.productFeatures).forEach(([fieldName, value]) => {
+      // Convert to number if it's a numeric string, otherwise keep as string
+      const numericValue = Number(value);
+      transformedFeatures[fieldName] = isNaN(numericValue)
+        ? value
+        : numericValue;
+    });
+
+    apiData.product_feature = transformedFeatures;
+
+    console.log('✅ Transformed product features:', transformedFeatures);
+  }
+
   // Handle images for both create and edit modes
   const imagePaths: string[] = [];
 
   if (editMode) {
     console.log('📸 Processing images for edit mode...');
 
-    // For edit mode, we need to collect ALL current images as relative paths
     const currentImages = formData.images || [];
 
     for (const imageUrl of currentImages) {
       if (imageUrl.startsWith('http')) {
-        // This is an existing image URL - convert to relative path
         const relativePath = extractRelativePathFromUrl(imageUrl);
         if (relativePath && !imagePaths.includes(relativePath)) {
           imagePaths.push(relativePath);
@@ -1975,7 +2005,6 @@ export const transformFormDataToApiFormat = (
       }
     }
 
-    // Add newly uploaded images (relative paths)
     if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
       for (const relativePath of formData.imageRelativePaths) {
         if (
@@ -1993,7 +2022,6 @@ export const transformFormDataToApiFormat = (
       paths: imagePaths,
     });
   } else {
-    // For create mode, only use newly uploaded images
     if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
       formData.imageRelativePaths.forEach((path: string) => {
         if (path && !path.startsWith('http') && !imagePaths.includes(path)) {
@@ -2005,15 +2033,12 @@ export const transformFormDataToApiFormat = (
     console.log('✅ Collected image paths for create mode:', imagePaths.length);
   }
 
-  // Set the image_pair_positon with all current relative paths
   if (imagePaths.length > 0) {
     apiData.image_pair_positon = imagePaths;
   } else {
-    // If no images, send empty array to clear all images
     apiData.image_pair_positon = [];
   }
 
-  // Add product_id for updates
   if (editMode && formData.productId) {
     apiData.product_id = parseInt(formData.productId);
   }
@@ -2022,7 +2047,10 @@ export const transformFormDataToApiFormat = (
     productId: apiData.product_id,
     productName: apiData.product_data.product,
     imageCount: apiData.image_pair_positon?.length || 0,
-    imagePaths: apiData.image_pair_positon || [],
+    hasProductFeatures: !!apiData.product_feature,
+    featureCount: apiData.product_feature
+      ? Object.keys(apiData.product_feature).length
+      : 0,
     isEdit: editMode,
   });
 
