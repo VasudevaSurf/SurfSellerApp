@@ -1963,6 +1963,22 @@ export const transformFormDataToApiFormat = (
     }
   }
 
+  // ✅ UPDATED: Handle tax_ids correctly
+  let taxIds: number[] = [];
+  if (formData.tax_ids) {
+    // If tax_ids is already an array, use it
+    taxIds = Array.isArray(formData.tax_ids) ? formData.tax_ids : [];
+  } else if (formData.taxType === 'VAT') {
+    // Fallback: if taxType is 'VAT', add tax ID 6
+    taxIds = [6];
+  }
+
+  console.log('💰 Tax configuration:', {
+    formData_tax_ids: formData.tax_ids,
+    formData_taxType: formData.taxType,
+    final_taxIds: taxIds,
+  });
+
   const apiData: CreateProductRequest = {
     lang_code: 'en',
     product_data: {
@@ -1989,7 +2005,7 @@ export const transformFormDataToApiFormat = (
       search_words: '',
       short_description: '',
       status: 'A',
-      tax_ids: formData.taxType === 'VAT' ? [1] : [],
+      tax_ids: taxIds, // ✅ Use the calculated tax IDs
       timestamp: Math.floor(Date.now() / 1000).toString(),
       tracking: formData.trackInventory ? 'B' : 'N',
       usergroup_ids: [],
@@ -1998,10 +2014,9 @@ export const transformFormDataToApiFormat = (
     user_id: userId,
   };
 
-  // ✅ NEW: Collect ALL product features from formData
+  // Collect ALL product features from formData
   const productFeature: {[key: string]: string} = {};
 
-  // Find all feature fields in formData (they start with "feature_")
   Object.keys(formData).forEach(key => {
     if (key.startsWith('feature_')) {
       const fieldName = key.replace('feature_', '');
@@ -2014,7 +2029,6 @@ export const transformFormDataToApiFormat = (
     }
   });
 
-  // Add product_feature to apiData if we have any features
   if (Object.keys(productFeature).length > 0) {
     (apiData as any).product_feature = productFeature;
     console.log('🎨 Product features to send:', productFeature);
@@ -2069,6 +2083,7 @@ export const transformFormDataToApiFormat = (
     productId: apiData.product_id,
     productName: apiData.product_data.product,
     imageCount: apiData.image_pair_positon?.length || 0,
+    tax_ids: apiData.product_data.tax_ids,
     productFeature: (apiData as any).product_feature,
     isEdit: editMode,
   });

@@ -160,6 +160,7 @@ const AddProduct = () => {
     listQtyCount: '',
     trackInventory: false,
     taxType: 'VAT',
+    tax_ids: [], // ✅ ADD THIS
     brand: '',
     color: '',
     size: '',
@@ -189,20 +190,6 @@ const AddProduct = () => {
       console.log(JSON.stringify(productData, null, 2));
       console.log('='.repeat(80));
 
-      console.log('🔍 Product Data Analysis:');
-      console.log('- Product ID:', productData.productId);
-      console.log('- Product Name:', productData.productName);
-      console.log('- Images Count:', productData.images?.length || 0);
-      console.log('- Min Qty:', productData.minQuantity);
-      console.log('- Max Qty:', productData.maxQuantity);
-      console.log('- Qty Step:', productData.qtyStep);
-      console.log('- List Qty Count:', productData.listQtyCount);
-      console.log('- Categories:', productData.selectedCategories);
-      console.log('- Brand:', productData.brand);
-      console.log('- Size:', productData.size);
-      console.log('- Weight:', productData.weight);
-      console.log('- API Response exists:', !!productData.apiResponse);
-
       const originalImageList = Array.isArray(productData.images)
         ? productData.images
         : [];
@@ -229,6 +216,7 @@ const AddProduct = () => {
           listQtyCount: productData.listQtyCount || '',
           trackInventory: Boolean(productData.trackInventory),
           taxType: productData.taxType || 'VAT',
+          tax_ids: productData.tax_ids || [], // ✅ ADD THIS
           brand: productData.brand || '',
           color: productData.color || '',
           size: productData.size || '',
@@ -247,16 +235,7 @@ const AddProduct = () => {
           apiResponse: productData.apiResponse,
         };
 
-        console.log('✅ Form data updated with values:', {
-          minQuantity: updatedData.minQuantity,
-          maxQuantity: updatedData.maxQuantity,
-          qtyStep: updatedData.qtyStep,
-          listQtyCount: updatedData.listQtyCount,
-          brand: updatedData.brand,
-          size: updatedData.size,
-          weight: updatedData.weight,
-          hasApiResponse: !!updatedData.apiResponse,
-        });
+        console.log('✅ Form data updated with tax_ids:', updatedData.tax_ids);
 
         return updatedData;
       });

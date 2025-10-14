@@ -1,4 +1,6 @@
-import React, {useState, useEffect, useMemo} from 'react';
+// src/screens/DashBoardScreens/ProductScreen/AddProduct/ProgressStepperPages/InventoryStepPages/InventoryStep.tsx
+
+import React, {useState, useEffect, useMemo, useRef} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import CheckIcon from '../../../../../../assets/icons/CheckIcon';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
@@ -54,6 +56,9 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<boolean | null>(false);
 
+  // ✅ NEW: Track if initial data has been loaded
+  const initialLoadDone = useRef(false);
+
   const [discounts, setDiscounts] = useState<
     Array<{
       id: number;
@@ -67,27 +72,138 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
   const [nextId, setNextId] = useState(1);
   const [deleteDiscountId, setDeleteDiscountId] = useState<number | null>(null);
 
-  // Pre-fill data if in edit mode
+  // Pre-fill data if in edit mode - ONLY RUN ONCE
   useEffect(() => {
+    // ✅ CRITICAL: Only run this effect once during initial load
+    if (initialLoadDone.current) {
+      console.log('⏭️ Skipping useEffect - initial load already done');
+      return;
+    }
+
+    console.log('🔄 InventoryStep useEffect triggered');
+    console.log('📦 Edit Mode:', editMode);
+    console.log('📦 FormData received:', JSON.stringify(formData, null, 2));
+
     if (editMode && formData) {
+      console.log('='.repeat(80));
+      console.log('📦 INVENTORY STEP - LOADING FORM DATA');
+      console.log('='.repeat(80));
+
+      // Log ALL formData keys
+      console.log('📋 All formData keys:', Object.keys(formData));
+
+      // Detailed tax_ids logging
+      console.log('💰 TAX DATA ANALYSIS:');
+      console.log('  - formData.tax_ids:', formData.tax_ids);
+      console.log('  - Type:', typeof formData.tax_ids);
+      console.log('  - Is Array:', Array.isArray(formData.tax_ids));
+      console.log('  - Array length:', formData.tax_ids?.length);
+      console.log('  - JSON stringified:', JSON.stringify(formData.tax_ids));
+
+      // ✅ ALSO check apiResponse.product_data.tax_ids
+      console.log(
+        '  - formData.apiResponse.product_data.tax_ids:',
+        formData.apiResponse?.product_data?.tax_ids,
+      );
+
+      if (formData.tax_ids && Array.isArray(formData.tax_ids)) {
+        formData.tax_ids.forEach((id: any, index: number) => {
+          console.log(`  - tax_ids[${index}]:`, {
+            value: id,
+            type: typeof id,
+            stringValue: String(id),
+            equals6String: String(id) === '6',
+            equals6Number: id === 6,
+            equalsStrict: id === '6',
+          });
+        });
+      }
+
+      console.log('  - formData.taxType:', formData.taxType);
+      console.log('='.repeat(80));
+
       setProductCode(formData.productCode || '');
       setQualityStock(formData.quantity || '');
       setMinQuantity(formData.minQuantity || '');
       setMaxQuantity(formData.maxQuantity || '');
       setAvailableQuantity(formData.availableQuantity || '');
-      setQtyStep(formData.qtyStep || ''); // ✅ ADD THIS
-      setListQtyCount(formData.listQtyCount || ''); // ✅ ADD THIS
+      setQtyStep(formData.qtyStep || '');
+      setListQtyCount(formData.listQtyCount || '');
       setTrackInventory(formData.trackInventory ? 'yes' : 'no');
-      setVatChecked(formData.taxType === 'VAT');
+
+      // ✅ Check BOTH locations for tax_ids
+      let hasTaxId = false;
+
+      console.log('🔍 Starting VAT check logic...');
+
+      // Function to check if an array contains tax ID 6
+      const checkTaxIdsArray = (
+        taxIdsArray: any[],
+        source: string,
+      ): boolean => {
+        if (!Array.isArray(taxIdsArray) || taxIdsArray.length === 0) {
+          console.log(`  ✗ ${source} is empty or not an array`);
+          return false;
+        }
+
+        console.log(`  ✓ ${source} has ${taxIdsArray.length} items`);
+
+        const found = taxIdsArray.some((id: any) => {
+          const idString = String(id).trim();
+          const idNumber = Number(id);
+
+          console.log(`    - Checking ${source} ID:`, {
+            original: id,
+            asString: idString,
+            asNumber: idNumber,
+            matchesString: idString === '6',
+            matchesNumber: idNumber === 6,
+          });
+
+          return idString === '6' || idNumber === 6;
+        });
+
+        console.log(`  → ${source} contains tax ID 6:`, found);
+        return found;
+      };
+
+      // Check formData.tax_ids first
+      if (formData.tax_ids && Array.isArray(formData.tax_ids)) {
+        console.log('  📦 Checking formData.tax_ids...');
+        hasTaxId = checkTaxIdsArray(formData.tax_ids, 'formData.tax_ids');
+      }
+
+      // If not found, check apiResponse.product_data.tax_ids
+      if (!hasTaxId && formData.apiResponse?.product_data?.tax_ids) {
+        console.log('  📦 Checking apiResponse.product_data.tax_ids...');
+        hasTaxId = checkTaxIdsArray(
+          formData.apiResponse.product_data.tax_ids,
+          'apiResponse.product_data.tax_ids',
+        );
+      }
+
+      console.log('='.repeat(80));
+      console.log('✅ FINAL VAT CHECKBOX STATE:', hasTaxId);
+      console.log('='.repeat(80));
+
+      setVatChecked(hasTaxId);
+
+      // ✅ Mark initial load as complete
+      initialLoadDone.current = true;
     }
-  }, [editMode, formData]);
+  }, []); // ✅ Empty dependency array - only run once on mount
+
+  // Add a separate effect to log vatChecked state changes
+  useEffect(() => {
+    console.log('🎯 VAT Checkbox State Changed:', vatChecked);
+  }, [vatChecked]);
 
   // Update form data when values change
   const handleProductCodeChange = (text: string) => {
     setProductCode(text);
     updateFormData({
       productCode: text,
-      product_code: text, // API field name
+      product_code: text,
     });
   };
 
@@ -95,7 +211,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
     setQualityStock(text);
     updateFormData({
       quantity: text,
-      amount: text, // API field name
+      amount: text,
     });
   };
 
@@ -103,7 +219,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
     setMinQuantity(text);
     updateFormData({
       minQuantity: text,
-      min_qty: text, // API field name
+      min_qty: text,
     });
   };
 
@@ -111,18 +227,24 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
     setMaxQuantity(text);
     updateFormData({
       maxQuantity: text,
-      max_qty: text, // API field name
+      max_qty: text,
     });
   };
 
   const handleQtyStepChange = (text: string) => {
     setQtyStep(text);
-    updateFormData({qtyStep: text});
+    updateFormData({
+      qtyStep: text,
+      qty_step: text,
+    });
   };
 
   const handleListQtyCountChange = (text: string) => {
     setListQtyCount(text);
-    updateFormData({listQtyCount: text});
+    updateFormData({
+      listQtyCount: text,
+      list_qty_count: text,
+    });
   };
 
   const handleAvailableQuantityChange = (text: string) => {
@@ -134,16 +256,28 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
     setTrackInventory(value);
     updateFormData({
       trackInventory: value === 'yes',
-      tracking: value === 'yes' ? 'B' : 'N', // API field: B = track, N = don't track
+      tracking: value === 'yes' ? 'B' : 'N',
     });
   };
 
+  // ✅ Handle VAT checkbox with correct tax_ids format
   const handleVatChange = (checked: boolean) => {
+    console.log('🔄 VAT checkbox changed:', {
+      checked,
+      willSetTaxIds: checked ? [6] : [],
+    });
+
     setVatChecked(checked);
+
+    // ✅ Update formData with correct format for API
+    // When checked: tax_ids = [6]
+    // When unchecked: tax_ids = []
     updateFormData({
       taxType: checked ? 'VAT' : '',
-      tax_ids: checked ? [1] : [], // API field: array of tax IDs
+      tax_ids: checked ? [6] : [],
     });
+
+    console.log('✅ FormData updated with tax_ids:', checked ? [6] : []);
   };
 
   const handleAddDiscount = () => {
@@ -225,6 +359,8 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
     {value: 'Absolute', label: 'Absolute (€)'},
   ];
 
+  console.log('🎨 InventoryStep render - vatChecked:', vatChecked);
+
   return (
     <View style={styles.container}>
       <View style={styles.section}>
@@ -285,7 +421,6 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
             keyboardType="numeric"
             required={false}
           />
-          {/* ✅ ADD THESE TWO NEW FIELDS */}
           <AnimatedTextInput
             label="Quantity step (Optional)"
             value={qtyStep}
@@ -300,42 +435,9 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
             keyboardType="numeric"
             required={false}
           />
-          {/* <AnimatedTextInput
-            label="Number of available quantities"
-            value={availableQuantity}
-            onChangeText={handleAvailableQuantityChange}
-            keyboardType="numeric"
-          /> */}
         </View>
       </View>
-      {/* <View style={styles.sectionItem}>
-        <Typography
-          text="Track Inventory"
-          variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-          customTextStyles={styles.primaryText}
-        />
-        <Typography
-          text="When inventory is tracked, the number of products in stock will decrease after each purchase"
-          variant={TypographyVariant.LXSMALL_REGULAR}
-          customTextStyles={styles.secondaryText}
-        />
-        <ToggleButtons
-          leftButtonText="Yes"
-          rightButtonText="No"
-          leftButtonValue="yes"
-          rightButtonValue="no"
-          initialActiveButton={trackInventory}
-          onSelectionChange={handleTrackInventoryChange}
-          inactiveBackgroundColor="transparent"
-          activeBackgroundColor={ColorPalette.toggleColor}
-          inactiveTextColor={ColorPalette.GREY_TEXT_500}
-          activeTextColor={ColorPalette.White}
-          containerStyle={styles.toggleContainer}
-          buttonStyle={styles.toggleButton}
-          textStyle={styles.toggleButtonText}
-          typographyVariant={TypographyVariant.LMEDIUM_MEDIUM}
-        />
-      </View> */}
+
       <View style={styles.taxCheckContainer}>
         <Typography
           text="Tax"
@@ -345,7 +447,10 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
         <View style={styles.checkBoxContainer}>
           <TouchableOpacity
             style={styles.checkboxRow}
-            onPress={() => handleVatChange(!vatChecked)}>
+            onPress={() => {
+              console.log('👆 Checkbox tapped! Current state:', vatChecked);
+              handleVatChange(!vatChecked);
+            }}>
             <View
               style={[
                 styles.checkbox,
@@ -355,7 +460,7 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
               ]}>
               {vatChecked && (
                 <View style={styles.checkmark}>
-                  <CheckIcon size={24} />
+                  <CheckIcon size={24} checkColor={ColorPalette.White} />
                 </View>
               )}
             </View>
@@ -368,157 +473,6 @@ const InventoryStep: React.FC<InventoryStepProps> = ({
         </View>
       </View>
 
-      {/* Quantity Discount Section - Keep existing implementation */}
-      {/* <View style={styles.section}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: Spacing.Medium,
-          }}>
-          <View style={styles.sectionHeaderDiscount}>
-            <Typography
-              variant={TypographyVariant.LMEDIUM_EXTRABOLD}
-              text="Quantity Discount"
-              customTextStyles={{color: ColorPalette.GREY_TEXT_500}}
-            />
-            <Tooltip
-              target={
-                <InfoIconPay
-                  size={22}
-                  color={ColorPalette.GREY_TEXT_400}
-                  style={undefined}
-                />
-              }
-              content={
-                <Typography
-                  customTextStyles={{
-                    color: ColorPalette.GREY_TEXT_200,
-                    paddingVertical: getScreenHeight(0.1),
-                  }}
-                  variant={TypographyVariant.LSMALL_MEDIUM}>
-                  Price reduction offered for bulk purchases.
-                </Typography>
-              }
-              placement="bottom"
-            />
-          </View>
-          <Button
-            text={discounts.length === 0 ? 'Add' : 'Add More'}
-            textVariant={TypographyVariant.H6_MEDIUM}
-            customTextStyles={{
-              color: ColorPalette.GREY_TEXT_500,
-            }}
-            onPress={handleAddDiscount}
-            activeOpacity={0.7}
-            type={ButtonType.OUTLINED}
-            customStyles={{
-              height: getScreenWidth(12),
-              borderRadius: BorderRadius.Small,
-              borderWidth: 1,
-              borderColor: ColorPalette.GREY_TEXT_500,
-              ...(discounts.length === 0
-                ? {
-                    paddingLeft: getScreenWidth(8),
-                    paddingRight: getScreenWidth(6),
-                  }
-                : {
-                    paddingLeft: getScreenWidth(6),
-                    paddingRight: getScreenWidth(4),
-                  }),
-            }}
-            IconComponent={PlusIcon}
-            iconProps={{
-              size: 28,
-              color: ColorPalette.GREY_TEXT_400,
-              strokeWidth: 1.5,
-            }}
-            iconPosition="right"
-          />
-        </View>
-
-        {discounts.length > 0 &&
-          discounts.map((discount, index) => (
-            <View
-              key={discount.id}
-              style={[
-                styles.inputContainer,
-                {
-                  borderWidth: 1,
-                  paddingTop: Spacing.Medium,
-                  marginHorizontal: Spacing.Medium,
-                  borderRadius: BorderRadius.Small,
-                  borderColor: ColorPalette.GREY_100,
-                },
-              ]}>
-              <AnimatedTextInput
-                label="Enter Minimum Quantity (e.g. 5)"
-                value={discount.minQty}
-                onChangeText={value =>
-                  handleChangeDiscount(discount.id, 'minQty', value)
-                }
-                keyboardType="phone-pad"
-              />
-              <AnimatedTextInput
-                label="Enter Maximum Quantity (Optional)"
-                value={discount.maxQty}
-                onChangeText={value =>
-                  handleChangeDiscount(discount.id, 'maxQty', value)
-                }
-                keyboardType="phone-pad"
-                required={false}
-              />
-              <AnimatedTextInput
-                label="Enter Discount Value (e.g. 5)"
-                value={discount.discountValue}
-                onChangeText={value =>
-                  handleChangeDiscount(discount.id, 'discountValue', value)
-                }
-                keyboardType="phone-pad"
-              />
-
-              <View
-                style={{
-                  zIndex: activeDropdown ? 3 : 1,
-                  marginHorizontal: Spacing.Medium,
-                }}>
-                <Dropdown
-                  options={DISCOUNT_TYPE_OPTIONS}
-                  selectedValue={discount.discountType}
-                  onSelect={value =>
-                    handleChangeDiscountType(
-                      discount.id,
-                      value as 'Percentage' | 'Absolute',
-                    )
-                  }
-                  placeholder="Select discount type"
-                  selectionType="radio"
-                  showSearch={false}
-                  onDropdownToggle={isOpen => handleDropdownToggle(isOpen)}
-                />
-              </View>
-
-              <Badge
-                text="Delete"
-                type={BadgeType.DANGER}
-                variant={BadgeVariant.OUTLINE}
-                onPress={() => {
-                  setDeleteDiscountId(discount.id);
-                  setShowDeleteModal(true);
-                }}
-                customContainerStyle={{
-                  borderRadius: Spacing.XSmall,
-                  paddingVertical: getScreenHeight(2),
-                  marginHorizontal: Spacing.Medium,
-                }}
-                textVariant={TypographyVariant.LMEDIUM_MEDIUM}
-                rightIcon={TrashIcon2}
-                iconSize={18}
-              />
-            </View>
-          ))}
-      </View> */}
       <AddModal
         isVisible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
