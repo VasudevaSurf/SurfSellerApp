@@ -10,11 +10,12 @@ import {RootStackParamList} from '../types/navigation';
 import {AuthNavigator} from './stacks/AuthNavigator';
 import {CreateNavigator} from './stacks/CreateNavigator';
 import {DashboardNavigator} from './stacks/DashBoardNavigator';
-import {OnboardingNavigator} from './stacks/OnboardingNavigator';
 import {VATNavigator} from './stacks/VATNavigator';
 import AppUpdateModal from '../components/MainComponents/AppUpdateModal';
 import VersionCheckService from '../utils/versionCheck';
 import {fetchInitializer} from '../redux/slices/initializerSlice';
+import SplashScreen from '../screens/Onboarding/SplashScreen/SplashScreen';
+import WelcomeScreen from '../screens/Onboarding/WelcomeScreen/WelcomeScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -28,6 +29,7 @@ export const RootNavigator = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [storeUrl, setStoreUrl] = useState('');
+  const [showSplash, setShowSplash] = useState(true);
 
   // Check auth status when app starts
   useEffect(() => {
@@ -48,6 +50,11 @@ export const RootNavigator = () => {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
       setIsInitialized(true);
+
+      // Hide splash after 2 seconds
+      setTimeout(() => {
+        setShowSplash(false);
+      }, 2000);
     };
 
     initialize();
@@ -180,6 +187,11 @@ export const RootNavigator = () => {
     return null;
   }
 
+  // Show splash screen for both logged in and logged out users
+  if (showSplash) {
+    return <SplashScreen navigation={{replace: () => {}}} />;
+  }
+
   return (
     <>
       <Stack.Navigator
@@ -188,7 +200,8 @@ export const RootNavigator = () => {
         }}>
         {!isLoggedIn ? (
           <>
-            <Stack.Screen name="Onboarding" component={OnboardingNavigator} />
+            {/* Welcome screen only - no OnboardingNavigator needed */}
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="Auth" component={AuthNavigator} />
             <Stack.Screen name="Create" component={CreateNavigator} />
             <Stack.Screen name="VAT" component={VATNavigator} />

@@ -180,7 +180,9 @@ const BusinessAdministrators = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView
+      style={{flex: 1, backgroundColor: ColorPalette.SearchBack}}
+      edges={['top', 'bottom']}>
       <Header
         name="Business Administrators"
         variant={TypographyVariant.H6_BOLD}

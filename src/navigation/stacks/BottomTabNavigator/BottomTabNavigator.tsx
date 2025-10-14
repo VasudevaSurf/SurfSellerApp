@@ -169,7 +169,11 @@ export default function BottomNavigation() {
           key={name}
           name={name}
           component={component}
-          options={{title}}
+          options={{
+            title,
+            // Ensure no extra wrapper that might hide content
+            lazy: false,
+          }}
         />
       ))}
     </Tab.Navigator>

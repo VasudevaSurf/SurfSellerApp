@@ -746,7 +746,9 @@ const ProductScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+    <SafeAreaView
+      style={{flex: 1, backgroundColor: ColorPalette.SearchBack}}
+      edges={['top', 'bottom']}>
       <Header
         name={
           isMultiSelectMode ? `${selectedProducts.length} Selected` : 'Products'
