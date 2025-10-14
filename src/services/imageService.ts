@@ -1,6 +1,4 @@
-// Enhanced image service with multiple deletion approaches
-// src/services/imageService.ts
-
+// Enhanced image service with product-specific deletion
 const API_BASE_URL = 'https://dev.surf.mt';
 const API_AUTH_HEADER =
   'Basic YWRtaW5Ac3VyZi5tdDpOOW9aMnlXMzc3cEg1VTExNTFiY3YyZlYyNDYySTk1NA==';
@@ -20,159 +18,164 @@ export interface ImageDeleteResponse {
   message: string;
 }
 
-// Try multiple approaches to delete image from server
-export const deleteProductImageFromServer = async (
-  relativePath: string,
-  productId?: string,
-  userId?: string,
-): Promise<{success: boolean; error?: string}> => {
-  console.log('🗑️ Attempting to delete image from server:', {
-    relativePath,
-    productId,
-    userId,
-  });
+export interface UploadedImageData {
+  uri: string;
+  fileName: string;
+  fileSize: number;
+  type: string;
+  relativePath: string;
+  viewUrl: string;
+  fileId?: string;
+  // NEW: Image pair data for deletion
+  pairId?: string;
+  detailedId?: string;
+  isMainPair?: boolean;
+}
 
-  // Approach 1: Try DELETE method with file uploader API
+// Extract image pair information from API response
+export const extractImagePairData = (
+  apiResponse: any,
+): {pairId: string; detailedId: string; isMainPair: boolean} | null => {
   try {
-    console.log('📤 Method 1: DELETE with file uploader API');
+    console.log('🔍 Extracting image pair data from response:', apiResponse);
 
-    const deletePayload = {
-      action: 'delete',
-      file_path: relativePath,
-      relative_path: relativePath,
-      lang_code: 'en',
-      type: 'product_image',
-      ...(userId && {user_id: userId}),
-      ...(productId && {product_id: productId}),
-    };
+    // Check for main_pair first
+    if (apiResponse.main_pair) {
+      const mainPair = apiResponse.main_pair;
+      return {
+        pairId: mainPair.pair_id?.toString() || '',
+        detailedId: mainPair.detailed_id?.toString() || '',
+        isMainPair: true,
+      };
+    }
 
-    const response = await fetch(
-      'https://dev.surf.mt/api.php?_d=NtSeFileUploaderApi',
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: API_AUTH_HEADER,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(deletePayload),
-      },
-    );
-
-    const responseText = await response.text();
-    console.log('📥 DELETE response:', {status: response.status, responseText});
-
-    if (response.ok) {
-      try {
-        const responseData = JSON.parse(responseText);
-        if (responseData.result) {
-          console.log(
-            '✅ Method 1 successful: Image deleted with DELETE method',
-          );
-          return {success: true};
-        }
-      } catch (parseError) {
-        // If parse fails but got 200, assume success
-        if (response.status === 200) {
-          console.log(
-            '✅ Method 1 successful: Assuming success based on 200 status',
-          );
-          return {success: true};
-        }
+    // Check for image_pairs
+    if (
+      apiResponse.image_pairs &&
+      typeof apiResponse.image_pairs === 'object'
+    ) {
+      const pairIds = Object.keys(apiResponse.image_pairs);
+      if (pairIds.length > 0) {
+        const firstPairId = pairIds[0];
+        const imagePair = apiResponse.image_pairs[firstPairId];
+        return {
+          pairId: firstPairId,
+          detailedId: imagePair.detailed_id?.toString() || '',
+          isMainPair: false,
+        };
       }
     }
+
+    console.warn('⚠️ Could not extract image pair data from response');
+    return null;
   } catch (error) {
-    console.warn('⚠️ Method 1 failed:', error.message);
+    console.error('❌ Error extracting image pair data:', error);
+    return null;
   }
+};
 
-  // Approach 2: Try POST method with action=delete
+// Delete product image using the Products API
+export const deleteProductImageFromServer = async (
+  userId: string,
+  productId: string,
+  imagePairData: {
+    pairId: string;
+    detailedId: string;
+    isMainPair?: boolean;
+  },
+): Promise<{success: boolean; error?: string}> => {
   try {
-    console.log('📤 Method 2: POST with action=delete');
+    console.log('🗑️ Deleting product image via Products API:', {
+      userId,
+      productId,
+      imagePairData,
+    });
 
-    const formData = new FormData();
-    formData.append('action', 'delete');
-    formData.append('file_path', relativePath);
-    formData.append('relative_path', relativePath);
-    formData.append('lang_code', 'en');
-    formData.append('type', 'product_image');
+    const imageObject = {
+      pair_id: imagePairData.pairId,
+      detailed_id: imagePairData.detailedId,
+      object_id: productId,
+    };
 
-    if (userId) formData.append('user_id', userId);
-    if (productId) formData.append('product_id', productId);
+    const requestData: any = {
+      user_id: userId,
+      delete_image: 1,
+      product_data: {
+        product_id: productId,
+        lang_code: 'en',
+      },
+    };
+
+    if (imagePairData.isMainPair) {
+      requestData.product_data.main_pair = {
+        ...imageObject,
+        image_id: 0,
+        position: 0,
+        object_type: 'product',
+        detailed: {
+          object_id: productId,
+          object_type: 'product',
+          type: 'M',
+        },
+      };
+    } else {
+      requestData.product_data.image_pairs = {
+        [imagePairData.pairId]: imageObject,
+      };
+    }
+
+    console.log(
+      '📤 Delete request payload:',
+      JSON.stringify(requestData, null, 2),
+    );
 
     const response = await fetch(
-      'https://dev.surf.mt/api.php?_d=NtSeFileUploaderApi',
+      `${API_BASE_URL}/api.php?_d=NtSeProductsApi&user_id=${userId}`,
       {
         method: 'POST',
         headers: {
           Authorization: API_AUTH_HEADER,
-          // Don't set Content-Type for FormData
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify(requestData),
       },
     );
 
     const responseText = await response.text();
-    console.log('📥 POST delete response:', {
-      status: response.status,
-      responseText,
-    });
+    console.log('📥 Delete response:', {status: response.status, responseText});
 
     if (response.ok) {
       try {
         const responseData = JSON.parse(responseText);
         if (responseData.result) {
-          console.log('✅ Method 2 successful: Image deleted with POST method');
+          console.log('✅ Image deleted successfully via Products API');
           return {success: true};
+        } else {
+          return {
+            success: false,
+            error: responseData.message || 'Failed to delete image',
+          };
         }
       } catch (parseError) {
         if (response.status === 200) {
-          console.log(
-            '✅ Method 2 successful: Assuming success based on 200 status',
-          );
+          console.log('✅ Assuming success based on 200 status');
           return {success: true};
         }
+        return {success: false, error: 'Invalid response format'};
       }
     }
-  } catch (error) {
-    console.warn('⚠️ Method 2 failed:', error.message);
+
+    return {
+      success: false,
+      error: `HTTP ${response.status}: Failed to delete image`,
+    };
+  } catch (error: any) {
+    console.error('❌ Delete image error:', error);
+    return {
+      success: false,
+      error: error.message || 'Network error during deletion',
+    };
   }
-
-  // Approach 3: Try with different API endpoint (if exists)
-  try {
-    console.log('📤 Method 3: Alternative endpoint');
-
-    const response = await fetch(
-      `https://dev.surf.mt/api.php?_d=NtSeFileUploaderApi&action=delete&file_path=${encodeURIComponent(
-        relativePath,
-      )}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: API_AUTH_HEADER,
-        },
-      },
-    );
-
-    const responseText = await response.text();
-    console.log('📥 Alternative endpoint response:', {
-      status: response.status,
-      responseText,
-    });
-
-    if (response.ok) {
-      console.log(
-        '✅ Method 3 successful: Image deleted with alternative endpoint',
-      );
-      return {success: true};
-    }
-  } catch (error) {
-    console.warn('⚠️ Method 3 failed:', error.message);
-  }
-
-  console.error('❌ All deletion methods failed for:', relativePath);
-  return {
-    success: false,
-    error: 'Failed to delete image from server using all available methods',
-  };
 };
 
 // Upload image with proper form data
@@ -286,26 +289,10 @@ export const uploadMultipleProductImages = async (
   },
 ): Promise<{
   success: boolean;
-  uploadedImages: Array<{
-    uri: string;
-    fileName: string;
-    fileSize: number;
-    type: string;
-    relativePath: string;
-    viewUrl: string;
-    fileId?: string;
-  }>;
+  uploadedImages: UploadedImageData[];
   errors: string[];
 }> => {
-  const uploadedImages: Array<{
-    uri: string;
-    fileName: string;
-    fileSize: number;
-    type: string;
-    relativePath: string;
-    viewUrl: string;
-    fileId?: string;
-  }> = [];
+  const uploadedImages: UploadedImageData[] = [];
   const errors: string[] = [];
 
   console.log(`🚀 Starting batch upload of ${images.length} images`);

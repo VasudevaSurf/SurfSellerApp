@@ -22,7 +22,11 @@ import {
   navigateToAuth,
 } from '../../../navigation/utils/navigationRef';
 import {logoutUser} from '../../../redux/slices/authSlice';
-import {fetchProfile} from '../../../redux/slices/profileSlice';
+import {
+  fetchProfile,
+  deleteAccount,
+  clearDeleteAccountSuccess,
+} from '../../../redux/slices/profileSlice';
 import {styles} from './AccountScreen.styles';
 import {RootState, AppDispatch} from '../../../redux/store';
 import BusinessProfileIcon from '../../../assets/icons/BusinessProfileIcon';
@@ -44,14 +48,71 @@ const AccountScreen = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const {profileData, loading, error} = useSelector(
-    (state: RootState) => state.profile,
-  );
+  const {
+    profileData,
+    loading,
+    error,
+    deletingAccount, // ✅ Add this
+    deleteAccountError, // ✅ Add this
+    deleteAccountSuccess, // ✅ Add this
+  } = useSelector((state: RootState) => state.profile);
 
   // ✅ Get initializer data for Privacy Policy and Terms URLs
   const initializerData = useSelector(
     (state: RootState) => state.initializer.data,
   );
+
+  useEffect(() => {
+    if (deleteAccountSuccess) {
+      Alert.alert(
+        'Account Deleted',
+        'Your account deletion request has been successfully submitted.',
+        [
+          {
+            text: 'OK',
+            onPress: async () => {
+              dispatch(clearDeleteAccountSuccess());
+              setShowDeleteModal(false);
+              // Logout and navigate to auth
+              await dispatch(logoutUser());
+              navigateToAuth();
+            },
+          },
+        ],
+        {cancelable: false},
+      );
+    }
+  }, [deleteAccountSuccess, dispatch]);
+
+  useEffect(() => {
+    if (deleteAccountError) {
+      Alert.alert('Error', deleteAccountError, [
+        {
+          text: 'OK',
+          onPress: () => {
+            dispatch(clearDeleteAccountSuccess());
+          },
+        },
+      ]);
+    }
+  }, [deleteAccountError, dispatch]);
+
+  const handleDeleteAccount = useCallback(async () => {
+    if (!userData?.user_id) {
+      Alert.alert('Error', 'User ID not found');
+      return;
+    }
+
+    console.log('🗑️ User confirmed account deletion');
+
+    try {
+      await dispatch(deleteAccount(userData.user_id)).unwrap();
+      // Success is handled by useEffect above
+    } catch (error) {
+      // Error is handled by useEffect above
+      console.error('Delete account error:', error);
+    }
+  }, [dispatch, userData]);
 
   // ✅ Debug: Log initializer data when component mounts or data changes
   useEffect(() => {
@@ -195,11 +256,11 @@ const AccountScreen = () => {
   const deleteButtons = useMemo(
     () => [
       {
-        text: 'Delete Account',
-        onPress: () => setShowDeleteModal(false),
+        text: deletingAccount ? 'Deleting...' : 'Delete Account',
+        onPress: handleDeleteAccount, // ✅ Now calls API
         variant: ButtonVariant.PRIMARY,
         type: ButtonType.PRIMARY,
-        state: ButtonState.DEFAULT,
+        state: deletingAccount ? ButtonState.DISABLED : ButtonState.DEFAULT,
         size: ButtonSize.MEDIUM,
         bgColor: ColorPalette.RED_100,
         customStyles: styles.customButton,
@@ -215,7 +276,7 @@ const AccountScreen = () => {
         customTextStyles: styles.customText,
       },
     ],
-    [],
+    [handleDeleteAccount, deletingAccount], // ✅ Add dependencies
   );
 
   // Share the app using inbuilt React Native Share
@@ -686,10 +747,10 @@ const AccountScreen = () => {
 
         <AddModal
           isVisible={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
+          onClose={() => !deletingAccount && setShowDeleteModal(false)} // ✅ Prevent closing while deleting
           headerText="Are you sure? Deleting your account is permanent."
           buttons={deleteButtons}
-          showCloseIcon={false}
+          showCloseIcon={!deletingAccount} // ✅ Hide close icon while deleting
         />
       </ScrollView>
     </SafeAreaView>

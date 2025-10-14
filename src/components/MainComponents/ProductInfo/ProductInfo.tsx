@@ -87,11 +87,72 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         fetchProductDetails({userId, productId}),
       ).unwrap();
 
-      // ✅ ADD THIS: Print complete raw API response
+      // ✅ ENHANCED DEBUG LOGGING
       console.log('='.repeat(80));
       console.log('📦 COMPLETE RAW API RESPONSE:');
       console.log('='.repeat(80));
       console.log(JSON.stringify(productDetails, null, 2));
+      console.log('='.repeat(80));
+
+      // ✅ ADD SPECIFIC IMAGE PAIR DEBUGGING
+      console.log('🔍 IMAGE PAIR DEBUGGING:');
+      console.log('='.repeat(80));
+
+      // Check main_pair
+      if (productDetails.main_pair) {
+        console.log(
+          '✅ Found main_pair:',
+          JSON.stringify(productDetails.main_pair, null, 2),
+        );
+      } else {
+        console.log('❌ No main_pair found');
+      }
+
+      // Check image_pairs
+      if (productDetails.image_pairs) {
+        console.log(
+          '✅ Found image_pairs:',
+          JSON.stringify(productDetails.image_pairs, null, 2),
+        );
+      } else {
+        console.log('❌ No image_pairs found');
+      }
+
+      // Check sections for images
+      if (productDetails.sections) {
+        console.log('📂 Sections available:', productDetails.sections.length);
+        productDetails.sections.forEach((section, index) => {
+          if (section.images) {
+            console.log(
+              `  Section ${index} (${section.section_type}) has ${
+                section.images?.length || 0
+              } images`,
+            );
+            console.log(
+              `  First image structure:`,
+              JSON.stringify(section.images?.[0], null, 2),
+            );
+          }
+        });
+      }
+
+      // Check product_data
+      if (productDetails.product_data) {
+        console.log('📦 product_data available');
+        if (productDetails.product_data.main_pair) {
+          console.log(
+            '  ✅ product_data.main_pair:',
+            JSON.stringify(productDetails.product_data.main_pair, null, 2),
+          );
+        }
+        if (productDetails.product_data.image_pairs) {
+          console.log(
+            '  ✅ product_data.image_pairs:',
+            JSON.stringify(productDetails.product_data.image_pairs, null, 2),
+          );
+        }
+      }
+
       console.log('='.repeat(80));
 
       // Extract comprehensive product data from API response
@@ -108,20 +169,21 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         },
       );
 
-      // ✅ ADD THIS DEBUG LOG
-      console.log('🔎 DEBUG: Does comprehensiveProductData have apiResponse?', {
-        hasApiResponse: !!comprehensiveProductData.apiResponse,
-        apiResponseType: typeof comprehensiveProductData.apiResponse,
-        keys: Object.keys(comprehensiveProductData),
-      });
-
+      console.log('🎯 Comprehensive product data being passed to navigation:');
       console.log(
-        '🎯 Navigating to edit with comprehensive data:',
-        comprehensiveProductData,
+        '  - Has apiResponse:',
+        !!comprehensiveProductData.apiResponse,
       );
-
-      console.log('🎯 Extracted product data for navigation:');
-      console.log(JSON.stringify(comprehensiveProductData, null, 2));
+      console.log(
+        '  - apiResponse keys:',
+        comprehensiveProductData.apiResponse
+          ? Object.keys(comprehensiveProductData.apiResponse)
+          : [],
+      );
+      console.log(
+        '  - Number of images:',
+        comprehensiveProductData.images?.length || 0,
+      );
 
       // Navigate to AddProduct with complete product data
       navigate('Dashboard', {

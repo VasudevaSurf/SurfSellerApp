@@ -567,6 +567,43 @@ export interface WithdrawalResponse {
   new_balance?: string;
 }
 
+export interface ProductImagePair {
+  pair_id: string | number;
+  detailed_id?: string | number;
+  image_id?: number;
+  object_id?: string | number;
+  position?: number;
+  object_type?: string;
+  detailed?: {
+    object_id: string | number;
+    object_type: string;
+    type: string;
+  };
+}
+
+export interface DeleteProductImageRequest {
+  user_id: string;
+  delete_image: 1;
+  product_data: {
+    product_id: string | number;
+    lang_code: string;
+    image_pairs?: {
+      [pairId: string]: ProductImagePair;
+    };
+    main_pair?: ProductImagePair;
+  };
+}
+
+export interface DeleteProductImageResponse {
+  result: boolean;
+  message: string;
+}
+
+export interface DeleteAccountResponse {
+  result: boolean;
+  message: string;
+}
+
 // Create the API client with the correct base URL and authorization
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -2148,6 +2185,89 @@ export const fetchOrderDetailsApi = async (userId: string, orderId: string) => {
   }
 };
 
+export const deleteProductImageApi = async (
+  userId: string,
+  productId: string,
+  imagePairData: {
+    pairId: string;
+    detailedId: string;
+    isMainPair?: boolean;
+  },
+): Promise<DeleteProductImageResponse> => {
+  try {
+    console.log('🗑️ Deleting product image:', {
+      userId,
+      productId,
+      imagePairData,
+    });
+
+    const imageObject: ProductImagePair = {
+      pair_id: imagePairData.pairId,
+      detailed_id: imagePairData.detailedId,
+      object_id: productId,
+    };
+
+    const requestData: DeleteProductImageRequest = {
+      user_id: userId,
+      delete_image: 1,
+      product_data: {
+        product_id: productId,
+        lang_code: 'en',
+      },
+    };
+
+    if (imagePairData.isMainPair) {
+      requestData.product_data.main_pair = {
+        ...imageObject,
+        image_id: 0,
+        position: 0,
+        object_type: 'product',
+        detailed: {
+          object_id: productId,
+          object_type: 'product',
+          type: 'M',
+        },
+      };
+    } else {
+      requestData.product_data.image_pairs = {
+        [imagePairData.pairId]: imageObject,
+      };
+    }
+
+    console.log(
+      '📤 Delete request payload:',
+      JSON.stringify(requestData, null, 2),
+    );
+
+    const response = await axios({
+      method: 'POST',
+      url: `${API_BASE_URL}/api.php?_d=NtSeProductsApi&user_id=${userId}`,
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: requestData,
+    });
+
+    console.log('📥 Delete image response:', response.data);
+    return response.data as DeleteProductImageResponse;
+  } catch (error: any) {
+    console.error('❌ Delete Product Image API error:', error);
+
+    if (error.response?.status === 404) {
+      throw new Error('Product or image not found');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to delete this image');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error occurred while deleting image');
+    } else {
+      throw new Error(
+        error.response?.data?.message || 'Failed to delete product image',
+      );
+    }
+  }
+};
+
 export const searchOrdersApi = async (
   userId: string,
   searchTerm: string,
@@ -2256,6 +2376,76 @@ export const fetchDashboardApi = async (
     } else {
       throw new Error(
         error.response?.data?.message || 'Failed to fetch dashboard data',
+      );
+    }
+  }
+};
+
+export const deleteAccountApi = async (
+  userId: string,
+  userData: {
+    email?: string;
+    firstname?: string;
+    lastname?: string;
+  },
+  companyData: {
+    fields_53?: string;
+    fields_54?: string;
+    fields_56?: string;
+    fields_57?: string;
+  },
+): Promise<DeleteAccountResponse> => {
+  try {
+    console.log('🗑️ Deleting account for userId:', userId);
+
+    const requestBody = {
+      user_data: userData,
+      company_data: companyData,
+      user_id: parseInt(userId),
+      delete: 1, // ✅ This triggers account deletion
+    };
+
+    console.log(
+      '📤 Delete account request:',
+      JSON.stringify(requestBody, null, 2),
+    );
+
+    const response = await axios({
+      method: 'POST',
+      url: 'https://dev.surf.mt/api.php?_d=NtSeProfilesApi',
+      headers: {
+        Authorization: API_AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+      data: requestBody,
+      timeout: 10000,
+    });
+
+    console.log('📥 Delete account response:', response.data);
+
+    return response.data as DeleteAccountResponse;
+  } catch (error: any) {
+    console.error('❌ Delete Account API error:', error);
+
+    if (error.code === 'ECONNABORTED') {
+      throw new Error(
+        'Request timeout. Please check your connection and try again.',
+      );
+    } else if (error.response?.status === 400) {
+      throw new Error(error.response?.data?.message || 'Invalid request');
+    } else if (error.response?.status === 403) {
+      throw new Error('You do not have permission to delete this account');
+    } else if (error.response?.status === 404) {
+      throw new Error('Account not found');
+    } else if (error.response?.status >= 500) {
+      throw new Error('Server error. Please try again later.');
+    } else if (!error.response) {
+      throw new Error('Network error. Please check your connection.');
+    } else {
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to delete account',
       );
     }
   }

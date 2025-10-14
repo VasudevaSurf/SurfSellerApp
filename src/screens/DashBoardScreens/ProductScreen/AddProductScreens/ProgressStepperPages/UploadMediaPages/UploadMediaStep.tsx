@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Alert, Image, TouchableOpacity, View} from 'react-native';
+import {useSelector} from 'react-redux';
 import InfoIconPay from '../../../../../../assets/icons/InfoIconPay';
 import CircleOutlineClose from '../../../../../../assets/icons/NewProductIcons/CircleOutlineClose';
 import CloudManIcon from '../../../../../../assets/icons/NewProductIcons/CloudManIcon';
@@ -31,15 +32,14 @@ import {
 } from '../../../../../../utils/imagePicker';
 import {
   uploadMultipleProductImages,
-  deleteProductImage,
   extractRelativePathFromUrl,
   deleteProductImageFromServer,
   UploadedImageData,
 } from '../../../../../../services/imageService';
 import {Spacing} from '../../../../../../config/globalStyles';
 import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
-import SuccessTickSquareIcon from '../../../../../../assets/icons/ToastIcons/SuccessTick';
 import {showCustomToast} from '../../../../../../components/MainComponents/Toast/ToastComponent';
+import {RootState} from '../../../../../../redux/store';
 
 interface FileData {
   id: string;
@@ -54,6 +54,10 @@ interface FileData {
   viewUrl?: string;
   isUploaded?: boolean;
   fileId?: string;
+  // NEW: Image pair data for deletion
+  pairId?: string;
+  detailedId?: string;
+  isMainPair?: boolean;
 }
 
 interface UploadMediaStepProps {
@@ -75,16 +79,253 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
   const [files, setFiles] = useState<FileData[]>([]);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
 
+  // Get userId from Redux
+  const userId = useSelector(
+    (state: RootState) => state.auth.userData?.user_id,
+  );
+
   // Pre-fill images if in edit mode
   useEffect(() => {
     if (editMode && formData.images && formData.images.length > 0) {
-      console.log('🔄 Pre-filling images in edit mode:', formData.images);
+      console.log('🔄 Pre-filling images in edit mode');
+      console.log('📦 formData.images:', formData.images);
+      console.log('📦 formData.apiResponse exists:', !!formData.apiResponse);
+
+      if (formData.apiResponse) {
+        console.log('📦 Full API Response Structure:');
+        console.log(JSON.stringify(formData.apiResponse, null, 2));
+      }
 
       const originalImageList = Array.isArray(formData.images)
         ? formData.images
         : [];
       setOriginalImages(originalImageList);
 
+      // Function to extract pair data for a given image URL
+      const extractPairDataForImage = (imageUrl: string, apiResponse: any) => {
+        if (!apiResponse) {
+          console.warn('⚠️ No API response available');
+          return {pairId: undefined, detailedId: undefined, isMainPair: false};
+        }
+
+        console.log(`🔍 Searching pair data for: ${imageUrl}`);
+
+        // Helper to check if URL matches
+        const urlMatches = (
+          pathToCheck: string,
+          targetUrl: string,
+        ): boolean => {
+          if (!pathToCheck) return false;
+
+          // Direct match
+          if (pathToCheck === targetUrl) return true;
+
+          // Check if either contains the other
+          if (
+            pathToCheck.includes(targetUrl) ||
+            targetUrl.includes(pathToCheck)
+          )
+            return true;
+
+          // Extract filename and compare
+          const getFilename = (url: string) => {
+            const parts = url.split('/');
+            return parts[parts.length - 1]?.split('?')[0];
+          };
+
+          const filename1 = getFilename(pathToCheck);
+          const filename2 = getFilename(targetUrl);
+
+          return filename1 === filename2;
+        };
+
+        // Strategy 1: Check main_pair
+        if (apiResponse.main_pair) {
+          console.log('🔍 Checking main_pair:', apiResponse.main_pair);
+
+          const mainPair = apiResponse.main_pair;
+          const detailed = mainPair.detailed || mainPair.icon || {};
+
+          const pathsToCheck = [
+            detailed.image_path,
+            detailed.absolute_path,
+            detailed.relative_path,
+            detailed.http_image_path,
+            detailed.https_image_path,
+            mainPair.image_path,
+            mainPair.detailed?.image_path,
+          ].filter(Boolean);
+
+          console.log('🔍 Main pair paths to check:', pathsToCheck);
+
+          for (const path of pathsToCheck) {
+            if (urlMatches(path, imageUrl)) {
+              console.log('✅ MATCH in main_pair!');
+              return {
+                pairId: mainPair.pair_id?.toString(),
+                detailedId:
+                  mainPair.detailed_id?.toString() ||
+                  detailed.image_id?.toString(),
+                isMainPair: true,
+              };
+            }
+          }
+        }
+
+        // Strategy 2: Check image_pairs
+        if (apiResponse.image_pairs) {
+          console.log('🔍 Checking image_pairs');
+
+          const imagePairsArray = Array.isArray(apiResponse.image_pairs)
+            ? apiResponse.image_pairs
+            : Object.values(apiResponse.image_pairs);
+
+          for (const pair of imagePairsArray) {
+            if (!pair) continue;
+
+            console.log('🔍 Checking pair:', pair);
+
+            const detailed = pair.detailed || pair.icon || {};
+
+            const pathsToCheck = [
+              detailed.image_path,
+              detailed.absolute_path,
+              detailed.relative_path,
+              detailed.http_image_path,
+              detailed.https_image_path,
+              pair.image_path,
+              pair.detailed?.image_path,
+            ].filter(Boolean);
+
+            console.log('🔍 Image pair paths to check:', pathsToCheck);
+
+            for (const path of pathsToCheck) {
+              if (urlMatches(path, imageUrl)) {
+                console.log('✅ MATCH in image_pairs!');
+                return {
+                  pairId: pair.pair_id?.toString(),
+                  detailedId:
+                    pair.detailed_id?.toString() ||
+                    detailed.image_id?.toString(),
+                  isMainPair: false,
+                };
+              }
+            }
+          }
+        }
+
+        // Strategy 3: Check sections
+        if (apiResponse.sections && Array.isArray(apiResponse.sections)) {
+          console.log('🔍 Checking sections');
+
+          for (const section of apiResponse.sections) {
+            // Check section images array
+            if (section.images && Array.isArray(section.images)) {
+              for (const img of section.images) {
+                const pathsToCheck = [
+                  img.image_path,
+                  img.detailed?.image_path,
+                  img.icon?.image_path,
+                  img.absolute_path,
+                  img.http_image_path,
+                ].filter(Boolean);
+
+                for (const path of pathsToCheck) {
+                  if (urlMatches(path, imageUrl)) {
+                    console.log('✅ MATCH in sections.images!');
+                    return {
+                      pairId: img.pair_id?.toString(),
+                      detailedId:
+                        img.detailed_id?.toString() || img.image_id?.toString(),
+                      isMainPair: img.type === 'M',
+                    };
+                  }
+                }
+              }
+            }
+
+            // Check blocks within sections
+            if (section.blocks && Array.isArray(section.blocks)) {
+              for (const block of section.blocks) {
+                if (block.fields && Array.isArray(block.fields)) {
+                  for (const field of block.fields) {
+                    // Check if field has image data
+                    if (field.image_pairs || field.main_pair) {
+                      const pairData = field.image_pairs || [field.main_pair];
+                      const pairsArray = Array.isArray(pairData)
+                        ? pairData
+                        : [pairData];
+
+                      for (const pair of pairsArray) {
+                        if (!pair) continue;
+
+                        const detailed = pair.detailed || pair.icon || {};
+                        const pathsToCheck = [
+                          detailed.image_path,
+                          pair.image_path,
+                        ].filter(Boolean);
+
+                        for (const path of pathsToCheck) {
+                          if (urlMatches(path, imageUrl)) {
+                            console.log('✅ MATCH in sections.blocks.fields!');
+                            return {
+                              pairId: pair.pair_id?.toString(),
+                              detailedId: pair.detailed_id?.toString(),
+                              isMainPair: pair.type === 'M',
+                            };
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Strategy 4: Check product_data if available
+        if (apiResponse.product_data) {
+          console.log('🔍 Checking product_data');
+
+          const productData = apiResponse.product_data;
+
+          if (productData.main_pair || productData.image_pairs) {
+            const allPairs = [
+              productData.main_pair,
+              ...(Array.isArray(productData.image_pairs)
+                ? productData.image_pairs
+                : productData.image_pairs
+                ? Object.values(productData.image_pairs)
+                : []),
+            ].filter(Boolean);
+
+            for (const pair of allPairs) {
+              const detailed = pair.detailed || pair.icon || {};
+              const pathsToCheck = [
+                detailed.image_path,
+                pair.image_path,
+              ].filter(Boolean);
+
+              for (const path of pathsToCheck) {
+                if (urlMatches(path, imageUrl)) {
+                  console.log('✅ MATCH in product_data!');
+                  return {
+                    pairId: pair.pair_id?.toString(),
+                    detailedId: pair.detailed_id?.toString(),
+                    isMainPair: pair === productData.main_pair,
+                  };
+                }
+              }
+            }
+          }
+        }
+
+        console.warn('⚠️ No pair data found for image:', imageUrl);
+        return {pairId: undefined, detailedId: undefined, isMainPair: false};
+      };
+
+      // Process all images
       const preFilledFiles = formData.images.map(
         (imageUrl: string, index: number) => {
           const urlParts = imageUrl.split('/');
@@ -103,6 +344,20 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               ? '250 KB'
               : '200 KB';
 
+          // Extract pair data for this image
+          const pairData = extractPairDataForImage(
+            imageUrl,
+            formData.apiResponse,
+          );
+
+          console.log(`📸 Image ${index + 1}:`, {
+            filename,
+            hasPairData: !!(pairData.pairId && pairData.detailedId),
+            pairId: pairData.pairId,
+            detailedId: pairData.detailedId,
+            isMainPair: pairData.isMainPair,
+          });
+
           return {
             id: `prefilled-${index}-${Date.now()}`,
             name: filename,
@@ -114,6 +369,9 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             viewUrl: imageUrl,
             relativePath: extractRelativePathFromUrl(imageUrl),
             isUploaded: true,
+            pairId: pairData.pairId,
+            detailedId: pairData.detailedId,
+            isMainPair: pairData.isMainPair,
           };
         },
       );
@@ -121,9 +379,24 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       setFiles(preFilledFiles);
       setUploadStatus('completed');
 
-      console.log('✅ Pre-filled files created:', preFilledFiles.length);
+      const filesWithPairData = preFilledFiles.filter(
+        f => f.pairId && f.detailedId,
+      );
+      console.log('✅ Pre-filled files summary:', {
+        total: preFilledFiles.length,
+        withPairData: filesWithPairData.length,
+        withoutPairData: preFilledFiles.length - filesWithPairData.length,
+      });
+
+      if (filesWithPairData.length === 0) {
+        console.warn('⚠️ WARNING: No image pair data found for any images!');
+        console.warn('⚠️ Server deletion will not be available');
+        console.warn(
+          '💡 You may need to refresh product details or check API response structure',
+        );
+      }
     }
-  }, [editMode, formData.images]);
+  }, [editMode, formData.images, formData.apiResponse]);
 
   const handleDelete = async (fileId: string) => {
     const fileToDelete = files.find(file => file.id === fileId);
@@ -131,6 +404,8 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       console.error('File to delete not found');
       return;
     }
+
+    console.log('🗑️ Delete requested for file:', fileToDelete);
 
     Alert.alert('Delete File', 'Are you sure you want to delete this file?', [
       {
@@ -140,7 +415,75 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       {
         text: 'Delete',
         onPress: async () => {
-          console.log('🗑️ Removing file from form:', fileToDelete);
+          console.log('🗑️ User confirmed deletion for:', fileToDelete);
+
+          // Check if we need to delete from server
+          if (
+            editMode &&
+            fileToDelete.isExisting &&
+            formData.productId &&
+            userId
+          ) {
+            // Check if we have pair data
+            if (!fileToDelete.pairId || !fileToDelete.detailedId) {
+              console.error('❌ Missing pair data for server deletion:', {
+                pairId: fileToDelete.pairId,
+                detailedId: fileToDelete.detailedId,
+              });
+
+              Alert.alert(
+                'Cannot Delete',
+                'Unable to delete this image from the server. Image pair information is missing. Please refresh the product and try again.',
+                [
+                  {
+                    text: 'OK',
+                    style: 'default',
+                  },
+                ],
+              );
+              return;
+            }
+
+            try {
+              console.log('🌐 Attempting to delete image from server:', {
+                userId,
+                productId: formData.productId,
+                pairId: fileToDelete.pairId,
+                detailedId: fileToDelete.detailedId,
+                isMainPair: fileToDelete.isMainPair,
+              });
+
+              const deleteResult = await deleteProductImageFromServer(
+                userId,
+                formData.productId,
+                {
+                  pairId: fileToDelete.pairId,
+                  detailedId: fileToDelete.detailedId,
+                  isMainPair: fileToDelete.isMainPair || false,
+                },
+              );
+
+              console.log('📥 Delete result from server:', deleteResult);
+
+              if (!deleteResult.success) {
+                console.error('❌ Server deletion failed:', deleteResult.error);
+                showCustomToast(
+                  deleteResult.error || 'Failed to delete image from server',
+                  '❌',
+                );
+                return;
+              }
+
+              console.log('✅ Image deleted from server successfully');
+            } catch (error: any) {
+              console.error('❌ Error deleting from server:', error);
+              showCustomToast(
+                error.message || 'Failed to delete image from server',
+                '❌',
+              );
+              return;
+            }
+          }
 
           // ✅ IMMEDIATE UI UPDATE - Remove from files list
           const updatedFiles = files.filter(file => file.id !== fileId);
@@ -149,12 +492,10 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           // ✅ Update form data - remove the deleted image
           const updatedImages = formData.images.filter((img: string) => {
             if (fileToDelete.isExisting) {
-              // Remove by comparing URLs
               return (
                 img !== fileToDelete.originalUrl && img !== fileToDelete.viewUrl
               );
             } else {
-              // Remove by comparing URI or view URL
               return img !== fileToDelete.uri && img !== fileToDelete.viewUrl;
             }
           });
@@ -162,7 +503,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           // ✅ Update relative paths
           let updatedRelativePaths = formData.imageRelativePaths || [];
 
-          // For existing images, remove from relative paths
           if (fileToDelete.relativePath) {
             updatedRelativePaths = updatedRelativePaths.filter(
               (path: string) => path !== fileToDelete.relativePath,
@@ -187,11 +527,7 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
             imageRelativePaths: updatedRelativePaths,
           });
 
-          // Show success message
-          showCustomToast(
-            'Image removed successfully!',
-            <SuccessTickSquareIcon size={18} />,
-          );
+          showCustomToast('Image removed successfully!', '✅');
 
           // If no files left, reset to initial state
           if (updatedFiles.length === 0) {
@@ -253,23 +589,17 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       }
 
       if (!result.success) {
-        // Alert.alert('Error', result.error || 'Failed to select images');
         setIsUploading(false);
         return;
       }
 
       if (result.images && result.images.length > 0) {
-        // Validate images
         const validImages = [];
         for (const image of result.images) {
           const validation = validateImage(image);
           if (validation.valid) {
             validImages.push(image);
           } else {
-            // Alert.alert(
-            //   'Invalid Image',
-            //   validation.error || 'Invalid image selected',
-            // );
             showCustomToast('Oops! Unsupported format!', '❌');
           }
         }
@@ -286,7 +616,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
           setCurrentUpload({current: 0, total: validImages.length});
 
           try {
-            // Upload images using the dedicated image service
             const uploadResult = await uploadMultipleProductImages(
               validImages.map(img => ({
                 uri: img.uri,
@@ -314,7 +643,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               uploadResult.success &&
               uploadResult.uploadedImages.length > 0
             ) {
-              // Create new file entries for uploaded images
               const newFiles: FileData[] = uploadResult.uploadedImages.map(
                 (image, index) => ({
                   id: `uploaded-${Date.now()}-${index}`,
@@ -328,13 +656,15 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
                   fileId: image.fileId,
                   isUploaded: true,
                   isExisting: false,
+                  pairId: image.pairId,
+                  detailedId: image.detailedId,
+                  isMainPair: image.isMainPair,
                 }),
               );
 
               const updatedFiles = [...files, ...newFiles];
               setFiles(updatedFiles);
 
-              // Update form data with new images
               const currentImages = formData.images || [];
               const newImageUrls = uploadResult.uploadedImages
                 .map(image => image.viewUrl)
@@ -363,21 +693,11 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
 
               setUploadStatus('completed');
 
-              // Show success message
               if (uploadResult.errors.length === 0) {
-                // Alert.alert(
-                //   'Success',
-                //   `${uploadResult.uploadedImages.length} image(s) uploaded successfully!`,
-                // );
-
                 showCustomToast('Image(s) uploaded successfully.', '✅');
               } else {
                 const successCount = uploadResult.uploadedImages.length;
                 const errorCount = uploadResult.errors.length;
-                // Alert.alert(
-                //   'Partial Success',
-                //   `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
-                // );
                 showCustomToast(
                   `${successCount} image(s) uploaded successfully, ${errorCount} failed.`,
                   '✅',
@@ -385,17 +705,11 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
               }
             } else {
               console.error('Upload failed:', uploadResult.errors);
-              // Alert.alert(
-              //   'Upload Failed',
-              //   'Failed to upload images. Please try again.',
-              // );
-
               showCustomToast('Oops! Upload failed. Try again.', '❌');
               setUploadStatus(files.length > 0 ? 'completed' : 'initial');
             }
           } catch (uploadError) {
             console.error('Upload error:', uploadError);
-            // Alert.alert('Upload Error', 'Upload failed. Please try again.');
             showCustomToast('Oops! Upload failed. Try again.', '❌');
             setUploadStatus(files.length > 0 ? 'completed' : 'initial');
           }
@@ -403,7 +717,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       }
     } catch (error: any) {
       console.error('Selection error:', error);
-      // Alert.alert('Selection Error', 'Failed to select images');
       showCustomToast('Failed to select images', '❌');
     } finally {
       setIsUploading(false);
@@ -438,16 +751,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
       customStyles: styles.customButton,
       disabled: isUploading,
     },
-    // {
-    //   text: 'Select from Drive',
-    //   onPress: () => handleUploadStart('drive'),
-    //   variant: ButtonVariant.PRIMARY,
-    //   state: ButtonState.DEFAULT,
-    //   type: ButtonType.OUTLINED,
-    //   size: ButtonSize.MEDIUM,
-    //   customTextStyles: styles.customText,
-    //   disabled: isUploading,
-    // },
   ];
 
   const getHeaderText = () => {
@@ -519,21 +822,6 @@ const UploadMediaStep: React.FC<UploadMediaStepProps> = ({
         )}
 
         {uploadStatus === 'completed' && files.length > 0 && !isUploading && (
-          // <View style={{alignItems: 'center', marginTop: 16}}>
-          //   <Button
-          //     text="Add More Images"
-          //     variant={ButtonVariant.PRIMARY}
-          //     state={ButtonState.DEFAULT}
-          //     size={ButtonSize.SMALL}
-          //     type={ButtonType.OUTLINED}
-          //     onPress={handleBrowseFiles}
-          //     customStyles={{
-          //       borderWidth: 1,
-          //       borderColor: ColorPalette.PURPLE_300,
-          //     }}
-          //   />
-          // </View>
-
           <View style={styles.uploadContainer}>
             <View style={styles.uploadBox}>
               <CloudManIcon size={70} style={undefined} />

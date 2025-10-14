@@ -9,6 +9,7 @@ import {
   LogoData,
   getProfileLogosApi,
   uploadCompanyLogoApi,
+  deleteAccountApi,
 } from '../../services/apiService';
 import {RootState} from '../store';
 
@@ -24,6 +25,9 @@ export interface ProfileState {
   lastUpdated: number | null;
   uploadingLogo: boolean; // Add this
   logoUploadError: string | null; // Add this
+  deletingAccount: boolean;
+  deleteAccountError: string | null;
+  deleteAccountSuccess: boolean;
 }
 
 const initialState: ProfileState = {
@@ -38,6 +42,9 @@ const initialState: ProfileState = {
   lastUpdated: null,
   uploadingLogo: false, // Add this
   logoUploadError: null, // Add this
+  deletingAccount: false,
+  deleteAccountError: null,
+  deleteAccountSuccess: false,
 };
 
 // Replace the helper function to extract user profile
@@ -198,6 +205,47 @@ export const fetchProfileLogos = createAsyncThunk(
   },
 );
 
+// Add this thunk after updateProfile
+export const deleteAccount = createAsyncThunk(
+  'profile/deleteAccount',
+  async (userId: string, {rejectWithValue, getState}) => {
+    try {
+      console.log('🗑️ Starting account deletion for userId:', userId);
+
+      // Get current profile data from state
+      const state = getState() as RootState;
+      const currentProfileData = state.profile.profileData;
+
+      if (!currentProfileData) {
+        throw new Error('Profile data not available');
+      }
+
+      // Prepare user_data and company_data from current profile
+      const userData = {
+        email: currentProfileData.email || '',
+        firstname: currentProfileData.firstname || '',
+        lastname: currentProfileData.lastname || '',
+      };
+
+      const companyData = {
+        fields_53: currentProfileData.accountholder_full_name || '',
+        fields_54: currentProfileData.iban || '',
+        fields_56: currentProfileData.bic || '',
+        fields_57: currentProfileData.bank_name || '',
+      };
+
+      const response = await deleteAccountApi(userId, userData, companyData);
+
+      console.log('✅ Account deletion response:', response);
+
+      return response;
+    } catch (error: any) {
+      console.error('❌ Delete account error:', error);
+      return rejectWithValue(error.message || 'Failed to delete account');
+    }
+  },
+);
+
 const profileSlice = createSlice({
   name: 'profile',
   initialState,
@@ -205,10 +253,16 @@ const profileSlice = createSlice({
     clearProfileError: state => {
       state.error = null;
       state.updateError = null;
-      state.logoUploadError = null; // Add this
+      state.logoUploadError = null;
+      state.deleteAccountError = null; // ✅ Add this
     },
     clearUpdateSuccess: state => {
       state.updateSuccess = false;
+    },
+    // ✅ Add this new reducer
+    clearDeleteAccountSuccess: state => {
+      state.deleteAccountSuccess = false;
+      state.deleteAccountError = null;
     },
     updateLocalProfile: (
       state,
@@ -291,6 +345,30 @@ const profileSlice = createSlice({
         state.uploadingLogo = false;
         state.logoUploadError = action.payload as string;
       })
+      .addCase(deleteAccount.pending, state => {
+        console.log('deleteAccount.pending');
+        state.deletingAccount = true;
+        state.deleteAccountError = null;
+        state.deleteAccountSuccess = false;
+      })
+      .addCase(deleteAccount.fulfilled, (state, action) => {
+        console.log('deleteAccount.fulfilled:', action.payload);
+        state.deletingAccount = false;
+        if (action.payload.result) {
+          state.deleteAccountSuccess = true;
+          state.deleteAccountError = null;
+        } else {
+          state.deleteAccountSuccess = false;
+          state.deleteAccountError =
+            action.payload.message || 'Failed to delete account';
+        }
+      })
+      .addCase(deleteAccount.rejected, (state, action) => {
+        console.log('deleteAccount.rejected:', action.payload);
+        state.deletingAccount = false;
+        state.deleteAccountError = action.payload as string;
+        state.deleteAccountSuccess = false;
+      })
       // Fetch Logos
       .addCase(fetchProfileLogos.fulfilled, (state, action) => {
         state.logos = action.payload;
@@ -301,6 +379,7 @@ const profileSlice = createSlice({
 export const {
   clearProfileError,
   clearUpdateSuccess,
+  clearDeleteAccountSuccess,
   updateLocalProfile,
   resetProfileState,
 } = profileSlice.actions;
