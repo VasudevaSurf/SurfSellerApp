@@ -1,6 +1,6 @@
-// Updated AddProduct.tsx with proper user ID and product ID passing
+// Updated AddProduct.tsx with conditional steps based on edit mode
 
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {ScrollView, View, Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useRoute, RouteProp} from '@react-navigation/native';
@@ -34,7 +34,14 @@ import {useCategories} from '../../../../hooks/useCategories';
 import {showCustomToast} from '../../../../components/MainComponents/Toast/ToastComponent';
 import SuccessTickSquareIcon from '../../../../assets/icons/ToastIcons/SuccessTick';
 
-const STEPS = [
+// ✅ Define steps arrays for both modes
+const ADD_PRODUCT_STEPS = [
+  {id: 1, label: 'Product Info'},
+  {id: 2, label: 'Upload Media'},
+  {id: 3, label: 'Inventory'},
+];
+
+const EDIT_PRODUCT_STEPS = [
   {id: 1, label: 'Product Info'},
   {id: 2, label: 'Upload Media'},
   {id: 3, label: 'Inventory'},
@@ -108,7 +115,6 @@ interface FormData {
   };
   selectedCategories: {id: string; name: string; path: string[]}[];
   apiResponse?: any;
-  // ✅ ADD THESE: Field IDs for Extra Fields
   brandFieldId?: string;
   sizeFieldId?: string;
   weightFieldId?: string;
@@ -130,6 +136,11 @@ const AddProduct = () => {
 
   // Use categories hook to get available categories
   const {categories} = useCategories();
+
+  // ✅ Dynamically select steps based on edit mode
+  const STEPS = useMemo(() => {
+    return editMode ? EDIT_PRODUCT_STEPS : ADD_PRODUCT_STEPS;
+  }, [editMode]);
 
   // Initialize formData with all required fields and proper defaults
   const [formData, setFormData] = useState<FormData>({
@@ -164,11 +175,11 @@ const AddProduct = () => {
     },
     selectedCategories: [] as {id: string; name: string; path: string[]}[],
     apiResponse: undefined,
-    // ✅ ADD THESE
     brandFieldId: '',
     sizeFieldId: '',
     weightFieldId: '',
   });
+
   // Pre-fill form data if in edit mode
   useEffect(() => {
     if (editMode && productData) {
@@ -190,7 +201,7 @@ const AddProduct = () => {
       console.log('- Brand:', productData.brand);
       console.log('- Size:', productData.size);
       console.log('- Weight:', productData.weight);
-      console.log('- API Response exists:', !!productData.apiResponse); // ✅ Check this
+      console.log('- API Response exists:', !!productData.apiResponse);
 
       const originalImageList = Array.isArray(productData.images)
         ? productData.images
@@ -233,7 +244,6 @@ const AddProduct = () => {
           userId: userId,
           category_listing: productData.category_listing || {id: 0, name: ''},
           selectedCategories: productData.selectedCategories || [],
-          // ✅✅✅ CRITICAL: Include the API response here
           apiResponse: productData.apiResponse,
         };
 
@@ -245,7 +255,7 @@ const AddProduct = () => {
           brand: updatedData.brand,
           size: updatedData.size,
           weight: updatedData.weight,
-          hasApiResponse: !!updatedData.apiResponse, // ✅ Verify this
+          hasApiResponse: !!updatedData.apiResponse,
         });
 
         return updatedData;
@@ -291,26 +301,18 @@ const AddProduct = () => {
       editMode,
       productId: formData.productId,
       userId: formData.userId,
-
-      // Original images (what we started with)
       originalImages: {
         count: originalImages.length,
         list: originalImages,
       },
-
-      // Current form data images (what's currently shown in UI)
       formDataImages: {
         count: formData.images?.length || 0,
         list: formData.images || [],
       },
-
-      // Uploaded image paths (new images that were uploaded)
       imageRelativePaths: {
         count: formData.imageRelativePaths?.length || 0,
         list: formData.imageRelativePaths || [],
       },
-
-      // What should be sent to API
       shouldSendToAPI: {
         existingImages:
           formData.images?.filter((img: string) => img.startsWith('http')) ||
@@ -324,68 +326,38 @@ const AddProduct = () => {
   };
 
   const handleSubmit = async () => {
-    // Add debug logging
     debugImageState();
 
     console.log('🚀 Form submitted:', {
       editMode,
       productId: formData.productId,
       userId: formData.userId,
-      // formData: {
-      //   productName: formData.productName,
-      //   price: formData.price,
-      //   currentImages: formData.images?.length || 0,
-      //   imageRelativePaths: formData.imageRelativePaths?.length || 0,
-      // },
       formData,
     });
 
-    // Validate required fields
     const requiredFields = ['productName', 'price'];
     const missingFields = requiredFields.filter(
       field => !formData[field]?.trim(),
     );
 
-    // if (missingFields.length > 0) {
-    //   console.warn('⚠️ Missing required fields:', missingFields);
-    //   // Alert.alert(
-    //   //   'Validation Error',
-    //   //   `Please fill in all required fields: ${missingFields.join(', ')}`,
-    //   // );
-    //   showCustomToast(
-    //     `Missing required fields: ${missingFields.join(', ')}`,
-    //     <SuccessTickSquareIcon size={18} />
-    //   )
-    //   return;
-    // }
-
-    // For new products, check if images are properly uploaded (if any were selected)
     if (!editMode && formData.images.length > 0) {
       if (
         !formData.imageRelativePaths ||
         formData.imageRelativePaths.length === 0
       ) {
-        // Alert.alert(
-        //   'Images Not Uploaded',
-        //   'Please wait for images to finish uploading before saving the product.',
-        // );
         showCustomToast('Oops! Upload failed. Try again.', '❌');
-
         return;
       }
     }
 
     if (!userId) {
-      // Alert.alert('Error', 'User session expired. Please login again.');
       showCustomToast('Session expired. Please login again.', '❌');
       return;
     }
 
-    // Show loading state
     setIsSubmitting(true);
 
     try {
-      // Transform form data to API format
       const apiData = transformFormDataToApiFormat(
         formData,
         userId,
@@ -404,26 +376,10 @@ const AddProduct = () => {
 
       let result;
       if (editMode) {
-        // console.log('🔄 Updating existing product...');
         result = await updateProductApi(apiData);
       } else {
-        // console.log('✨ Creating new product...');
         result = await createProductApi(apiData);
       }
-
-      // Show success message
-      // Alert.alert(
-      //   'Success',
-      //   editMode
-      //     ? 'Product updated successfully! Image changes have been saved.'
-      //     : 'Product created successfully!',
-      //   [
-      //     {
-      //       text: 'OK',
-      //       onPress: () => goBack(),
-      //     },
-      //   ],
-      // );
 
       goBack();
       const successMessage = editMode
@@ -433,21 +389,6 @@ const AddProduct = () => {
       showCustomToast(successMessage, '✅');
     } catch (error: any) {
       console.error('💥 Error saving product:', error);
-
-      // Alert.alert(
-      //   editMode ? 'Update Failed' : 'Creation Failed',
-      //   error.message ||
-      //   `Failed to ${editMode ? 'update' : 'create'
-      //   } product. Please try again.`,
-      //   [
-      //     { text: 'OK', style: 'default' },
-      //     {
-      //       text: 'Retry',
-      //       onPress: () => handleSubmit(),
-      //       style: 'default',
-      //     },
-      //   ],
-      // );
 
       const erroMessage = `Failed to ${
         editMode ? 'update' : 'create'
@@ -505,13 +446,17 @@ const AddProduct = () => {
           />
         );
       case 4:
-        return (
-          <FeaturesStep
-            formData={formData}
-            updateFormData={updateFormData}
-            editMode={editMode}
-          />
-        );
+        // ✅ Only render Features step in edit mode
+        if (editMode) {
+          return (
+            <FeaturesStep
+              formData={formData}
+              updateFormData={updateFormData}
+              editMode={editMode}
+            />
+          );
+        }
+        return null;
       default:
         console.warn('❓ Unknown step:', currentStep);
         return null;
@@ -538,11 +483,11 @@ const AddProduct = () => {
       case 1:
         return formData.productName.trim() && formData.price.trim();
       case 2:
-        return true; // Images are optional
+        return true;
       case 3:
         return formData.productCode.trim();
       case 4:
-        return true; // Features are optional
+        return true;
       default:
         return true;
     }
@@ -563,6 +508,7 @@ const AddProduct = () => {
     relativePathCount: formData.imageRelativePaths.length,
     isValidStep: isValidStep(),
     isDisabled: isButtonDisabled(),
+    totalSteps: STEPS.length,
   });
 
   return (
