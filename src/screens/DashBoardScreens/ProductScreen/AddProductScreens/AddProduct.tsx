@@ -89,8 +89,8 @@ interface FormData {
   quantity: string;
   minQuantity: string;
   maxQuantity: string;
-  qtyStep: string; // ✅ ADD THIS
-  listQtyCount: string; // ✅ ADD THIS
+  qtyStep: string;
+  listQtyCount: string;
   trackInventory: boolean;
   taxType: string;
   brand: string;
@@ -107,6 +107,11 @@ interface FormData {
     name: string;
   };
   selectedCategories: {id: string; name: string; path: string[]}[];
+  apiResponse?: any;
+  // ✅ ADD THESE: Field IDs for Extra Fields
+  brandFieldId?: string;
+  sizeFieldId?: string;
+  weightFieldId?: string;
 }
 
 const AddProduct = () => {
@@ -140,8 +145,8 @@ const AddProduct = () => {
     quantity: '',
     minQuantity: '',
     maxQuantity: '',
-    qtyStep: '', // ✅ ADD THIS
-    listQtyCount: '', // ✅ ADD THIS
+    qtyStep: '',
+    listQtyCount: '',
     trackInventory: false,
     taxType: 'VAT',
     brand: '',
@@ -158,11 +163,34 @@ const AddProduct = () => {
       name: '',
     },
     selectedCategories: [] as {id: string; name: string; path: string[]}[],
+    apiResponse: undefined,
+    // ✅ ADD THESE
+    brandFieldId: '',
+    sizeFieldId: '',
+    weightFieldId: '',
   });
   // Pre-fill form data if in edit mode
   useEffect(() => {
     if (editMode && productData) {
-      console.log('🔄 Pre-filling form data in edit mode:', productData);
+      console.log('='.repeat(80));
+      console.log('📝 ADD PRODUCT SCREEN - RECEIVED PRODUCT DATA:');
+      console.log('='.repeat(80));
+      console.log(JSON.stringify(productData, null, 2));
+      console.log('='.repeat(80));
+
+      console.log('🔍 Product Data Analysis:');
+      console.log('- Product ID:', productData.productId);
+      console.log('- Product Name:', productData.productName);
+      console.log('- Images Count:', productData.images?.length || 0);
+      console.log('- Min Qty:', productData.minQuantity);
+      console.log('- Max Qty:', productData.maxQuantity);
+      console.log('- Qty Step:', productData.qtyStep);
+      console.log('- List Qty Count:', productData.listQtyCount);
+      console.log('- Categories:', productData.selectedCategories);
+      console.log('- Brand:', productData.brand);
+      console.log('- Size:', productData.size);
+      console.log('- Weight:', productData.weight);
+      console.log('- API Response exists:', !!productData.apiResponse); // ✅ Check this
 
       const originalImageList = Array.isArray(productData.images)
         ? productData.images
@@ -186,8 +214,8 @@ const AddProduct = () => {
           quantity: productData.quantity || '',
           minQuantity: productData.minQuantity || '',
           maxQuantity: productData.maxQuantity || '',
-          qtyStep: productData.qtyStep || '', // ✅ ADD THIS
-          listQtyCount: productData.listQtyCount || '', // ✅ ADD THIS
+          qtyStep: productData.qtyStep || '',
+          listQtyCount: productData.listQtyCount || '',
           trackInventory: Boolean(productData.trackInventory),
           taxType: productData.taxType || 'VAT',
           brand: productData.brand || '',
@@ -205,13 +233,19 @@ const AddProduct = () => {
           userId: userId,
           category_listing: productData.category_listing || {id: 0, name: ''},
           selectedCategories: productData.selectedCategories || [],
+          // ✅✅✅ CRITICAL: Include the API response here
+          apiResponse: productData.apiResponse,
         };
 
-        console.log('✅ Form data updated with inventory values:', {
+        console.log('✅ Form data updated with values:', {
           minQuantity: updatedData.minQuantity,
           maxQuantity: updatedData.maxQuantity,
-          qtyStep: updatedData.qtyStep, // ✅ LOG THIS
-          listQtyCount: updatedData.listQtyCount, // ✅ LOG THIS
+          qtyStep: updatedData.qtyStep,
+          listQtyCount: updatedData.listQtyCount,
+          brand: updatedData.brand,
+          size: updatedData.size,
+          weight: updatedData.weight,
+          hasApiResponse: !!updatedData.apiResponse, // ✅ Verify this
         });
 
         return updatedData;
@@ -335,7 +369,7 @@ const AddProduct = () => {
         //   'Images Not Uploaded',
         //   'Please wait for images to finish uploading before saving the product.',
         // );
-        showCustomToast("Oops! Upload failed. Try again.", '❌');
+        showCustomToast('Oops! Upload failed. Try again.', '❌');
 
         return;
       }
@@ -343,7 +377,7 @@ const AddProduct = () => {
 
     if (!userId) {
       // Alert.alert('Error', 'User session expired. Please login again.');
-      showCustomToast("Session expired. Please login again.", '❌')
+      showCustomToast('Session expired. Please login again.', '❌');
       return;
     }
 
@@ -397,8 +431,6 @@ const AddProduct = () => {
         : 'Product added successfully.';
 
       showCustomToast(successMessage, '✅');
-
-
     } catch (error: any) {
       console.error('💥 Error saving product:', error);
 
@@ -417,11 +449,10 @@ const AddProduct = () => {
       //   ],
       // );
 
-      const erroMessage =
-        `Failed to ${editMode ? 'update' : 'create'
-        } product. Please try again.`
+      const erroMessage = `Failed to ${
+        editMode ? 'update' : 'create'
+      } product. Please try again.`;
       showCustomToast(erroMessage, '❌');
-
     } finally {
       setIsSubmitting(false);
     }

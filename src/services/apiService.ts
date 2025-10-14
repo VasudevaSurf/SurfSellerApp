@@ -1523,6 +1523,8 @@ export const fetchProductDetailsApi = async (
   productId: string,
 ) => {
   try {
+    console.log('🌐 Fetching product details from API:', {userId, productId});
+
     const response = await apiClient.get(`/api.php`, {
       params: {
         _d: 'NtSeProductsApi',
@@ -1531,9 +1533,19 @@ export const fetchProductDetailsApi = async (
         for_product_data: true,
       },
     });
+
+    // ✅ ADD THIS: Log complete raw response
+    console.log('='.repeat(80));
+    console.log('📡 RAW API RESPONSE FROM SERVER:');
+    console.log('='.repeat(80));
+    console.log('Response Status:', response.status);
+    console.log('Response Headers:', JSON.stringify(response.headers, null, 2));
+    console.log('Response Data:', JSON.stringify(response.data, null, 2));
+    console.log('='.repeat(80));
+
     return response.data as ProductDetailsResponse;
   } catch (error) {
-    console.error('Fetch Product Details API error:', error);
+    console.error('❌ Fetch Product Details API error:', error);
     throw error;
   }
 };
@@ -1896,17 +1908,10 @@ export const transformFormDataToApiFormat = (
   availableCategories: CategoryData[] = [],
   originalImages?: string[],
 ): CreateProductRequest => {
-  console.log('🔄 Transforming form data to API format:', {
-    editMode,
-    productName: formData.productName,
-    currentImages: formData.images?.length || 0,
-    imageRelativePaths: formData.imageRelativePaths?.length || 0,
-    originalImages: originalImages?.length || 0,
-  });
+  console.log('🔄 Transforming form data to API format:', formData);
 
-  // Extract category IDs from categoryPath
-  let categoryIds: number[] = [309]; // Default fallback
-
+  // Extract category IDs
+  let categoryIds: number[] = [309];
   if (
     formData.categoryPath &&
     formData.categoryPath.length > 0 &&
@@ -1932,7 +1937,7 @@ export const transformFormDataToApiFormat = (
       exceptions_type: 'F',
       full_description: formData.description || '',
       list_price: '0.00',
-      list_qty_count: formData.listQtyCount || '', // ✅ ADD THIS
+      list_qty_count: formData.listQtyCount || '',
       max_qty: formData.maxQuantity || '',
       min_qty: formData.minQuantity || '',
       options_type: 'P',
@@ -1942,7 +1947,7 @@ export const transformFormDataToApiFormat = (
       product: formData.productName || '',
       product_code: formData.productCode || '',
       promo_text: '',
-      qty_step: formData.qtyStep || '', // ✅ ADD THIS
+      qty_step: formData.qtyStep || '',
       sales_amount: '',
       search_words: '',
       short_description: '',
@@ -1956,18 +1961,35 @@ export const transformFormDataToApiFormat = (
     user_id: userId,
   };
 
-  // Handle images for both create and edit modes
+  // ✅ NEW: Collect ALL product features from formData
+  const productFeature: {[key: string]: string} = {};
+
+  // Find all feature fields in formData (they start with "feature_")
+  Object.keys(formData).forEach(key => {
+    if (key.startsWith('feature_')) {
+      const fieldName = key.replace('feature_', '');
+      const value = formData[key];
+
+      if (value) {
+        productFeature[fieldName] = value;
+        console.log(`✅ Adding feature: ${fieldName} = ${value}`);
+      }
+    }
+  });
+
+  // Add product_feature to apiData if we have any features
+  if (Object.keys(productFeature).length > 0) {
+    (apiData as any).product_feature = productFeature;
+    console.log('🎨 Product features to send:', productFeature);
+  }
+
+  // Handle images
   const imagePaths: string[] = [];
 
   if (editMode) {
-    console.log('📸 Processing images for edit mode...');
-
-    // For edit mode, we need to collect ALL current images as relative paths
     const currentImages = formData.images || [];
-
     for (const imageUrl of currentImages) {
       if (imageUrl.startsWith('http')) {
-        // This is an existing image URL - convert to relative path
         const relativePath = extractRelativePathFromUrl(imageUrl);
         if (relativePath && !imagePaths.includes(relativePath)) {
           imagePaths.push(relativePath);
@@ -1975,7 +1997,6 @@ export const transformFormDataToApiFormat = (
       }
     }
 
-    // Add newly uploaded images (relative paths)
     if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
       for (const relativePath of formData.imageRelativePaths) {
         if (
@@ -1987,13 +2008,7 @@ export const transformFormDataToApiFormat = (
         }
       }
     }
-
-    console.log('✅ Collected image paths for edit mode:', {
-      totalPaths: imagePaths.length,
-      paths: imagePaths,
-    });
   } else {
-    // For create mode, only use newly uploaded images
     if (formData.imageRelativePaths && formData.imageRelativePaths.length > 0) {
       formData.imageRelativePaths.forEach((path: string) => {
         if (path && !path.startsWith('http') && !imagePaths.includes(path)) {
@@ -2001,28 +2016,23 @@ export const transformFormDataToApiFormat = (
         }
       });
     }
-
-    console.log('✅ Collected image paths for create mode:', imagePaths.length);
   }
 
-  // Set the image_pair_positon with all current relative paths
   if (imagePaths.length > 0) {
     apiData.image_pair_positon = imagePaths;
   } else {
-    // If no images, send empty array to clear all images
     apiData.image_pair_positon = [];
   }
 
-  // Add product_id for updates
   if (editMode && formData.productId) {
     apiData.product_id = parseInt(formData.productId);
   }
 
-  console.log('🎯 Final API data for product:', {
+  console.log('🎯 Final API data:', {
     productId: apiData.product_id,
     productName: apiData.product_data.product,
     imageCount: apiData.image_pair_positon?.length || 0,
-    imagePaths: apiData.image_pair_positon || [],
+    productFeature: (apiData as any).product_feature,
     isEdit: editMode,
   });
 

@@ -295,7 +295,18 @@ export const fetchProductDetails = createAsyncThunk(
 
       const response = await fetchProductDetailsApi(userId, productId);
 
-      console.log('📦 Raw product details response:', response);
+      // ✅ ADD THIS: Log raw response in Redux thunk
+      console.log('='.repeat(80));
+      console.log('🏪 REDUX THUNK - RAW API RESPONSE:');
+      console.log('='.repeat(80));
+      console.log(JSON.stringify(response, null, 2));
+      console.log('='.repeat(80));
+
+      console.log('📦 Raw product details response structure:');
+      console.log('- Has product_data:', !!response.product_data);
+      console.log('- Has sections:', !!response.sections);
+      console.log('- Has images:', !!response.images);
+      console.log('- Has category_listing:', !!response.category_listing);
 
       const enhancedResponse = {
         ...response,
@@ -303,7 +314,10 @@ export const fetchProductDetails = createAsyncThunk(
         productData: response.product_data || response,
       };
 
-      console.log('✅ Enhanced product details:', enhancedResponse);
+      console.log(
+        '✅ Enhanced product details:',
+        JSON.stringify(enhancedResponse, null, 2),
+      );
 
       return enhancedResponse;
     } catch (error: any) {

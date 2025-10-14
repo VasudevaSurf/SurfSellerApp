@@ -87,7 +87,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         fetchProductDetails({userId, productId}),
       ).unwrap();
 
-      console.log('✅ Product details loaded:', productDetails);
+      // ✅ ADD THIS: Print complete raw API response
+      console.log('='.repeat(80));
+      console.log('📦 COMPLETE RAW API RESPONSE:');
+      console.log('='.repeat(80));
+      console.log(JSON.stringify(productDetails, null, 2));
+      console.log('='.repeat(80));
 
       // Extract comprehensive product data from API response
       const comprehensiveProductData = extractProductDataFromAPI(
@@ -103,10 +108,20 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         },
       );
 
+      // ✅ ADD THIS DEBUG LOG
+      console.log('🔎 DEBUG: Does comprehensiveProductData have apiResponse?', {
+        hasApiResponse: !!comprehensiveProductData.apiResponse,
+        apiResponseType: typeof comprehensiveProductData.apiResponse,
+        keys: Object.keys(comprehensiveProductData),
+      });
+
       console.log(
         '🎯 Navigating to edit with comprehensive data:',
         comprehensiveProductData,
       );
+
+      console.log('🎯 Extracted product data for navigation:');
+      console.log(JSON.stringify(comprehensiveProductData, null, 2));
 
       // Navigate to AddProduct with complete product data
       navigate('Dashboard', {
@@ -618,8 +633,8 @@ const extractProductDataFromAPI = (
     quantity: basicInfo.stock || '0',
     minQuantity: '',
     maxQuantity: '',
-    qtyStep: '', // ✅ ADD THIS
-    listQtyCount: '', // ✅ ADD THIS
+    qtyStep: '',
+    listQtyCount: '',
     trackInventory: true,
     taxType: 'VAT',
     brand: '',
@@ -632,6 +647,8 @@ const extractProductDataFromAPI = (
     status: basicInfo.active ? 'A' : 'D',
     category_listing: apiResponse?.category_listing || [],
     selectedCategories: [],
+    // ✅ ADD THIS: Include the full API response
+    apiResponse: apiResponse, // This is the key addition!
   };
 
   try {
@@ -688,11 +705,11 @@ const extractProductDataFromAPI = (
                     extractedData.maxQuantity = field.value?.toString() || '';
                     console.log('✅ Extracted max_qty:', field.value);
                     break;
-                  case 'qty_step': // ✅ ADD THIS
+                  case 'qty_step':
                     extractedData.qtyStep = field.value?.toString() || '';
                     console.log('✅ Extracted qty_step:', field.value);
                     break;
-                  case 'list_qty_count': // ✅ ADD THIS
+                  case 'list_qty_count':
                     extractedData.listQtyCount = field.value?.toString() || '';
                     console.log('✅ Extracted list_qty_count:', field.value);
                     break;
@@ -703,6 +720,52 @@ const extractProductDataFromAPI = (
               });
             }
           });
+        }
+
+        // ✅ NEW: Extract Extra Fields data for Features step
+        if (section.section_type === 'features' && section.blocks) {
+          const extraFieldsBlock = section.blocks.find(
+            (block: any) => block.block_name === 'Extra Fields',
+          );
+
+          if (extraFieldsBlock?.fields) {
+            console.log('🎨 Found Extra Fields in API response');
+
+            extraFieldsBlock.fields.forEach((field: any) => {
+              // Extract Brand
+              if (field.name === 'Brand' && field.value && field.variants) {
+                const selectedVariant = field.variants.find(
+                  (v: any) => v.id === field.value,
+                );
+                if (selectedVariant) {
+                  extractedData.brand = selectedVariant.name;
+                  console.log('✅ Extracted brand:', selectedVariant.name);
+                }
+              }
+
+              // Extract Size
+              if (field.name === 'Size' && field.value && field.variants) {
+                const selectedVariant = field.variants.find(
+                  (v: any) => v.id === field.value,
+                );
+                if (selectedVariant) {
+                  extractedData.size = selectedVariant.name;
+                  console.log('✅ Extracted size:', selectedVariant.name);
+                }
+              }
+
+              // Extract Weight
+              if (field.name === 'Weight' && field.value && field.variants) {
+                const selectedVariant = field.variants.find(
+                  (v: any) => v.id === field.value,
+                );
+                if (selectedVariant) {
+                  extractedData.weight = selectedVariant.name;
+                  console.log('✅ Extracted weight:', selectedVariant.name);
+                }
+              }
+            });
+          }
         }
       });
     }
@@ -737,7 +800,7 @@ const extractProductDataFromAPI = (
       extractedData = {
         ...extractedData,
         ...existingProductData,
-        // ✅ Preserve the extracted API data for key fields (don't let existingProductData override)
+        // ✅ Preserve the extracted API data for key fields
         images: extractedData.images,
         categoryPath: extractedData.categoryPath,
         description: extractedData.description,
@@ -746,6 +809,14 @@ const extractProductDataFromAPI = (
           extractedData.minQuantity || existingProductData.minQuantity || '',
         maxQuantity:
           extractedData.maxQuantity || existingProductData.maxQuantity || '',
+        qtyStep: extractedData.qtyStep || existingProductData.qtyStep || '',
+        listQtyCount:
+          extractedData.listQtyCount || existingProductData.listQtyCount || '',
+        brand: extractedData.brand || existingProductData.brand || '',
+        size: extractedData.size || existingProductData.size || '',
+        weight: extractedData.weight || existingProductData.weight || '',
+        // ✅ IMPORTANT: Keep the apiResponse
+        apiResponse: apiResponse,
       };
     }
 
@@ -756,6 +827,7 @@ const extractProductDataFromAPI = (
     return {
       ...extractedData,
       images: basicInfo.orderImage ? [basicInfo.orderImage] : [],
+      apiResponse: apiResponse, // ✅ Still include API response even on error
     };
   }
 };
