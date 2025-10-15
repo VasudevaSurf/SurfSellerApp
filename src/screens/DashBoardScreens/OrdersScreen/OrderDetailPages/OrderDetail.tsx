@@ -40,39 +40,38 @@ import {
 } from '../../../../redux/slices/orderDetailsSlice';
 import ChatIcon from '../../../../assets/icons/ChatIcon';
 import AnimatedLoader from '../../../../assets/icons/LoaderIcon';
-import {convertOrderStatus, showStatusToast} from '../OrderScreen';
+import {getStatusLabel, showStatusToast} from '../OrderScreen';
 
-// ✅ UPDATED: Map API status codes to display status
-const mapStatusToDisplay = (apiStatus: string): OrderStatus => {
-  const statusMap: {[key: string]: OrderStatus} = {
+// ✅ UPDATED: Direct status label mapping
+const getStatusLabelLocal = (apiStatus: string): string => {
+  const statusMap: {[key: string]: string} = {
     O: 'Pending',
-    P: 'Accepted', // ✅ CHANGED from 'Processing'
+    P: 'Accepted',
     C: 'Completed',
     F: 'Failed',
-    I: 'Cancelled',
+    I: 'Canceled',
     D: 'Declined',
-    B: 'Shipped',
-    Y: 'Processing', // ✅ "Awaiting call" maps to Processing
-    A: 'Processing', // ✅ "Fraud checking" maps to Processing
+    B: 'Backordered',
+    Y: 'Awaiting call',
+    A: 'Fraud checking',
   };
-
-  return statusMap[apiStatus] || 'Processing';
+  return statusMap[apiStatus] || 'Unknown';
 };
 
-// ✅ UPDATED: Map display status back to API status codes
-const mapStatusToApi = (displayStatus: OrderStatus): string => {
-  const statusMap: {[key: string]: string} = {
-    Pending: 'O',
-    Accepted: 'P', // ✅ ADDED
-    Processing: 'Y', // ✅ Maps to "Awaiting call"
-    Completed: 'C',
-    Failed: 'F',
-    Cancelled: 'I',
-    Declined: 'D',
-    Shipped: 'B',
+// ✅ UPDATED: Direct color mapping from API
+const getStatusColor = (apiStatus: string): string => {
+  const colorMap: {[key: string]: string} = {
+    O: '#ff9522',
+    P: '#97cf4d',
+    C: '#97cf4d',
+    F: '#ff5215',
+    I: '#c2c2c2',
+    D: '#ff5215',
+    B: '#28abf6',
+    Y: '#cc4125',
+    A: '#dcdcdc',
   };
-
-  return statusMap[displayStatus] || 'P';
+  return colorMap[apiStatus] || ColorPalette.GREY_300;
 };
 
 const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
@@ -106,11 +105,11 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     orderTime: params.orderTime || new Date().toLocaleTimeString(),
     orderImage: params.orderImage || 'https://picsum.photos/202',
     orderName: params.orderName || 'Product',
-    orderStatus: params.orderStatus || 'Pending',
+    orderStatus: params.orderStatus || ('O' as OrderStatus),
   });
 
   const [currentStatus, setCurrentStatus] = useState<OrderStatus>(
-    params.orderStatus || 'Pending',
+    params.orderStatus || ('O' as OrderStatus),
   );
 
   const [customerInfo, setCustomerInfo] = useState({
@@ -178,9 +177,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
           'https://picsum.photos/202',
         orderName: firstProduct?.product || params.orderName || 'Product',
         orderStatus:
-          mapStatusToDisplay(orderDetails.status) ||
-          params.orderStatus ||
-          'Pending',
+          orderDetails.status || params.orderStatus || ('O' as OrderStatus),
       });
 
       setCustomerInfo({
@@ -284,10 +281,9 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
         method: paymentMethod,
       });
 
+      // ✅ Use API status directly
       setCurrentStatus(
-        mapStatusToDisplay(orderDetails.status) ||
-          params.orderStatus ||
-          'Pending',
+        orderDetails.status || params.orderStatus || ('O' as OrderStatus),
       );
     }
   }, [orderDetails, params]);
@@ -300,28 +296,30 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
     };
   }, [statusUpdateError, dispatch]);
 
+  // ✅ UPDATED: Handle status change - pass status directly
   const handleStatusChange = async (newStatus: OrderStatus) => {
     try {
-      console.log('OrderDetail - Status change to:', newStatus);
+      console.log('OrderDetail - Received status from modal:', newStatus);
+      console.log('OrderDetail - Status type:', typeof newStatus);
 
       if (!userId) {
         console.error('No userId available for status update');
         return;
       }
 
-      const apiStatus = mapStatusToApi(newStatus);
+      // ✅ Pass status directly - it's already in API format (O, P, C, etc.)
       const res = await dispatch(
         updateOrderStatusDetails({
           userId,
           orderId: orderId!,
-          status: apiStatus,
+          status: newStatus, // This should be 'B' not 'Backordered'
         }),
       ).unwrap();
 
-      const updatedStatus = convertOrderStatus(res.newStatus);
-      showStatusToast(updatedStatus);
+      const updatedStatusLabel = getStatusLabelLocal(res.newStatus);
+      showStatusToast(updatedStatusLabel);
 
-      setCurrentStatus(newStatus);
+      setCurrentStatus(res.newStatus as OrderStatus);
       console.log('OrderDetail - Status updated successfully');
     } catch (error: any) {
       console.error('OrderDetail - Failed to update status:', error);
@@ -329,7 +327,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
   };
 
   const handlePrintInvoice = async () => {
-    console.log('Print Invoice button pressed');
+    console.log('Print Receipt button pressed');
 
     if (!orderData.orderNumber || orderData.orderNumber === 'N/A') {
       Alert.alert(
@@ -344,81 +342,64 @@ const OrderDetail: React.FC<OrderDetailProps> = ({route}) => {
 
     try {
       const invoiceText = `
-========================================
-         INVOICE - SELLER HUB
-========================================
+ORDER RECEIPT
 
-Order Number: ${orderData.orderNumber}
+Company: Surf Creative Solutions Ltd
 Date: ${orderData.orderDate}
 Time: ${orderData.orderTime}
+Order Number: ${orderData.orderNumber}
 
-========================================
 CUSTOMER DETAILS
-========================================
 
-Name: ${customerInfo.name}
-Email: ${customerInfo.email}
-Phone: ${customerInfo.phone}
+Name: ${customerInfo.name || 'N/A'}
+Email: ${customerInfo.email || 'N/A'}
+Phone: ${customerInfo.phone || 'N/A'}
 
-========================================
 SHIPPING DETAILS
-========================================
 
 Method: ${shippingInfo.method}
 Address: ${shippingInfo.address}
 
-========================================
 ORDER ITEMS
-========================================
 
 Product: ${productInfo.name}
 Quantity: ${productInfo.quantity}
 Unit Price: ${priceInfo.subtotal}
 
-========================================
 PAYMENT SUMMARY
-========================================
 
-Subtotal:          ${priceInfo.subtotal}
-Shipping:          ${priceInfo.shipping}
-Order Discount:    EUR 0.00
-VAT (12%):         EUR 0.00
-Payment Surcharge: EUR 0.00
+Subtotal: ${priceInfo.subtotal}
+Shipping: ${priceInfo.shipping}
+Order Discount: €0.00
+Payment Surcharge: €0.00
 
-----------------------------------------
-TOTAL:             ${priceInfo.total}
-========================================
+TOTAL: ${priceInfo.total}
 
 PAYMENT METHOD
+
 ${paymentInfo.method}
 
-========================================
+For any queries related to this order, please contact:
+Email: sales@surf.mt
+Phone: +356 77215267
 
-Thank you for your business!
-
-Surf Seller Hub
-Made in Malta
-Copyright ${new Date().getFullYear()}
-
-For queries: support@surf.mt
-Phone: +356 9282 9128
-
-========================================
+Surf Creative Solutions Ltd
+© ${new Date().getFullYear()} Surf Creative Solutions Ltd
       `.trim();
 
-      console.log('Invoice text prepared');
+      console.log('Receipt text prepared');
 
       await Share.share({
-        title: `Invoice ${orderData.orderNumber}`,
+        title: `Receipt ${orderData.orderNumber}`,
         message: invoiceText,
       });
 
       console.log('Share completed');
     } catch (error: any) {
-      console.error('Error sharing invoice:', error);
+      console.error('Error sharing Receipt:', error);
 
       if (error.message && !error.message.toLowerCase().includes('cancel')) {
-        Alert.alert('Error', 'Failed to share invoice. Please try again.', [
+        Alert.alert('Error', 'Failed to share Receipt. Please try again.', [
           {text: 'OK'},
         ]);
       }
@@ -522,18 +503,6 @@ Phone: +356 9282 9128
         </View>
       ),
     },
-    {
-      title: 'Coupon code',
-      content: (
-        <View style={styles.accordionContent}>
-          <Typography
-            text="AO877AW"
-            variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{color: ColorPalette.GREY_TEXT_300}}
-          />
-        </View>
-      ),
-    },
   ];
 
   const _renderHeader = (section: any, index: number, isActive: boolean) => {
@@ -569,22 +538,6 @@ Phone: +356 9282 9128
 
   const _updateSections = (activeSections: any) => {
     setActiveSections(activeSections);
-  };
-
-  // ✅ UPDATED: Helper function to determine status color
-  const getStatusColor = (status: OrderStatus): string => {
-    const statusColorMap: {[key: string]: string} = {
-      Pending: '#ff9522',
-      Accepted: '#97cf4d', // ✅ ADDED - Same green as API
-      Processing: '#cc4125', // ✅ Updated to match "Awaiting call" color
-      Completed: '#1FC16B',
-      Failed: '#ff5215',
-      Cancelled: '#c2c2c2',
-      Declined: '#ff5215',
-      Shipped: '#28abf6',
-    };
-
-    return statusColorMap[status] || ColorPalette.PURPLE_300;
   };
 
   if (loading && !orderData.orderNumber) {
@@ -908,7 +861,7 @@ Phone: +356 9282 9128
 
         <View style={styles.buttonContainer}>
           <Badge
-            text={printingInvoice ? 'Generating...' : 'Print Invoice'}
+            text={printingInvoice ? 'Generating...' : 'Print Receipt'}
             type={BadgeType.PRIMARY}
             variant={BadgeVariant.OUTLINE}
             onPress={handlePrintInvoice}
@@ -928,7 +881,11 @@ Phone: +356 9282 9128
           />
 
           <Badge
-            text={updatingStatus ? 'Updating...' : currentStatus}
+            text={
+              updatingStatus
+                ? 'Updating...'
+                : getStatusLabelLocal(currentStatus)
+            }
             variant={BadgeVariant.FILLED}
             type={BadgeType.PRIMARY}
             onPress={() => !updatingStatus && setIsModalVisible(true)}

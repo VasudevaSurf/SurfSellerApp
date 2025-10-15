@@ -552,7 +552,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               ]}
             />
           </View>
-          <View style={styles.platFormContainer}>
+          {/* <View style={styles.platFormContainer}>
             <Typography
               variant={TypographyVariant.LSMALL_REGULAR}
               text="Platform fee :"
@@ -569,7 +569,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 isDisabled && {color: ColorPalette.GREY_TEXT_200},
               ]}
             />
-          </View>
+          </View> */}
         </View>
 
         <View style={styles.infoContainerThree}>

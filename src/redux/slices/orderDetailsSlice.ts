@@ -117,7 +117,7 @@ export const fetchOrderDetails = createAsyncThunk(
         order_id: orderInfo.order_id,
         order_number: orderInfo.order_number || orderInfo.order_id,
         timestamp: orderInfo.timestamp,
-        status: orderInfo.status,
+        status: orderInfo.status, // ✅ Use status directly from API
         total: orderInfo.total ? `€${orderInfo.total}` : '€0.00',
         firstname: orderInfo.firstname,
         lastname: orderInfo.lastname,
@@ -136,7 +136,7 @@ export const fetchOrderDetails = createAsyncThunk(
         formattedDate: timeInfo.date,
         formattedTime: timeInfo.time,
 
-        // ✅ ADD THESE NEW FIELDS FOR SHIPPING
+        // Shipping details
         shipping_name: orderInfo.shipping_name,
         shipping: orderInfo.shipping,
         customer_address: orderInfo.customer_address,
@@ -147,11 +147,11 @@ export const fetchOrderDetails = createAsyncThunk(
         s_country_descr: orderInfo.s_country_descr,
         s_country: orderInfo.s_country,
 
-        // ✅ ADD THESE NEW FIELDS FOR PAYMENT
+        // Payment details
         payment_name: orderInfo.payment_name,
         payment_method: orderInfo.payment_method,
 
-        // ✅ OPTIONAL: ADD BILLING ADDRESS TOO
+        // Billing address
         billing_address: orderInfo.billing_address,
         b_address: orderInfo.b_address,
         b_address_2: orderInfo.b_address_2,
@@ -170,6 +170,7 @@ export const fetchOrderDetails = createAsyncThunk(
   },
 );
 
+// ✅ UPDATED: Pass status directly without conversion
 export const updateOrderStatusDetails = createAsyncThunk(
   'orderDetails/updateOrderStatus',
   async (
@@ -180,7 +181,7 @@ export const updateOrderStatusDetails = createAsyncThunk(
     }: {
       userId: string;
       orderId: string;
-      status: string;
+      status: string; // ✅ Accept API status code directly
     },
     {rejectWithValue},
   ) => {
@@ -191,6 +192,7 @@ export const updateOrderStatusDetails = createAsyncThunk(
         status,
       });
 
+      // ✅ Pass status directly to API
       const response = await updateOrderStatusApi(userId, orderId, status);
 
       if (!response.result) {
@@ -199,7 +201,7 @@ export const updateOrderStatusDetails = createAsyncThunk(
 
       return {
         orderId,
-        newStatus: status,
+        newStatus: status, // ✅ Return the status as-is
         message: response.message,
       };
     } catch (error: any) {

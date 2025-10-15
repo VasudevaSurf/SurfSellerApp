@@ -35,87 +35,53 @@ import {
 } from '../../../redux/slices/ordersSlice';
 import FilterIcon from '../../../assets/icons/FilterIcon';
 import SuccessTickSquareIcon from '../../../assets/icons/ToastIcons/SuccessTick';
-import { showCustomToast } from '../../../components/MainComponents/Toast/ToastComponent';
-import { FilterOrdersModal } from '../../../components/MainComponents/FilterOrdersModal';
+import {showCustomToast} from '../../../components/MainComponents/Toast/ToastComponent';
+import {FilterOrdersModal} from '../../../components/MainComponents/FilterOrdersModal';
 import AnimatedLoader from '../../../assets/icons/LoaderIcon';
 
-export const statusIconMap: { [key: string]: ReactNode | string } = {
-  'Pending': '⏳',
-  'Open': '📂',
-  'Accepted':'✅',
-  'Paid': '💰',
-  'Declined':'🚫',
-  'Failed': '❌',
-  'Backordered': '📦',
-  'Shipped': '🚚',
-  'Delivered': '📬',
-  'Completed': '🏆',
-  'Cancelled': '🗑️',
-  'Returned': '🔄',
-  'Exchanged': '♻️',
+// ✅ UPDATED: Status icon map with all statuses
+export const statusIconMap: {[key: string]: ReactNode | string} = {
+  Pending: '⏳',
+  Accepted: '✅',
+  Completed: '🏆',
+  Failed: '❌',
+  Canceled: '🗑️',
+  Declined: '🚫',
+  Backordered: '📦',
+  'Awaiting call': '📞',
+  'Fraud checking': '🔍',
 };
 
-export const showStatusToast = (status: string) => {  
+// ✅ UPDATED: Direct status label mapping
+export const getStatusLabel = (apiStatus: string): string => {
+  const statusMap: {[key: string]: string} = {
+    O: 'Pending',
+    P: 'Accepted',
+    C: 'Completed',
+    F: 'Failed',
+    I: 'Canceled',
+    D: 'Declined',
+    B: 'Backordered',
+    Y: 'Awaiting call',
+    A: 'Fraud checking',
+  };
+  return statusMap[apiStatus] || apiStatus;
+};
+
+export const showStatusToast = (status: string) => {
   const message = `Order marked as ${status}`;
-  const iconComponent = statusIconMap[status] || <SuccessTickSquareIcon size={18} />;
-  
+  const iconComponent = statusIconMap[status] || (
+    <SuccessTickSquareIcon size={18} />
+  );
+
   showCustomToast(message, iconComponent);
 };
 
-
-// Map API status codes to display status
-export const convertOrderStatus = (apiStatus: string): OrderStatus => {
-  const statusMap: {[key: string]: OrderStatus} = {
-    O: 'Pending',
-    P: 'Accepted', // ✅ CHANGED from 'Processing'
-    C: 'Completed',
-    F: 'Failed',
-    I: 'Cancelled',
-    D: 'Declined',
-    B: 'Shipped',
-    Y: 'Processing', // ✅ "Awaiting call" maps to Processing
-    A: 'Processing', // ✅ "Fraud checking" maps to Processing
-  };
-
-  return statusMap[apiStatus] || 'Processing';
-};
-
-// ✅ UPDATED: Map display status back to API status codes
-const convertStatusToApi = (displayStatus: OrderStatus): string => {
-  const statusMap: { [key: string]: string } = {
-    Pending: 'O',
-    Accepted: 'P', // ✅ ADDED
-    Processing: 'Y', // ✅ Maps to "Awaiting call"
-    Completed: 'C',
-    Failed: 'F',
-    Cancelled: 'I',
-    Declined: 'D',
-    Shipped: 'B',
-  };
-
-  return statusMap[displayStatus] || 'P';
-};
-
-// ✅ UPDATED: Get API status from filter ID
+// ✅ UPDATED: Direct status mapping - no conversion needed
 const getApiStatusFromFilter = (filterId: string): string | undefined => {
   if (filterId === 'all') return undefined;
-
-  const filterToApiMap: { [key: string]: string } = {
-    pending: 'O',
-    accepted: 'P', // ✅ ADDED
-    processing: 'Y', // ✅ Maps to "Awaiting call"
-    completed: 'C',
-    failed: 'F',
-    cancelled: 'I',
-    declined: 'D',
-    shipped: 'B',
-  };
-
-  if (['O', 'P', 'C', 'F', 'I', 'D', 'B', 'Y', 'A'].includes(filterId)) {
-    return filterId;
-  }
-
-  return filterToApiMap[filterId];
+  // Return the filter ID directly as it's already the API status code
+  return filterId;
 };
 
 const OrderScreen = () => {
@@ -168,7 +134,7 @@ const OrderScreen = () => {
   useEffect(() => {
     if (userId) {
       const apiStatus = getApiStatusFromFilter(statusFilter);
-      dispatch(fetchOrders({ userId, status: apiStatus }));
+      dispatch(fetchOrders({userId, status: apiStatus}));
     }
   }, [dispatch, userId]);
 
@@ -196,27 +162,26 @@ const OrderScreen = () => {
         orderPhone: order.phone || '',
         orderDate: order.formattedDate || new Date().toLocaleDateString(),
         orderTime: order.formattedTime || new Date().toLocaleTimeString(),
-        orderStatus: convertOrderStatus(order.status || ''),
+        orderStatus: order.status as OrderStatus, // ✅ Use status directly
         orderQuantity: firstProduct?.amount || 1,
       };
     }) || [];
 
-  // ✅ UPDATED: Define filter options
+  // ✅ UPDATED: Filter options with actual API status codes
   const filterOptions = [
     {id: 'all', label: 'All'},
-    {id: 'pending', label: 'Pending'},
-    {id: 'accepted', label: 'Accepted'}, // ✅ ADDED
-    {id: 'processing', label: 'Processing'},
-    {id: 'completed', label: 'Completed'},
-    {id: 'shipped', label: 'Shipped'},
-    {id: 'cancelled', label: 'Cancelled'},
-    {id: 'failed', label: 'Failed'},
-    {id: 'declined', label: 'Declined'},
+    {id: 'O', label: 'Pending'},
+    {id: 'P', label: 'Accepted'},
+    {id: 'C', label: 'Completed'},
+    {id: 'B', label: 'Backordered'},
+    {id: 'F', label: 'Failed'},
+    {id: 'I', label: 'Canceled'},
+    {id: 'D', label: 'Declined'},
   ];
 
   const [selectedFilter, setSelectedFilter] = useState(
     filterOptions.find(option => option.id === statusFilter) ||
-    filterOptions[0],
+      filterOptions[0],
   );
 
   // Update selected filter when statusFilter changes
@@ -241,10 +206,10 @@ const OrderScreen = () => {
       const timeoutId = setTimeout(() => {
         if (userId) {
           if (text.trim()) {
-            dispatch(searchOrders({ userId, searchTerm: text }));
+            dispatch(searchOrders({userId, searchTerm: text}));
           } else {
             const apiStatus = getApiStatusFromFilter(statusFilter);
-            dispatch(fetchOrders({ userId, status: apiStatus }));
+            dispatch(fetchOrders({userId, status: apiStatus}));
           }
         }
       }, 500);
@@ -258,15 +223,15 @@ const OrderScreen = () => {
   const handleSearch = useCallback(() => {
     if (userId) {
       if (searchText.trim()) {
-        dispatch(searchOrders({ userId, searchTerm: searchText }));
+        dispatch(searchOrders({userId, searchTerm: searchText}));
       } else {
         const apiStatus = getApiStatusFromFilter(statusFilter);
-        dispatch(fetchOrders({ userId, status: apiStatus }));
+        dispatch(fetchOrders({userId, status: apiStatus}));
       }
     }
   }, [dispatch, userId, searchText, statusFilter]);
 
-  // Handle status change for individual orders
+  // ✅ UPDATED: Handle status change - pass status directly
   const handleStatusChange = useCallback(
     async (orderId: string, newStatus: OrderStatus) => {
       try {
@@ -275,18 +240,20 @@ const OrderScreen = () => {
           return;
         }
 
-        const apiStatus = convertStatusToApi(newStatus);
+        console.log('Updating order status:', {orderId, newStatus});
+
+        // ✅ Pass status directly - it's already in API format
         const res = await dispatch(
-          updateOrderStatus({userId, orderId, status: apiStatus}),
+          updateOrderStatus({userId, orderId, status: newStatus}),
         ).unwrap();
 
-        const updatedStatus = convertOrderStatus(res.newStatus);
-        showStatusToast(updatedStatus);
+        const updatedStatusLabel = getStatusLabel(res.newStatus);
+        showStatusToast(updatedStatusLabel);
 
         // Refresh orders list after successful update
         setTimeout(() => {
           const currentApiStatus = getApiStatusFromFilter(statusFilter);
-          dispatch(fetchOrders({ userId: userId!, status: currentApiStatus }));
+          dispatch(fetchOrders({userId: userId!, status: currentApiStatus}));
         }, 1000);
       } catch (error: any) {
         console.error('Failed to update order status:', error);
@@ -297,7 +264,7 @@ const OrderScreen = () => {
 
   // Handle filter selection
   const handleFilterSelect = useCallback(
-    (filter: { id: string; label: string }) => {
+    (filter: {id: string; label: string}) => {
       dispatch(setStatusFilter(filter.id));
 
       if (userId) {
@@ -316,7 +283,7 @@ const OrderScreen = () => {
             }),
           );
         } else {
-          dispatch(fetchOrders({ userId, status: apiStatus }));
+          dispatch(fetchOrders({userId, status: apiStatus}));
         }
       }
     },
@@ -352,7 +319,7 @@ const OrderScreen = () => {
 
     if (userId) {
       const apiStatus = getApiStatusFromFilter(statusFilter);
-      dispatch(fetchOrders({ userId, status: apiStatus }));
+      dispatch(fetchOrders({userId, status: apiStatus}));
     }
   };
 
@@ -412,7 +379,7 @@ const OrderScreen = () => {
   }, [statusUpdateError, searchTimeoutRef, dispatch]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{flex: 1}} edges={['bottom']}>
       <Header
         name="Orders"
         variant={TypographyVariant.H6_BOLD}
@@ -423,7 +390,7 @@ const OrderScreen = () => {
             onPress: () =>
               navigate('Dashboard', {
                 screen: 'Account',
-                params: { screen: 'NotificationScreen' },
+                params: {screen: 'NotificationScreen'},
               }),
             size: 22,
             color: ColorPalette.IconColor,
@@ -463,12 +430,13 @@ const OrderScreen = () => {
             borderBottomWidth: 1,
             borderBottomColor: ColorPalette.GREY_100,
           }}>
-          <View style={{ flex: 1 }}>
+          <View style={{flex: 1}}>
             <Typography
-              text={`${getActiveFilterCount()} filter${getActiveFilterCount() > 1 ? 's' : ''
-                } applied`}
+              text={`${getActiveFilterCount()} filter${
+                getActiveFilterCount() > 1 ? 's' : ''
+              } applied`}
               variant={TypographyVariant.PSMALL_MEDIUM}
-              customTextStyles={{ color: ColorPalette.PURPLE_300 }}
+              customTextStyles={{color: ColorPalette.PURPLE_300}}
             />
             {currentFilters.customerName && (
               <Typography
@@ -502,8 +470,9 @@ const OrderScreen = () => {
             )}
             {(currentFilters.minOrderValue || currentFilters.maxOrderValue) && (
               <Typography
-                text={`• Value: €${currentFilters.minOrderValue || '0'} - €${currentFilters.maxOrderValue || '∞'
-                  }`}
+                text={`• Value: €${currentFilters.minOrderValue || '0'} - €${
+                  currentFilters.maxOrderValue || '∞'
+                }`}
                 variant={TypographyVariant.PXSMALL_REGULAR}
                 customTextStyles={{
                   color: ColorPalette.GREY_TEXT_400,
@@ -516,7 +485,7 @@ const OrderScreen = () => {
             <Typography
               text="Clear All"
               variant={TypographyVariant.PSMALL_SEMIBOLD}
-              customTextStyles={{ color: ColorPalette.RED_100 }}
+              customTextStyles={{color: ColorPalette.RED_100}}
             />
           </TouchableOpacity>
         </View>
@@ -542,7 +511,7 @@ const OrderScreen = () => {
           <Typography
             text={`Error updating status: ${statusUpdateError}`}
             variant={TypographyVariant.PSMALL_MEDIUM}
-            customTextStyles={{ color: '#C62828' }}
+            customTextStyles={{color: '#C62828'}}
           />
         </View>
       )}
@@ -564,7 +533,7 @@ const OrderScreen = () => {
           <Typography
             text={`Error: ${error}`}
             variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{ color: ColorPalette.RED_200 }}
+            customTextStyles={{color: ColorPalette.RED_200}}
           />
         </View>
       ) : (
@@ -572,7 +541,7 @@ const OrderScreen = () => {
           style={styles.mainContainer}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: getScreenHeight(4) },
+            {paddingBottom: getScreenHeight(4)},
           ]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.productContainer}>
@@ -608,11 +577,11 @@ const OrderScreen = () => {
                     hasActiveFilters()
                       ? 'No orders match your filters'
                       : searchText.trim()
-                        ? `No orders found for "${searchText}"`
-                        : 'No orders found'
+                      ? `No orders found for "${searchText}"`
+                      : 'No orders found'
                   }
                   variant={TypographyVariant.PMEDIUM_SEMIBOLD}
-                  customTextStyles={{ color: ColorPalette.GREY_TEXT_400 }}
+                  customTextStyles={{color: ColorPalette.GREY_TEXT_400}}
                 />
                 {(searchText.trim() || hasActiveFilters()) && (
                   <TouchableOpacity
@@ -620,7 +589,7 @@ const OrderScreen = () => {
                       setSearchText('');
                       handleClearFilters();
                     }}
-                    style={{ marginTop: getScreenHeight(1) }}>
+                    style={{marginTop: getScreenHeight(1)}}>
                     <Typography
                       text="Clear search and filters"
                       variant={TypographyVariant.PSMALL_MEDIUM}

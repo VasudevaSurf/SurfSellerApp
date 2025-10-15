@@ -12,95 +12,67 @@ import {StatusModal} from '../StatusModal/StatusModal';
 import {styles} from './OrderInfo.styles';
 import {OrderInfoProps, OrderStatus} from './OrderInfo.types';
 
-// ✅ UPDATED: Added Accepted status
+// ✅ UPDATED: Direct mapping of API status codes to display labels
+export const getStatusLabel = (status: OrderStatus): string => {
+  const statusMap: {[key: string]: string} = {
+    O: 'Pending',
+    P: 'Accepted',
+    C: 'Completed',
+    F: 'Failed',
+    I: 'Canceled',
+    D: 'Declined',
+    B: 'Backordered',
+    Y: 'Awaiting call',
+    A: 'Fraud checking',
+  };
+  return statusMap[status] || 'Unknown';
+};
+
+// ✅ UPDATED: Use exact colors from API
+export const getStatusColors = (
+  status: OrderStatus,
+): {borderColor: string; textColor: string} => {
+  const colorMap: {[key: string]: string} = {
+    O: '#ff9522', // Pending - Orange
+    P: '#97cf4d', // Accepted - Green
+    C: '#97cf4d', // Completed - Green
+    F: '#ff5215', // Failed - Red
+    I: '#c2c2c2', // Canceled - Gray
+    D: '#ff5215', // Declined - Red
+    B: '#28abf6', // Backordered - Blue
+    Y: '#cc4125', // Awaiting call - Dark Red
+    A: '#dcdcdc', // Fraud checking - Light Gray
+  };
+
+  const color = colorMap[status] || ColorPalette.GREY_200;
+  return {
+    borderColor: color,
+    textColor: color,
+  };
+};
+
+// ✅ UPDATED: Badge type based on status
 export const getStatusBadgeType = (status: OrderStatus): BadgeType => {
   switch (status) {
-    case 'Delivered':
-    case 'Paid':
-    case 'Completed':
+    case 'C': // Completed
+    case 'P': // Accepted
       return BadgeType.SUCCESS;
 
-    case 'Pending':
-    case 'Open':
-    case 'Backordered':
-    case 'Shipped':
+    case 'O': // Pending
+    case 'B': // Backordered
       return BadgeType.WARNING;
 
-    case 'Accepted': // ✅ ADDED
-    case 'Exchanged':
-    case 'Returned':
+    case 'Y': // Awaiting call
+    case 'A': // Fraud checking
       return BadgeType.PRIMARY;
 
-    case 'Cancelled':
-    case 'Declined':
-    case 'Failed':
+    case 'F': // Failed
+    case 'D': // Declined
+    case 'I': // Canceled
       return BadgeType.DANGER;
 
     default:
       return BadgeType.SECONDARY;
-  }
-};
-
-// ✅ UPDATED: Added Accepted status color
-export const getStatusColors = (
-  status: OrderStatus,
-): {borderColor: string; textColor: string} => {
-  switch (status) {
-    // ✅ Green statuses
-    case 'Delivered':
-    case 'Paid':
-    case 'Completed':
-      return {
-        borderColor: ColorPalette.Green_200,
-        textColor: ColorPalette.Green_200,
-      };
-
-    // 🟡 Yellow/Amber statuses
-    case 'Pending':
-    case 'Open':
-    case 'Backordered':
-    case 'Shipped':
-      return {
-        borderColor: ColorPalette.YELLOW_200,
-        textColor: ColorPalette.YELLOW_200,
-      };
-
-    // 🔵 Blue / Active process statuses
-    case 'Accepted': // ✅ ADDED - Using green color as per API
-      return {
-        borderColor: '#97cf4d',
-        textColor: '#97cf4d',
-      };
-
-    case 'Exchanged':
-    case 'Returned':
-      return {
-        borderColor: ColorPalette.ProgressLine,
-        textColor: ColorPalette.ProgressLine,
-      };
-
-    // 🔴 Red / Failure statuses
-    case 'Cancelled':
-    case 'Declined':
-    case 'Failed':
-      return {
-        borderColor: ColorPalette.RED_100,
-        textColor: ColorPalette.RED_100,
-      };
-
-    // Processing status (Awaiting call)
-    case 'Processing':
-      return {
-        borderColor: '#cc4125',
-        textColor: '#cc4125',
-      };
-
-    // Default / unknown status
-    default:
-      return {
-        borderColor: ColorPalette.GREY_200,
-        textColor: ColorPalette.GREY_100,
-      };
   }
 };
 
@@ -120,8 +92,6 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
   onCardPress,
   style,
 }) => {
-  console.log('orderStatus in orderInfo:', orderStatus);
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   const statusColors = getStatusColors(orderStatus);
 
@@ -223,7 +193,7 @@ export const OrderInfo: React.FC<OrderInfoProps> = ({
           customTextStyles={{color: ColorPalette.GREY_TEXT_100}}
         />
         <Badge
-          text={orderStatus}
+          text={getStatusLabel(orderStatus)}
           type={getStatusBadgeType(orderStatus)}
           variant={BadgeVariant.OUTLINE}
           rightIcon={ArrowDownIcon}

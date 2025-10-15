@@ -1,22 +1,16 @@
 import {StyleProp, ViewStyle} from 'react-native';
 
-// ✅ UPDATED: Added 'Accepted' to OrderStatus
+// ✅ UPDATED: Use exact API status codes
 export type OrderStatus =
-  | 'All'
-  | 'Pending'
-  | 'Processing'
-  | 'Open'
-  | 'Accepted' // ✅ ADDED
-  | 'Paid'
-  | 'Declined'
-  | 'Failed'
-  | 'Backordered'
-  | 'Shipped'
-  | 'Delivered'
-  | 'Completed'
-  | 'Cancelled'
-  | 'Returned'
-  | 'Exchanged';
+  | 'O' // Pending
+  | 'P' // Accepted
+  | 'C' // Completed
+  | 'F' // Failed
+  | 'I' // Canceled
+  | 'D' // Declined
+  | 'B' // Backordered
+  | 'Y' // Awaiting call
+  | 'A'; // Fraud checking
 
 export interface OrderDetailParams {
   orderId: string;

@@ -47,7 +47,7 @@ const initialState: ProfileState = {
   deleteAccountSuccess: false,
 };
 
-// Replace the helper function to extract user profile
+// Updated extractUserProfile function in profileSlice.ts
 const extractUserProfile = (
   sections: ProfileResponse['sections'],
 ): UserProfile => {
@@ -105,6 +105,15 @@ const extractUserProfile = (
             break;
           case 'fields_56': // BIC
             userProfile.bic = field.value;
+            break;
+          case 'fields_55': // ✅ NEW: Account Type
+            // Parse the value as number
+            const accountTypeValue = field.value
+              ? parseInt(field.value)
+              : undefined;
+            if (accountTypeValue) {
+              userProfile.account_type = accountTypeValue;
+            }
             break;
         }
       });

@@ -364,9 +364,9 @@ const ChatScreen = () => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.inputContainer}>
-        <View style={styles.uploadContainer}>
+        {/* <View style={styles.uploadContainer}>
           <ImageUploadIcon />
-        </View>
+        </View> */}
         <View style={styles.textInputContainer}>
           <TextInput
             style={styles.textInput}

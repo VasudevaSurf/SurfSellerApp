@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
     backgroundColor: ColorPalette.White,
     borderTopLeftRadius: BorderRadius.XSmall, // Using enum instead of getFigmaDimension(8)
     borderTopRightRadius: BorderRadius.XSmall, // Using enum instead of getFigmaDimension(8)
-    height:getScreenHeight(91)
+    height: getScreenHeight(79),
   },
   searchContainer: {
     padding: getScreenWidth(4), // Already using getScreenWidth
@@ -44,9 +44,7 @@ export const styles = StyleSheet.create({
   },
   sectionContainer: {
     paddingHorizontal: getScreenWidth(5), // Already using getScreenWidth
-    height:getScreenHeight(72)
-
-
+    height: getScreenHeight(60),
   },
   optionContainer: {
     flexDirection: 'row',

@@ -41,7 +41,7 @@ interface UpdatedEditFieldScreenProps {
   navigation: any;
 }
 
-// Update the submitFormAction function with better logging
+// Update the submitFormAction function with account type handling
 const submitFormAction = async (
   actionType: string,
   values: any,
@@ -113,30 +113,40 @@ const submitFormAction = async (
           terms: values,
         };
         break;
-      // ✅ ADD THESE BANK DETAILS CASES
+      // Bank Details Cases
       case 'updateAccountName':
         profileData = {
-          accountholder_full_name: values, // This will be mapped to fields_53 in the API service
+          accountholder_full_name: values, // This will be mapped to fields_53
         };
         console.log('📝 Updating account holder name to:', values);
         break;
       case 'updateBankName':
         profileData = {
-          bank_name: values, // This will be mapped to fields_57 in the API service
+          bank_name: values, // This will be mapped to fields_57
         };
         console.log('📝 Updating bank name to:', values);
         break;
       case 'updateIBAN':
         profileData = {
-          iban: values, // This will be mapped to fields_54 in the API service
+          iban: values, // This will be mapped to fields_54
         };
         console.log('📝 Updating IBAN to:', values);
         break;
       case 'updateBicCode':
         profileData = {
-          bic: values, // This will be mapped to fields_56 in the API service
+          bic: values, // This will be mapped to fields_56
         };
         console.log('📝 Updating BIC code to:', values);
+        break;
+      // ✅ NEW: Account Type Case
+      case 'updateAccountType':
+        // Parse the value to ensure it's a number (1 or 2)
+        const accountTypeValue =
+          typeof values === 'string' ? parseInt(values) : values;
+        profileData = {
+          account_type: accountTypeValue, // This will be mapped to fields_55
+        };
+        console.log('📝 Updating account type to:', accountTypeValue);
         break;
       default:
         console.warn(`Unhandled action type: ${actionType}`);
@@ -199,12 +209,23 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
+  // ✅ Account Type options with correct API values
   const ACCOUNT_TYPE_OPTIONS = [
-    {value: 'Checking', label: 'Checking'},
-    {value: 'Savings', label: 'Savings'},
-    {value: 'Business', label: 'Business'},
-    {value: 'Other', label: 'Other'},
+    {value: '1', label: 'Individual'}, // API expects 1 for Individual
+    {value: '2', label: 'Business'}, // API expects 2 for Business
   ];
+
+  useEffect(() => {
+    // ✅ Convert initial value to string for dropdown
+    if (fieldType === 'accountType' && initialValue) {
+      const stringValue =
+        typeof initialValue === 'number'
+          ? initialValue.toString()
+          : initialValue;
+      setFieldValue(stringValue);
+      console.log('🔄 Initialized account type with value:', stringValue);
+    }
+  }, [fieldType, initialValue]);
 
   const renderIconOrImage = () => {
     if (iconComponent) {
@@ -255,13 +276,28 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
               return 'Please enter a valid phone number';
             return true;
           };
+        case 'accountType':
+          // ✅ NEW: Validation for account type
+          return value => {
+            if (!value || value.trim() === '') {
+              return 'Please select an account type';
+            }
+            if (value !== '1' && value !== '2') {
+              return 'Invalid account type selected';
+            }
+            return true;
+          };
         case 'businessName':
         case 'vatNumber':
         case 'streetName':
         case 'cityName':
         case 'postalCode':
         case 'country':
-          // All company fields are optional
+        case 'accountName':
+        case 'bankName':
+        case 'IBAN':
+        case 'bicCode':
+          // All company and bank fields are optional
           return () => true;
         default:
           return () => true;
@@ -281,6 +317,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
   };
 
   const handleDropdownChange = (value: string) => {
+    console.log('🔄 Account type dropdown changed to:', value);
     setFieldValue(value);
     setError('');
     setActiveDropdown(null);
@@ -290,7 +327,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     setActiveDropdown(isOpen ? key : null);
   };
 
-  // Replace the navigateBack function
+  // Navigate back function
   const navigateBack = (updatedData: any) => {
     // Dispatch action to refresh profile data
     if (userData?.user_id) {
@@ -314,7 +351,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     );
   };
 
-  // Replace the entire handleSubmit function
+  // Handle submit function
   const handleSubmit = async (): Promise<void> => {
     if (!userData?.user_id) {
       setError('User not found. Please login again.');
@@ -362,9 +399,20 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           return;
         }
 
+        // ✅ For account type, convert string back to number before submitting
+        const submitValue =
+          fieldType === 'accountType' ? parseInt(fieldValue) : fieldValue;
+
+        console.log('🚀 Submitting field:', {
+          fieldType,
+          originalValue: fieldValue,
+          submitValue,
+          actionType: onSubmitActionType,
+        });
+
         await submitFormAction(
           onSubmitActionType,
-          fieldValue,
+          submitValue,
           dispatch,
           userData.user_id,
         );
@@ -423,7 +471,22 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     }
 
     // For single fields, check if value changed
-    const hasChanged = fieldValue !== initialValue;
+    const currentValue = fieldValue.toString();
+    const initial = initialValue?.toString() || '';
+    const hasChanged = currentValue !== initial;
+
+    console.log('🔍 Submit disabled check:', {
+      fieldType,
+      currentValue,
+      initial,
+      hasChanged,
+      fieldValue,
+    });
+
+    // ✅ For account type, it's required
+    if (fieldType === 'accountType') {
+      return !hasChanged || !fieldValue || fieldValue.trim() === '';
+    }
 
     // For optional fields, allow submission even if empty but changed
     const optionalFields = [
@@ -433,7 +496,12 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
       'cityName',
       'postalCode',
       'country',
+      'accountName',
+      'bankName',
+      'IBAN',
+      'bicCode',
     ];
+
     if (optionalFields.includes(fieldType)) {
       return !hasChanged;
     }
@@ -527,6 +595,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                   )}
                 </View>
               ) : fieldType === 'accountType' ? (
+                // ✅ Account Type Dropdown
                 <View
                   style={{
                     flex: 1,
@@ -547,11 +616,17 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                   {displayError && (
                     <Typography
                       text={displayError}
-                      customTextStyles={{color: ColorPalette.RED, marginTop: 5}}
+                      variant={TypographyVariant.PSMALL_REGULAR}
+                      customTextStyles={{
+                        color: ColorPalette.RED,
+                        marginTop: 8,
+                        paddingHorizontal: 4,
+                      }}
                     />
                   )}
                 </View>
               ) : (
+                // Regular text input for other fields
                 <AnimatedTextInput
                   label={label || fieldType}
                   value={fieldValue}

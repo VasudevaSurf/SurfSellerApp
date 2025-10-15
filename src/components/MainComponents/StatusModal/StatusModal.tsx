@@ -19,22 +19,17 @@ import {TypographyVariant} from '../../UserComponents/Typography/Typography.type
 import {styles} from './StatusModal.styles';
 import {Option, StatusModalProps} from './StatusModal.types';
 
+// ✅ UPDATED: Use API status codes as values
 const DEFAULT_OPTIONS: Option[] = [
-  {value: 'All', label: 'All', isSelected: false},
-  {value: 'Pending', label: 'Pending', isSelected: false},
-  {value: 'Processing', label: 'Processing', isSelected: false},
-  {value: 'Open', label: 'Open', isSelected: false},
-  {value: 'Accepted', label: 'Accepted', isSelected: false},
-  {value: 'Paid', label: 'Paid', isSelected: false},
-  {value: 'Declined', label: 'Declined', isSelected: false},
-  {value: 'Failed', label: 'Failed', isSelected: false},
-  {value: 'Backordered', label: 'Backordered', isSelected: false},
-  {value: 'Shipped', label: 'Shipped', isSelected: false},
-  {value: 'Delivered', label: 'Delivered', isSelected: false},
-  {value: 'Completed', label: 'Completed', isSelected: false},
-  {value: 'Cancelled', label: 'Cancelled', isSelected: false},
-  {value: 'Returned', label: 'Returned', isSelected: false},
-  {value: 'Exchanged', label: 'Exchanged', isSelected: false},
+  {value: 'O', label: 'Pending', isSelected: false},
+  {value: 'P', label: 'Accepted', isSelected: false},
+  {value: 'C', label: 'Completed', isSelected: false},
+  {value: 'F', label: 'Failed', isSelected: false},
+  {value: 'I', label: 'Canceled', isSelected: false},
+  {value: 'D', label: 'Declined', isSelected: false},
+  {value: 'B', label: 'Backordered', isSelected: false},
+  {value: 'Y', label: 'Awaiting call', isSelected: false},
+  {value: 'A', label: 'Fraud checking', isSelected: false},
 ];
 
 export const StatusModal: React.FC<StatusModalProps> = ({
@@ -43,9 +38,9 @@ export const StatusModal: React.FC<StatusModalProps> = ({
   onSubmit,
   initialStatus,
   options = DEFAULT_OPTIONS,
-  title = 'Choose Options',
-  showSearch = true,
-  searchPlaceholder = 'Search orders, products',
+  title = 'Choose Status',
+  showSearch = false, // ✅ Default to false for status modal
+  searchPlaceholder = 'Search status',
   selectionType = 'radio',
   checkboxProps = {
     size: 24,
@@ -63,14 +58,13 @@ export const StatusModal: React.FC<StatusModalProps> = ({
 
       if (selectionType === 'radio') {
         // For radio buttons: only one can be selected
+        // ✅ Compare using API status codes
         updatedOptions = options.map(option => ({
           ...option,
           isSelected: option.value === initialStatus,
         }));
       } else {
         // For checkboxes: support for multiple selections
-        // If initialStatus is a string, treat it as a single selection
-        // If it's an array, support multiple selections
         const initialStatusArray = Array.isArray(initialStatus)
           ? initialStatus
           : initialStatus
@@ -85,7 +79,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
 
       setModalOptions(updatedOptions);
       setFilteredOptions(updatedOptions);
-      setSearchText(''); // Reset search text when modal opens
+      setSearchText('');
     }
   }, [options, initialStatus, isVisible, selectionType]);
 
@@ -112,7 +106,6 @@ export const StatusModal: React.FC<StatusModalProps> = ({
           })),
         );
 
-        // Update filtered options to reflect the selection
         setFilteredOptions(prevFiltered =>
           prevFiltered.map(option => ({
             ...option,
@@ -131,7 +124,6 @@ export const StatusModal: React.FC<StatusModalProps> = ({
           })),
         );
 
-        // Update filtered options to reflect the selection
         setFilteredOptions(prevFiltered =>
           prevFiltered.map(option => ({
             ...option,
@@ -148,10 +140,11 @@ export const StatusModal: React.FC<StatusModalProps> = ({
 
   const handleSubmit = useCallback(() => {
     if (selectionType === 'radio') {
-      // For radio buttons: return a single selected value
+      // For radio buttons: return a single selected value (API status code)
       const selectedOption = modalOptions.find(option => option.isSelected);
       if (selectedOption) {
-        onSubmit(selectedOption.value);
+        console.log('StatusModal - Submitting status:', selectedOption.value);
+        onSubmit(selectedOption.value); // ✅ This sends the API code (O, P, C, etc.)
       }
     } else {
       // For checkboxes: return an array of selected values
@@ -159,6 +152,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
         .filter(option => option.isSelected)
         .map(option => option.value);
 
+      console.log('StatusModal - Submitting statuses:', selectedValues);
       onSubmit(selectedValues);
     }
     onClose();

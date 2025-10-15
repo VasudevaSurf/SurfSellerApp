@@ -312,7 +312,25 @@ export interface UserProfile {
   bank_name?: string;
   iban?: string;
   bic?: string;
+  account_type?: number;
 }
+
+export const ACCOUNT_TYPES = {
+  INDIVIDUAL: 1,
+  BUSINESS: 2,
+} as const;
+
+// ✅ NEW: Helper function to get account type label
+export const getAccountTypeLabel = (value: number | string): string => {
+  const numValue = typeof value === 'string' ? parseInt(value) : value;
+  return numValue === ACCOUNT_TYPES.BUSINESS ? 'Business' : 'Individual';
+};
+
+// ✅ NEW: Helper function to get account type options
+export const getAccountTypeOptions = () => [
+  {value: ACCOUNT_TYPES.INDIVIDUAL, name: 'Individual'},
+  {value: ACCOUNT_TYPES.BUSINESS, name: 'Business'},
+];
 
 export interface ProfileLogoField {
   name: string;
@@ -1186,6 +1204,7 @@ export const fetchProfileApi = async (userId: string) => {
   }
 };
 
+// Update the updateProfileApi function - add account_type handling
 export const updateProfileApi = async (
   userId: string,
   profileData: Partial<UserProfile>,
@@ -1280,6 +1299,13 @@ export const updateProfileApi = async (
       if (!isUpdating('bic') && currentProfileData.bic !== undefined) {
         companyData.fields_56 = currentProfileData.bic;
       }
+      // ✅ NEW: Account Type
+      if (
+        !isUpdating('account_type') &&
+        currentProfileData.account_type !== undefined
+      ) {
+        companyData.fields_55 = currentProfileData.account_type;
+      }
     }
 
     // NOW apply the new values (these will override any existing values)
@@ -1345,6 +1371,14 @@ export const updateProfileApi = async (
     if (profileData.bic !== undefined) {
       companyData.fields_56 = profileData.bic;
       console.log('✅ Updating fields_56 (BIC) to:', profileData.bic);
+    }
+    // ✅ NEW: Account Type update
+    if (profileData.account_type !== undefined) {
+      companyData.fields_55 = profileData.account_type;
+      console.log(
+        '✅ Updating fields_55 (Account Type) to:',
+        profileData.account_type,
+      );
     }
 
     const requestBody = {
@@ -2318,7 +2352,7 @@ export const searchOrdersApi = async (
 export const updateOrderStatusApi = async (
   userId: string,
   orderId: string,
-  status: string,
+  status: string, // ✅ Accept API status code directly
 ): Promise<OrderStatusUpdateResponse> => {
   try {
     console.log('Updating order status:', {userId, orderId, status});
@@ -2336,7 +2370,7 @@ export const updateOrderStatusApi = async (
         product_ids: orderId,
         user_id: userId,
         action: 'change_status',
-        status_to: status,
+        status_to: status, // ✅ Pass status directly
       },
     });
 

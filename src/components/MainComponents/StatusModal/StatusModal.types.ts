@@ -21,8 +21,9 @@ export interface StatusModalProps {
   checkboxProps?: CheckboxProps;
 }
 
+// ✅ UPDATED: Option now uses API status codes
 export interface Option {
-  value: OrderStatus;
-  label: string;
+  value: OrderStatus; // API status code (O, P, C, etc.)
+  label: string; // Display label (Pending, Accepted, etc.)
   isSelected: boolean;
 }

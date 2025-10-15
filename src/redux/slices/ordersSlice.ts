@@ -81,7 +81,7 @@ const normalizeTimestamp = (timestampData: any) => {
 
     let formattedTime = time;
     if (time && !time.includes('AM') && !time.includes('PM')) {
-      const [hours, minutes] = time.split(':').map(Number);
+      const [hours, minutes] = time.split(':').map(':').map(Number);
       const period = hours >= 12 ? 'PM' : 'AM';
       const hours12 = hours % 12 || 12;
       formattedTime = `${hours12}:${minutes

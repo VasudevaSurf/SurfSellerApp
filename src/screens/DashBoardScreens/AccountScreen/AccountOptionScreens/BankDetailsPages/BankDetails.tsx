@@ -23,6 +23,7 @@ import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
 import {RootState, AppDispatch} from '../../../../../redux/store';
 import {fetchProfile} from '../../../../../redux/slices/profileSlice';
 import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
+import {getAccountTypeLabel} from '../../../../../services/apiService';
 
 const BankDetails = () => {
   const route = useRoute();
@@ -36,6 +37,7 @@ const BankDetails = () => {
   const [IBAN, setIBAN] = useState('');
   const [bicCode, setBicCode] = useState('');
   const [bankName, setBankName] = useState('');
+  const [accountType, setAccountType] = useState<number | undefined>(undefined); // ✅ NEW
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Fetch profile data when component mounts
@@ -79,18 +81,30 @@ const BankDetails = () => {
       const iban = getFieldValue('fields_54'); // IBAN
       const bic = getFieldValue('fields_56'); // BIC
       const bank = getFieldValue('fields_57'); // Bank Name
+      const accountTypeValue = getFieldValue('fields_55'); // ✅ NEW: Account Type
 
       console.log('💳 Extracted bank details:', {
         holderName,
         iban,
         bic,
         bank,
+        accountTypeValue, // ✅ NEW
       });
 
       setAccountName(holderName);
       setIBAN(iban);
       setBicCode(bic);
       setBankName(bank);
+
+      // ✅ NEW: Parse account type
+      if (accountTypeValue) {
+        const parsedAccountType = parseInt(accountTypeValue);
+        if (!isNaN(parsedAccountType)) {
+          setAccountType(parsedAccountType);
+          console.log('✅ Account Type set to:', parsedAccountType);
+        }
+      }
+
       setIsInitializing(false);
     }
   }, [rawProfileData]);
@@ -104,12 +118,15 @@ const BankDetails = () => {
           updatedIBAN,
           updatedBicCode,
           updatedBankName,
+          updatedAccountType, // ✅ NEW
         } = route.params;
 
         if (updatedAccountName) setAccountName(updatedAccountName);
         if (updatedIBAN) setIBAN(updatedIBAN);
         if (updatedBicCode) setBicCode(updatedBicCode);
         if (updatedBankName) setBankName(updatedBankName);
+        if (updatedAccountType !== undefined)
+          setAccountType(updatedAccountType); // ✅ NEW
       }
     }, [route.params]),
   );
@@ -196,6 +213,32 @@ const BankDetails = () => {
           onSubmitActionType: 'updateBankName',
           size: 24,
           originScreen: 'BankDetails',
+        },
+      },
+    });
+  };
+
+  // ✅ NEW: Handle Edit Account Type
+  const handleEditAccountType = () => {
+    navigate('Dashboard', {
+      screen: 'Account',
+      params: {
+        screen: 'EditField',
+        params: {
+          fieldType: 'accountType',
+          initialValue: accountType,
+          headerTitle: 'Update account type',
+          label: 'Account type',
+          description:
+            'Select whether this is an Individual or Business account.',
+          validationType: 'accountType',
+          onSubmitActionType: 'updateAccountType',
+          originScreen: 'BankDetails',
+          // ✅ Pass dropdown options
+          dropdownOptions: [
+            {value: 1, name: 'Individual'},
+            {value: 2, name: 'Business'},
+          ],
         },
       },
     });
@@ -322,6 +365,22 @@ const BankDetails = () => {
             customBorderWidth={1}
             disabled={true}
           />
+
+          {/* ✅ NEW: Account Type Field */}
+          <AnimatedTextInput
+            label="Account type"
+            value={accountType ? getAccountTypeLabel(accountType) : ''}
+            onChangeText={() => {}} // Read-only
+            keyboardType="default"
+            customLabelColorFocused={ColorPalette.GREY_TEXT_400}
+            customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
+            rightText="Edit"
+            onRightTextPress={handleEditAccountType}
+            customBorderColor={ColorPalette.GREY_TEXT_400}
+            customBorderWidth={1}
+            disabled={true}
+          />
+
           <AnimatedTextInput
             label="IBAN"
             value={IBAN}
