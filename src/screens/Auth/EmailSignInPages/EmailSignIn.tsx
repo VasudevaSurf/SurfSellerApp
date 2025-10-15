@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {SafeAreaView, View, Alert, ScrollView, Linking} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {MainBanner} from '../../../components/MainComponents/MainBanner/MainBanner';
@@ -28,6 +28,11 @@ const EmailSignIn = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
   const {isLoading, error} = useSelector((state: RootState) => state.auth);
 
+  // ✅ Get initializer data for Terms and Privacy URLs
+  const initializerData = useSelector(
+    (state: RootState) => state.initializer.data,
+  );
+
   // State
   const [emailId, setEmailId] = useState('');
   const [password, setPassword] = useState('');
@@ -52,13 +57,48 @@ const EmailSignIn = ({navigation}) => {
     }
   }, [error, dispatch]);
 
-  const handleTermsPress = () => {
-    console.log('Navigate to Terms of Use');
-  };
+  // ✅ Handler to open external links
+  const handleOpenLink = useCallback(async (url: string, linkName: string) => {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`🔗 [EMAIL SIGN IN] Opening ${linkName}`);
+    console.log('URL:', url);
 
-  const handlePrivacyPress = () => {
-    console.log('Navigate to Privacy Policy');
-  };
+    try {
+      if (!url || url.trim() === '') {
+        console.error('❌ URL is empty');
+        Alert.alert('Error', `${linkName} link is not available`);
+        return;
+      }
+
+      console.log('🚀 Opening URL...');
+      await Linking.openURL(url);
+      console.log(`✅ Successfully opened ${linkName}`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    } catch (error) {
+      console.error(`❌ Failed to open ${linkName}:`, error);
+      Alert.alert(
+        'Unable to Open Link',
+        `Failed to open ${linkName}\n\nError: ${error?.message}`,
+      );
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    }
+  }, []);
+
+  // ✅ Updated handlers to use initializer URLs
+  const handleTermsPress = useCallback(() => {
+    console.log('🔘 Terms of Use clicked');
+    console.log('Terms URL:', initializerData?.terms_of_use_page);
+    handleOpenLink(initializerData?.terms_of_use_page || '', 'Terms of Use');
+  }, [handleOpenLink, initializerData]);
+
+  const handlePrivacyPress = useCallback(() => {
+    console.log('🔘 Privacy Policy clicked');
+    console.log('Privacy URL:', initializerData?.privacy_policy_page);
+    handleOpenLink(
+      initializerData?.privacy_policy_page || '',
+      'Privacy Policy',
+    );
+  }, [handleOpenLink, initializerData]);
 
   const handleCreateAccount = () => {
     Linking.openURL('https://sell.surf.mt/register');
@@ -70,8 +110,6 @@ const EmailSignIn = ({navigation}) => {
       buttonState === ButtonState.FOCUSED
     )
       return;
-
-    // We'll let the isLoading state from Redux control the button state through the useEffect
 
     // Dispatch login action
     const resultAction = await dispatch(
@@ -184,7 +222,7 @@ const EmailSignIn = ({navigation}) => {
   const renderSignup = () => (
     <View style={styles.termsContainerTwo}>
       <Typography
-        text="Don’t have an account?"
+        text="Don't have an account?"
         variant={TypographyVariant.LMEDIUM_REGULAR}
         customTextStyles={styles.captionTwo}
       />
