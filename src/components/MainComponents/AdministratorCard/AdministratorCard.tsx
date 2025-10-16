@@ -160,7 +160,7 @@ export const AdministratorCard: React.FC<AdministratorCardProps> = ({
           />
         </View>
 
-        <View style={styles.detailRow}>
+        {/* <View style={styles.detailRow}>
           <Typography
             text="Registered"
             variant={TypographyVariant.LMEDIUM_REGULAR}
@@ -171,7 +171,7 @@ export const AdministratorCard: React.FC<AdministratorCardProps> = ({
             variant={TypographyVariant.LMEDIUM_MEDIUM}
             customTextStyles={styles.valueText}
           />
-        </View>
+        </View> */}
 
         <View style={styles.detailRow}>
           <Typography
