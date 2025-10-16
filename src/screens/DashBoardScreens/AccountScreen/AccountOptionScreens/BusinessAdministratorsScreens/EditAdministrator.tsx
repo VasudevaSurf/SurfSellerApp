@@ -483,7 +483,7 @@ const EditAdministrator = () => {
               customTextColor={ColorPalette.GREY_TEXT_500}
             />
 
-            <AnimatedTextInput
+            {/* <AnimatedTextInput
               label="Confirm Password"
               value="••••••••"
               onChangeText={() => {}}
@@ -497,7 +497,7 @@ const EditAdministrator = () => {
               customBorderWidth={1}
               disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-            />
+            /> */}
           </View>
         </View>
 
