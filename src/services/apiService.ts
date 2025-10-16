@@ -297,6 +297,7 @@ export interface UserProfile {
   firstname?: string;
   lastname?: string;
   phone?: string;
+  password1?: string; // ✅ Add this for password updates
   company?: string;
   vat_number?: string;
   address?: string;
@@ -307,7 +308,7 @@ export interface UserProfile {
   invoice_logo?: string;
   company_description?: string;
   terms?: string;
-  // NEW: Add bank details fields
+  // Bank details fields
   accountholder_full_name?: string;
   bank_name?: string;
   iban?: string;
@@ -1308,8 +1309,6 @@ export const updateProfileApi = async (
       }
     }
 
-    // NOW apply the new values (these will override any existing values)
-    // User data
     if (profileData.email !== undefined) {
       userData.email = profileData.email;
     }
@@ -1321,6 +1320,11 @@ export const updateProfileApi = async (
     }
     if (profileData.phone !== undefined) {
       userData.phone = profileData.phone;
+    }
+    // ✅ NEW: Handle password update
+    if (profileData.password1 !== undefined) {
+      userData.password1 = profileData.password1;
+      console.log('✅ Updating password');
     }
 
     // Company data

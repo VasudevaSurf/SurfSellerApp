@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -7,12 +7,12 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useRoute, useFocusEffect } from '@react-navigation/native';
-import { useDispatch, useSelector } from 'react-redux';
-import { Header } from '../../../../../components/UserComponents/Header/Header';
-import { TypographyVariant } from '../../../../../components/UserComponents/Typography/Typography.types';
-import { ColorPalette } from '../../../../../config/colorPalette';
-import { goBack, navigate } from '../../../../../navigation/utils/navigationRef';
+import {useRoute, useFocusEffect} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
+import {Header} from '../../../../../components/UserComponents/Header/Header';
+import {TypographyVariant} from '../../../../../components/UserComponents/Typography/Typography.types';
+import {ColorPalette} from '../../../../../config/colorPalette';
+import {goBack, navigate} from '../../../../../navigation/utils/navigationRef';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import AnimatedTextInput from '../../../../../components/UserComponents/TextInput/TextInput';
 import {
@@ -21,15 +21,18 @@ import {
   ButtonState,
   ButtonVariant,
 } from '../../../../../components/UserComponents/Button';
-import { Typography } from '../../../../../components/UserComponents/Typography/Typography';
-import { Administrator } from '../../../../../components/MainComponents/AdministratorCard/AdministratorCard';
-import { TrashIcon2 } from '../../../../../assets/icons/NewProductIcons/TrashIcon2';
-import { RootState, AppDispatch } from '../../../../../redux/store';
-import { fetchProfile } from '../../../../../redux/slices/profileSlice';
-import { styles } from './EditAdministrator.styles';
+import {Typography} from '../../../../../components/UserComponents/Typography/Typography';
+import {Administrator} from '../../../../../components/MainComponents/AdministratorCard/AdministratorCard';
+import {TrashIcon2} from '../../../../../assets/icons/NewProductIcons/TrashIcon2';
+import {RootState, AppDispatch} from '../../../../../redux/store';
+import {fetchProfile} from '../../../../../redux/slices/profileSlice';
+import {styles} from './EditAdministrator.styles';
 import QuestionMarkIcon from '../../../../../assets/icons/QuestionMarkIcon';
 import LockIcon from '../../../../../assets/icons/LockIcon';
-import { getScreenHeight, getScreenWidth } from '../../../../../helpers/screenSize';
+import {
+  getScreenHeight,
+  getScreenWidth,
+} from '../../../../../helpers/screenSize';
 import InfoIconPay from '../../../../../assets/icons/InfoIconPay';
 
 const INITIAL_COUNTRY_CODE = '+356';
@@ -41,22 +44,14 @@ interface RouteParams {
   isCurrentUser?: boolean;
 }
 
-const InfoIcon = () => (
-  <Typography
-    text="ⓘ"
-    variant={TypographyVariant.PMEDIUM_REGULAR}
-    customTextStyles={{ color: ColorPalette.GREY_TEXT_400, fontSize: 20 }}
-  />
-);
-
 const EditAdministrator = () => {
   const route = useRoute();
   const dispatch = useDispatch<AppDispatch>();
-  const { administrator, isCurrentUser } = (route.params as RouteParams) || {};
+  const {administrator, isCurrentUser} = (route.params as RouteParams) || {};
   const isEditMode = !!administrator;
 
   const userData = useSelector((state: RootState) => state.auth.userData);
-  const { profileData, loading: profileLoading } = useSelector(
+  const {profileData, loading: profileLoading} = useSelector(
     (state: RootState) => state.profile,
   );
 
@@ -82,23 +77,35 @@ const EditAdministrator = () => {
   useFocusEffect(
     React.useCallback(() => {
       if (userData?.user_id && isCurrentUser) {
+        console.log('🔄 Fetching fresh profile data...');
         dispatch(fetchProfile(userData.user_id));
       }
     }, [dispatch, userData?.user_id, isCurrentUser]),
   );
 
-  // Update state when profile data changes or route params change
+  // Update state when profile data changes
   useEffect(() => {
+    console.log('📊 Profile data changed:', profileData);
+
     if (isCurrentUser && profileData) {
       // Use profile data for current user
       const firstName = profileData.firstname || '';
       const lastName = profileData.lastname || '';
       const constructedFullName = `${firstName} ${lastName}`.trim();
 
+      console.log('✅ Updating form with profile data:', {
+        fullName: constructedFullName,
+        email: profileData.email,
+        phone: profileData.phone,
+        address: profileData.address,
+        city: profileData.city,
+        postalCode: profileData.postal_code,
+      });
+
       setFullName(constructedFullName || '');
       setEmail(profileData.email || '');
       setPhoneNumber(profileData.phone?.replace('+356 ', '') || '');
-      setStreetName(profileData.street || '');
+      setStreetName(profileData.address || ''); // ✅ Use address field
       setCityName(profileData.city || '');
       setPostalCode(profileData.postal_code || '');
       setCountry(profileData.country || 'Malta');
@@ -115,31 +122,6 @@ const EditAdministrator = () => {
       setInitialLoading(false);
     }
   }, [profileData, administrator, isCurrentUser]);
-
-  // Handle updates from route params (when returning from EditFieldScreen)
-  useFocusEffect(
-    React.useCallback(() => {
-      if (route.params) {
-        const {
-          updatedName,
-          updatedEmail,
-          updatedPhone,
-          updatedStreet,
-          updatedCity,
-          updatedPostal,
-          updatedCountry,
-        } = route.params;
-
-        if (updatedName) setFullName(updatedName);
-        if (updatedEmail) setEmail(updatedEmail);
-        if (updatedPhone) setPhoneNumber(updatedPhone);
-        if (updatedStreet) setStreetName(updatedStreet);
-        if (updatedCity) setCityName(updatedCity);
-        if (updatedPostal) setPostalCode(updatedPostal);
-        if (updatedCountry) setCountry(updatedCountry);
-      }
-    }, [route.params]),
-  );
 
   const handleEditName = () => {
     const nameParts = fullName.split(' ');
@@ -200,7 +182,6 @@ const EditAdministrator = () => {
           onSubmitActionType: 'updateEmail',
           captionText: 'Email verified',
           iconImage: require('../../../../../assets/images/elements.png'),
-
           size: 24,
           originScreen: 'EditAdministrator',
         },
@@ -266,7 +247,6 @@ const EditAdministrator = () => {
           onSubmitActionType: 'updatePhone',
           captionText: 'WhatsApp number verified',
           iconImage: require('../../../../../assets/images/elements.png'),
-
           size: 24,
           originScreen: 'EditAdministrator',
         },
@@ -280,15 +260,15 @@ const EditAdministrator = () => {
       params: {
         screen: 'EditField',
         params: {
-          fieldType: 'streetName',
+          fieldType: 'address', // ✅ Use 'address' to match API field
           initialValue: streetName,
           headerTitle: 'Update street name and number',
           label: 'Street name and number',
           description:
             'Please update the street name and number for better experience.',
           keyboardType: 'default',
-          validationType: 'streetName',
-          onSubmitActionType: 'updateStreetName',
+          validationType: 'address',
+          onSubmitActionType: 'updateAddress', // ✅ Change action type
           originScreen: 'EditAdministrator',
         },
       },
@@ -368,7 +348,7 @@ const EditAdministrator = () => {
         onPress: () => {
           navigate('Dashboard', {
             screen: 'Account',
-            params: { screen: 'FAQScreen' },
+            params: {screen: 'FAQScreen'},
           });
         },
         size: 24,
@@ -425,7 +405,7 @@ const EditAdministrator = () => {
           <Typography
             text={fetchError}
             variant={TypographyVariant.PMEDIUM_REGULAR}
-            customTextStyles={{ color: ColorPalette.RED_200 }}
+            customTextStyles={{color: ColorPalette.RED_200}}
           />
           <Button
             text="Retry"
@@ -436,7 +416,7 @@ const EditAdministrator = () => {
               setFetchError('');
               setInitialLoading(true);
             }}
-            customStyles={{ marginTop: 16 }}
+            customStyles={{marginTop: 16}}
           />
         </View>
       </SafeAreaView>
@@ -490,7 +470,7 @@ const EditAdministrator = () => {
             <AnimatedTextInput
               label="Password"
               value="••••••••"
-              onChangeText={() => { }}
+              onChangeText={() => {}}
               keyboardType="default"
               secureTextEntry={true}
               customLabelColorFocused={ColorPalette.GREY_TEXT_400}
@@ -506,7 +486,7 @@ const EditAdministrator = () => {
             <AnimatedTextInput
               label="Confirm Password"
               value="••••••••"
-              onChangeText={() => { }}
+              onChangeText={() => {}}
               keyboardType="default"
               secureTextEntry={true}
               customLabelColorFocused={ColorPalette.GREY_TEXT_400}
@@ -560,15 +540,21 @@ const EditAdministrator = () => {
               showCountrySection
               countryCode={INITIAL_COUNTRY_CODE}
               countryFlag={MALTA_FLAG_URL}
-              onCountryPress={() => { }}
+              onCountryPress={() => {}}
               customLabelColorFocused={ColorPalette.GREY_TEXT_400}
               customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
-              rightText="Edit"
+              // rightText="Edit"
               onRightTextPress={handleEditPhone}
               customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
               disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
+              rightIcons={[
+                {
+                  icon: <LockIcon size={20} color="#4A4A4A" />,
+                  onPress: () => {},
+                },
+              ]}
             />
 
             <AnimatedTextInput
@@ -601,7 +587,7 @@ const EditAdministrator = () => {
               customTextColor={ColorPalette.GREY_TEXT_500}
             />
 
-            <AnimatedTextInput
+            {/* <AnimatedTextInput
               label="Postal code"
               value={postalCode}
               onChangeText={setPostalCode}
@@ -614,7 +600,7 @@ const EditAdministrator = () => {
               customBorderWidth={1}
               disabled={true}
               customTextColor={ColorPalette.GREY_TEXT_500}
-            />
+            /> */}
 
             {/* Country Badge */}
             <AnimatedTextInput
@@ -626,14 +612,14 @@ const EditAdministrator = () => {
               customLabelColorUnfocused={ColorPalette.GREY_TEXT_400}
               showCountrySection
               countryFlag={MALTA_FLAG_URL}
-              onCountryPress={() => { }}
+              onCountryPress={() => {}}
               customBorderColor={ColorPalette.GREY_TEXT_400}
               customBorderWidth={1}
               disabled={true}
               rightIcons={[
                 {
                   icon: <LockIcon size={20} color="#4A4A4A" />,
-                  onPress: () => { },
+                  onPress: () => {},
                 },
               ]}
             />
@@ -664,17 +650,16 @@ const EditAdministrator = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: ColorPalette.MainHeading,
-                width: getScreenWidth(24)
+                width: getScreenWidth(24),
               }}
               onPress={() => {}}
-              activeOpacity={0.7}
-            >
+              activeOpacity={0.7}>
               <Typography
                 variant={TypographyVariant.LMEDIUM_MEDIUM}
                 text={'Owner'}
                 customTextStyles={{
                   color: ColorPalette.White,
-                  paddingVertical: getScreenHeight(0.2)
+                  paddingVertical: getScreenHeight(0.2),
                 }}
               />
             </TouchableOpacity>
@@ -707,9 +692,14 @@ const EditAdministrator = () => {
           variant={ButtonVariant.PRIMARY}
           state={ButtonState.DEFAULT}
           size={ButtonSize.MEDIUM}
-          onPress={() => { }}
+          onPress={() => {
+            Alert.alert(
+              'Info',
+              'All changes are saved automatically when you edit each field.',
+              [{text: 'OK'}],
+            );
+          }}
           loading={isSubmitting}
-        // disabled={isSubmitDisabled()}
         />
       </View>
     </SafeAreaView>

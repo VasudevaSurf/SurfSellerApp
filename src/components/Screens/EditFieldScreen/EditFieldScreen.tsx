@@ -41,7 +41,7 @@ interface UpdatedEditFieldScreenProps {
   navigation: any;
 }
 
-// Update the submitFormAction function with account type handling
+// ✅ UPDATED: Submit form action with password and address support
 const submitFormAction = async (
   actionType: string,
   values: any,
@@ -71,6 +71,14 @@ const submitFormAction = async (
           phone: values,
         };
         break;
+      // ✅ NEW: Password update case
+      case 'updatePassword':
+        // Only send password1, confirmPassword is for client validation only
+        profileData = {
+          password1: values.password, // Use password field, not confirmPassword
+        };
+        console.log('📝 Updating password');
+        break;
       case 'updateBusinessName':
         profileData = {
           company: values,
@@ -83,10 +91,13 @@ const submitFormAction = async (
         };
         console.log('📝 Updating VAT number to:', values);
         break;
+      // ✅ UPDATED: Use 'address' instead of 'streetName'
+      case 'updateAddress':
       case 'updateStreetName':
         profileData = {
-          address: values,
+          address: values, // API uses 'address' field
         };
+        console.log('📝 Updating address to:', values);
         break;
       case 'updateCityName':
         profileData = {
@@ -138,7 +149,7 @@ const submitFormAction = async (
         };
         console.log('📝 Updating BIC code to:', values);
         break;
-      // ✅ NEW: Account Type Case
+      // ✅ Account Type Case
       case 'updateAccountType':
         // Parse the value to ensure it's a number (1 or 2)
         const accountTypeValue =
@@ -276,8 +287,15 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
               return 'Please enter a valid phone number';
             return true;
           };
+        // ✅ NEW: Password validation
+        case 'password':
+          return value => {
+            if (!value.trim()) return 'Password cannot be empty';
+            if (value.length < 6)
+              return 'Password must be at least 6 characters';
+            return true;
+          };
         case 'accountType':
-          // ✅ NEW: Validation for account type
           return value => {
             if (!value || value.trim() === '') {
               return 'Please select an account type';
@@ -289,6 +307,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
           };
         case 'businessName':
         case 'vatNumber':
+        case 'address': // ✅ Add address validation
         case 'streetName':
         case 'cityName':
         case 'postalCode':
@@ -328,7 +347,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
   };
 
   // Navigate back function
-  const navigateBack = (updatedData: any) => {
+  const navigateBack = (updatedData: any = {}) => {
     // Dispatch action to refresh profile data
     if (userData?.user_id) {
       dispatch(fetchProfile(userData.user_id));
@@ -342,7 +361,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
         {
           text: 'OK',
           onPress: () => {
-            // Navigate back
+            // Simply go back - the profile will be refreshed automatically
             navigation.goBack();
           },
         },
@@ -351,7 +370,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     );
   };
 
-  // Handle submit function
+  // ✅ UPDATED: Handle submit function with password support
   const handleSubmit = async (): Promise<void> => {
     if (!userData?.user_id) {
       setError('User not found. Please login again.');
@@ -365,15 +384,35 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
         let hasErrors = false;
         const newErrors: ErrorValues = {};
 
-        fields.forEach(field => {
-          const validationFn = getValidationForType(field.validationType);
-          const validationResult = validationFn(fieldValues[field.key] || '');
+        // ✅ Special handling for password fields
+        if (onSubmitActionType === 'updatePassword') {
+          const password = fieldValues.password || '';
+          const confirmPassword = fieldValues.confirmPassword || '';
 
-          if (validationResult !== true) {
-            newErrors[field.key] = validationResult;
+          // Validate password
+          const passwordValidation = getValidationForType('password')(password);
+          if (passwordValidation !== true) {
+            newErrors.password = passwordValidation;
             hasErrors = true;
           }
-        });
+
+          // Check if passwords match
+          if (password !== confirmPassword) {
+            newErrors.confirmPassword = 'Passwords do not match';
+            hasErrors = true;
+          }
+        } else {
+          // Regular field validation
+          fields.forEach(field => {
+            const validationFn = getValidationForType(field.validationType);
+            const validationResult = validationFn(fieldValues[field.key] || '');
+
+            if (validationResult !== true) {
+              newErrors[field.key] = validationResult;
+              hasErrors = true;
+            }
+          });
+        }
 
         if (hasErrors) {
           setErrors(newErrors);
@@ -429,7 +468,15 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
             },
           });
         } else {
-          navigateBack({});
+          // ✅ Pass back the updated value with correct key
+          const returnKey =
+            fieldType === 'address' || onSubmitActionType === 'updateAddress'
+              ? 'updatedStreet'
+              : `updated${
+                  fieldType.charAt(0).toUpperCase() + fieldType.slice(1)
+                }`;
+
+          navigateBack({[returnKey]: fieldValue});
         }
       }
     } catch (error: any) {
@@ -453,6 +500,17 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     if (updating || isSubmitting) return true;
 
     if (multipleFields) {
+      // ✅ For password, check both fields
+      if (onSubmitActionType === 'updatePassword') {
+        const password = fieldValues.password || '';
+        const confirmPassword = fieldValues.confirmPassword || '';
+        return (
+          password.trim() === '' ||
+          confirmPassword.trim() === '' ||
+          password !== confirmPassword
+        );
+      }
+
       // Check if any changes were made
       const hasChanges = fields.some(field => {
         const currentValue = fieldValues[field.key] || '';
@@ -492,6 +550,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
     const optionalFields = [
       'businessName',
       'vatNumber',
+      'address', // ✅ Add address
       'streetName',
       'cityName',
       'postalCode',
@@ -563,11 +622,15 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                         handleMultiFieldChange(field.key, text)
                       }
                       keyboardType={field.keyboardType || 'default'}
+                      // ✅ Add password support
+                      type={
+                        field.key.includes('password') ? 'password' : undefined
+                      }
                       customLabelColorFocused={ColorPalette.PURPLE_300}
                       customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
                       customBorderColor={
                         errors[field.key]
-                          ? ColorPalette.RED
+                          ? ColorPalette.RED_200
                           : ColorPalette.GREY_TEXT_400
                       }
                       customFocusedBorderColor={ColorPalette.PURPLE_300}
@@ -589,7 +652,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                       <Typography
                         variant={TypographyVariant.PSMALL_REGULAR}
                         text={errors.general}
-                        customTextStyles={{color: ColorPalette.RED}}
+                        customTextStyles={{color: ColorPalette.RED_200}}
                       />
                     </View>
                   )}
@@ -618,7 +681,7 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                       text={displayError}
                       variant={TypographyVariant.PSMALL_REGULAR}
                       customTextStyles={{
-                        color: ColorPalette.RED,
+                        color: ColorPalette.RED_200,
                         marginTop: 8,
                         paddingHorizontal: 4,
                       }}
@@ -635,7 +698,9 @@ const EditFieldScreen: React.FC<UpdatedEditFieldScreenProps> = ({
                   customLabelColorFocused={ColorPalette.PURPLE_300}
                   customLabelColorUnfocused={ColorPalette.GREY_TEXT_00}
                   customBorderColor={
-                    displayError ? ColorPalette.RED : ColorPalette.GREY_TEXT_400
+                    displayError
+                      ? ColorPalette.RED_200
+                      : ColorPalette.GREY_TEXT_400
                   }
                   customFocusedBorderColor={ColorPalette.PURPLE_300}
                   customBorderWidth={1}

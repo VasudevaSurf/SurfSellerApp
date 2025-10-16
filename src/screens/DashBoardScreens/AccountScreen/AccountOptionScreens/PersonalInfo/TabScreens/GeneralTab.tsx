@@ -193,7 +193,7 @@ const GeneralTab: React.FC<GeneralTabProps> = ({
           customBorderWidth={1}
           disabled={true}
         />
-        <AnimatedTextInput
+        {/* <AnimatedTextInput
           label="Postal code"
           value={postalCode}
           onChangeText={() => {}}
@@ -205,7 +205,7 @@ const GeneralTab: React.FC<GeneralTabProps> = ({
           customBorderColor={ColorPalette.GREY_TEXT_400}
           customBorderWidth={1}
           disabled={true}
-        />
+        /> */}
         <AnimatedTextInput
           label="Country"
           value={country}
