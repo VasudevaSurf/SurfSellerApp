@@ -42,6 +42,7 @@ import ChatIcon from '../../../assets/icons/ChatIcon';
 import LogoutIcon from '../../../assets/icons/LogOutIcon';
 import {TrashIcon2} from '../../../assets/icons/NewProductIcons/TrashIcon2';
 import TermsConditionsIcon from '../../../assets/icons/TermsAndConditionIcon';
+import {fetchInitializer} from '../../../redux/slices/initializerSlice';
 
 const AccountScreen = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -146,11 +147,79 @@ const AccountScreen = () => {
       console.log('└─ Value:', initializerData.terms_of_use_page);
     } else {
       console.warn('⚠️ No initializer data available yet');
-      console.log('Initializer data should be loaded on app startup');
-      console.log('Check RootNavigator initialization');
+      console.log('Attempting to fetch initializer data...');
+
+      // ✅ Try to fetch initializer data if not available
+      dispatch(fetchInitializer());
     }
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-  }, [initializerData]);
+  }, [initializerData, dispatch]);
+
+  // Update the handleOpenLink function to check for data
+  const handleOpenLink = useCallback(
+    async (url: string, linkName: string) => {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`🔗 [OPEN LINK] Attempting to open: ${linkName}`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+      try {
+        console.log('📊 Link Details:');
+        console.log('├─ Link Name:', linkName);
+        console.log('├─ URL (RAW from API):', url);
+        console.log('├─ URL Length:', url?.length || 0);
+        console.log('└─ Is Empty?', !url || url.trim() === '');
+
+        // ✅ Check if initializer data is available
+        if (!initializerData) {
+          console.error('❌ Initializer data not loaded');
+          Alert.alert(
+            'Loading',
+            'App configuration is still loading. Please try again in a moment.',
+            [
+              {
+                text: 'Retry',
+                onPress: () => {
+                  dispatch(fetchInitializer());
+                },
+              },
+              {text: 'Cancel', style: 'cancel'},
+            ],
+          );
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+          return;
+        }
+
+        if (!url || url.trim() === '') {
+          console.error('❌ URL is empty or undefined');
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+          Alert.alert('Error', `${linkName} link is not available`);
+          return;
+        }
+
+        console.log('\n🚀 Opening URL directly (no modifications)...');
+
+        await Linking.openURL(url);
+        console.log('✅ [OPEN LINK] Successfully opened:', linkName);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+      } catch (error) {
+        console.error('\n💥 [OPEN LINK] Failed to open URL');
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.error('Error Details:', {
+          linkName,
+          url,
+          errorMessage: error?.message,
+          errorType: error?.name,
+        });
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+        Alert.alert(
+          'Unable to Open Link',
+          `Failed to open ${linkName}\n\nURL: ${url}\n\nError: ${error?.message}`,
+        );
+      }
+    },
+    [initializerData, dispatch],
+  );
 
   // Fetch profile data when component mounts
   useEffect(() => {
@@ -183,48 +252,48 @@ const AccountScreen = () => {
   }, [dispatch]);
 
   // ✅ Handle opening external links - use URL exactly as provided by API
-  const handleOpenLink = useCallback(async (url: string, linkName: string) => {
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log(`🔗 [OPEN LINK] Attempting to open: ${linkName}`);
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  // const handleOpenLink = useCallback(async (url: string, linkName: string) => {
+  //   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  //   console.log(`🔗 [OPEN LINK] Attempting to open: ${linkName}`);
+  //   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
-    try {
-      console.log('📊 Link Details:');
-      console.log('├─ Link Name:', linkName);
-      console.log('├─ URL (RAW from API):', url);
-      console.log('├─ URL Length:', url?.length || 0);
-      console.log('└─ Is Empty?', !url || url.trim() === '');
+  //   try {
+  //     console.log('📊 Link Details:');
+  //     console.log('├─ Link Name:', linkName);
+  //     console.log('├─ URL (RAW from API):', url);
+  //     console.log('├─ URL Length:', url?.length || 0);
+  //     console.log('└─ Is Empty?', !url || url.trim() === '');
 
-      if (!url || url.trim() === '') {
-        console.error('❌ URL is empty or undefined');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-        Alert.alert('Error', `${linkName} link is not available`);
-        return;
-      }
+  //     if (!url || url.trim() === '') {
+  //       console.error('❌ URL is empty or undefined');
+  //       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  //       Alert.alert('Error', `${linkName} link is not available`);
+  //       return;
+  //     }
 
-      console.log('\n🚀 Opening URL directly (no modifications)...');
+  //     console.log('\n🚀 Opening URL directly (no modifications)...');
 
-      // Just open the URL directly without any canOpenURL check or modifications
-      await Linking.openURL(url);
-      console.log('✅ [OPEN LINK] Successfully opened:', linkName);
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-    } catch (error) {
-      console.error('\n💥 [OPEN LINK] Failed to open URL');
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.error('Error Details:', {
-        linkName,
-        url,
-        errorMessage: error?.message,
-        errorType: error?.name,
-      });
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  //     // Just open the URL directly without any canOpenURL check or modifications
+  //     await Linking.openURL(url);
+  //     console.log('✅ [OPEN LINK] Successfully opened:', linkName);
+  //     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  //   } catch (error) {
+  //     console.error('\n💥 [OPEN LINK] Failed to open URL');
+  //     console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  //     console.error('Error Details:', {
+  //       linkName,
+  //       url,
+  //       errorMessage: error?.message,
+  //       errorType: error?.name,
+  //     });
+  //     console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
-      Alert.alert(
-        'Unable to Open Link',
-        `Failed to open ${linkName}\n\nURL: ${url}\n\nError: ${error?.message}`,
-      );
-    }
-  }, []);
+  //     Alert.alert(
+  //       'Unable to Open Link',
+  //       `Failed to open ${linkName}\n\nURL: ${url}\n\nError: ${error?.message}`,
+  //     );
+  //   }
+  // }, []);
 
   // Memoize modal buttons with updated logout functionality
   const logoutButtons = useMemo(

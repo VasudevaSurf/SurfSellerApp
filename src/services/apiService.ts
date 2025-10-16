@@ -1173,14 +1173,27 @@ export const loginApi = async (email: string, password: string) => {
 // INITIALIZER
 export const fetchInitializerApi = async () => {
   try {
+    console.log('📡 [API] Fetching initializer data...');
+
+    // ✅ Use the correct endpoint format
     const response = await apiClient.get(`/api.php`, {
       params: {
         _d: 'NtSeInitializerApi',
       },
     });
+
+    console.log('✅ [API] Initializer data fetched successfully');
+    console.log('📊 Response data:', {
+      hasPrivacyPolicy: !!response.data.privacy_policy_page,
+      hasTermsOfUse: !!response.data.terms_of_use_page,
+      hasWhatsappUrl: !!response.data.whatsapp_url,
+      privacyPolicyUrl: response.data.privacy_policy_page,
+      termsOfUseUrl: response.data.terms_of_use_page,
+    });
+
     return response.data as InitializerResponse;
   } catch (error) {
-    console.error('Fetch Initializer API error:', error);
+    console.error('❌ [API] Fetch Initializer error:', error);
     throw error;
   }
 };
