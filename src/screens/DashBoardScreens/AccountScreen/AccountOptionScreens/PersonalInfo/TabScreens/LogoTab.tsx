@@ -51,8 +51,9 @@ const InfoIcon = () => (
   </Svg>
 );
 
+// ✅ UPDATED: Production authorization header
 const API_AUTH_HEADER =
-  'Basic YWRtaW5Ac3VyZi5tdDpOOW9aMnlXMzc3cEg1VTExNTFiY3YyZlYyNDYySTk1NA==';
+  'Basic YWRtaW5Ac3VyZi5tdDpSMlZXbjE2N1VaUFc2Y3VLNDEwMWdCMTM2UTk0UFQ2SA==';
 
 const LogoTab: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -105,9 +106,10 @@ const LogoTab: React.FC = () => {
             themeImage.https_image_path;
 
           if (imagePath) {
+            // ✅ UPDATED: Production URL
             const fullUrl = imagePath.startsWith('http')
               ? imagePath
-              : `https://dev.surf.mt/${imagePath}`;
+              : `https://surf.mt/${imagePath}`;
             console.log('✅ Setting company logo URL:', fullUrl);
             setCompanyLogoUri(fullUrl);
           }
@@ -131,9 +133,10 @@ const LogoTab: React.FC = () => {
             mailImage.https_image_path;
 
           if (imagePath) {
+            // ✅ UPDATED: Production URL
             const fullUrl = imagePath.startsWith('http')
               ? imagePath
-              : `https://dev.surf.mt/${imagePath}`;
+              : `https://surf.mt/${imagePath}`;
             console.log('✅ Setting invoice logo URL:', fullUrl);
             setInvoiceLogoUri(fullUrl);
           }
@@ -263,8 +266,9 @@ const LogoTab: React.FC = () => {
 
       console.log('📤 Uploading to server...');
 
+      // ✅ UPDATED: Production URL
       const response = await fetch(
-        'https://dev.surf.mt/api.php?_d=NtSeProfilesApi',
+        'https://surf.mt/api.php?_d=NtSeProfilesApi',
         {
           method: 'POST',
           headers: {
@@ -332,9 +336,10 @@ const LogoTab: React.FC = () => {
           previousImage?.image_path || previousImage?.http_image_path;
 
         if (previousPath) {
+          // ✅ UPDATED: Production URL
           const fullUrl = previousPath.startsWith('http')
             ? previousPath
-            : `https://dev.surf.mt/${previousPath}`;
+            : `https://surf.mt/${previousPath}`;
           setCompanyLogoUri(fullUrl);
         } else {
           setCompanyLogoUri(null);
@@ -350,9 +355,10 @@ const LogoTab: React.FC = () => {
           previousImage?.image_path || previousImage?.http_image_path;
 
         if (previousPath) {
+          // ✅ UPDATED: Production URL
           const fullUrl = previousPath.startsWith('http')
             ? previousPath
-            : `https://dev.surf.mt/${previousPath}`;
+            : `https://surf.mt/${previousPath}`;
           setInvoiceLogoUri(fullUrl);
         } else {
           setInvoiceLogoUri(null);

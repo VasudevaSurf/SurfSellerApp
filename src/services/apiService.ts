@@ -1,9 +1,9 @@
 import axios from 'axios';
 import {API_ENDPOINTS} from '../constants/apiEndpoints';
 
-const API_BASE_URL = 'https://dev.surf.mt/2.0/api';
+const API_BASE_URL = 'https://surf.mt/2.0/api';
 const API_AUTH_HEADER =
-  'Basic YWRtaW5Ac3VyZi5tdDpOOW9aMnlXMzc3cEg1VTExNTFiY3YyZlYyNDYySTk1NA==';
+  'Basic YWRtaW5Ac3VyZi5tdDpSMlZXbjE2N1VaUFc2Y3VLNDEwMWdCMTM2UTk0UFQ2SA==';
 
 export interface Product {
   product_id: string;
@@ -693,12 +693,11 @@ export const uploadCompanyLogoApi = async (
     });
 
     const response = await fetch(
-      'https://dev.surf.mt/api.php?_d=NtSeProfilesApi',
+      'https://surf.mt/api.php?_d=NtSeProfilesApi', // UPDATED
       {
         method: 'POST',
         headers: {
           Authorization: API_AUTH_HEADER,
-          // DO NOT set Content-Type - let FormData set it with boundary
         },
         body: formData,
       },
@@ -807,7 +806,7 @@ export const fetchNotificationsApi = async (
   try {
     console.log('Fetching notifications for userId:', userId);
 
-    let url = `${API_BASE_URL}/api.php?_d=NtSeNotificationsApi&user_id=${userId}&severity=${severity}`;
+    let url = `https://surf.mt/api.php?_d=NtSeNotificationsApi&user_id=${userId}&severity=${severity}`; // UPDATED
 
     if (section) {
       url += `&section=${section}`;
@@ -853,7 +852,7 @@ export const markNotificationAsReadApi = async (
 
     const response = await axios({
       method: 'PUT',
-      url: `${API_BASE_URL}/api.php?_d=NtSeNotificationsApi`,
+      url: `https://surf.mt/api.php?_d=NtSeNotificationsApi`, // UPDATED
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
@@ -885,7 +884,7 @@ export const deleteNotificationApi = async (
 
     const response = await axios({
       method: 'DELETE',
-      url: `${API_BASE_URL}/api.php?_d=NtSeNotificationsApi`,
+      url: `https://surf.mt/api.php?_d=NtSeNotificationsApi`, // UPDATED
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
@@ -986,7 +985,7 @@ export const uploadProductImageApi = async (
     console.log('📤 Sending upload request...');
 
     const response = await fetch(
-      'https://dev.surf.mt/api.php?_d=NtSeFileUploaderApi',
+      'https://surf.mt/api.php?_d=NtSeFileUploaderApi', // UPDATED
       {
         method: 'POST',
         headers: {
@@ -1049,7 +1048,7 @@ export const createWithdrawalApi = async (
 
     const response = await axios({
       method: 'POST',
-      url: `${API_BASE_URL}/api.php?_d=NtSeBalanceApi&user_id=${userId}`,
+      url: `https://surf.mt/api.php?_d=NtSeBalanceApi&user_id=${userId}`, // UPDATED
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
@@ -1408,7 +1407,7 @@ export const updateProfileApi = async (
 
     const response = await axios({
       method: 'POST',
-      url: 'https://dev.surf.mt/api.php?_d=NtSeProfilesApi',
+      url: 'https://surf.mt/api.php?_d=NtSeProfilesApi', // UPDATED
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
@@ -1467,7 +1466,7 @@ export const fetchBalanceApi = async (
   try {
     console.log('Fetching balance for userId:', userId);
 
-    let url = `https://dev.surf.mt/api.php?_d=NtSeBalanceApi&user_id=${userId}`;
+    let url = `https://surf.mt/api.php?_d=NtSeBalanceApi&user_id=${userId}`; // UPDATED
 
     url += `&page=${page}&items_per_page=${itemsPerPage}`;
 
@@ -1698,7 +1697,7 @@ export const updateProductStatusApi = async (
 
     const response = await axios({
       method: 'PUT',
-      url: `https://dev.surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`,
+      url: `https://surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`, // UPDATED
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
@@ -1753,7 +1752,7 @@ export const updateMultipleProductsStatusApi = async (
 
     const response = await axios({
       method: 'PUT',
-      url: `https://dev.surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`,
+      url: `https://surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`, // UPDATED
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
@@ -1789,7 +1788,7 @@ export const deleteProductApi = async (
 
     const response = await axios({
       method: 'PUT',
-      url: `https://dev.surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`,
+      url: `https://surf.mt/api.php?_d=NtSeProductsApi%2F${userId}`, // UPDATED
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
@@ -2151,10 +2150,10 @@ export const extractRelativePathFromUrl = (url: string): string => {
   try {
     console.log('🔗 Extracting relative path from URL:', url);
 
-    // Specific pattern for dev.surf.mt URLs
-    // Example: https://dev.surf.mt/images/detailed/123/image.jpg -> images/detailed/123/image.jpg
-    const devSurfPattern = /https?:\/\/dev\.surf\.mt\/(.+)$/;
-    const match = url.match(devSurfPattern);
+    // ✅ UPDATED: Specific pattern for surf.mt URLs (production)
+    // Example: https://surf.mt/images/detailed/123/image.jpg -> images/detailed/123/image.jpg
+    const surfPattern = /https?:\/\/surf\.mt\/(.+)$/;
+    const match = url.match(surfPattern);
 
     if (match && match[1]) {
       // Remove any query parameters
@@ -2163,7 +2162,7 @@ export const extractRelativePathFromUrl = (url: string): string => {
       return relativePath;
     }
 
-    // Fallback: try general pattern
+    // Fallback: try general pattern (works for both dev and prod)
     const generalPattern = /https?:\/\/[^\/]+\/(.+)$/;
     const generalMatch = url.match(generalPattern);
 
@@ -2200,7 +2199,7 @@ export const fetchOrdersApi = async (
       status,
     });
 
-    const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}`;
+    const url = `https://surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}`; // UPDATED
     let params: any = {
       page,
       items_per_page: itemsPerPage,
@@ -2232,7 +2231,7 @@ export const fetchOrderDetailsApi = async (userId: string, orderId: string) => {
   try {
     console.log('Fetching order details for:', {userId, orderId});
 
-    const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}&order_id=${orderId}`;
+    const url = `https://surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}&order_id=${orderId}`; // UPDATED
 
     const response = await axios({
       method: 'GET',
@@ -2342,7 +2341,7 @@ export const searchOrdersApi = async (
   try {
     console.log('Searching orders with:', {userId, searchTerm, page});
 
-    const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}`;
+    const url = `https://surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}`; // UPDATED
     const params = {
       search: searchTerm,
       page,
@@ -2374,7 +2373,7 @@ export const updateOrderStatusApi = async (
   try {
     console.log('Updating order status:', {userId, orderId, status});
 
-    const url = `https://dev.surf.mt/api.php?_d=NtSeOrdersApi%2F${orderId}`;
+    const url = `https://surf.mt/api.php?_d=NtSeOrdersApi%2F${orderId}`; // UPDATED
 
     const response = await axios({
       method: 'PUT',
@@ -2419,7 +2418,8 @@ export const fetchDashboardApi = async (
 
     const response = await axios({
       method: 'GET',
-      url: `https://dev.surf.mt/api/api.php?_d=NtSeDashboardApi&user_id=${userId}`,
+      // ✅ FIXED: Removed extra '/api/' - should be just one 'api.php'
+      url: `https://surf.mt/api.php?_d=NtSeDashboardApi&user_id=${userId}`,
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',
@@ -2478,7 +2478,7 @@ export const deleteAccountApi = async (
 
     const response = await axios({
       method: 'POST',
-      url: 'https://dev.surf.mt/api.php?_d=NtSeProfilesApi',
+      url: 'https://surf.mt/api.php?_d=NtSeProfilesApi', // UPDATED
       headers: {
         Authorization: API_AUTH_HEADER,
         'Content-Type': 'application/json',

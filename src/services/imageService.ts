@@ -1,7 +1,7 @@
 // Enhanced image service with product-specific deletion
-const API_BASE_URL = 'https://dev.surf.mt';
+const API_BASE_URL = 'https://surf.mt';
 const API_AUTH_HEADER =
-  'Basic YWRtaW5Ac3VyZi5tdDpOOW9aMnlXMzc3cEg1VTExNTFiY3YyZlYyNDYySTk1NA==';
+  'Basic YWRtaW5Ac3VyZi5tdDpSMlZXbjE2N1VaUFc2Y3VLNDEwMWdCMTM2UTk0UFQ2SA==';
 
 export interface ImageUploadResponse {
   result: boolean;
@@ -130,7 +130,7 @@ export const deleteProductImageFromServer = async (
     );
 
     const response = await fetch(
-      `${API_BASE_URL}/api.php?_d=NtSeProductsApi&user_id=${userId}`,
+      `${API_BASE_URL}/api.php?_d=NtSeProductsApi&user_id=${userId}`, // Uses API_BASE_URL
       {
         method: 'POST',
         headers: {
@@ -220,7 +220,7 @@ export const uploadProductImage = async (
     console.log('📤 Sending upload request...');
 
     const response = await fetch(
-      'https://dev.surf.mt/api.php?_d=NtSeFileUploaderApi',
+      'https://surf.mt/api.php?_d=NtSeFileUploaderApi', // UPDATED
       {
         method: 'POST',
         headers: {
@@ -359,19 +359,34 @@ export const extractRelativePathFromUrl = (url: string): string => {
   }
 
   try {
-    const match = url.match(/https?:\/\/dev\.surf\.mt\/(.+)$/);
+    // Specific pattern for surf.mt URLs (UPDATED)
+    // Example: https://surf.mt/images/detailed/123/image.jpg -> images/detailed/123/image.jpg
+    const surfPattern = /https?:\/\/surf\.mt\/(.+)$/; // UPDATED
+    const match = url.match(surfPattern);
+
     if (match && match[1]) {
-      return match[1].split('?')[0];
+      const relativePath = match[1].split('?')[0];
+      console.log(`✅ Extracted relative path: ${url} -> ${relativePath}`);
+      return relativePath;
     }
 
-    const fallbackMatch = url.match(/https?:\/\/[^\/]+\/(.+)$/);
-    if (fallbackMatch && fallbackMatch[1]) {
-      return fallbackMatch[1].split('?')[0];
+    // Fallback: try general pattern
+    const generalPattern = /https?:\/\/[^\/]+\/(.+)$/;
+    const generalMatch = url.match(generalPattern);
+
+    if (generalMatch && generalMatch[1]) {
+      const relativePath = generalMatch[1].split('?')[0];
+      console.log(`✅ Extracted with fallback: ${url} -> ${relativePath}`);
+      return relativePath;
     }
 
+    console.warn(
+      '⚠️ Could not extract relative path, returning original URL:',
+      url,
+    );
     return url;
   } catch (error) {
-    console.error('Error extracting relative path:', error);
+    console.error('❌ Error extracting relative path:', error);
     return url;
   }
 };

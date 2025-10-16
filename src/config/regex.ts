@@ -42,9 +42,11 @@ export const formatWithCommas = (value: string) => {
 };
 export const quoteContentExtractionRegex = /\*quotes\*(.*?)\*quotes\*/g;
 
+// ✅ UPDATED: This function is no longer needed for production
+// Production URLs should already be clean (no 'dev.' prefix)
 export const cleanUrl = (url: string): string => {
   if (!url) return '';
 
-  // Remove 'dev.' from the URL if it exists
-  return url.replace(/https:\/\/dev\./, 'https://');
+  // Production URLs are already clean, just return them
+  return url;
 };
