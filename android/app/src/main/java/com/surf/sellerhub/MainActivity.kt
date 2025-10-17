@@ -1,4 +1,4 @@
-package com.surfsellerhub
+package com.surf.sellerhub
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

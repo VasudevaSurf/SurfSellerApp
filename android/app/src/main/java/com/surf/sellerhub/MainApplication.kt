@@ -1,4 +1,4 @@
-package com.surfsellerhub
+package com.surf.sellerhub
 
 import android.app.Application
 import com.facebook.react.PackageList
