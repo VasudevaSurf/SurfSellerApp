@@ -1,4 +1,4 @@
-// Updated AddProduct.tsx with conditional steps based on edit mode
+// Updated AddProduct.tsx with HTML description cleaning
 
 import React, {useState, useEffect, useMemo} from 'react';
 import {ScrollView, View, Alert} from 'react-native';
@@ -33,8 +33,8 @@ import {
 import {useCategories} from '../../../../hooks/useCategories';
 import {showCustomToast} from '../../../../components/MainComponents/Toast/ToastComponent';
 import SuccessTickSquareIcon from '../../../../assets/icons/ToastIcons/SuccessTick';
+import {extractPlainTextForEditing} from '../../../../utils/htmlUtils';
 
-// ✅ Define steps arrays for both modes
 const ADD_PRODUCT_STEPS = [
   {id: 1, label: 'Product Info'},
   {id: 2, label: 'Upload Media'},
@@ -129,20 +129,16 @@ const AddProduct = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
 
-  // Get userId from Redux store
   const userId = useSelector(
     (state: RootState) => state.auth.userData?.user_id,
   );
 
-  // Use categories hook to get available categories
   const {categories} = useCategories();
 
-  // ✅ Dynamically select steps based on edit mode
   const STEPS = useMemo(() => {
     return editMode ? EDIT_PRODUCT_STEPS : ADD_PRODUCT_STEPS;
   }, [editMode]);
 
-  // Initialize formData with all required fields and proper defaults
   const [formData, setFormData] = useState<FormData>({
     productId: productId || '',
     productName: '',
@@ -160,7 +156,7 @@ const AddProduct = () => {
     listQtyCount: '',
     trackInventory: false,
     taxType: 'VAT',
-    tax_ids: [], // ✅ ADD THIS
+    tax_ids: [],
     brand: '',
     color: '',
     size: '',
@@ -195,6 +191,13 @@ const AddProduct = () => {
         : [];
       setOriginalImages(originalImageList);
 
+      // ✅ Clean HTML from description
+      const cleanDescription = extractPlainTextForEditing(
+        productData.description || '',
+      );
+      console.log('🧹 Original description:', productData.description);
+      console.log('✨ Cleaned description:', cleanDescription);
+
       setFormData(prevData => {
         const updatedData = {
           ...prevData,
@@ -203,7 +206,7 @@ const AddProduct = () => {
           price: productData.price || '',
           category: productData.category || '',
           subcategory: productData.subcategory || '',
-          description: productData.description || '',
+          description: cleanDescription, // ✅ Use cleaned description
           images: originalImageList,
           imageRelativePaths: Array.isArray(productData.imageRelativePaths)
             ? productData.imageRelativePaths
@@ -216,7 +219,7 @@ const AddProduct = () => {
           listQtyCount: productData.listQtyCount || '',
           trackInventory: Boolean(productData.trackInventory),
           taxType: productData.taxType || 'VAT',
-          tax_ids: productData.tax_ids || [], // ✅ ADD THIS
+          tax_ids: productData.tax_ids || [],
           brand: productData.brand || '',
           color: productData.color || '',
           size: productData.size || '',
@@ -235,6 +238,7 @@ const AddProduct = () => {
           apiResponse: productData.apiResponse,
         };
 
+        console.log('✅ Form data updated with cleaned description');
         console.log('✅ Form data updated with tax_ids:', updatedData.tax_ids);
 
         return updatedData;
@@ -244,7 +248,6 @@ const AddProduct = () => {
 
   console.log('formData on edit screen', formData);
 
-  // Update user context when userId changes
   useEffect(() => {
     if (userId) {
       setFormData(prevData => ({
@@ -425,7 +428,6 @@ const AddProduct = () => {
           />
         );
       case 4:
-        // ✅ Only render Features step in edit mode
         if (editMode) {
           return (
             <FeaturesStep

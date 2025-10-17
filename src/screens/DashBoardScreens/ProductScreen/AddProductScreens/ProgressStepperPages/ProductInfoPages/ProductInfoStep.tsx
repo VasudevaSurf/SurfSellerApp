@@ -1,4 +1,4 @@
-// Updated ProductInfoStep.tsx to handle category path
+// Updated ProductInfoStep.tsx to handle HTML descriptions
 
 import React, {useState, useEffect, useMemo} from 'react';
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
@@ -40,6 +40,7 @@ import CrossCircleIcon from '../../../../../../assets/icons/CrossIcon';
 import {useCategories} from '../../../../../../hooks/useCategories';
 import {Category, FALLBACK_CATEGORIES} from './CategoryConstants';
 import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
+import {extractPlainTextForEditing} from '../../../../../../utils/htmlUtils';
 
 interface ProductInfoStepProps {
   formData: {
@@ -48,8 +49,8 @@ interface ProductInfoStepProps {
     category: string;
     subcategory?: string;
     description: string;
-    categoryPath?: string[]; // Add category path support
-    productId?: string; // Make productId optional
+    categoryPath?: string[];
+    productId?: string;
     category_listing?: {
       id: number;
       name: string;
@@ -59,8 +60,6 @@ interface ProductInfoStepProps {
   editMode?: boolean;
 }
 
-// Recursive helper: walks the tree by names in order
-// Walks the tree based on category names
 const findCategoryIdsFromPath = (
   rootCategories: Category[],
   path: string[],
@@ -70,7 +69,7 @@ const findCategoryIdsFromPath = (
 
   for (const name of path) {
     const match = currentLevel.find(cat => cat.name === name);
-    if (!match) break; // stop if any level doesn’t exist
+    if (!match) break;
     ids.push(match.id);
     currentLevel = match.subcategories || [];
   }
@@ -79,13 +78,12 @@ const findCategoryIdsFromPath = (
 };
 
 const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
-  formData = {}, // Provide default empty object
+  formData = {},
   updateFormData,
   editMode = false,
 }) => {
   console.log('formData', formData);
 
-  // Safely access formData properties with defaults
   const safeFormData = {
     productName: formData?.productName || '',
     price: formData?.price || '',
@@ -94,8 +92,8 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
     description: formData?.description || '',
     categoryPath: formData?.categoryPath || [],
     productId: formData?.productId || '',
-    selectedCategories: formData?.selectedCategories || [], // NEW
-    ...formData, // Spread any additional properties
+    selectedCategories: formData?.selectedCategories || [],
+    ...formData,
   };
 
   console.log('safeFormData', safeFormData.categoryPath);
@@ -114,18 +112,14 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
   );
   const [initializedCategories, setInitializedCategories] = useState(false);
 
-  // Use the categories hook
   const {categories: apiCategories} = useCategories();
 
-  // Use API categories if available, otherwise fall back to static categories
   const rootCategories = useMemo(() => {
     if (apiCategories && apiCategories.length > 0) {
       return apiCategories;
     }
     return FALLBACK_CATEGORIES;
   }, [apiCategories]);
-
-  // Track whether initial load from formData is done
 
   useEffect(() => {
     if (
@@ -138,11 +132,10 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
         safeFormData.categoryPath,
       );
       setSelectedCategoryIds(ids);
-      setInitializedCategories(true); // mark initialized so we don't override later
+      setInitializedCategories(true);
     }
   }, [safeFormData?.categoryPath, rootCategories, initializedCategories]);
 
-  // Handle text editor focus
   const handleTextAreaFocus = () => {
     setIsFocused(true);
   };
@@ -151,7 +144,6 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
     setIsFocused(false);
   };
 
-  // Text format handlers
   const handleAlignmentChange = (alignment: 'left' | 'center' | 'right') => {
     setTextAlignment(alignment);
   };
@@ -165,7 +157,6 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
 
   console.log('formData in ProductInfoStep', formData);
 
-  // NEW: Handle multi-category selection from CategorySelectionScreen
   const handleCategorySelection = (
     categories: {
       id: string;
@@ -175,16 +166,13 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
   ) => {
     if (!categories || categories.length === 0) return;
 
-    // Update formData
     updateFormData({selectedCategories: categories});
 
-    // Update local selection state
     setSelectedCategoryIds(new Set(categories.map(c => c.id)));
   };
 
   console.log('selectedCategoryIds on parent', selectedCategoryIds);
 
-  // Updated navigation to category selection
   const navigateToCategorySelection = () => {
     navigate('Dashboard', {
       screen: 'Product',
@@ -192,21 +180,18 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
         screen: 'CategoryScreen',
         params: {
           onSelectCategory: handleCategorySelection,
-          initialSelectedCategories: safeFormData.selectedCategories, // pass current selected
+          initialSelectedCategories: safeFormData.selectedCategories,
           productId: safeFormData.productId,
         },
       },
     });
   };
 
-  // Updated category display text with full path support
   const getCategoryDisplayText = () => {
-    // Check if we have a category path (new format)
     if (safeFormData.categoryPath && safeFormData.categoryPath.length > 0) {
       return safeFormData.categoryPath.join(', ');
     }
 
-    // Fallback to old format for backwards compatibility
     if (!safeFormData.category) {
       return 'Select category*';
     }
@@ -216,12 +201,10 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
       : safeFormData.category;
   };
 
-  // Get placeholder text for category selection
   const getCategoryPlaceholderText = () => {
     return 'Select category*';
   };
 
-  // Check if category is selected
   const isCategorySelected = () => {
     return (
       (safeFormData.categoryPath && safeFormData.categoryPath.length > 0) ||
@@ -241,7 +224,6 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
     return editMode ? 'Update Product Description' : 'Product description';
   };
 
-  // Helper to get category info for debugging
   const getCategoryDebugInfo = () => {
     if (safeFormData.categoryPath) {
       return `Path: [${safeFormData.categoryPath.join(', ')}]`;
@@ -312,9 +294,8 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
           />
           <AnimatedTextInput
             label="Enter price*"
-            value={safeFormData.price} // ✅ Direct value, no formatting
+            value={safeFormData.price}
             onChangeText={text => {
-              // Clean input: allow only numbers and one decimal point
               const cleaned = text.replace(/[^0-9.]/g, '');
               const parts = cleaned.split('.');
               const formatted =
@@ -330,7 +311,6 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
           />
 
           <View style={styles.selectContainer}>
-            {/* Always visible select category row */}
             <TouchableOpacity
               style={[styles.inputContainer, styles.selectBtn]}
               activeOpacity={0.7}
@@ -343,12 +323,10 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               <ArrowRightIcon color={ColorPalette.GREY_TEXT_400} />
             </TouchableOpacity>
 
-            {/* Selected categories list (only when available) */}
-            {/* Selected categories list */}
             {safeFormData.selectedCategories.length > 0 &&
               safeFormData.selectedCategories.map((item, index) => (
                 <View
-                  key={item.id} // use id instead of index for stable keys
+                  key={item.id}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -359,7 +337,6 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
                     borderRadius: BorderRadius.Small,
                     marginTop: getScreenHeight(1),
                   }}>
-                  {/* Category Name */}
                   <Typography
                     text={item.name}
                     variant={TypographyVariant.PMEDIUM_REGULAR}
@@ -368,7 +345,6 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
                     }}
                   />
 
-                  {/* Remove Icon */}
                   <TouchableOpacity
                     onPress={() => {
                       const updatedCategories =
@@ -400,20 +376,6 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
                 </View>
               ))}
           </View>
-
-          {/* Debug info - remove in production */}
-          {/* {__DEV__ && isCategorySelected() && (
-            <View style={{paddingHorizontal: getScreenWidth(4), marginTop: 8}}>
-              <Typography
-                variant={TypographyVariant.LXSMALL_REGULAR}
-                text={getCategoryDebugInfo()}
-                customTextStyles={{
-                  color: ColorPalette.GREY_TEXT_200,
-                  fontSize: 10,
-                }}
-              />
-            </View>
-          )} */}
         </View>
       </View>
 
@@ -475,7 +437,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
                 <InfoIconPay
                   size={22}
                   color={ColorPalette.GREY_TEXT_400}
-                  style={undefined} // Pass original style props
+                  style={undefined}
                 />
               }
               content={
@@ -491,33 +453,18 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               placement="top"
             />
           </View>
-
-          {/* {!editMode && (
-            <Button
-              text="Generate"
-              variant={ButtonVariant.PRIMARY}
-              type={ButtonType.PRIMARY}
-              state={ButtonState.AI}
-              size={ButtonSize.SMALL}
-              onPress={() => {}}
-              withShadow
-              textVariant={TypographyVariant.LMEDIUM_MEDIUM}
-            />
-          )} */}
         </View>
 
         <View style={styles.toolbar}>
           <Badge
             text="Paragraph"
             variant={BadgeVariant.FILLED}
-            // rightIcon={ArrowDownIcon}
             onPress={e => {
               e.stopPropagation();
             }}
             textVariant={TypographyVariant.LSMALL_REGULAR}
             customContainerStyle={styles.containerStyle}
             customTextColor={ColorPalette.GREY_TEXT_400}
-            // iconSize={16}
           />
 
           <View style={styles.toolbarIcons}>
@@ -610,34 +557,6 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
           </View>
         </View>
 
-        {/* <View
-          style={[
-            styles.textAreaContainer,
-            isFocused && styles.textAreaContainerFocused,
-          ]}> */}
-        {/* <TextInput
-            label="Product Description"
-            style={[
-              styles.textArea,
-              { textAlign: textAlignment },
-              textFormat.bold && styles.boldText,
-              textFormat.italic && styles.italicText,
-              textFormat.underline && styles.underlineText,
-            ]}
-            placeholder={
-              editMode
-                ? 'Update your product description...'
-                : 'e.g. Sonic Wave: Powerful sound, deep bass, 12H playtime, Bluetooth. Perfect for any space!'
-            }
-            placeholderTextColor={ColorPalette.GREY_TEXT_00}
-            multiline={true}
-            numberOfLines={6}
-            textAlignVertical="top"
-            value={safeFormData.description}
-            onChangeText={text => updateFormData({ description: text })}
-            onFocus={handleTextAreaFocus}
-            onBlur={handleTextAreaBlur}
-          /> */}
         <AnimatedTextInput
           value={safeFormData.description}
           onChangeText={text => updateFormData({description: text})}
@@ -672,10 +591,7 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
             paddingHorizontal: 0,
             top: isFocused ? getScreenHeight(2) : getScreenHeight(-0.5),
           }}
-          // required={false}
         />
-
-        {/* </View> */}
       </View>
     </View>
   );

@@ -229,7 +229,7 @@ const GeneralTab: React.FC<GeneralTabProps> = ({
       </View>
 
       {/* Billing Address Question */}
-      <View style={styles.taxCheckContainer1}>
+      {/* <View style={styles.taxCheckContainer1}>
         <View style={{flexDirection: 'row', gap: 5}}>
           <Typography
             text="Are the store and billing addresses the same?"
@@ -248,7 +248,7 @@ const GeneralTab: React.FC<GeneralTabProps> = ({
             }}
           />
         </View>
-      </View>
+      </View> */}
     </ScrollView>
   );
 };
