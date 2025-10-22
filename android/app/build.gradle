@@ -82,8 +82,8 @@ android {
         applicationId "com.surf.sellerhub"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.0.1"
     }
     signingConfigs {
         release {
@@ -106,9 +106,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Remove the line: signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            minifyEnabled true                    // ✅ Enable ProGuard/R8
+            shrinkResources true                  // ✅ Remove unused resources
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
         }
     }
