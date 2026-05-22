@@ -5,6 +5,7 @@ import OTPVerificationScreen from '../../screens/Auth/OTPVerificationScreen/OTPV
 import PhoneNumberScreen from '../../screens/Auth/PhoneNumberScreen/PhoneNumberScreen';
 import { AuthStackParamList } from '../../types/navigation';
 import EmailSignIn from '../../screens/Auth/EmailSignInPages/EmailSignIn';
+import RegistrationScreen from '../../screens/Auth/Registration/RegistrationScreen';
 
 const Stack = createStackNavigator<AuthStackParamList>();
 
@@ -15,6 +16,7 @@ export const AuthNavigator = () => {
         headerShown: false,
       }}>
       <Stack.Screen name="EmailSignIn" component={EmailSignIn} />
+      <Stack.Screen name="Registration" component={RegistrationScreen} />
       {/* <Stack.Screen name="PhoneNumber" component={PhoneNumberScreen} /> */}
       {/* <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} /> */}
       <Stack.Screen name="AuthSuccess" component={AuthSuccessScreen} />

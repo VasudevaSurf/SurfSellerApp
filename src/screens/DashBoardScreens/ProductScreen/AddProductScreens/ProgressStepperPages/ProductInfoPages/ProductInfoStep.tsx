@@ -1,7 +1,7 @@
 // Updated ProductInfoStep.tsx to handle HTML descriptions
 
 import React, {useState, useEffect, useMemo} from 'react';
-import {Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Text, TextInput, TouchableOpacity, View, ActivityIndicator, Alert} from 'react-native';
 import ArrowDownIcon from '../../../../../../assets/icons/ArrowDownIcon';
 import ArrowRightIcon from '../../../../../../assets/icons/ArrowRightIcon';
 import InfoIcon from '../../../../../../assets/icons/InfoIcon';
@@ -13,6 +13,7 @@ import PencilUnderlineIcon from '../../../../../../assets/icons/NewProductIcons/
 import TextSymbolIcon from '../../../../../../assets/icons/NewProductIcons/TextSymbolIcon';
 import UnderlineIcon from '../../../../../../assets/icons/NewProductIcons/UnderlineIcon';
 import UnderlineTextIcon from '../../../../../../assets/icons/NewProductIcons/UnderlineTextIcon';
+import BrainIcon from '../../../../../../assets/icons/BrainIcon';
 import {Badge} from '../../../../../../components/UserComponents/Badges/Badge';
 import {BadgeVariant} from '../../../../../../components/UserComponents/Badges/Badge.types';
 import {
@@ -41,6 +42,9 @@ import {useCategories} from '../../../../../../hooks/useCategories';
 import {Category, FALLBACK_CATEGORIES} from './CategoryConstants';
 import Tooltip from '../../../../../../components/MainComponents/Tooltip/Tooltip';
 import {extractPlainTextForEditing} from '../../../../../../utils/htmlUtils';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../../../../../redux/store';
+import {generateContentApi} from '../../../../../../services/apiService';
 
 interface ProductInfoStepProps {
   formData: {
@@ -111,6 +115,11 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
     new Set(safeFormData.selectedCategories.map(c => c.id)),
   );
   const [initializedCategories, setInitializedCategories] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const userId = useSelector(
+    (state: RootState) => state.auth.userData?.user_id,
+  );
 
   const {categories: apiCategories} = useCategories();
 
@@ -252,6 +261,31 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+  };
+
+  const handleGenerateContent = async () => {
+    if (!safeFormData.productName) {
+      Alert.alert('Missing Info', 'Please enter a product name first.');
+      return;
+    }
+    if (!userId) {
+      Alert.alert('Error', 'User ID not found.');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const response = await generateContentApi(userId, safeFormData.productName);
+      if (response && response.result && response.content?.full_description) {
+        updateFormData({description: response.content.full_description});
+      } else {
+        Alert.alert('Error', response.message || 'Failed to generate content.');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'An error occurred while generating content.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -453,6 +487,31 @@ const ProductInfoStep: React.FC<ProductInfoStepProps> = ({
               placement="top"
             />
           </View>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: ColorPalette.SearchBack,
+              paddingHorizontal: getScreenWidth(2),
+              paddingVertical: getScreenHeight(0.5),
+              borderRadius: BorderRadius.XSmall,
+            }}
+            onPress={handleGenerateContent}
+            disabled={isGenerating}>
+            {isGenerating ? (
+              <ActivityIndicator size="small" color={ColorPalette.Primary} />
+            ) : (
+              <BrainIcon size={16} />
+            )}
+            <Typography
+              text={isGenerating ? 'Generating...' : 'Generate'}
+              variant={TypographyVariant.LSMALL_MEDIUM}
+              customTextStyles={{
+                color: ColorPalette.Primary,
+                marginLeft: getScreenWidth(1),
+              }}
+            />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.toolbar}>

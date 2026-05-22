@@ -152,9 +152,7 @@ const WelcomeScreen = () => {
 
   // Navigation handlers
   const handleLogin = () => navigate('Auth', { screen: 'EmailSignIn' });
-  const handleCreateNewAccount = () => {
-    Linking.openURL('https://sell.surf.mt/register');
-  };
+  const handleCreateNewAccount = () => navigate('Auth', { screen: 'Registration' });
 
   return (
     <View style={styles.mainContainer}>

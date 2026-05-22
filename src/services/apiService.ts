@@ -1,7 +1,7 @@
 import axios from 'axios';
-import {API_ENDPOINTS} from '../constants/apiEndpoints';
+import { API_ENDPOINTS } from '../constants/apiEndpoints';
 
-const API_BASE_URL = 'https://surf.mt/2.0/api';
+const API_BASE_URL = 'https://surf.mt/';
 const API_AUTH_HEADER =
   'Basic YWRtaW5Ac3VyZi5tdDpSMlZXbjE2N1VaUFc2Y3VLNDEwMWdCMTM2UTk0UFQ2SA==';
 
@@ -329,8 +329,8 @@ export const getAccountTypeLabel = (value: number | string): string => {
 
 // ✅ NEW: Helper function to get account type options
 export const getAccountTypeOptions = () => [
-  {value: ACCOUNT_TYPES.INDIVIDUAL, name: 'Individual'},
-  {value: ACCOUNT_TYPES.BUSINESS, name: 'Business'},
+  { value: ACCOUNT_TYPES.INDIVIDUAL, name: 'Individual' },
+  { value: ACCOUNT_TYPES.BUSINESS, name: 'Business' },
 ];
 
 export interface ProfileLogoField {
@@ -639,7 +639,7 @@ export const uploadCompanyLogoApi = async (
   logoType: 'theme' | 'mail' = 'theme',
 ): Promise<LogoUploadResponse> => {
   try {
-    console.log('📤 Uploading company logo:', {userId, logoType, logoUri});
+    console.log('📤 Uploading company logo:', { userId, logoType, logoUri });
 
     const formData = new FormData();
 
@@ -659,7 +659,7 @@ export const uploadCompanyLogoApi = async (
       mimeType = 'image/jpeg';
     }
 
-    console.log('📋 File details:', {fileName, mimeType, logoType});
+    console.log('📋 File details:', { fileName, mimeType, logoType });
 
     // CRITICAL: Add the file with correct format
     formData.append(`file_logotypes_image_icon[${logoType}]`, {
@@ -846,9 +846,9 @@ export const fetchNotificationsApi = async (
 export const markNotificationAsReadApi = async (
   userId: string,
   notificationId: string,
-): Promise<{result: boolean; message: string}> => {
+): Promise<{ result: boolean; message: string }> => {
   try {
-    console.log('Marking notification as read:', {userId, notificationId});
+    console.log('Marking notification as read:', { userId, notificationId });
 
     const response = await axios({
       method: 'PUT',
@@ -878,9 +878,9 @@ export const markNotificationAsReadApi = async (
 export const deleteNotificationApi = async (
   userId: string,
   notificationId: string,
-): Promise<{result: boolean; message: string}> => {
+): Promise<{ result: boolean; message: string }> => {
   try {
-    console.log('Deleting notification:', {userId, notificationId});
+    console.log('Deleting notification:', { userId, notificationId });
 
     const response = await axios({
       method: 'DELETE',
@@ -956,7 +956,7 @@ export const uploadProductImageApi = async (
   error?: string;
 }> => {
   try {
-    console.log('🚀 Uploading product image:', {fileName, params});
+    console.log('🚀 Uploading product image:', { fileName, params });
 
     const formData = new FormData();
 
@@ -1044,7 +1044,7 @@ export const createWithdrawalApi = async (
   comments?: string,
 ): Promise<WithdrawalResponse> => {
   try {
-    console.log('Creating withdrawal:', {userId, amount, comments});
+    console.log('Creating withdrawal:', { userId, amount, comments });
 
     const response = await axios({
       method: 'POST',
@@ -1081,7 +1081,7 @@ export const createWithdrawalApi = async (
 
 // Batch upload function optimized for product images
 export const uploadMultipleProductImages = async (
-  images: Array<{uri: string; fileName: string; type: string}>,
+  images: Array<{ uri: string; fileName: string; type: string }>,
   params: FileUploadParams = {},
   onProgress?: (current: number, total: number, fileName: string) => void,
 ): Promise<{
@@ -1448,8 +1448,8 @@ export const updateProfileApi = async (
     } else {
       throw new Error(
         error.response?.data?.message ||
-          error.message ||
-          'Failed to update profile',
+        error.message ||
+        'Failed to update profile',
       );
     }
   }
@@ -1610,7 +1610,7 @@ export const fetchProductDetailsApi = async (
   productId: string,
 ) => {
   try {
-    console.log('🌐 Fetching product details from API:', {userId, productId});
+    console.log('🌐 Fetching product details from API:', { userId, productId });
 
     const response = await apiClient.get(`/api.php`, {
       params: {
@@ -1693,7 +1693,7 @@ export const updateProductStatusApi = async (
   status: 'A' | 'D' | 'H' | 'X',
 ): Promise<StatusUpdateResponse> => {
   try {
-    console.log('Updating product status:', {userId, productId, status});
+    console.log('Updating product status:', { userId, productId, status });
 
     const response = await axios({
       method: 'PUT',
@@ -1784,7 +1784,7 @@ export const deleteProductApi = async (
       ? productIds.join(',')
       : productIds;
 
-    console.log('Deleting products:', {userId, productIds: productIdsString});
+    console.log('Deleting products:', { userId, productIds: productIdsString });
 
     const response = await axios({
       method: 'PUT',
@@ -1850,7 +1850,7 @@ export const fetchCategoriesApi = async (
 
     console.log('Fetching categories with params:', params);
 
-    const response = await apiClient.get(`/api.php`, {params});
+    const response = await apiClient.get(`/api.php`, { params });
 
     console.log('Categories API response:', response.data);
 
@@ -1884,8 +1884,8 @@ const transformCategoryRecursive = (category: any): CategoryData => {
     subcategories:
       category.subcategories && Array.isArray(category.subcategories)
         ? category.subcategories.map((sub: any) =>
-            transformCategoryRecursive(sub),
-          )
+          transformCategoryRecursive(sub),
+        )
         : undefined,
   };
 };
@@ -2065,7 +2065,7 @@ export const transformFormDataToApiFormat = (
   };
 
   // Collect ALL product features from formData
-  const productFeature: {[key: string]: string} = {};
+  const productFeature: { [key: string]: string } = {};
 
   Object.keys(formData).forEach(key => {
     if (key.startsWith('feature_')) {
@@ -2229,7 +2229,7 @@ export const fetchOrdersApi = async (
 
 export const fetchOrderDetailsApi = async (userId: string, orderId: string) => {
   try {
-    console.log('Fetching order details for:', {userId, orderId});
+    console.log('Fetching order details for:', { userId, orderId });
 
     const url = `https://surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}&order_id=${orderId}`; // UPDATED
 
@@ -2339,7 +2339,7 @@ export const searchOrdersApi = async (
   page: number = 1,
 ) => {
   try {
-    console.log('Searching orders with:', {userId, searchTerm, page});
+    console.log('Searching orders with:', { userId, searchTerm, page });
 
     const url = `https://surf.mt/api.php?_d=NtSeOrdersApi&user_id=${userId}`; // UPDATED
     const params = {
@@ -2371,7 +2371,7 @@ export const updateOrderStatusApi = async (
   status: string, // ✅ Accept API status code directly
 ): Promise<OrderStatusUpdateResponse> => {
   try {
-    console.log('Updating order status:', {userId, orderId, status});
+    console.log('Updating order status:', { userId, orderId, status });
 
     const url = `https://surf.mt/api.php?_d=NtSeOrdersApi%2F${orderId}`; // UPDATED
 
@@ -2510,10 +2510,28 @@ export const deleteAccountApi = async (
     } else {
       throw new Error(
         error.response?.data?.message ||
-          error.message ||
-          'Failed to delete account',
+        error.message ||
+        'Failed to delete account',
       );
     }
+  }
+};
+
+export const generateContentApi = async (userId: string, title: string) => {
+  try {
+    const url = `https://surf.mt/api/2.0/NtContentGenerationApi&user_id=${userId}&title=${encodeURIComponent(title)}`;
+    const response = await axios({
+      method: 'GET',
+      url: url,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: API_AUTH_HEADER,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('generateContentApi error:', error);
+    throw error;
   }
 };
 

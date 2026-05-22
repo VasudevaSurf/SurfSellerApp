@@ -101,7 +101,7 @@ const EmailSignIn = ({navigation}) => {
   }, [handleOpenLink, initializerData]);
 
   const handleCreateAccount = () => {
-    Linking.openURL('https://sell.surf.mt/register');
+    navigation.navigate('Registration');
   };
 
   const handleSignIn = async () => {

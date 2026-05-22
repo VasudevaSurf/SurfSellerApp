@@ -12,7 +12,9 @@ export type AuthStackParamList = {
   OTPVerification: {
     phoneNumber: string;
   };
+  Registration: undefined;
   AuthSuccess: undefined;
+  EmailSignIn: undefined;
 };
 
 export type OnboardingStackParamList = {
