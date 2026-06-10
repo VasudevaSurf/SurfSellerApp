@@ -1,11 +1,11 @@
 // src/services/geminiService.ts
 
-import {generateSystemPrompt} from '../data/lucyTrainingData';
+import { generateSystemPrompt } from '../data/lucyTrainingData';
+// @ts-ignore
+import { OPENROUTER_API_KEY, OPENROUTER_MODEL } from '@env';
 
-// ✅ CORRECT API KEY AND MODEL FOR YOUR FREE TIER
-const GEMINI_API_KEY = 'AIzaSyD-osVY0YvL9tA0cu522l2LlbYGVLKVYco';
-const GEMINI_MODEL = 'gemini-2.0-flash';
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const DEFAULT_MODEL = 'openrouter/free';
 
 export interface Message {
   id: string;
@@ -15,6 +15,17 @@ export interface Message {
   timestamp: number;
 }
 
+export interface OpenRouterResponse {
+  choices: Array<{
+    message: {
+      role: 'system' | 'user' | 'assistant';
+      content: string;
+    };
+    finish_reason?: string;
+  }>;
+}
+
+// Keep the old response interface name defined for backward compatibility (in case of dynamic imports)
 export interface GeminiResponse {
   candidates: Array<{
     content: {
@@ -23,25 +34,13 @@ export interface GeminiResponse {
       }>;
       role: string;
     };
-    finishReason?: string;
-    index?: number;
-    safetyRatings?: Array<{
-      category: string;
-      probability: string;
-    }>;
   }>;
-  promptFeedback?: {
-    safetyRatings: Array<{
-      category: string;
-      probability: string;
-    }>;
-  };
 }
 
 class GeminiService {
   private conversationHistory: Array<{
-    role: string;
-    parts: Array<{text: string}>;
+    role: 'system' | 'user' | 'assistant';
+    content: string;
   }> = [];
   private systemPrompt: string;
 
@@ -55,14 +54,12 @@ class GeminiService {
     // Initialize conversation with system prompt
     this.conversationHistory = [
       {
-        role: 'user',
-        parts: [{text: this.systemPrompt}],
+        role: 'system',
+        content: this.systemPrompt,
       },
       {
-        role: 'model',
-        parts: [
-          {
-            text: `I understand completely. I am Lucy, Surf's chatbot assistant. I'm ready to help sellers with:
+        role: 'assistant',
+        content: `I understand completely. I am Lucy, Surf's chatbot assistant. I'm ready to help sellers with:
 - Seller registration and onboarding
 - Product uploads and management
 - Payments and payouts
@@ -73,8 +70,6 @@ class GeminiService {
 I'll only provide verified information from Surf's official documentation, and I'll share relevant video tutorials when appropriate. If I can't help with something, I'll connect you with the support team at sales@surf.mt or WhatsApp +356 7965 0714.
 
 How can I assist you today? 😊`,
-          },
-        ],
       },
     ];
   }
@@ -83,68 +78,56 @@ How can I assist you today? 😊`,
     try {
       console.log('📤 Lucy processing:', userMessage);
 
+      // Get API Key and Model with fallbacks
+      const apiKey = OPENROUTER_API_KEY || (process.env as any).OPENROUTER_API_KEY;
+      const model = OPENROUTER_MODEL || (process.env as any).OPENROUTER_MODEL || DEFAULT_MODEL;
+
+      // Gracefully warn user in the chat interface if API Key is not configured
+      if (!apiKey || apiKey === 'YOUR_OPENROUTER_API_KEY' || apiKey.trim() === '') {
+        console.warn('⚠️ OpenRouter API Key is not configured. Please add OPENROUTER_API_KEY to your .env file.');
+        return "I'm sorry, my API configuration is incomplete. Please configure the `OPENROUTER_API_KEY` in the `.env` file.";
+      }
+
       // Add user message to history
       this.conversationHistory.push({
         role: 'user',
-        parts: [{text: userMessage}],
+        content: userMessage,
       });
 
-      const requestBody = {
-        contents: this.conversationHistory,
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048,
-          stopSequences: [],
-        },
-        safetySettings: [
-          {
-            category: 'HARM_CATEGORY_HARASSMENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-          },
-          {
-            category: 'HARM_CATEGORY_HATE_SPEECH',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-          },
-          {
-            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-          },
-          {
-            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-          },
-        ],
-      };
-
-      const response = await fetch(GEMINI_API_URL, {
+      const response = await fetch(OPENROUTER_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': GEMINI_API_KEY,
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://sell.surf.mt',
+          'X-Title': 'Surf Seller App',
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          model: model,
+          messages: this.conversationHistory,
+          temperature: 0.7,
+          max_tokens: 2048,
+        }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Gemini API Error:', errorText);
+        console.error('❌ OpenRouter API Error:', errorText);
         throw new Error(`API request failed: ${response.status}`);
       }
 
-      const data: GeminiResponse = await response.json();
+      const data: OpenRouterResponse = await response.json();
 
-      if (data.candidates && data.candidates.length > 0) {
-        const candidate = data.candidates[0];
+      if (data.choices && data.choices.length > 0) {
+        const choice = data.choices[0];
 
-        if (candidate.content?.parts?.[0]?.text) {
-          const assistantMessage = candidate.content.parts[0].text;
+        if (choice.message?.content) {
+          const assistantMessage = choice.message.content;
 
           // Add assistant response to history
           this.conversationHistory.push({
-            role: 'model',
-            parts: [{text: assistantMessage}],
+            role: 'assistant',
+            content: assistantMessage,
           });
 
           console.log('✅ Lucy responded successfully');
@@ -152,7 +135,7 @@ How can I assist you today? 😊`,
         }
       }
 
-      throw new Error('Invalid response from Gemini');
+      throw new Error('Invalid response from OpenRouter');
     } catch (error: any) {
       console.error('💥 Error:', error.message);
       throw error;
@@ -165,23 +148,19 @@ How can I assist you today? 😊`,
     // Reset to system prompt
     this.conversationHistory = [
       {
-        role: 'user',
-        parts: [{text: this.systemPrompt}],
+        role: 'system',
+        content: this.systemPrompt,
       },
       {
-        role: 'model',
-        parts: [
-          {
-            text: `I understand completely. I am Lucy, Surf's chatbot assistant. I'm ready to help sellers with all their questions about registration, products, payments, deliveries, and more. How can I assist you today? 😊`,
-          },
-        ],
+        role: 'assistant',
+        content: `I understand completely. I am Lucy, Surf's chatbot assistant. I'm ready to help sellers with all their questions about registration, products, payments, deliveries, and more. How can I assist you today? 😊`,
       },
     ];
   }
 
   getConversationHistory(): Array<{
-    role: string;
-    parts: Array<{text: string}>;
+    role: 'system' | 'user' | 'assistant';
+    content: string;
   }> {
     return this.conversationHistory;
   }
@@ -197,41 +176,52 @@ How can I assist you today? 😊`,
     botMessages: number;
   } {
     const userMessages =
-      this.conversationHistory.filter(msg => msg.role === 'user').length - 1; // Subtract system prompt
+      this.conversationHistory.filter(msg => msg.role === 'user').length;
 
     const botMessages =
-      this.conversationHistory.filter(msg => msg.role === 'model').length - 1; // Subtract initial response
+      this.conversationHistory.filter(msg => msg.role === 'assistant').length - 1; // Subtract initial response
 
     return {
-      totalMessages: this.conversationHistory.length - 2, // Subtract system messages
+      totalMessages: this.conversationHistory.length - 2, // Subtract system and initial response
       userMessages,
       botMessages,
     };
   }
 
   // Method to check API connectivity
-  async testConnection(): Promise<{success: boolean; message: string}> {
+  async testConnection(): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(GEMINI_API_URL, {
+      const apiKey = OPENROUTER_API_KEY || (process.env as any).OPENROUTER_API_KEY;
+      const model = OPENROUTER_MODEL || (process.env as any).OPENROUTER_MODEL || DEFAULT_MODEL;
+
+      if (!apiKey || apiKey === 'YOUR_OPENROUTER_API_KEY' || apiKey.trim() === '') {
+        return {
+          success: true, // Return true but with config instructions so frontend can test
+          message: '❌ OpenRouter API Key is not configured. Please add OPENROUTER_API_KEY to your .env file.',
+        };
+      }
+
+      const response = await fetch(OPENROUTER_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': GEMINI_API_KEY,
+          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          contents: [
+          model: model,
+          messages: [
             {
-              parts: [{text: 'Hello'}],
+              role: 'user',
+              content: 'Hello',
             },
           ],
         }),
       });
 
       if (response.ok) {
-        const data = await response.json();
         return {
           success: true,
-          message: `✅ API connection successful! Model: ${GEMINI_MODEL}`,
+          message: `✅ API connection successful! Model: ${model}`,
         };
       } else {
         const errorText = await response.text();

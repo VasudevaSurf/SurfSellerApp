@@ -82,11 +82,6 @@ export const faqData = [
               },
             ],
           },
-          {
-            type: 'link',
-            text: 'Refer to our pricing plans here',
-            url: 'https://sell.surf.mt/pricing',
-          },
         ],
       },
     ],
@@ -102,7 +97,7 @@ export const faqData = [
         content:
           'You can register by %LINK% and filling in a simple form with your business details. Once submitted, our team will review your application and get in touch for the next steps.',
         linkText: 'Clicking Here',
-        url: 'https://sell.surf.mt/register',
+        url: 'https://sell.surf.mt/',
       },
     ],
   },

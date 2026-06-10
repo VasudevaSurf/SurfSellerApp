@@ -6,6 +6,7 @@ import {
     TouchableOpacity,
     Linking,
     StyleSheet,
+    Text,
 } from 'react-native';
 import ArrowLeft from '../../../../../assets/icons/ArrowLeft';
 import ChatIcon from '../../../../../assets/icons/ChatIcon';
@@ -18,6 +19,7 @@ import { goBack, navigate } from '../../../../../navigation/utils/navigationRef'
 import { BadgeType, BadgeVariant } from '../../../../../components/UserComponents/Badges/Badge.types';
 import { Spacing } from '../../../../../config/globalStyles';
 import { faqData } from './FAQScreen';
+import { textBaseStyles } from '../../../../../components/UserComponents/Typography/Typography.styles';
 
 // A helper to find the specific FAQ data by ID
 export const getFaqAnswerById = (id) => faqData.find((item) => item.id === id);
@@ -96,11 +98,19 @@ const FAQAnswer = ({ route }) => {
                 const parts = section.content.split('%LINK%');
                 return (
                     <View key={index}>
-                        <Typography variant={TypographyVariant.PSMALL_REGULAR} customTextStyles={styles.sectionContent}>
-                            <Typography text={parts[0]} variant={TypographyVariant.PSMALL_REGULAR} />
-                            <Typography text={section.linkText} onPress={() => Linking.openURL(section.url)} customTextStyles={styles.inlineLinkText} variant={TypographyVariant.PSMALL_REGULAR} />
-                            <Typography text={parts[1]} variant={TypographyVariant.PSMALL_REGULAR} />
-                        </Typography>
+                        <Text style={[
+                            textBaseStyles[TypographyVariant.PSMALL_REGULAR],
+                            textBaseStyles.fontColor,
+                            styles.sectionContent,
+                        ]}>
+                            {parts[0]}
+                            <Text
+                                onPress={() => Linking.openURL(section.url)}
+                                style={styles.inlineLinkText}>
+                                {section.linkText}
+                            </Text>
+                            {parts[1]}
+                        </Text>
                     </View>
                 );
             case 'group':
@@ -141,7 +151,8 @@ const FAQAnswer = ({ route }) => {
                     <View key={index}>
                         {renderContent(section, index)}
                     </View>
-                ))}            </View>
+                ))}
+            </View>
         );
     };
 
